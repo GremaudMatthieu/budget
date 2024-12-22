@@ -12,7 +12,7 @@ export default function Dashboard() {
     const router = useRouter()
     const { user, loading: userLoading } = useUser()
     const { t } = useTranslation()
-    const { envelopesData, loading: envelopesLoading, error } = useEnvelopes()
+    const { envelopesData, loading: envelopesLoading, errorEnvelope } = useEnvelopes()
 
     useEffect(() => {
         if (!userLoading && !user) {
@@ -27,10 +27,6 @@ export default function Dashboard() {
     }
 
     if (!user) return null
-
-    if (error) {
-        return <div className="text-center text-red-500 mt-8">{error}</div>
-    }
 
     if (!envelopesData || envelopesData.envelopes.length === 0) {
         return (

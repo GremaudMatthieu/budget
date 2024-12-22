@@ -15,6 +15,5 @@ export interface EnvelopeState {
     totalItems: number
   } | null
   loading: boolean
-  error: string | null
+  errorEnvelope: string | null
 }
-

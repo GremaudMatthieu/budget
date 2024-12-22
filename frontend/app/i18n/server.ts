@@ -8,7 +8,6 @@ export function getTranslations(lang: string = 'en') {
             for (const k of keys) {
                 value = value[k]
                 if (value === undefined) {
-                    console.warn(`Translation key not found: ${key}`)
                     return key
                 }
             }

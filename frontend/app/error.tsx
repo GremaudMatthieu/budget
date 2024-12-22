@@ -9,9 +9,6 @@ export default function Error({
     error: Error
     reset: () => void
 }) {
-    useEffect(() => {
-        console.error(error)
-    }, [error])
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">

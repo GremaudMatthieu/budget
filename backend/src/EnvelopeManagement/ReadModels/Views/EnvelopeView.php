@@ -190,7 +190,6 @@ final class EnvelopeView implements EnvelopeViewInterface, \JsonSerializable
             'currentBudget' => $this->currentBudget,
             'targetBudget' => $this->targetBudget,
             'name' => $this->name,
-            'userUuid' => $this->userUuid,
         ];
     }
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useUser } from '../domain/user/userHooks'
@@ -8,10 +8,12 @@ import { useTranslation } from '../hooks/useTranslation'
 import { Home, User, Menu, X, PieChart, Mail } from 'lucide-react'
 import { useAppContext } from '../providers'
 import { LanguageSelector } from './LanguageSelector'
+import {useEnvelopes} from "../domain/envelope/envelopeHooks";
+import ErrorModal from "./ErrorModal";
 
 export default function Header() {
     const pathname = usePathname()
-    const { user, signOut, isAuthenticated, loading } = useUser()
+
     const { t } = useTranslation()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const { state: { isAuthenticated: appIsAuthenticated, user: appUser, loading: appLoading } } = useAppContext()
@@ -38,7 +40,6 @@ export default function Header() {
             {children}
         </Link>
     )
-
     return (
         <header className="bg-white shadow-md">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

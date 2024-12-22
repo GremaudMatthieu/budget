@@ -14,11 +14,11 @@ export function useEnvelopes() {
   const [envelopeState, setEnvelopeState] = useState<EnvelopeState>({
     envelopesData: state.envelopesData,
     loading: false,
-    error: null,
+    errorEnvelope: null,
   })
 
   const setLoading = (loading: boolean) => setEnvelopeState(prev => ({ ...prev, loading }))
-  const setError = (error: string | null) => setEnvelopeState(prev => ({ ...prev, error }))
+  const setError = (errorEnvelope: string | null) => setEnvelopeState(prev => ({ ...prev, errorEnvelope }))
 
   const updateEnvelopeState = useCallback((updatedEnvelope: Envelope) => {
     setEnvelopeState(prev => ({
@@ -38,7 +38,6 @@ export function useEnvelopes() {
       const updatedEnvelopes = await api.envelopeQueries.listEnvelopes()
       setEnvelopeState(prev => ({ ...prev, envelopesData: updatedEnvelopes, loading: false }))
     } catch (err) {
-      console.error('Error refreshing envelopes:', err)
       setError('Failed to refresh envelopes')
       setLoading(false)
     }
@@ -60,7 +59,6 @@ export function useEnvelopes() {
           return
         }
       } catch (err) {
-        console.error(`Error polling for ${action}:`, err)
       }
       retries++
     }

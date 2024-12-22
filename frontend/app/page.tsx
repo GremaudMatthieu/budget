@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, DollarSign, PieChart, TrendingUp } from 'lucide-react'
+import { ArrowRight, DollarSign, PieChart, TrendingUp, BarChart2, Calendar } from 'lucide-react'
 import { useTranslation } from './hooks/useTranslation'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -46,12 +46,12 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="grid gap-6 mb-8 md:mb-16 md:grid-cols-2">
+          <section className="grid gap-6 mb-8 md:mb-16 md:grid-cols-3">
             <div className="neomorphic p-4 md:p-6 rounded-lg text-center">
               <DollarSign className="mx-auto h-10 w-10 md:h-12 md:w-12 text-primary mb-3 md:mb-4" />
-              <h2 className="text-lg md:text-xl font-semibold mb-2">{t('home.easyBudgeting')}</h2>
+              <h2 className="text-lg md:text-xl font-semibold mb-2">{t('home.smartBudgeting')}</h2>
               <p className="text-sm md:text-base text-muted-foreground">
-                {t('home.easyBudgetingDesc')}
+                {t('home.smartBudgetingDesc')}
               </p>
             </div>
             <div className="neomorphic p-4 md:p-6 rounded-lg text-center">
@@ -59,6 +59,13 @@ export default function Home() {
               <h2 className="text-lg md:text-xl font-semibold mb-2">{t('home.visualTracking')}</h2>
               <p className="text-sm md:text-base text-muted-foreground">
                 {t('home.visualTrackingDesc')}
+              </p>
+            </div>
+            <div className="neomorphic p-4 md:p-6 rounded-lg text-center">
+              <BarChart2 className="mx-auto h-10 w-10 md:h-12 md:w-12 text-primary mb-3 md:mb-4" />
+              <h2 className="text-lg md:text-xl font-semibold mb-2">{t('home.advancedAnalytics')}</h2>
+              <p className="text-sm md:text-base text-muted-foreground">
+                {t('home.advancedAnalyticsDesc')}
               </p>
             </div>
           </section>
@@ -70,27 +77,27 @@ export default function Home() {
                 <div className="neomorphic-circle w-12 h-12 md:w-16 md:h-16 flex items-center justify-center text-xl md:text-2xl font-bold mx-auto mb-3 md:mb-4">
                   1
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold mb-2">{t('home.createEnvelopes')}</h3>
+                <h3 className="text-lg md:text-xl font-semibold mb-2">{t('home.createBudget')}</h3>
                 <p className="text-sm md:text-base text-muted-foreground">
-                  {t('home.createEnvelopesDesc')}
+                  {t('home.createBudgetDesc')}
                 </p>
               </div>
               <div>
                 <div className="neomorphic-circle w-12 h-12 md:w-16 md:h-16 flex items-center justify-center text-xl md:text-2xl font-bold mx-auto mb-3 md:mb-4">
                   2
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold mb-2">{t('home.allocateFunds')}</h3>
+                <h3 className="text-lg md:text-xl font-semibold mb-2">{t('home.trackExpenses')}</h3>
                 <p className="text-sm md:text-base text-muted-foreground">
-                  {t('home.allocateFundsDesc')}
+                  {t('home.trackExpensesDesc')}
                 </p>
               </div>
               <div>
                 <div className="neomorphic-circle w-12 h-12 md:w-16 md:h-16 flex items-center justify-center text-xl md:text-2xl font-bold mx-auto mb-3 md:mb-4">
                   3
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold mb-2">{t('home.trackSpending')}</h3>
+                <h3 className="text-lg md:text-xl font-semibold mb-2">{t('home.analyzeProgress')}</h3>
                 <p className="text-sm md:text-base text-muted-foreground">
-                  {t('home.trackSpendingDesc')}
+                  {t('home.analyzeProgressDesc')}
                 </p>
               </div>
             </div>
@@ -102,26 +109,26 @@ export default function Home() {
               <div className="flex flex-col items-center mb-6 md:mb-8 md:flex-row">
                 <TrendingUp className="h-12 w-12 md:h-16 md:w-16 text-primary mb-3 md:mb-0 md:mr-6" />
                 <div>
-                  <h3 className="text-xl md:text-2xl font-semibold mb-2 text-center md:text-left">{t('home.digitalEnvelopes')}</h3>
+                  <h3 className="text-xl md:text-2xl font-semibold mb-2 text-center md:text-left">{t('home.comprehensiveBudgeting')}</h3>
                   <p className="text-sm md:text-base text-muted-foreground">
-                    {t('home.digitalEnvelopesDesc')}
+                    {t('home.comprehensiveBudgetingDesc')}
                   </p>
                   <p className="text-sm md:text-base text-muted-foreground mt-2 md:mt-4">
-                    {t('home.noBankConnection')}
+                    {t('home.futureFeaturesHint')}
                   </p>
                 </div>
               </div>
               <div className="grid gap-4 md:gap-6 md:grid-cols-2">
                 <div className="neomorphic-inset p-3 md:p-4 rounded-lg">
-                  <h4 className="text-base md:text-lg font-semibold mb-2">{t('home.convenientAccessible')}</h4>
+                  <h4 className="text-base md:text-lg font-semibold mb-2">{t('home.flexibleCustomization')}</h4>
                   <p className="text-sm md:text-base text-muted-foreground">
-                    {t('home.convenientAccessibleDesc')}
+                    {t('home.flexibleCustomizationDesc')}
                   </p>
                 </div>
                 <div className="neomorphic-inset p-3 md:p-4 rounded-lg">
-                  <h4 className="text-base md:text-lg font-semibold mb-2">{t('home.betterOverview')}</h4>
+                  <h4 className="text-base md:text-lg font-semibold mb-2">{t('home.insightfulReporting')}</h4>
                   <p className="text-sm md:text-base text-muted-foreground">
-                    {t('home.betterOverviewDesc')}
+                    {t('home.insightfulReportingDesc')}
                   </p>
                 </div>
               </div>

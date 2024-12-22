@@ -1,7 +1,9 @@
 export interface User {
   id: string
   email: string
-  name: string
+  firstname: string
+  lastname: string
+  pending?: boolean
 }
 
 export interface UserState {
@@ -9,4 +11,3 @@ export interface UserState {
   loading: boolean
   error: string | null
 }
-

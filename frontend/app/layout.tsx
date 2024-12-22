@@ -7,8 +7,8 @@ import { LanguageProvider } from './contexts/LanguageContext'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-    title: 'Budget Envelope App',
-    description: 'Manage your budget with envelopes',
+    title: 'GoGoBudgeto App',
+    description: 'Manage your budget',
 }
 
 export default function RootLayout({
