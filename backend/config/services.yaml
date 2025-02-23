@@ -27,6 +27,11 @@ services:
         resource: '../src/Gateway/BudgetEnvelope/Presentation/HTTP/Controllers'
         tags: [ 'controller.service_arguments' ]
 
+    App\Gateway\BudgetPlan\Presentation\HTTP\Controllers\:
+        resource: '../src/Gateway/BudgetPlan/Presentation/HTTP/Controllers'
+        tags: [ 'controller.service_arguments' ]
+
+    # BUDGET ENVELOPE CONTEXT
     App\BudgetEnvelopeContext\Application\Handlers\CommandHandlers\AddABudgetEnvelopeCommandHandler:
         tags: [ 'messenger.message_handler' ]
 
@@ -65,6 +70,27 @@ services:
 
     App\BudgetEnvelopeContext\ReadModels\Projections\BudgetEnvelopeLedgerEntryProjection:
         tags: [ 'messenger.message_handler' ]
+
+    # BUDGET PLAN CONTEXT
+
+    App\BudgetPlanContext\Application\Handlers\CommandHandlers\GenerateABudgetPlanCommandHandler:
+        tags: [ 'messenger.message_handler' ]
+
+    App\BudgetPlanContext\ReadModels\Projections\BudgetPlanIncomeEntryProjection:
+        tags: [ 'messenger.message_handler' ]
+
+    App\BudgetPlanContext\ReadModels\Projections\BudgetPlanNeedEntryProjection:
+        tags: [ 'messenger.message_handler' ]
+
+    App\BudgetPlanContext\ReadModels\Projections\BudgetPlanProjection:
+        tags: [ 'messenger.message_handler' ]
+
+    App\BudgetPlanContext\ReadModels\Projections\BudgetPlanSavingEntryProjection:
+        tags: [ 'messenger.message_handler' ]
+
+    App\BudgetPlanContext\ReadModels\Projections\BudgetPlanWantEntryProjection:
+        tags: [ 'messenger.message_handler' ]
+    # USER CONTEXT
 
     App\UserContext\Application\Handlers\CommandHandlers\SignUpAUserCommandHandler:
         tags: [ 'messenger.message_handler' ]

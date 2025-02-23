@@ -30,6 +30,7 @@ framework:
 
         routing:
             # Domain Events
+            # BUDGET ENVELOPE CONTEXT
             'App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent': domain_events
             'App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent': domain_events
             'App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent': domain_events
@@ -38,6 +39,9 @@ framework:
             'App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeReplayedDomainEvent': domain_events
             'App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRewoundDomainEvent': domain_events
             'App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedDomainEvent': domain_events
+            # BUDGET PLAN CONTEXT
+            'App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedDomainEvent': domain_events
+            # USER CONTEXT
             'App\UserContext\Domain\Events\UserDeletedDomainEvent': domain_events
             'App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent': domain_events
             'App\UserContext\Domain\Events\UserLastnameChangedDomainEvent': domain_events
@@ -49,6 +53,7 @@ framework:
             'App\UserContext\Domain\Events\UserReplayedDomainEvent': domain_events
             'App\UserContext\Domain\Events\UserRewoundDomainEvent': domain_events
             # Notification Events
+            # BUDGET ENVELOPE CONTEXT
             'App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeAddedNotificationEvent': notification_events
             'App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeCreditedNotificationEvent': notification_events
             'App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeDebitedNotificationEvent': notification_events
@@ -62,6 +67,13 @@ framework:
             'App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeLedgerCreditEntryAddedNotificationEvent': notification_events
             'App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeLedgerEntriesRewoundNotificationEvent': notification_events
             'App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeLedgerEntriesReplayedNotificationEvent': notification_events
+            # BUDGET PLAN CONTEXT
+            'App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanGeneratedNotificationEvent': notification_events
+            'App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanIncomeGeneratedNotificationEvent': notification_events
+            'App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanWantGeneratedNotificationEvent': notification_events
+            'App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanNeedGeneratedNotificationEvent': notification_events
+            'App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanSavingGeneratedNotificationEvent': notification_events
+            # USER CONTEXT
             'App\UserContext\Infrastructure\Events\Notifications\UserDeletedNotificationEvent': notification_events
             'App\UserContext\Infrastructure\Events\Notifications\UserFirstnameChangedNotificationEvent': notification_events
             'App\UserContext\Infrastructure\Events\Notifications\UserLastnameChangedNotificationEvent': notification_events

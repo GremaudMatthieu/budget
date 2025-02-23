@@ -28,6 +28,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/BudgetEnvelopeContext/ReadModels/Views'
                 prefix: 'App\BudgetEnvelopeContext\ReadModels\Views'
                 alias: EnvelopeView
+            BudgetPlanView:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/BudgetPlanContext/ReadModels/Views'
+                prefix: 'App\BudgetPlanContext\ReadModels\Views'
+                alias: BudgetPlanView
             EventStore:
                 type: attribute
                 is_bundle: false

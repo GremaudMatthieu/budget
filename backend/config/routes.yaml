@@ -4,6 +4,12 @@ controllers_rest_envelope:
         namespace: App\Gateway\BudgetEnvelope\Presentation\HTTP\Controllers
     type: attribute
 
+controllers_rest_budget_plan:
+    resource:
+        path: ../src/Gateway/BudgetPlan/Presentation/HTTP/Controllers/
+        namespace: App\Gateway\BudgetPlan\Presentation\HTTP\Controllers
+    type: attribute
+
 controllers_rest_user:
     resource:
         path: ../src/Gateway/User/Presentation/HTTP/Controllers/

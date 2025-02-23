@@ -35,7 +35,7 @@ final class BudgetEnvelopeLedgerEntryView implements BudgetEnvelopeLedgerEntryVi
     #[ORM\Column(name: 'entry_type', type: 'string', length: 6)]
     private(set) string $entryType;
 
-    #[ORM\Column(name: 'description', type: 'string', length: 35, options: ['default' => ''])]
+    #[ORM\Column(name: 'description', type: 'string', length: 13, options: ['default' => ''])]
     private(set) string $description;
 
     #[ORM\Column(name: 'user_uuid', type: 'string', length: 36)]

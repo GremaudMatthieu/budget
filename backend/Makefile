@@ -42,7 +42,7 @@ phpunit-coverage:
 	docker exec -it my_symfony_app ./vendor/bin/phpunit --coverage-html coverage
 
 phpstan:
-	docker exec -it my_symfony_app ./vendor/bin/phpstan analyse --level=max --generate-baseline --memory-limit=1G
+	docker exec -it my_symfony_app ./vendor/bin/phpstan analyse --level=max --generate-baseline --memory-limit=1G -vv
 
 rector:
 	docker exec -it my_symfony_app ./vendor/bin/rector process
@@ -50,4 +50,4 @@ rector:
 cs-fixer:
 	docker exec -it my_symfony_app ./vendor/bin/php-cs-fixer fix
 
-# export PHP_CS_FIXER_IGNORE_ENV=1 && ./vendor/bin/php-cs-fixer fix
+# docker exec -it my_symfony_app /bin/sh -c 'export PHP_CS_FIXER_IGNORE_ENV=1 && ./vendor/bin/php-cs-fixer fix'
