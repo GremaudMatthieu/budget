@@ -20,9 +20,7 @@ interface BudgetPlanIncomeEntryViewInterface
         \DateTimeImmutable $occurredOn,
     ): self;
 
-    public static function fromBudgetPlanIncomeAddedDomainEvent(
-        BudgetPlanIncomeAddedDomainEvent $budgetPlanIncomeAddedDomainEvent,
-    ): self;
+    public static function fromBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): self;
 
     public static function fromRepository(array $budgetPlanIncomeEntry): self;
 

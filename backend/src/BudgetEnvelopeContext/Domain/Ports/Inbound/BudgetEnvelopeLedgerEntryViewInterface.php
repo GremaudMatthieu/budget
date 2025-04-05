@@ -13,11 +13,7 @@ interface BudgetEnvelopeLedgerEntryViewInterface
 
     public function jsonSerialize(): array;
 
-    public static function fromBudgetEnvelopeCreditedDomainEvent(
-        BudgetEnvelopeCreditedDomainEvent $budgetEnvelopeCreditedDomainEvent,
-    ): self;
+    public static function fromBudgetEnvelopeCreditedDomainEvent(BudgetEnvelopeCreditedDomainEvent $event): self;
 
-    public static function fromBudgetEnvelopeDebitedDomainEvent(
-        BudgetEnvelopeDebitedDomainEvent $budgetEnvelopeDebitedDomainEvent,
-    ): self;
+    public static function fromBudgetEnvelopeDebitedDomainEvent(BudgetEnvelopeDebitedDomainEvent $event): self;
 }

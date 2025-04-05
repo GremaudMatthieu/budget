@@ -61,259 +61,236 @@ final readonly class BudgetPlanProjection
         };
     }
 
-    private function handleBudgetPlanGeneratedDomainEvent(
-        BudgetPlanGeneratedDomainEvent $budgetPlanGeneratedDomainEvent,
-    ): void {
-        $this->budgetPlanViewRepository->save(
-            BudgetPlanView::fromBudgetPlanGeneratedDomainEvent($budgetPlanGeneratedDomainEvent),
-        );
-        try {
-            $this->publisher->publishNotificationEvents(
-                [BudgetPlanGeneratedNotificationEvent::fromDomainEvent($budgetPlanGeneratedDomainEvent)],
-            );
-        } catch (\Exception $e) {
-        }
-    }
-
-    private function handleBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent,
-    ): void {
-        $this->budgetPlanViewRepository->save(
-            BudgetPlanView::fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-                $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent,
-            ),
-        );
+    private function handleBudgetPlanGeneratedDomainEvent(BudgetPlanGeneratedDomainEvent $event): void
+    {
+        $this->budgetPlanViewRepository->save(BudgetPlanView::fromBudgetPlanGeneratedDomainEvent($event));
         try {
             $this->publisher->publishNotificationEvents(
                 [
-                    BudgetPlanGeneratedWithOneThatAlreadyExistsNotificationEvent::fromDomainEvent(
-                        $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent,
-                    ),
+                    BudgetPlanGeneratedNotificationEvent::fromDomainEvent($event),
                 ],
             );
         } catch (\Exception $e) {
         }
     }
 
-    private function handleBudgetPlanRemovedDomainEvent(
-        BudgetPlanRemovedDomainEvent $budgetPlanRemovedDomainEvent,
+    private function handleBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
+        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent $event,
     ): void {
-        $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanRemovedDomainEvent->aggregateId, 'is_deleted' => false],
+        $this->budgetPlanViewRepository->save(
+            BudgetPlanView::fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent($event),
         );
-
-        if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
-            return;
-        }
-
-        $budgetPlanView->fromEvent($budgetPlanRemovedDomainEvent);
-        $this->budgetPlanViewRepository->save($budgetPlanView);
         try {
             $this->publisher->publishNotificationEvents(
-                [BudgetPlanRemovedNotificationEvent::fromDomainEvent($budgetPlanRemovedDomainEvent)],
+                [
+                    BudgetPlanGeneratedWithOneThatAlreadyExistsNotificationEvent::fromDomainEvent($event),
+                ],
             );
         } catch (\Exception $e) {
         }
     }
 
-    private function handleBudgetPlanCurrencyChangedDomainEvent(
-        BudgetPlanCurrencyChangedDomainEvent $budgetPlanCurrencyChangedDomainEvent,
-    ): void {
+    private function handleBudgetPlanRemovedDomainEvent(BudgetPlanRemovedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanCurrencyChangedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanCurrencyChangedDomainEvent);
+        $budgetPlanView->fromEvent($event);
+        $this->budgetPlanViewRepository->save($budgetPlanView);
+        try {
+            $this->publisher->publishNotificationEvents([BudgetPlanRemovedNotificationEvent::fromDomainEvent($event)]);
+        } catch (\Exception $e) {
+        }
+    }
+
+    private function handleBudgetPlanCurrencyChangedDomainEvent(BudgetPlanCurrencyChangedDomainEvent $event): void
+    {
+        $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
+        );
+
+        if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
+            return;
+        }
+
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
         try {
             $this->publisher->publishNotificationEvents(
-                [BudgetPlanCurrencyChangedNotificationEvent::fromDomainEvent($budgetPlanCurrencyChangedDomainEvent)],
+                [BudgetPlanCurrencyChangedNotificationEvent::fromDomainEvent($event)],
             );
         } catch (\Exception $e) {
         }
     }
 
-    private function handleBudgetPlanIncomeAddedDomainEvent(
-        BudgetPlanIncomeAddedDomainEvent $budgetPlanIncomeAddedDomainEvent,
-    ): void {
+    private function handleBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): void {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanIncomeAddedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanIncomeAddedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanSavingAddedDomainEvent(
-        BudgetPlanSavingAddedDomainEvent $budgetPlanSavingAddedDomainEvent,
-    ): void {
+    private function handleBudgetPlanSavingAddedDomainEvent(BudgetPlanSavingAddedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanSavingAddedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanSavingAddedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanNeedAddedDomainEvent(
-        BudgetPlanNeedAddedDomainEvent $budgetPlanNeedAddedDomainEvent,
-    ): void {
+    private function handleBudgetPlanNeedAddedDomainEvent(BudgetPlanNeedAddedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanNeedAddedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanNeedAddedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanWantAddedDomainEvent(
-        BudgetPlanWantAddedDomainEvent $budgetPlanWantAddedDomainEvent,
-    ): void {
+    private function handleBudgetPlanWantAddedDomainEvent(BudgetPlanWantAddedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanWantAddedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanWantAddedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanIncomeAdjustedDomainEvent(
-        BudgetPlanIncomeAdjustedDomainEvent $budgetPlanIncomeAdjustedDomainEvent,
-    ): void {
+    private function handleBudgetPlanIncomeAdjustedDomainEvent(BudgetPlanIncomeAdjustedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanIncomeAdjustedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanIncomeAdjustedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanNeedAdjustedDomainEvent(
-        BudgetPlanNeedAdjustedDomainEvent $budgetPlanNeedAdjustedDomainEvent,
-    ): void {
+    private function handleBudgetPlanNeedAdjustedDomainEvent(BudgetPlanNeedAdjustedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanNeedAdjustedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanNeedAdjustedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanSavingAdjustedDomainEvent(
-        BudgetPlanSavingAdjustedDomainEvent $budgetPlanSavingAdjustedDomainEvent,
-    ): void {
+    private function handleBudgetPlanSavingAdjustedDomainEvent(BudgetPlanSavingAdjustedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanSavingAdjustedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanSavingAdjustedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanWantAdjustedDomainEvent(
-        BudgetPlanWantAdjustedDomainEvent $budgetPlanWantAdjustedDomainEvent,
-    ): void {
+    private function handleBudgetPlanWantAdjustedDomainEvent(BudgetPlanWantAdjustedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanWantAdjustedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanWantAdjustedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanIncomeRemovedDomainEvent(
-        BudgetPlanIncomeRemovedDomainEvent $budgetPlanIncomeRemovedDomainEvent,
-    ): void {
+    private function handleBudgetPlanIncomeRemovedDomainEvent(BudgetPlanIncomeRemovedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanIncomeRemovedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanIncomeRemovedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanWantRemovedDomainEvent(
-        BudgetPlanWantRemovedDomainEvent $budgetPlanWantRemovedDomainEvent,
-    ): void {
+    private function handleBudgetPlanWantRemovedDomainEvent(BudgetPlanWantRemovedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanWantRemovedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanWantRemovedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanNeedRemovedDomainEvent(
-        BudgetPlanNeedRemovedDomainEvent $budgetPlanNeedRemovedDomainEvent,
-    ): void {
+    private function handleBudgetPlanNeedRemovedDomainEvent(BudgetPlanNeedRemovedDomainEvent $event): void {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanNeedRemovedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanNeedRemovedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanSavingRemovedDomainEvent(
-        BudgetPlanSavingRemovedDomainEvent $budgetPlanSavingRemovedDomainEvent,
-    ): void {
+    private function handleBudgetPlanSavingRemovedDomainEvent(BudgetPlanSavingRemovedDomainEvent $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
-            ['uuid' => $budgetPlanSavingRemovedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetPlanView instanceof BudgetPlanViewInterface) {
             return;
         }
 
-        $budgetPlanView->fromEvent($budgetPlanSavingRemovedDomainEvent);
+        $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 }

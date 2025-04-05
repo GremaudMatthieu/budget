@@ -50,7 +50,7 @@ final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
             throw new BudgetEnvelopeNameAlreadyExistsForUserException();
         }
 
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetEnvelopeNameRegisteredDomainEvent(
                 $this->budgetEnvelopeNameRegistryId,
                 (string) $userId,
@@ -65,7 +65,7 @@ final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
         BudgetEnvelopeUserId $userId,
         BudgetEnvelopeId $envelopeId,
     ): void {
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetEnvelopeNameReleasedDomainEvent(
                 $this->budgetEnvelopeNameRegistryId,
                 (string) $userId,

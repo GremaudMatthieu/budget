@@ -15,16 +15,16 @@ final readonly class ListBudgetEnvelopesQueryHandler
     ) {
     }
 
-    public function __invoke(ListBudgetEnvelopesQuery $listBudgetEnvelopesQuery): BudgetEnvelopesPaginatedInterface
+    public function __invoke(ListBudgetEnvelopesQuery $query): BudgetEnvelopesPaginatedInterface
     {
         return $this->budgetEnvelopesRepository->findBy(
             [
-                'user_uuid' => (string) $listBudgetEnvelopesQuery->getBudgetEnvelopeUserId(),
+                'user_uuid' => (string) $query->getBudgetEnvelopeUserId(),
                 'is_deleted' => false,
             ],
-            $listBudgetEnvelopesQuery->getOrderBy(),
-            $listBudgetEnvelopesQuery->getLimit(),
-            $listBudgetEnvelopesQuery->getOffset(),
+            $query->getOrderBy(),
+            $query->getLimit(),
+            $query->getOffset(),
         );
     }
 }

@@ -11,7 +11,7 @@ interface UserViewInterface
 {
     public static function fromRepository(array $user): self;
 
-    public static function fromUserSignedUpDomainEvent(UserSignedUpDomainEvent $userSignedUpDomainEvent): self;
+    public static function fromUserSignedUpDomainEvent(UserSignedUpDomainEvent $event): self;
 
     public function fromEvents(\Generator $events): void;
 

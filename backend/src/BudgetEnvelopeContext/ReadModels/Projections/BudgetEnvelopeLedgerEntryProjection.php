@@ -41,49 +41,42 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
         };
     }
 
-    private function handleBudgetEnvelopeCreditedDomainEvent(
-        BudgetEnvelopeCreditedDomainEvent $budgetEnvelopeCreditedDomainEvent,
-    ): void {
+    private function handleBudgetEnvelopeCreditedDomainEvent(BudgetEnvelopeCreditedDomainEvent $event): void
+    {
         $this->budgetEnvelopeLedgerEntryViewRepository->save(
-            BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeCreditedDomainEvent(
-                $budgetEnvelopeCreditedDomainEvent,
-            ),
+            BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeCreditedDomainEvent($event),
         );
         try {
             $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeLedgerCreditEntryAddedNotificationEvent::fromDomainEvent($budgetEnvelopeCreditedDomainEvent),
+                BudgetEnvelopeLedgerCreditEntryAddedNotificationEvent::fromDomainEvent($event),
             ]);
         } catch (\Exception) {
         }
     }
 
-    private function handleBudgetEnvelopeDebitedDomainEvent(
-        BudgetEnvelopeDebitedDomainEvent $budgetEnvelopeDebitedDomainEvent,
-    ): void {
+    private function handleBudgetEnvelopeDebitedDomainEvent(BudgetEnvelopeDebitedDomainEvent $event): void
+    {
         $this->budgetEnvelopeLedgerEntryViewRepository->save(
-            BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeDebitedDomainEvent(
-                $budgetEnvelopeDebitedDomainEvent,
-            ),
+            BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeDebitedDomainEvent($event),
         );
         try {
             $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeLedgerDebitEntryAddedNotificationEvent::fromDomainEvent($budgetEnvelopeDebitedDomainEvent),
+                BudgetEnvelopeLedgerDebitEntryAddedNotificationEvent::fromDomainEvent($event),
             ]);
         } catch (\Exception) {
         }
     }
 
-    private function handleBudgetEnvelopeRewoundDomainEvent(
-        BudgetEnvelopeRewoundDomainEvent $budgetEnvelopeRewoundDomainEvent,
-    ): void {
-        $this->budgetEnvelopeLedgerEntryViewRepository->delete($budgetEnvelopeRewoundDomainEvent->aggregateId);
+    private function handleBudgetEnvelopeRewoundDomainEvent(BudgetEnvelopeRewoundDomainEvent $event): void
+    {
+        $this->budgetEnvelopeLedgerEntryViewRepository->delete($event->aggregateId);
         $budgetEnvelopeEvents = $this->eventSourcedRepository->getByDomainEvents(
-            $budgetEnvelopeRewoundDomainEvent->aggregateId,
+            $event->aggregateId,
             [BudgetEnvelopeCreditedDomainEvent::class, BudgetEnvelopeDebitedDomainEvent::class],
-            UtcClock::fromStringToImmutable($budgetEnvelopeRewoundDomainEvent->desiredDateTime->format(\DateTimeInterface::ATOM)),
+            UtcClock::fromStringToImmutable($event->desiredDateTime->format(\DateTimeInterface::ATOM)),
         );
 
-        /** @var array{type: string, payload: string} $budgetEnvelopeEvent */
+        /** @var array{event_name: string, payload: string} $budgetEnvelopeEvent */
         foreach ($budgetEnvelopeEvents as $budgetEnvelopeEvent) {
             match ($this->eventClassMap->getEventPathByClassName($budgetEnvelopeEvent['event_name'])) {
                 BudgetEnvelopeCreditedDomainEvent::class => $this->handleBudgetEnvelopeCreditedDomainEvent(
@@ -102,23 +95,22 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
 
         try {
             $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeLedgerEntriesRewoundNotificationEvent::fromDomainEvent($budgetEnvelopeRewoundDomainEvent),
+                BudgetEnvelopeLedgerEntriesRewoundNotificationEvent::fromDomainEvent($event),
             ]);
         } catch (\Exception) {
         }
     }
 
-    private function handleBudgetEnvelopeReplayedDomainEvent(
-        BudgetEnvelopeReplayedDomainEvent $budgetEnvelopeReplayedDomainEvent,
-    ): void {
-        $this->budgetEnvelopeLedgerEntryViewRepository->delete($budgetEnvelopeReplayedDomainEvent->aggregateId);
+    private function handleBudgetEnvelopeReplayedDomainEvent(BudgetEnvelopeReplayedDomainEvent $event): void
+    {
+        $this->budgetEnvelopeLedgerEntryViewRepository->delete($event->aggregateId);
         $budgetEnvelopeEvents = $this->eventSourcedRepository->getByDomainEvents(
-            $budgetEnvelopeReplayedDomainEvent->aggregateId,
+            $event->aggregateId,
             [BudgetEnvelopeCreditedDomainEvent::class, BudgetEnvelopeDebitedDomainEvent::class],
-            UtcClock::fromStringToImmutable(($budgetEnvelopeReplayedDomainEvent->updatedAt)->format(\DateTimeInterface::ATOM)),
+            UtcClock::fromStringToImmutable(($event->updatedAt)->format(\DateTimeInterface::ATOM)),
         );
 
-        /** @var array{type: string, payload: string} $budgetEnvelopeEvent */
+        /** @var array{event_name: string, payload: string} $budgetEnvelopeEvent */
         foreach ($budgetEnvelopeEvents as $budgetEnvelopeEvent) {
             match ($this->eventClassMap->getEventPathByClassName($budgetEnvelopeEvent['event_name'])) {
                 BudgetEnvelopeCreditedDomainEvent::class => $this->handleBudgetEnvelopeCreditedDomainEvent(
@@ -137,7 +129,7 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
 
         try {
             $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeLedgerEntriesReplayedNotificationEvent::fromDomainEvent($budgetEnvelopeReplayedDomainEvent),
+                BudgetEnvelopeLedgerEntriesReplayedNotificationEvent::fromDomainEvent($event),
             ]);
         } catch (\Exception) {
         }

@@ -72,30 +72,27 @@ final class BudgetEnvelopeLedgerEntryView implements BudgetEnvelopeLedgerEntryVi
     }
 
     #[\Override]
-    public static function fromBudgetEnvelopeCreditedDomainEvent(
-        BudgetEnvelopeCreditedDomainEvent $budgetEnvelopeCreditedDomainEvent,
-    ): self {
+    public static function fromBudgetEnvelopeCreditedDomainEvent(BudgetEnvelopeCreditedDomainEvent $event): self
+    {
         return new self(
-            BudgetEnvelopeId::fromString($budgetEnvelopeCreditedDomainEvent->aggregateId),
+            BudgetEnvelopeId::fromString($event->aggregateId),
             BudgetEnvelopeEntryType::fromString(BudgetEnvelopeEntryType::CREDIT),
-            BudgetEnvelopeEntryDescription::fromString($budgetEnvelopeCreditedDomainEvent->description),
-            BudgetEnvelopeUserId::fromString($budgetEnvelopeCreditedDomainEvent->userId),
-            $budgetEnvelopeCreditedDomainEvent->occurredOn,
-            $budgetEnvelopeCreditedDomainEvent->creditMoney,
+            BudgetEnvelopeEntryDescription::fromString($event->description),
+            BudgetEnvelopeUserId::fromString($event->userId),
+            $event->occurredOn,
+            $event->creditMoney,
         );
     }
 
     #[\Override]
-    public static function fromBudgetEnvelopeDebitedDomainEvent(
-        BudgetEnvelopeDebitedDomainEvent $budgetEnvelopeDebitedDomainEvent,
-    ): self {
+    public static function fromBudgetEnvelopeDebitedDomainEvent(BudgetEnvelopeDebitedDomainEvent $event): self {
         return new self(
-            BudgetEnvelopeId::fromString($budgetEnvelopeDebitedDomainEvent->aggregateId),
+            BudgetEnvelopeId::fromString($event->aggregateId),
             BudgetEnvelopeEntryType::fromString(BudgetEnvelopeEntryType::DEBIT),
-            BudgetEnvelopeEntryDescription::fromString($budgetEnvelopeDebitedDomainEvent->description),
-            BudgetEnvelopeUserId::fromString($budgetEnvelopeDebitedDomainEvent->userId),
-            $budgetEnvelopeDebitedDomainEvent->occurredOn,
-            $budgetEnvelopeDebitedDomainEvent->debitMoney,
+            BudgetEnvelopeEntryDescription::fromString($event->description),
+            BudgetEnvelopeUserId::fromString($event->userId),
+            $event->occurredOn,
+            $event->debitMoney,
         );
     }
 

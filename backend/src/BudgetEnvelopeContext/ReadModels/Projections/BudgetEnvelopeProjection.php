@@ -52,187 +52,173 @@ final readonly class BudgetEnvelopeProjection
         };
     }
 
-    private function handleBudgetEnvelopeAddedDomainEvent(
-        BudgetEnvelopeAddedDomainEvent $budgetEnvelopeAddedDomainEvent,
-    ): void {
-        $this->budgetEnvelopeViewRepository->save(
-            BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent($budgetEnvelopeAddedDomainEvent),
-        );
+    private function handleBudgetEnvelopeAddedDomainEvent(BudgetEnvelopeAddedDomainEvent $event): void
+    {
+        $this->budgetEnvelopeViewRepository->save(BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent($event));
         try {
             $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeAddedNotificationEvent::fromDomainEvent($budgetEnvelopeAddedDomainEvent)],
+                [BudgetEnvelopeAddedNotificationEvent::fromDomainEvent($event)],
             );
         } catch (\Exception) {
         }
     }
 
-    private function handleBudgetEnvelopeCreditedDomainEvent(
-        BudgetEnvelopeCreditedDomainEvent $budgetEnvelopeCreditedDomainEvent,
-    ): void {
+    private function handleBudgetEnvelopeCreditedDomainEvent(BudgetEnvelopeCreditedDomainEvent $event): void
+    {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $budgetEnvelopeCreditedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
             return;
         }
 
-        $budgetEnvelopeView->fromEvent($budgetEnvelopeCreditedDomainEvent);
+        $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
         try {
             $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeCreditedNotificationEvent::fromDomainEvent($budgetEnvelopeCreditedDomainEvent)],
+                [BudgetEnvelopeCreditedNotificationEvent::fromDomainEvent($event)],
             );
         } catch (\Exception) {
         }
     }
 
-    private function handleBudgetEnvelopeDebitedDomainEvent(
-        BudgetEnvelopeDebitedDomainEvent $budgetEnvelopeDebitedDomainEvent,
-    ): void {
+    private function handleBudgetEnvelopeDebitedDomainEvent(BudgetEnvelopeDebitedDomainEvent $event): void
+    {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $budgetEnvelopeDebitedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
             return;
         }
 
-        $budgetEnvelopeView->fromEvent($budgetEnvelopeDebitedDomainEvent);
+        $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
         try {
             $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeDebitedNotificationEvent::fromDomainEvent($budgetEnvelopeDebitedDomainEvent)],
+                [BudgetEnvelopeDebitedNotificationEvent::fromDomainEvent($event)],
             );
         } catch (\Exception) {
         }
     }
 
-    private function handleBudgetEnvelopeNamedDomainEvent(
-        BudgetEnvelopeRenamedDomainEvent $budgetEnvelopeRenamedDomainEvent,
-    ): void {
+    private function handleBudgetEnvelopeNamedDomainEvent(BudgetEnvelopeRenamedDomainEvent $event): void
+    {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $budgetEnvelopeRenamedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
             return;
         }
 
-        $budgetEnvelopeView->fromEvent($budgetEnvelopeRenamedDomainEvent);
+        $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
         try {
             $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeRenamedNotificationEvent::fromDomainEvent($budgetEnvelopeRenamedDomainEvent)],
+                [BudgetEnvelopeRenamedNotificationEvent::fromDomainEvent($event)],
             );
         } catch (\Exception) {
         }
     }
 
-    private function handleBudgetEnvelopeDeletedDomainEvent(
-        BudgetEnvelopeDeletedDomainEvent $budgetEnvelopeDeletedDomainEvent,
-    ): void {
+    private function handleBudgetEnvelopeDeletedDomainEvent(BudgetEnvelopeDeletedDomainEvent $event): void {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $budgetEnvelopeDeletedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
             return;
         }
 
-        $budgetEnvelopeView->fromEvent($budgetEnvelopeDeletedDomainEvent);
+        $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
         try {
             $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeDeletedNotificationEvent::fromDomainEvent($budgetEnvelopeDeletedDomainEvent)],
+                [BudgetEnvelopeDeletedNotificationEvent::fromDomainEvent($event)],
             );
         } catch (\Exception) {
         }
     }
 
-    private function handleBudgetEnvelopeRewoundDomainEvent(
-        BudgetEnvelopeRewoundDomainEvent $budgetEnvelopeRewoundDomainEvent,
-    ): void {
+    private function handleBudgetEnvelopeRewoundDomainEvent(BudgetEnvelopeRewoundDomainEvent $event): void
+    {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $budgetEnvelopeRewoundDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
             return;
         }
 
-        $budgetEnvelopeView->fromEvent($budgetEnvelopeRewoundDomainEvent);
+        $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
         try {
             $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeRewoundNotificationEvent::fromDomainEvent($budgetEnvelopeRewoundDomainEvent)],
+                [BudgetEnvelopeRewoundNotificationEvent::fromDomainEvent($event)],
             );
         } catch (\Exception) {
         }
     }
 
-    private function handleBudgetEnvelopeReplayedDomainEvent(
-        BudgetEnvelopeReplayedDomainEvent $budgetEnvelopeReplayedDomainEvent,
-    ): void {
+    private function handleBudgetEnvelopeReplayedDomainEvent(BudgetEnvelopeReplayedDomainEvent $event): void
+    {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $budgetEnvelopeReplayedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
             return;
         }
 
-        $budgetEnvelopeView->fromEvent($budgetEnvelopeReplayedDomainEvent);
+        $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
         try {
             $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeReplayedNotificationEvent::fromDomainEvent($budgetEnvelopeReplayedDomainEvent)],
+                [BudgetEnvelopeReplayedNotificationEvent::fromDomainEvent($event)],
             );
         } catch (\Exception) {
         }
     }
 
     private function handleBudgetEnvelopeTargetedAmountChangedDomainEvent(
-        BudgetEnvelopeTargetedAmountChangedDomainEvent $budgetEnvelopeTargetedAmountChangedDomainEvent,
+        BudgetEnvelopeTargetedAmountChangedDomainEvent $event,
     ): void {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $budgetEnvelopeTargetedAmountChangedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
             return;
         }
 
-        $budgetEnvelopeView->fromEvent($budgetEnvelopeTargetedAmountChangedDomainEvent);
+        $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
         try {
             $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeTargetedAmountChangedNotificationEvent::fromDomainEvent(
-                    $budgetEnvelopeTargetedAmountChangedDomainEvent,
-                ),
+                BudgetEnvelopeTargetedAmountChangedNotificationEvent::fromDomainEvent($event),
             ]);
         } catch (\Exception) {
         }
     }
 
     private function handleBudgetEnvelopeCurrencyChangedDomainEvent(
-        BudgetEnvelopeCurrencyChangedDomainEvent $budgetEnvelopeCurrencyChangedDomainEvent,
+        BudgetEnvelopeCurrencyChangedDomainEvent $event,
     ): void {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $budgetEnvelopeCurrencyChangedDomainEvent->aggregateId, 'is_deleted' => false],
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
 
         if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
             return;
         }
 
-        $budgetEnvelopeView->fromEvent($budgetEnvelopeCurrencyChangedDomainEvent);
+        $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
         try {
             $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeCurrencyChangedNotificationEvent::fromDomainEvent(
-                    $budgetEnvelopeCurrencyChangedDomainEvent,
-                ),
+                BudgetEnvelopeCurrencyChangedNotificationEvent::fromDomainEvent($event),
             ]);
         } catch (\Exception) {
         }

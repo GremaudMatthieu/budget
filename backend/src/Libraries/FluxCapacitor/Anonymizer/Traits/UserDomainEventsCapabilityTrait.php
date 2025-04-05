@@ -10,7 +10,7 @@ trait UserDomainEventsCapabilityTrait
 {
     private array $events = [];
 
-    protected function raiseDomainEvents(AbstractUserDomainEventInterface $event): void
+    protected function raiseDomainEvent(AbstractUserDomainEventInterface $event): void
     {
         $this->{sprintf('apply%s', new \ReflectionClass($event)->getShortName())}($event);
         $this->events[] = $event;
