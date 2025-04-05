@@ -12,7 +12,7 @@ interface BudgetEnvelopeViewInterface
     public static function fromRepository(array $budgetEnvelope): self;
 
     public static function fromBudgetEnvelopeAddedDomainEvent(
-        BudgetEnvelopeAddedDomainEvent $budgetEnvelopeAddedDomainEvent,
+        BudgetEnvelopeAddedDomainEvent $event,
     ): self;
 
     public function fromEvent(DomainEventInterface $event): void;

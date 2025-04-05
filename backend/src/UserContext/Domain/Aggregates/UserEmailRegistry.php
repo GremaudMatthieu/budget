@@ -39,7 +39,7 @@ final class UserEmailRegistry implements AggregateRootInterface
     public function registerEmail(UserEmail $email, UserId $userId): void
     {
         $emailHash = $this->hashEmail((string) $email);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new UserEmailRegisteredDomainEvent(
                 $this->userEmailRegistryId,
                 (string)$userId,
@@ -51,7 +51,7 @@ final class UserEmailRegistry implements AggregateRootInterface
     public function releaseEmail(UserEmail $email, UserId $userId): void
     {
         $emailHash = $this->hashEmail((string) $email);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new UserEmailReleasedDomainEvent(
                 $this->userEmailRegistryId,
                 (string)$userId,
@@ -119,7 +119,7 @@ final class UserEmailRegistry implements AggregateRootInterface
         $this->raisedDomainEvents = [];
     }
 
-    private function raiseDomainEvents(object $event): void
+    private function raiseDomainEvent(object $event): void
     {
         $this->raisedDomainEvents[] = $event;
     }

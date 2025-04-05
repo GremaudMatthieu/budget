@@ -129,12 +129,13 @@ final class EventStore implements EventStoreInterface
             $this->publisher->publishDomainEvents($aggregate->raisedDomainEvents());
             $this->connection->commit();
             $aggregate->clearRaisedDomainEvents();
+
             if ($aggregate instanceof UserAggregateInterface) {
                 $aggregate->clearKeys();
             }
+
         } catch (Exception $e) {
             $this->connection->rollBack();
-            dump($e);
             throw new PublishDomainEventsException();
         }
         $this->untrackAggregate($aggregate);

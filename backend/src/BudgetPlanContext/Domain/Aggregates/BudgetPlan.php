@@ -74,7 +74,7 @@ final class BudgetPlan implements AggregateRootInterface
         TranslatorInterface $translator,
     ): self {
         $aggregate = new self();
-        $aggregate->raiseDomainEvents(
+        $aggregate->raiseDomainEvent(
             new BudgetPlanGeneratedDomainEvent(
                 (string) $budgetPlanId,
                 UtcClock::fromImmutableToString($date),
@@ -99,7 +99,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): self {
         $aggregate = new self();
         $currentDate = UtcClock::immutableNow();
-        $aggregate->raiseDomainEvents(
+        $aggregate->raiseDomainEvent(
             new BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
                 (string) $budgetPlanId,
                 UtcClock::fromImmutableToString($date),
@@ -154,7 +154,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): void {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanCurrencyChangedDomainEvent(
                 (string) $this->budgetPlanId,
                 (string) $this->userId,
@@ -173,7 +173,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): void {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanIncomeAddedDomainEvent(
                 (string) $budgetPlanId,
                 (string) $incomeId,
@@ -195,7 +195,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): void {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanWantAddedDomainEvent(
                 (string) $budgetPlanId,
                 (string) $wantId,
@@ -217,7 +217,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): void {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanNeedAddedDomainEvent(
                 (string) $budgetPlanId,
                 (string) $needId,
@@ -239,7 +239,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): void {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanSavingAddedDomainEvent(
                 (string) $budgetPlanId,
                 (string) $savingId,
@@ -261,7 +261,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): void {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanWantAdjustedDomainEvent(
                 (string) $budgetPlanId,
                 (string) $wantId,
@@ -283,7 +283,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): void {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanNeedAdjustedDomainEvent(
                 (string) $budgetPlanId,
                 (string) $needId,
@@ -305,7 +305,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): void {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanSavingAdjustedDomainEvent(
                 (string) $budgetPlanId,
                 (string) $savingId,
@@ -327,7 +327,7 @@ final class BudgetPlan implements AggregateRootInterface
     ): void {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanIncomeAdjustedDomainEvent(
                 (string) $budgetPlanId,
                 (string) $incomeId,
@@ -339,30 +339,20 @@ final class BudgetPlan implements AggregateRootInterface
         );
     }
 
-    public function removeAnIncome(
-        BudgetPlanEntryId $incomeId,
-        BudgetPlanUserId $userId,
-    ): void
+    public function removeAnIncome(BudgetPlanEntryId $incomeId, BudgetPlanUserId $userId): void
     {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
-            new BudgetPlanIncomeRemovedDomainEvent(
-                (string) $this->budgetPlanId,
-                (string) $incomeId,
-                (string) $userId,
-            )
+        $this->raiseDomainEvent(
+            new BudgetPlanIncomeRemovedDomainEvent((string) $this->budgetPlanId, (string) $incomeId, (string) $userId),
         );
     }
 
-    public function removeASaving(
-        BudgetPlanEntryId $savingId,
-        BudgetPlanUserId $userId,
-    ): void
+    public function removeASaving(BudgetPlanEntryId $savingId, BudgetPlanUserId $userId): void
     {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanSavingRemovedDomainEvent(
                 (string) $this->budgetPlanId,
                 (string) $savingId,
@@ -371,14 +361,11 @@ final class BudgetPlan implements AggregateRootInterface
         );
     }
 
-    public function removeAWant(
-        BudgetPlanEntryId $wantId,
-        BudgetPlanUserId $userId,
-    ): void
+    public function removeAWant(BudgetPlanEntryId $wantId, BudgetPlanUserId $userId): void
     {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanWantRemovedDomainEvent(
                 (string) $this->budgetPlanId,
                 (string) $wantId,
@@ -387,14 +374,11 @@ final class BudgetPlan implements AggregateRootInterface
         );
     }
 
-    public function removeANeed(
-        BudgetPlanEntryId $needId,
-        BudgetPlanUserId $userId,
-    ): void
+    public function removeANeed(BudgetPlanEntryId $needId, BudgetPlanUserId $userId): void
     {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanNeedRemovedDomainEvent(
                 (string) $this->budgetPlanId,
                 (string) $needId,
@@ -407,7 +391,7 @@ final class BudgetPlan implements AggregateRootInterface
     {
         $this->assertNotDeleted();
         $this->assertOwnership($userId);
-        $this->raiseDomainEvents(
+        $this->raiseDomainEvent(
             new BudgetPlanRemovedDomainEvent(
                 (string) $this->budgetPlanId,
                 (string) $this->userId,
@@ -462,23 +446,20 @@ final class BudgetPlan implements AggregateRootInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanCurrencyChangedDomainEvent(
-        BudgetPlanCurrencyChangedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanCurrencyChangedDomainEvent(BudgetPlanCurrencyChangedDomainEvent $event): void
+    {
         $this->currency = BudgetPlanCurrency::fromString($event->currency);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanRemovedDomainEvent(
-        BudgetPlanRemovedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanRemovedDomainEvent(BudgetPlanRemovedDomainEvent $event): void
+    {
         $this->isDeleted = $event->isDeleted;
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanIncomeAddedDomainEvent(
-        BudgetPlanIncomeAddedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): void
+    {
         $this->incomes[] = BudgetPlanIncome::fromArray([
             'uuid' => $event->uuid,
             'incomeName' => $event->name,
@@ -488,9 +469,8 @@ final class BudgetPlan implements AggregateRootInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanWantAddedDomainEvent(
-        BudgetPlanWantAddedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanWantAddedDomainEvent(BudgetPlanWantAddedDomainEvent $event): void
+    {
         $this->wants[] = BudgetPlanWant::fromArray([
             'uuid' => $event->uuid,
             'wantName' => $event->name,
@@ -500,9 +480,8 @@ final class BudgetPlan implements AggregateRootInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanNeedAddedDomainEvent(
-        BudgetPlanNeedAddedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanNeedAddedDomainEvent(BudgetPlanNeedAddedDomainEvent $event): void
+    {
         $this->needs[] = BudgetPlanNeed::fromArray([
             'uuid' => $event->uuid,
             'needName' => $event->name,
@@ -512,9 +491,8 @@ final class BudgetPlan implements AggregateRootInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanSavingAddedDomainEvent(
-        BudgetPlanSavingAddedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanSavingAddedDomainEvent(BudgetPlanSavingAddedDomainEvent $event): void
+    {
         $this->savings[] = BudgetPlanSaving::fromArray([
             'uuid' => $event->uuid,
             'savingName' => $event->name,
@@ -524,9 +502,8 @@ final class BudgetPlan implements AggregateRootInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanIncomeAdjustedDomainEvent(
-        BudgetPlanIncomeAdjustedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanIncomeAdjustedDomainEvent(BudgetPlanIncomeAdjustedDomainEvent $event): void
+    {
         $this->incomes = array_map(function(BudgetPlanIncome $income) use ($event) {
             if ($income->getUuid() === $event->uuid) {
                 return BudgetPlanIncome::fromArray([
@@ -541,9 +518,8 @@ final class BudgetPlan implements AggregateRootInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanWantAdjustedDomainEvent(
-        BudgetPlanWantAdjustedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanWantAdjustedDomainEvent(BudgetPlanWantAdjustedDomainEvent $event): void
+    {
         $this->wants = array_map(function(BudgetPlanWant $want) use ($event) {
             if ($want->getUuid() === $event->uuid) {
                 return BudgetPlanWant::fromArray([
@@ -558,9 +534,8 @@ final class BudgetPlan implements AggregateRootInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanNeedAdjustedDomainEvent(
-        BudgetPlanNeedAdjustedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanNeedAdjustedDomainEvent(BudgetPlanNeedAdjustedDomainEvent $event): void
+    {
         $this->needs = array_map(function(BudgetPlanNeed $need) use ($event) {
             if ($need->getUuid() === $event->uuid) {
                 return BudgetPlanNeed::fromArray([
@@ -575,9 +550,8 @@ final class BudgetPlan implements AggregateRootInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanSavingAdjustedDomainEvent(
-        BudgetPlanSavingAdjustedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanSavingAdjustedDomainEvent(BudgetPlanSavingAdjustedDomainEvent $event): void
+    {
         $this->savings = array_map(function(BudgetPlanSaving $saving) use ($event) {
             if ($saving->getUuid() === $event->uuid) {
                 return BudgetPlanSaving::fromArray([
@@ -592,30 +566,26 @@ final class BudgetPlan implements AggregateRootInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanIncomeRemovedDomainEvent(
-        BudgetPlanIncomeRemovedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanIncomeRemovedDomainEvent(BudgetPlanIncomeRemovedDomainEvent $event): void
+    {
         $this->incomes = array_filter($this->incomes, fn(BudgetPlanIncome $income) => $income->getUuid() !== $event->uuid);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanWantRemovedDomainEvent(
-        BudgetPlanWantRemovedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanWantRemovedDomainEvent(BudgetPlanWantRemovedDomainEvent $event): void
+    {
         $this->wants = array_filter($this->wants, fn(BudgetPlanWant $want) => $want->getUuid() !== $event->uuid);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanNeedRemovedDomainEvent(
-        BudgetPlanNeedRemovedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanNeedRemovedDomainEvent(BudgetPlanNeedRemovedDomainEvent $event): void
+    {
         $this->needs = array_filter($this->needs, fn(BudgetPlanNeed $need) => $need->getUuid() !== $event->uuid);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyBudgetPlanSavingRemovedDomainEvent(
-        BudgetPlanSavingRemovedDomainEvent $event,
-    ): void {
+    public function applyBudgetPlanSavingRemovedDomainEvent(BudgetPlanSavingRemovedDomainEvent $event): void
+    {
         $this->savings = array_filter($this->savings, fn(BudgetPlanSaving $saving) => $saving->getUuid() !== $event->uuid);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }

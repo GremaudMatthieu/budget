@@ -38,23 +38,19 @@ final readonly class BudgetPlanIncomeEntryProjection
         };
     }
 
-    private function handleBudgetPlanGeneratedDomainEvent(
-        BudgetPlanGeneratedDomainEvent $budgetPlanGeneratedDomainEvent,
-    ): void {
-        foreach ($budgetPlanGeneratedDomainEvent->incomes as $income) {
+    private function handleBudgetPlanGeneratedDomainEvent(BudgetPlanGeneratedDomainEvent $event): void {
+        foreach ($event->incomes as $income) {
             $this->budgetPlanIncomeEntryViewRepository->save(
                 BudgetPlanIncomeEntryView::fromArrayOnBudgetPlanGeneratedDomainEvent(
                     $income,
-                    $budgetPlanGeneratedDomainEvent->aggregateId,
-                    $budgetPlanGeneratedDomainEvent->occurredOn,
+                    $event->aggregateId,
+                    $event->occurredOn,
                 ),
             );
             try {
                 $this->publisher->publishNotificationEvents(
                     [
-                        BudgetPlanIncomeAddedNotificationEvent::fromBudgetPlanGeneratedDomainEvent(
-                            $budgetPlanGeneratedDomainEvent,
-                        ),
+                        BudgetPlanIncomeAddedNotificationEvent::fromBudgetPlanGeneratedDomainEvent($event),
                     ],
                 );
             } catch (\Exception $e) {
@@ -63,21 +59,21 @@ final readonly class BudgetPlanIncomeEntryProjection
     }
 
     private function handleBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent,
+        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent $event,
     ): void {
-        foreach ($budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->incomes as $income) {
+        foreach ($event->incomes as $income) {
             $this->budgetPlanIncomeEntryViewRepository->save(
                 BudgetPlanIncomeEntryView::fromArrayOnBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
                     $income,
-                    $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->aggregateId,
-                    $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->occurredOn,
+                    $event->aggregateId,
+                    $event->occurredOn,
                 ),
             );
             try {
                 $this->publisher->publishNotificationEvents(
                     [
                         BudgetPlanIncomeAddedNotificationEvent::fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-                            $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent,
+                            $event,
                         ),
                     ],
                 );
@@ -86,59 +82,50 @@ final readonly class BudgetPlanIncomeEntryProjection
         }
     }
 
-    private function handleBudgetPlanIncomeAddedDomainEvent(
-        BudgetPlanIncomeAddedDomainEvent $budgetPlanIncomeAddedDomainEvent,
-    ): void {
+    private function handleBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): void
+    {
         $this->budgetPlanIncomeEntryViewRepository->save(
-            BudgetPlanIncomeEntryView::fromBudgetPlanIncomeAddedDomainEvent($budgetPlanIncomeAddedDomainEvent),
+            BudgetPlanIncomeEntryView::fromBudgetPlanIncomeAddedDomainEvent($event),
         );
         try {
             $this->publisher->publishNotificationEvents(
                 [
-                    BudgetPlanIncomeAddedNotificationEvent::fromBudgetPlanIncomeAddedDomainEvent(
-                        $budgetPlanIncomeAddedDomainEvent,
-                    ),
+                    BudgetPlanIncomeAddedNotificationEvent::fromBudgetPlanIncomeAddedDomainEvent($event),
                 ],
             );
         } catch (\Exception $e) {
         }
     }
 
-    private function handleBudgetPlanIncomeAdjustedDomainEvent(
-        BudgetPlanIncomeAdjustedDomainEvent $budgetPlanIncomeAdjustedDomainEvent,
-    ): void {
+    private function handleBudgetPlanIncomeAdjustedDomainEvent(BudgetPlanIncomeAdjustedDomainEvent $event): void
+    {
         $budgetPlanIncomeView = $this->budgetPlanIncomeEntryViewRepository->findOneByUuid(
-            $budgetPlanIncomeAdjustedDomainEvent->uuid,
+            $event->uuid,
         );
 
         if (!$budgetPlanIncomeView instanceof BudgetPlanIncomeEntryViewInterface) {
             return;
         }
 
-        $budgetPlanIncomeView->fromEvent($budgetPlanIncomeAdjustedDomainEvent);
+        $budgetPlanIncomeView->fromEvent($event);
         $this->budgetPlanIncomeEntryViewRepository->save($budgetPlanIncomeView);
         try {
             $this->publisher->publishNotificationEvents(
                 [
-                    BudgetPlanIncomeAdjustedNotificationEvent::fromBudgetPlanIncomeAdjustedDomainEvent(
-                        $budgetPlanIncomeAdjustedDomainEvent,
-                    ),
+                    BudgetPlanIncomeAdjustedNotificationEvent::fromBudgetPlanIncomeAdjustedDomainEvent($event),
                 ],
             );
         } catch (\Exception $e) {
         }
     }
 
-    private function handleBudgetPlanIncomeRemovedDomainEvent(
-        BudgetPlanIncomeRemovedDomainEvent $budgetPlanIncomeRemovedDomainEvent,
-    ): void {
-        $this->budgetPlanIncomeEntryViewRepository->delete($budgetPlanIncomeRemovedDomainEvent->uuid);
+    private function handleBudgetPlanIncomeRemovedDomainEvent(BudgetPlanIncomeRemovedDomainEvent $event): void
+    {
+        $this->budgetPlanIncomeEntryViewRepository->delete($event->uuid);
         try {
             $this->publisher->publishNotificationEvents(
                 [
-                    BudgetPlanIncomeRemovedNotificationEvent::fromDomainEvent(
-                        $budgetPlanIncomeRemovedDomainEvent,
-                    ),
+                    BudgetPlanIncomeRemovedNotificationEvent::fromDomainEvent($event),
                 ],
             );
         } catch (\Exception $e) {

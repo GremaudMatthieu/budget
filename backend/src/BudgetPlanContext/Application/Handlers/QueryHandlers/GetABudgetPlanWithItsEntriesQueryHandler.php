@@ -20,12 +20,12 @@ final readonly class GetABudgetPlanWithItsEntriesQueryHandler
     /**
      * @throws BudgetPlanNotFoundException
      */
-    public function __invoke(GetABudgetPlanWithItsEntriesQuery $getABudgetPlanWithItsEntriesQuery): array
+    public function __invoke(GetABudgetPlanWithItsEntriesQuery $query): array
     {
         $budgetPlan = $this->budgetPlanViewRepository->findOnePlanWithEntriesBy(
             [
-                'uuid' => (string) $getABudgetPlanWithItsEntriesQuery->getBudgetPlanId(),
-                'user_uuid' => (string) $getABudgetPlanWithItsEntriesQuery->getBudgetPlanUserId(),
+                'uuid' => (string) $query->getBudgetPlanId(),
+                'user_uuid' => (string) $query->getBudgetPlanUserId(),
                 'is_deleted' => false,
             ]
         );
@@ -36,7 +36,7 @@ final readonly class GetABudgetPlanWithItsEntriesQueryHandler
 
         return $this->budgetPlanCategoriesTranslator->translate(
             $budgetPlan,
-            $getABudgetPlanWithItsEntriesQuery->getUserLanguagePreference(),
+            $query->getUserLanguagePreference(),
         );
     }
 }

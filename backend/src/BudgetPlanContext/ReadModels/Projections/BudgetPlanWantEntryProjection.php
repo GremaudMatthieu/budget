@@ -39,21 +39,21 @@ final readonly class BudgetPlanWantEntryProjection
     }
 
     private function handleBudgetPlanGeneratedDomainEvent(
-        BudgetPlanGeneratedDomainEvent $budgetPlanGeneratedDomainEvent,
+        BudgetPlanGeneratedDomainEvent $event,
     ): void {
-        foreach ($budgetPlanGeneratedDomainEvent->wants as $want) {
+        foreach ($event->wants as $want) {
             $this->budgetPlanWantEntryViewRepository->save(
                 BudgetPlanWantEntryView::fromArrayOnBudgetPlanGeneratedDomainEvent(
                     $want,
-                    $budgetPlanGeneratedDomainEvent->aggregateId,
-                    $budgetPlanGeneratedDomainEvent->occurredOn,
+                    $event->aggregateId,
+                    $event->occurredOn,
                 ),
             );
             try {
                 $this->publisher->publishNotificationEvents(
                     [
                         BudgetPlanWantAddedNotificationEvent::fromBudgetPlanGeneratedDomainEvent(
-                            $budgetPlanGeneratedDomainEvent,
+                            $event,
                         ),
                     ],
                 );

@@ -16,18 +16,17 @@ final readonly class GetACalendarWithItsBudgetPlansFinancialRatiosByYearQueryHan
     ) {
     }
 
-    public function __invoke(
-        GetACalendarWithItsBudgetPlansFinancialRatiosByYearQuery $getACalendarWithItsBudgetPlansFinancialRatiosByYearQuery,
-    ): array {
+    public function __invoke(GetACalendarWithItsBudgetPlansFinancialRatiosByYearQuery $query): array
+    {
         return $this->budgetPlanCategoriesTranslator->translate(
             $this->budgetPlanViewRepository->getACalendarWithItsBudgetPlansFinancialRatiosByYear(
                 [
-                    'user_uuid' => (string) $getACalendarWithItsBudgetPlansFinancialRatiosByYearQuery->getBudgetPlanUserId(),
-                    'year' => $getACalendarWithItsBudgetPlansFinancialRatiosByYearQuery->getDate()->format('Y'),
+                    'user_uuid' => (string) $query->getBudgetPlanUserId(),
+                    'year' => $query->getDate()->format('Y'),
                     'is_deleted' => false,
                 ],
             ),
-            $getACalendarWithItsBudgetPlansFinancialRatiosByYearQuery->getUserLanguagePreference(),
+            $query->getUserLanguagePreference(),
         );
     }
 }

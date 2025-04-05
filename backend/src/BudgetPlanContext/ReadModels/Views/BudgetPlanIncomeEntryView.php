@@ -73,21 +73,20 @@ final class BudgetPlanIncomeEntryView implements \JsonSerializable, BudgetPlanIn
         );
     }
 
-    public static function fromBudgetPlanIncomeAddedDomainEvent(
-        BudgetPlanIncomeAddedDomainEvent $budgetPlanIncomeAddedDomainEvent,
-    ): self {
+    public static function fromBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): self
+    {
         return new self(
-            BudgetPlanId::fromString($budgetPlanIncomeAddedDomainEvent->aggregateId),
+            BudgetPlanId::fromString($event->aggregateId),
             BudgetPlanIncome::fromArray(
                 [
-                    'uuid' => $budgetPlanIncomeAddedDomainEvent->uuid,
-                    'incomeName' => $budgetPlanIncomeAddedDomainEvent->name,
-                    'category' => $budgetPlanIncomeAddedDomainEvent->category,
-                    'amount' => $budgetPlanIncomeAddedDomainEvent->amount,
+                    'uuid' => $event->uuid,
+                    'incomeName' => $event->name,
+                    'category' => $event->category,
+                    'amount' => $event->amount,
                 ]
             ),
-            $budgetPlanIncomeAddedDomainEvent->occurredOn,
-            \DateTime::createFromImmutable($budgetPlanIncomeAddedDomainEvent->occurredOn),
+            $event->occurredOn,
+            \DateTime::createFromImmutable($event->occurredOn),
         );
     }
 

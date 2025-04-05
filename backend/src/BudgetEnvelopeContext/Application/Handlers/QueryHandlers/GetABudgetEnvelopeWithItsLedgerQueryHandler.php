@@ -18,11 +18,11 @@ final readonly class GetABudgetEnvelopeWithItsLedgerQueryHandler
     /**
      * @throws BudgetEnvelopeNotFoundException
      */
-    public function __invoke(GetABudgetEnvelopeWithItsLedgerQuery $getABudgetEnvelopeWithItsLedgerQuery): array
+    public function __invoke(GetABudgetEnvelopeWithItsLedgerQuery $query): array
     {
         $budgetEnvelope = $this->budgetEnvelopeViewRepository->findOneEnvelopeWithItsLedgerBy([
-            'uuid' => (string) $getABudgetEnvelopeWithItsLedgerQuery->getBudgetEnvelopeId(),
-            'user_uuid' => (string) $getABudgetEnvelopeWithItsLedgerQuery->getBudgetEnvelopeUserId(),
+            'uuid' => (string) $query->getBudgetEnvelopeId(),
+            'user_uuid' => (string) $query->getBudgetEnvelopeUserId(),
             'is_deleted' => false,
         ]);
 

@@ -30,7 +30,7 @@ final readonly class MailerAdapter implements MailerInterface
                 ->to($user->getEmail())
                 ->subject($this->translator->trans('password_reset.subject', [], 'messages', $user->languagePreference))
                 ->html(
-                    $this->generateEmailContent(
+                    $this->generatePasswordResetEmailContent(
                         $user,
                         $this->generatePasswordResetUrl($token),
                         $user->languagePreference,
@@ -39,8 +39,11 @@ final readonly class MailerAdapter implements MailerInterface
         );
     }
 
-    private function generateEmailContent(UserViewInterface $user, string $passwordResetUrl, string $locale): string
-    {
+    private function generatePasswordResetEmailContent(
+        UserViewInterface $user,
+        string $passwordResetUrl,
+        string $locale,
+    ): string {
         return <<<HTML
         <!DOCTYPE html>
         <html lang="{$locale}">
@@ -90,7 +93,11 @@ final readonly class MailerAdapter implements MailerInterface
 
     private function generatePasswordResetUrl(string $token): string
     {
-        return $this->urlGeneratorAdapter->generate('app_user_reset_password', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->urlGeneratorAdapter->generate(
+            'app_user_reset_password',
+            ['token' => $token],
+            UrlGeneratorInterface::ABSOLUTE_URL,
+        );
     }
 
     /**

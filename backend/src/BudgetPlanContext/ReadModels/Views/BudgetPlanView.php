@@ -80,30 +80,29 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
         $this->isDeleted = $isDeleted;
     }
 
-    public static function fromBudgetPlanGeneratedDomainEvent(
-        BudgetPlanGeneratedDomainEvent $budgetPlanGeneratedDomainEvent,
-    ): self {
+    public static function fromBudgetPlanGeneratedDomainEvent(BudgetPlanGeneratedDomainEvent $event): self
+    {
         return new self(
-            BudgetPlanId::fromString($budgetPlanGeneratedDomainEvent->aggregateId),
-            BudgetPlanUserId::fromString($budgetPlanGeneratedDomainEvent->userId),
-            BudgetPlanCurrency::fromString($budgetPlanGeneratedDomainEvent->currency),
-            new \DateTimeImmutable($budgetPlanGeneratedDomainEvent->date),
-            $budgetPlanGeneratedDomainEvent->occurredOn,
-            \DateTime::createFromImmutable($budgetPlanGeneratedDomainEvent->occurredOn),
+            BudgetPlanId::fromString($event->aggregateId),
+            BudgetPlanUserId::fromString($event->userId),
+            BudgetPlanCurrency::fromString($event->currency),
+            new \DateTimeImmutable($event->date),
+            $event->occurredOn,
+            \DateTime::createFromImmutable($event->occurredOn),
             false,
         );
     }
 
     public static function fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent,
+        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent $event,
     ): self {
         return new self(
-            BudgetPlanId::fromString($budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->aggregateId),
-            BudgetPlanUserId::fromString($budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->userId),
-            BudgetPlanCurrency::fromString($budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->currency),
-            new \DateTimeImmutable($budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->date),
-            $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->occurredOn,
-            \DateTime::createFromImmutable($budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->occurredOn),
+            BudgetPlanId::fromString($event->aggregateId),
+            BudgetPlanUserId::fromString($event->userId),
+            BudgetPlanCurrency::fromString($event->currency),
+            new \DateTimeImmutable($event->date),
+            $event->occurredOn,
+            \DateTime::createFromImmutable($event->occurredOn),
             false,
         );
     }
@@ -196,89 +195,75 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
         $this->isDeleted = false;
     }
 
-    private function applyBudgetPlanCurrencyChangedDomainEvent(
-        BudgetPlanCurrencyChangedDomainEvent $budgetPlanCurrencyChangedDomainEvent,
-    ): void {
-        $this->currency = $budgetPlanCurrencyChangedDomainEvent->currency;
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanCurrencyChangedDomainEvent->occurredOn);
+    private function applyBudgetPlanCurrencyChangedDomainEvent(BudgetPlanCurrencyChangedDomainEvent $event): void
+    {
+        $this->currency = $event->currency;
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanIncomeAddedDomainEvent(
-        BudgetPlanIncomeAddedDomainEvent $budgetPlanIncomeAddedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanIncomeAddedDomainEvent->occurredOn);
+    private function applyBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanNeedAddedDomainEvent(
-        BudgetPlanNeedAddedDomainEvent $budgetPlanNeedAddedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanNeedAddedDomainEvent->occurredOn);
+    private function applyBudgetPlanNeedAddedDomainEvent(BudgetPlanNeedAddedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanSavingAddedDomainEvent(
-        BudgetPlanSavingAddedDomainEvent $budgetPlanSavingAddedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanSavingAddedDomainEvent->occurredOn);
+    private function applyBudgetPlanSavingAddedDomainEvent(BudgetPlanSavingAddedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanWantAddedDomainEvent(
-        BudgetPlanWantAddedDomainEvent $budgetPlanWantAddedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanWantAddedDomainEvent->occurredOn);
+    private function applyBudgetPlanWantAddedDomainEvent(BudgetPlanWantAddedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanIncomeAdjustedDomainEvent(
-        BudgetPlanIncomeAdjustedDomainEvent $budgetPlanIncomeAdjustedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanIncomeAdjustedDomainEvent->occurredOn);
+    private function applyBudgetPlanIncomeAdjustedDomainEvent(BudgetPlanIncomeAdjustedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanNeedAdjustedDomainEvent(
-        BudgetPlanNeedAdjustedDomainEvent $budgetPlanNeedAdjustedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanNeedAdjustedDomainEvent->occurredOn);
+    private function applyBudgetPlanNeedAdjustedDomainEvent(BudgetPlanNeedAdjustedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanSavingAdjustedDomainEvent(
-        BudgetPlanSavingAdjustedDomainEvent $budgetPlanSavingAdjustedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanSavingAdjustedDomainEvent->occurredOn);
+    private function applyBudgetPlanSavingAdjustedDomainEvent(BudgetPlanSavingAdjustedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanWantAdjustedDomainEvent(
-        BudgetPlanWantAdjustedDomainEvent $budgetPlanWantAdjustedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanWantAdjustedDomainEvent->occurredOn);
+    private function applyBudgetPlanWantAdjustedDomainEvent(BudgetPlanWantAdjustedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function handleBudgetPlanIncomeRemovedDomainEvent(
-        BudgetPlanIncomeRemovedDomainEvent $budgetPlanIncomeRemovedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanIncomeRemovedDomainEvent->occurredOn);
+    private function handleBudgetPlanIncomeRemovedDomainEvent(BudgetPlanIncomeRemovedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function handleBudgetPlanWantRemovedDomainEvent(
-        BudgetPlanWantRemovedDomainEvent $budgetPlanWantRemovedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanWantRemovedDomainEvent->occurredOn);
+    private function handleBudgetPlanWantRemovedDomainEvent(BudgetPlanWantRemovedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function handleBudgetPlanNeedRemovedDomainEvent(
-        BudgetPlanNeedRemovedDomainEvent $budgetPlanNeedRemovedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanNeedRemovedDomainEvent->occurredOn);
+    private function handleBudgetPlanNeedRemovedDomainEvent(BudgetPlanNeedRemovedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function handleBudgetPlanSavingRemovedDomainEvent(
-        BudgetPlanSavingRemovedDomainEvent $budgetPlanSavingRemovedDomainEvent,
-    ): void {
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanSavingRemovedDomainEvent->occurredOn);
+    private function handleBudgetPlanSavingRemovedDomainEvent(BudgetPlanSavingRemovedDomainEvent $event): void
+    {
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanRemovedDomainEvent(
-        BudgetPlanRemovedDomainEvent $budgetPlanRemovedDomainEvent,
-    ): void {
-        $this->isDeleted = $budgetPlanRemovedDomainEvent->isDeleted;
-        $this->updatedAt = \DateTime::createFromImmutable($budgetPlanRemovedDomainEvent->occurredOn);
+    private function applyBudgetPlanRemovedDomainEvent(BudgetPlanRemovedDomainEvent $event): void
+    {
+        $this->isDeleted = $event->isDeleted;
+        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 }
