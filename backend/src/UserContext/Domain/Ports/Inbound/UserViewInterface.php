@@ -17,8 +17,6 @@ interface UserViewInterface
 
     public function fromEvent(DomainEventInterface $event): void;
 
-    public function getPassword(): ?string;
-
     public function getUuid(): string;
 
     public function getEmail(): string;

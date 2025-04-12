@@ -12,21 +12,17 @@ use App\UserContext\Domain\Events\UserDeletedDomainEvent;
 use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent;
 use App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent;
 use App\UserContext\Domain\Events\UserLastnameChangedDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordChangedDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordResetDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordResetRequestedDomainEvent;
 use App\UserContext\Domain\Events\UserReplayedDomainEvent;
 use App\UserContext\Domain\Events\UserRewoundDomainEvent;
 use App\UserContext\Domain\Events\UserSignedUpDomainEvent;
 use App\UserContext\Domain\Ports\Inbound\UserViewRepositoryInterface;
-use App\UserContext\Domain\Ports\Outbound\MailerInterface;
 use App\UserContext\Domain\Ports\Outbound\RefreshTokenManagerInterface;
 use App\UserContext\Domain\ValueObjects\UserConsent;
 use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
 use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserPassword;
+use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use App\UserContext\ReadModels\Projections\UserProjection;
 use App\UserContext\ReadModels\Views\UserView;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -36,7 +32,6 @@ class UserProjectionTest extends TestCase
 {
     private UserViewRepositoryInterface&MockObject $userViewRepository;
     private PublisherInterface&MockObject $publisher;
-    private MailerInterface&MockObject $mailer;
     private UserProjection $userProjection;
     private KeyManagementRepositoryInterface&MockObject $keyManagementRepository;
     private EventEncryptorInterface&MockObject $eventEncryptor;
@@ -46,13 +41,11 @@ class UserProjectionTest extends TestCase
     {
         $this->userViewRepository = $this->createMock(UserViewRepositoryInterface::class);
         $this->publisher = $this->createMock(PublisherInterface::class);
-        $this->mailer = $this->createMock(MailerInterface::class);
         $this->keyManagementRepository = $this->createMock(KeyManagementRepositoryInterface::class);
         $this->eventEncryptor = $this->createMock(EventEncryptorInterface::class);
         $this->refreshTokenManager = $this->createMock(RefreshTokenManagerInterface::class);
         $this->userProjection = new UserProjection(
             $this->userViewRepository,
-            $this->mailer,
             $this->keyManagementRepository,
             $this->eventEncryptor,
             $this->refreshTokenManager,
@@ -71,13 +64,14 @@ class UserProjectionTest extends TestCase
         $event = new UserSignedUpDomainEvent(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             'john.doe@example.com',
-            'password123',
             'John',
             'Doe',
             'fr',
             true,
             ['ROLE_USER'],
             'b7e685be-db83-4866-9f85-102fac30a50b',
+            'google',
+            '1234567890',
         );
 
         $this->keyManagementRepository->expects($this->once())
@@ -94,13 +88,14 @@ class UserProjectionTest extends TestCase
         $event = new UserSignedUpDomainEvent(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             'john.doe@example.com',
-            'password123',
             'John',
             'Doe',
             'fr',
             true,
             ['ROLE_USER'],
             'b7e685be-db83-4866-9f85-102fac30a50b',
+            'google',
+            '1234567890',
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -114,7 +109,8 @@ class UserProjectionTest extends TestCase
                     && $view->email === $event->email
                     && $view->firstname === $event->firstname
                     && $view->lastname === $event->lastname
-                    && $view->password === $event->password
+                    && $view->registrationContext === $event->registrationContext
+                    && $view->providerUserId === $event->providerUserId
                     && $view->consentGiven === $event->isConsentGiven
                     && $view->roles === $event->roles;
             }));
@@ -134,7 +130,6 @@ class UserProjectionTest extends TestCase
         $userView = new UserView(
             UserId::fromString($event->aggregateId),
             UserEmail::fromString('test@mail.com'),
-            UserPassword::fromString('password'),
             UserFirstname::fromString('Test firstName'),
             UserLastname::fromString('Test lastName'),
             UserLanguagePreference::fromString('fr'),
@@ -143,6 +138,8 @@ class UserProjectionTest extends TestCase
             new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
             new \DateTime('2024-12-07T22:03:35+00:00'),
             ['ROLE_USER'],
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -170,7 +167,6 @@ class UserProjectionTest extends TestCase
         $userView = new UserView(
             UserId::fromString($event->aggregateId),
             UserEmail::fromString('test@mail.com'),
-            UserPassword::fromString('password'),
             UserFirstname::fromString('Test firstName'),
             UserLastname::fromString('Test lastName'),
             UserLanguagePreference::fromString('fr'),
@@ -179,6 +175,8 @@ class UserProjectionTest extends TestCase
             new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
             new \DateTime('2024-12-07T22:03:35+00:00'),
             ['ROLE_USER'],
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -206,7 +204,6 @@ class UserProjectionTest extends TestCase
         $userView = new UserView(
             UserId::fromString($event->aggregateId),
             UserEmail::fromString('test@mail.com'),
-            UserPassword::fromString('password'),
             UserFirstname::fromString('Test firstName'),
             UserLastname::fromString('Test lastName'),
             UserLanguagePreference::fromString('fr'),
@@ -215,119 +212,8 @@ class UserProjectionTest extends TestCase
             new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
             new \DateTime('2024-12-07T22:03:35+00:00'),
             ['ROLE_USER'],
-        );
-
-        $this->keyManagementRepository->method('getKey')
-            ->willReturn('encryption-key');
-        $this->userViewRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['uuid' => $event->aggregateId])
-            ->willReturn($userView);
-        $this->userViewRepository->expects($this->once())
-            ->method('save')
-            ->with($userView);
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
-
-        $this->userProjection->__invoke($event);
-    }
-
-    public function testHandleUserPasswordResetEvent(): void
-    {
-        $event = new UserPasswordResetDomainEvent(
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-            'newpassword123',
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-        );
-        $userView = new UserView(
-            UserId::fromString($event->aggregateId),
-            UserEmail::fromString('test@mail.com'),
-            UserPassword::fromString('password'),
-            UserFirstname::fromString('Test firstName'),
-            UserLastname::fromString('Test lastName'),
-            UserLanguagePreference::fromString('fr'),
-            UserConsent::fromBool(true),
-            new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
-            new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
-            new \DateTime('2024-12-07T22:03:35+00:00'),
-            ['ROLE_USER'],
-        );
-
-        $this->keyManagementRepository->method('getKey')
-            ->willReturn('encryption-key');
-        $this->userViewRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['uuid' => $event->aggregateId])
-            ->willReturn($userView);
-        $this->userViewRepository->expects($this->once())
-            ->method('save')
-            ->with($userView);
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
-
-        $this->userProjection->__invoke($event);
-    }
-
-    public function testHandleUserPasswordResetRequestedEvent(): void
-    {
-        $event = new UserPasswordResetRequestedDomainEvent(
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-            'reset-token-123',
-            new \DateTimeImmutable('+1 hour'),
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-        );
-        $userView = new UserView(
-            UserId::fromString($event->aggregateId),
-            UserEmail::fromString('test@mail.com'),
-            UserPassword::fromString('password'),
-            UserFirstname::fromString('Test firstName'),
-            UserLastname::fromString('Test lastName'),
-            UserLanguagePreference::fromString('fr'),
-            UserConsent::fromBool(true),
-            new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
-            new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
-            new \DateTime('2024-12-07T22:03:35+00:00'),
-            ['ROLE_USER'],
-        );
-
-        $this->keyManagementRepository->method('getKey')
-            ->willReturn('encryption-key');
-        $this->userViewRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['uuid' => $event->aggregateId])
-            ->willReturn($userView);
-        $this->userViewRepository->expects($this->once())
-            ->method('save')
-            ->with($userView);
-        $this->mailer->expects($this->once())
-            ->method('sendPasswordResetEmail')
-            ->with($userView, 'reset-token-123');
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
-
-        $this->userProjection->__invoke($event);
-    }
-
-    public function testHandleUserPasswordUpdatedEvent(): void
-    {
-        $event = new UserPasswordChangedDomainEvent(
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-            'oldpassword123',
-            'newpassword123',
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-        );
-        $userView = new UserView(
-            UserId::fromString($event->aggregateId),
-            UserEmail::fromString('test@mail.com'),
-            UserPassword::fromString('password'),
-            UserFirstname::fromString('Test firstName'),
-            UserLastname::fromString('Test lastName'),
-            UserLanguagePreference::fromString('fr'),
-            UserConsent::fromBool(true),
-            new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
-            new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
-            new \DateTime('2024-12-07T22:03:35+00:00'),
-            ['ROLE_USER'],
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -354,7 +240,6 @@ class UserProjectionTest extends TestCase
         $userView = new UserView(
             UserId::fromString($event->aggregateId),
             UserEmail::fromString('test@mail.com'),
-            UserPassword::fromString('password'),
             UserFirstname::fromString('Test firstName'),
             UserLastname::fromString('Test lastName'),
             UserLanguagePreference::fromString('fr'),
@@ -363,6 +248,8 @@ class UserProjectionTest extends TestCase
             new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
             new \DateTime('2024-12-07T22:03:35+00:00'),
             ['ROLE_USER'],
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -440,68 +327,6 @@ class UserProjectionTest extends TestCase
         $this->userProjection->__invoke($event);
     }
 
-    public function testHandleUserPasswordResetEventWithUserThatDoesNotExist(): void
-    {
-        $event = new UserPasswordResetDomainEvent(
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-            'newpassword123',
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-        );
-
-        $this->keyManagementRepository->method('getKey')
-            ->willReturn('encryption-key');
-        $this->userViewRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['uuid' => $event->aggregateId])
-            ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
-
-        $this->userProjection->__invoke($event);
-    }
-
-    public function testHandleUserPasswordResetRequestedEventWithUserThatDoesNotExist(): void
-    {
-        $event = new UserPasswordResetRequestedDomainEvent(
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-            'reset-token-123',
-            new \DateTimeImmutable('+1 hour'),
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-        );
-
-        $this->keyManagementRepository->method('getKey')
-            ->willReturn('encryption-key');
-        $this->userViewRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['uuid' => $event->aggregateId])
-            ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
-
-        $this->userProjection->__invoke($event);
-    }
-
-    public function testHandleUserPasswordUpdatedEventWithUserThatDoesNotExist(): void
-    {
-        $event = new UserPasswordChangedDomainEvent(
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-            'oldpassword123',
-            'newpassword123',
-            'b7e685be-db83-4866-9f85-102fac30a50b',
-        );
-
-        $this->keyManagementRepository->method('getKey')
-            ->willReturn('encryption-key');
-        $this->userViewRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['uuid' => $event->aggregateId])
-            ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
-
-        $this->userProjection->__invoke($event);
-    }
-
     public function testHandleUserDeletedEventWithUserThatDoesNotExist(): void
     {
         $event = new UserDeletedDomainEvent(
@@ -529,17 +354,17 @@ class UserProjectionTest extends TestCase
             'Doe',
             'fr',
             'john.doe@example.com',
-            'password123',
             true,
             '2024-12-07T22:03:35+00:00',
             '2024-12-07T22:03:35+00:00',
             'b7e685be-db83-4866-9f85-102fac30a50b',
+            'google',
+            '1234567890',
         );
 
         $userView = new UserView(
             UserId::fromString($event->aggregateId),
             UserEmail::fromString($event->email),
-            UserPassword::fromString($event->password),
             UserFirstname::fromString($event->firstname),
             UserLastname::fromString($event->lastname),
             UserLanguagePreference::fromString('fr'),
@@ -548,6 +373,8 @@ class UserProjectionTest extends TestCase
             new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
             new \DateTime('2024-12-07T22:03:35+00:00'),
             ['ROLE_USER'],
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -573,11 +400,12 @@ class UserProjectionTest extends TestCase
             'Doe',
             'fr',
             'john.doe@example.com',
-            'password123',
             true,
             '2024-12-07T22:03:35+00:00',
             '2024-12-07T22:03:35+00:00',
             'b7e685be-db83-4866-9f85-102fac30a50b',
+            'google',
+            '1234567890',
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -600,17 +428,17 @@ class UserProjectionTest extends TestCase
             'Doe',
             'fr',
             'john.doe@example.com',
-            'password123',
             true,
             '2024-12-07T22:03:35+00:00',
             '2024-12-07T22:03:35+00:00',
             'b7e685be-db83-4866-9f85-102fac30a50b',
+            'google',
+            '1234567890',
         );
 
         $userView = new UserView(
             UserId::fromString($event->aggregateId),
             UserEmail::fromString($event->email),
-            UserPassword::fromString($event->password),
             UserFirstname::fromString($event->firstname),
             UserLastname::fromString($event->lastname),
             UserLanguagePreference::fromString('fr'),
@@ -619,6 +447,8 @@ class UserProjectionTest extends TestCase
             new \DateTimeImmutable('2024-12-07T22:03:35+00:00'),
             new \DateTime('2024-12-07T22:03:35+00:00'),
             ['ROLE_USER'],
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -644,11 +474,12 @@ class UserProjectionTest extends TestCase
             'Doe',
             'fr',
             'john.doe@example.com',
-            'password123',
             true,
             '2024-12-07T22:03:35+00:00',
             '2024-12-07T22:03:35+00:00',
             'b7e685be-db83-4866-9f85-102fac30a50b',
+            'google',
+            '1234567890',
         );
 
         $this->keyManagementRepository->method('getKey')

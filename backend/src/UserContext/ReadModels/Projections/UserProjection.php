@@ -12,23 +12,16 @@ use App\UserContext\Domain\Events\UserDeletedDomainEvent;
 use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent;
 use App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent;
 use App\UserContext\Domain\Events\UserLastnameChangedDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordChangedDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordResetDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordResetRequestedDomainEvent;
 use App\UserContext\Domain\Events\UserReplayedDomainEvent;
 use App\UserContext\Domain\Events\UserRewoundDomainEvent;
 use App\UserContext\Domain\Events\UserSignedUpDomainEvent;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use App\UserContext\Domain\Ports\Inbound\UserViewRepositoryInterface;
-use App\UserContext\Domain\Ports\Outbound\MailerInterface;
 use App\UserContext\Domain\Ports\Outbound\RefreshTokenManagerInterface;
 use App\UserContext\Infrastructure\Events\Notifications\UserDeletedNotificationEvent;
 use App\UserContext\Infrastructure\Events\Notifications\UserFirstnameChangedNotificationEvent;
 use App\UserContext\Infrastructure\Events\Notifications\UserLanguagePreferenceChangedNotificationEvent;
 use App\UserContext\Infrastructure\Events\Notifications\UserLastnameChangedNotificationEvent;
-use App\UserContext\Infrastructure\Events\Notifications\UserPasswordChangedNotificationEvent;
-use App\UserContext\Infrastructure\Events\Notifications\UserPasswordResetNotificationEvent;
-use App\UserContext\Infrastructure\Events\Notifications\UserPasswordResetRequestedNotificationEvent;
 use App\UserContext\Infrastructure\Events\Notifications\UserReplayedNotificationEvent;
 use App\UserContext\Infrastructure\Events\Notifications\UserRewoundNotificationEvent;
 use App\UserContext\Infrastructure\Events\Notifications\UserSignedUpNotificationEvent;
@@ -38,7 +31,6 @@ final readonly class UserProjection
 {
     public function __construct(
         private UserViewRepositoryInterface $userViewRepository,
-        private MailerInterface $mailer,
         private KeyManagementRepositoryInterface $keyManagementRepository,
         private EventEncryptorInterface $eventEncryptor,
         private RefreshTokenManagerInterface $refreshTokenManager,
@@ -61,9 +53,6 @@ final readonly class UserProjection
             UserFirstnameChangedDomainEvent::class => $this->handleUserFirstnameChangedDomainEvent($event),
             UserLastnameChangedDomainEvent::class => $this->handleUserLastnameChangedDomainEvent($event),
             UserLanguagePreferenceChangedDomainEvent::class => $this->handleUserLanguagePreferenceChangedDomainEvent($event),
-            UserPasswordResetDomainEvent::class => $this->handleUserPasswordResetEvent($event),
-            UserPasswordResetRequestedDomainEvent::class => $this->handleUserPasswordResetRequestedDomainEvent($event),
-            UserPasswordChangedDomainEvent::class => $this->handleUserPasswordChangedDomainEvent($event),
             UserDeletedDomainEvent::class => $this->handleUserDeletedDomainEvent($event),
             UserReplayedDomainEvent::class => $this->handleUserReplayedDomainEvent($event),
             UserRewoundDomainEvent::class => $this->handleUserRewoundDomainEvent($event),
@@ -136,65 +125,6 @@ final readonly class UserProjection
         try {
             $this->publisher->publishNotificationEvents([
                 UserLastnameChangedNotificationEvent::fromDomainEvent(
-                    $event,
-                ),
-            ]);
-        } catch (\Exception $e) {
-        }
-    }
-
-    private function handleUserPasswordResetEvent(UserPasswordResetDomainEvent $event): void
-    {
-        $userView = $this->userViewRepository->findOneBy(['uuid' => $event->aggregateId]);
-
-        if (!$userView instanceof UserViewInterface) {
-            return;
-        }
-
-        $userView->fromEvent($event);
-        $this->userViewRepository->save($userView);
-        try {
-            $this->publisher->publishNotificationEvents([UserPasswordResetNotificationEvent::fromDomainEvent($event)]);
-        } catch (\Exception $e) {
-        }
-    }
-
-    private function handleUserPasswordResetRequestedDomainEvent(UserPasswordResetRequestedDomainEvent $event): void
-    {
-        $userView = $this->userViewRepository->findOneBy(
-            ['uuid' => $event->aggregateId],
-        );
-
-        if (!$userView instanceof UserViewInterface) {
-            return;
-        }
-
-        $userView->fromEvent($event);
-        $this->userViewRepository->save($userView);
-        $this->mailer->sendPasswordResetEmail($userView, $event->passwordResetToken);
-        try {
-            $this->publisher->publishNotificationEvents([
-                UserPasswordResetRequestedNotificationEvent::fromDomainEvent(
-                    $event,
-                ),
-            ]);
-        } catch (\Exception $e) {
-        }
-    }
-
-    private function handleUserPasswordChangedDomainEvent(UserPasswordChangedDomainEvent $event): void
-    {
-        $userView = $this->userViewRepository->findOneBy(['uuid' => $event->aggregateId]);
-
-        if (!$userView instanceof UserViewInterface) {
-            return;
-        }
-
-        $userView->fromEvent($event);
-        $this->userViewRepository->save($userView);
-        try {
-            $this->publisher->publishNotificationEvents([
-                UserPasswordChangedNotificationEvent::fromDomainEvent(
                     $event,
                 ),
             ]);

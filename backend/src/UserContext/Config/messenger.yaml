@@ -6,9 +6,6 @@ framework:
       'App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent': domain_events
       'App\UserContext\Domain\Events\UserLastnameChangedDomainEvent': domain_events
       'App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent': domain_events
-      'App\UserContext\Domain\Events\UserPasswordResetDomainEvent': domain_events
-      'App\UserContext\Domain\Events\UserPasswordResetRequestedDomainEvent': domain_events
-      'App\UserContext\Domain\Events\UserPasswordChangedDomainEvent': domain_events
       'App\UserContext\Domain\Events\UserSignedUpDomainEvent': domain_events
       'App\UserContext\Domain\Events\UserReplayedDomainEvent': domain_events
       'App\UserContext\Domain\Events\UserRewoundDomainEvent': domain_events
@@ -19,9 +16,6 @@ framework:
       'App\UserContext\Infrastructure\Events\Notifications\UserFirstnameChangedNotificationEvent': notification_events
       'App\UserContext\Infrastructure\Events\Notifications\UserLastnameChangedNotificationEvent': notification_events
       'App\UserContext\Infrastructure\Events\Notifications\UserLanguagePreferenceChangedNotificationEvent': notification_events
-      'App\UserContext\Infrastructure\Events\Notifications\UserPasswordResetNotificationEvent': notification_events
-      'App\UserContext\Infrastructure\Events\Notifications\UserPasswordResetRequestedNotificationEvent': notification_events
-      'App\UserContext\Infrastructure\Events\Notifications\UserPasswordChangedNotificationEvent': notification_events
       'App\UserContext\Infrastructure\Events\Notifications\UserSignedUpNotificationEvent': notification_events
       'App\UserContext\Infrastructure\Events\Notifications\UserReplayedNotificationEvent': notification_events
       'App\UserContext\Infrastructure\Events\Notifications\UserRewoundNotificationEvent': notification_events

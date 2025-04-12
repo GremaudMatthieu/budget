@@ -11,8 +11,7 @@ use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
 use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserPassword;
-use App\UserContext\Domain\ValueObjects\UserPasswordResetToken;
+use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use App\UserContext\ReadModels\Views\UserView;
 use PHPUnit\Framework\TestCase;
 
@@ -23,7 +22,6 @@ class UserViewTest extends TestCase
         $userView = new UserView(
             UserId::fromString('b7e685be-db83-4866-9f85-102fac30a50b'),
             UserEmail::fromString('john.doe@example.com'),
-            UserPassword::fromString('password123'),
             UserFirstname::fromString('John'),
             UserLastname::fromString('Doe'),
             UserLanguagePreference::fromString('fr'),
@@ -32,25 +30,23 @@ class UserViewTest extends TestCase
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             new \DateTime('2023-01-01T00:00:00+00:00'),
             ['ROLE_USER'],
-            UserPasswordResetToken::fromString('reset-token-123'),
-            new \DateTimeImmutable('+1 hour')
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $this->assertEquals('b7e685be-db83-4866-9f85-102fac30a50b', $userView->uuid);
         $this->assertEquals('john.doe@example.com', $userView->getEmail());
-        $this->assertEquals('password123', $userView->getPassword());
         $this->assertEquals('John', $userView->firstname);
         $this->assertEquals('Doe', $userView->lastname);
         $this->assertEquals('fr', $userView->languagePreference);
         $this->assertTrue($userView->consentGiven);
         $this->assertEquals('2023-01-01T00:00:00+00:00', $userView->consentDate->format(\DateTimeInterface::ATOM));
         $this->assertEquals(['ROLE_USER'], $userView->getRoles());
-        $this->assertEquals('reset-token-123', $userView->passwordResetToken);
-        $this->assertEquals((new \DateTimeImmutable('+1 hour'))->format(\DateTimeInterface::ATOM), $userView->passwordResetTokenExpiry->format(\DateTimeInterface::ATOM));
         $this->assertEquals('2023-01-01T00:00:00+00:00', $userView->createdAt->format(\DateTimeInterface::ATOM));
         $this->assertEquals('2023-01-01T00:00:00+00:00', $userView->updatedAt->format(\DateTimeInterface::ATOM));
         $this->assertEquals('john.doe@example.com', $userView->getUserIdentifier());
-        $this->assertEquals(null, $userView->eraseCredentials());
+        $this->assertEquals('google', $userView->registrationContext);
+        $this->assertEquals('1234567890', $userView->providerUserId);
     }
 
     public function testJsonSerialize(): void
@@ -58,7 +54,6 @@ class UserViewTest extends TestCase
         $userView = new UserView(
             UserId::fromString('b7e685be-db83-4866-9f85-102fac30a50b'),
             UserEmail::fromString('john.doe@example.com'),
-            UserPassword::fromString('password123'),
             UserFirstname::fromString('John'),
             UserLastname::fromString('Doe'),
             UserLanguagePreference::fromString('fr'),
@@ -67,8 +62,8 @@ class UserViewTest extends TestCase
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             new \DateTime('2023-01-01T00:00:00+00:00'),
             ['ROLE_USER'],
-            UserPasswordResetToken::fromString('reset-token-123'),
-            new \DateTimeImmutable('+1 hour')
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $expected = [
@@ -88,7 +83,6 @@ class UserViewTest extends TestCase
             'id' => 1,
             'uuid' => 'b7e685be-db83-4866-9f85-102fac30a50b',
             'email' => 'john.doe@example.com',
-            'password' => 'password123',
             'firstname' => 'John',
             'lastname' => 'Doe',
             'language_preference' => 'fr',
@@ -97,15 +91,16 @@ class UserViewTest extends TestCase
             'created_at' => '2023-01-01T00:00:00+00:00',
             'updated_at' => '2023-01-01T00:00:00+00:00',
             'roles' => json_encode(['ROLE_USER']),
-            'password_reset_token' => 'reset-token-123',
-            'password_reset_token_expiry' => (new \DateTimeImmutable('+1 hour'))->format(\DateTimeInterface::ATOM),
+            'registration_context' => 'google',
+            'provider_user_id' => '1234567890',
         ];
 
         $userView = UserView::fromRepository($userData);
 
         $this->assertEquals($userData['uuid'], $userView->getUuid());
         $this->assertEquals($userData['email'], $userView->getEmail());
-        $this->assertEquals($userData['password'], $userView->getPassword());
+        $this->assertEquals($userData['registration_context'], $userView->registrationContext);
+        $this->assertEquals($userData['provider_user_id'], $userView->providerUserId);
         $this->assertEquals($userData['firstname'], $userView->firstname);
         $this->assertEquals($userData['lastname'], $userView->lastname);
         $this->assertEquals($userData['language_preference'], $userView->languagePreference);
@@ -114,8 +109,6 @@ class UserViewTest extends TestCase
         $this->assertEquals($userData['created_at'], $userView->createdAt->format(\DateTimeInterface::ATOM));
         $this->assertEquals($userData['updated_at'], $userView->updatedAt->format(\DateTimeInterface::ATOM));
         $this->assertEquals(json_decode($userData['roles'], true), $userView->getRoles());
-        $this->assertEquals($userData['password_reset_token'], $userView->passwordResetToken);
-        $this->assertEquals($userData['password_reset_token_expiry'], $userView->passwordResetTokenExpiry->format(\DateTimeInterface::ATOM));
     }
 
     public function testFromEvents(): void
@@ -123,7 +116,6 @@ class UserViewTest extends TestCase
         $userView = new UserView(
             UserId::fromString('b7e685be-db83-4866-9f85-102fac30a50b'),
             UserEmail::fromString('john.doe@example.com'),
-            UserPassword::fromString('password123'),
             UserFirstname::fromString('John'),
             UserLastname::fromString('Doe'),
             UserLanguagePreference::fromString('fr'),
@@ -132,8 +124,8 @@ class UserViewTest extends TestCase
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             new \DateTime('2023-01-01T00:00:00+00:00'),
             ['ROLE_USER'],
-            UserPasswordResetToken::fromString('reset-token-123'),
-            new \DateTimeImmutable('+1 hour')
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $userView->fromEvents(
@@ -145,13 +137,14 @@ class UserViewTest extends TestCase
                         'userId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
                         'requestId' => '8f636cef-6a4d-40f1-a9cf-4e64f67ce7c0',
                         'email' => 'john.doe@example.com',
-                        'password' => 'password123',
                         'firstname' => 'John',
                         'lastname' => 'Doe',
                         'languagePreference' => 'fr',
                         'isConsentGiven' => true,
                         'occurredOn' => '2023-01-01T00:00:00+00:00',
                         'roles' => ['ROLE_USER'],
+                        'registrationContext' => 'google',
+                        'providerUserId' => '1234567890',
                     ]),
                 ];
             })());

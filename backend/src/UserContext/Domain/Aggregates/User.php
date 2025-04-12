@@ -12,21 +12,16 @@ use App\UserContext\Domain\Events\UserDeletedDomainEvent;
 use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent;
 use App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent;
 use App\UserContext\Domain\Events\UserLastnameChangedDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordChangedDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordResetDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordResetRequestedDomainEvent;
 use App\UserContext\Domain\Events\UserReplayedDomainEvent;
 use App\UserContext\Domain\Events\UserRewoundDomainEvent;
 use App\UserContext\Domain\Events\UserSignedUpDomainEvent;
-use App\UserContext\Domain\Exceptions\InvalidUserOperationException;
 use App\UserContext\Domain\Exceptions\UserIsNotOwnedByUserException;
 use App\UserContext\Domain\ValueObjects\UserConsent;
 use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
 use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserPassword;
-use App\UserContext\Domain\ValueObjects\UserPasswordResetToken;
+use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 
 final class User implements AggregateRootInterface, UserAggregateInterface
 {
@@ -35,7 +30,6 @@ final class User implements AggregateRootInterface, UserAggregateInterface
 
     private UserId $userId;
     private UserEmail $email;
-    private UserPassword $password;
     private UserFirstname $firstname;
     private UserLastname $lastname;
     private UserLanguagePreference $languagePreference;
@@ -45,8 +39,8 @@ final class User implements AggregateRootInterface, UserAggregateInterface
     private \DateTime $updatedAt;
     private array $roles = ['ROLE_USER'];
     private int $aggregateVersion = 0;
-    private ?UserPasswordResetToken $passwordResetToken;
-    private ?\DateTimeImmutable $passwordResetTokenExpiry;
+    private UserRegistrationContext $userRegistrationContext;
+    private string $providerUserId;
 
     private function __construct()
     {
@@ -55,24 +49,26 @@ final class User implements AggregateRootInterface, UserAggregateInterface
     public static function create(
         UserId $userId,
         UserEmail $email,
-        UserPassword $password,
         UserFirstname $firstname,
         UserLastname $lastname,
         UserLanguagePreference $languagePreference,
         UserConsent $isConsentGiven,
+        UserRegistrationContext $registrationContext,
+        string $providerUserId,
     ): self {
         $aggregate = new self();
         $aggregate->raiseDomainEvent(
             new UserSignedUpDomainEvent(
                 (string) $userId,
                 (string) $email,
-                (string) $password,
                 (string) $firstname,
                 (string) $lastname,
                 (string) $languagePreference,
                 $isConsentGiven->toBool(),
                 $aggregate->roles,
                 (string) $userId,
+                (string) $registrationContext,
+                $providerUserId,
             ),
         );
 
@@ -131,49 +127,6 @@ final class User implements AggregateRootInterface, UserAggregateInterface
         );
     }
 
-    public function updatePassword(UserPassword $oldPassword, UserPassword $newPassword, UserId $userId): void
-    {
-        $this->assertOwnership($userId);
-        $this->raiseDomainEvent(
-            new UserPasswordChangedDomainEvent(
-                (string) $this->userId,
-                (string) $oldPassword,
-                (string) $newPassword,
-                (string) $this->userId,
-            ),
-        );
-    }
-
-    public function setPasswordResetToken(UserPasswordResetToken $passwordResetToken, UserId $userId): void
-    {
-        $this->assertOwnership($userId);
-        $this->raiseDomainEvent(
-            new UserPasswordResetRequestedDomainEvent(
-                (string) $this->userId,
-                (string) $passwordResetToken,
-                UtcClock::fromDateTimeImmutable(new \DateTimeImmutable('+1 hour')),
-                (string) $this->userId,
-            ),
-        );
-    }
-
-    public function resetPassword(UserPassword $password, UserId $userId): void
-    {
-        $this->assertOwnership($userId);
-
-        if ($this->passwordResetTokenExpiry < UtcClock::immutableNow()) {
-            throw InvalidUserOperationException::operationOnResetUserPassword();
-        }
-
-        $this->raiseDomainEvent(
-            new UserPasswordResetDomainEvent(
-                (string) $this->userId,
-                (string) $password,
-                (string) $this->userId,
-            ),
-        );
-    }
-
     public function rewind(UserId $userId): void
     {
         $this->assertOwnership($userId);
@@ -184,11 +137,12 @@ final class User implements AggregateRootInterface, UserAggregateInterface
                 (string) $this->lastname,
                 (string) $this->languagePreference,
                 (string) $this->email,
-                (string) $this->password,
                 $this->consentGiven->toBool(),
                 UtcClock::fromImmutableToString($this->consentDate),
                 UtcClock::fromDateTimeToString($this->updatedAt),
                 (string) $this->userId,
+                (string) $this->userRegistrationContext,
+                $this->providerUserId,
             ),
         );
     }
@@ -203,11 +157,12 @@ final class User implements AggregateRootInterface, UserAggregateInterface
                 (string) $this->lastname,
                 (string) $this->languagePreference,
                 (string) $this->email,
-                (string) $this->password,
                 $this->consentGiven->toBool(),
                 UtcClock::fromImmutableToString($this->consentDate),
                 UtcClock::fromDateTimeToString($this->updatedAt),
                 (string) $this->userId,
+                (string) $this->userRegistrationContext,
+                $this->providerUserId,
             ),
         );
     }
@@ -238,7 +193,6 @@ final class User implements AggregateRootInterface, UserAggregateInterface
     {
         $this->userId = UserId::fromString($event->aggregateId);
         $this->email = UserEmail::fromString($event->email);
-        $this->password = UserPassword::fromString($event->password);
         $this->firstname = UserFirstname::fromString($event->firstname);
         $this->lastname = UserLastname::fromString($event->lastname);
         $this->languagePreference = UserLanguagePreference::fromString($event->languagePreference);
@@ -247,8 +201,8 @@ final class User implements AggregateRootInterface, UserAggregateInterface
         $this->consentGiven = UserConsent::fromBool($event->isConsentGiven);
         $this->consentDate = UtcClock::immutableNow();
         $this->roles = ['ROLE_USER'];
-        $this->passwordResetToken = null;
-        $this->passwordResetTokenExpiry = null;
+        $this->userRegistrationContext = UserRegistrationContext::fromString($event->registrationContext);
+        $this->providerUserId = $event->providerUserId;
     }
 
     public function applyUserFirstnameChangedDomainEvent(UserFirstnameChangedDomainEvent $event): void
@@ -269,27 +223,6 @@ final class User implements AggregateRootInterface, UserAggregateInterface
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
-    public function applyUserPasswordChangedDomainEvent(UserPasswordChangedDomainEvent $event): void
-    {
-        $this->password = UserPassword::fromString($event->newPassword);
-        $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
-    }
-
-    public function applyUserPasswordResetRequestedDomainEvent(UserPasswordResetRequestedDomainEvent $event): void
-    {
-        $this->passwordResetToken = UserPasswordResetToken::fromString(
-            $event->passwordResetToken,
-        );
-        $this->passwordResetTokenExpiry = $event->passwordResetTokenExpiry;
-        $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
-    }
-
-    public function applyUserPasswordResetDomainEvent(UserPasswordResetDomainEvent $event): void
-    {
-        $this->password = UserPassword::fromString($event->password);
-        $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
-    }
-
     public function applyUserDeletedDomainEvent(): void
     {
         $this->updatedAt = UtcClock::now();
@@ -301,10 +234,11 @@ final class User implements AggregateRootInterface, UserAggregateInterface
         $this->lastname = UserLastname::fromString($event->lastname);
         $this->languagePreference = UserLanguagePreference::fromString($event->languagePreference);
         $this->email = UserEmail::fromString($event->email);
-        $this->password = UserPassword::fromString($event->password);
         $this->consentGiven = UserConsent::fromBool($event->isConsentGiven);
         $this->consentDate = UtcClock::fromDateTimeImmutable($event->consentDate);
         $this->updatedAt = UtcClock::fromDatetime($event->updatedAt);
+        $this->userRegistrationContext = UserRegistrationContext::fromString($event->registrationContext);
+        $this->providerUserId = $event->providerUserId;
     }
 
     public function applyUserRewoundDomainEvent(UserRewoundDomainEvent $event): void
@@ -313,10 +247,11 @@ final class User implements AggregateRootInterface, UserAggregateInterface
         $this->lastname = UserLastname::fromString($event->lastname);
         $this->languagePreference = UserLanguagePreference::fromString($event->languagePreference);
         $this->email = UserEmail::fromString($event->email);
-        $this->password = UserPassword::fromString($event->password);
         $this->consentGiven = UserConsent::fromBool($event->isConsentGiven);
         $this->consentDate = UtcClock::fromDateTimeImmutable($event->consentDate);
         $this->updatedAt = UtcClock::fromDatetime($event->updatedAt);
+        $this->userRegistrationContext = UserRegistrationContext::fromString($event->registrationContext);
+        $this->providerUserId = $event->providerUserId;
     }
 
     private function assertOwnership(UserId $userId): void

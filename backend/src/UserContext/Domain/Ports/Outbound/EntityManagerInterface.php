@@ -8,5 +8,7 @@ interface EntityManagerInterface
 {
     public function remove(object $object): void;
 
+    public function persist(object $object): void;
+
     public function flush(): void;
 }

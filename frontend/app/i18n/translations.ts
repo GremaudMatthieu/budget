@@ -70,6 +70,7 @@ export const translations = {
             signingIn: "Signing In...",
             dontHaveAccount: "Don't have an account?",
             signUp: "Sign Up",
+            or: "or"
         },
         envelopes: {
             title: "Your Budget Envelopes",
@@ -430,6 +431,7 @@ export const translations = {
             signingIn: "Connexion en cours...",
             dontHaveAccount: "Vous n'avez pas de compte ?",
             signUp: "S'inscrire",
+            or: "ou"
         },
         envelopes: {
             title: "Vos enveloppes budgétaires",

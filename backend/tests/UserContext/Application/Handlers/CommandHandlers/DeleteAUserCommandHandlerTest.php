@@ -19,7 +19,7 @@ use App\UserContext\Domain\ValueObjects\UserEmailRegistryId;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
 use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserPassword;
+use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -48,11 +48,12 @@ class DeleteAUserCommandHandlerTest extends TestCase
         $user = User::create(
             UserId::fromString($userId),
             UserEmail::fromString($userEmail),
-            UserPassword::fromString('password123'),
             UserFirstname::fromString('Test'),
             UserLastname::fromString('User'),
             UserLanguagePreference::fromString('fr'),
-            UserConsent::fromBool(true)
+            UserConsent::fromBool(true),
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $registry = UserEmailRegistry::create(
@@ -100,11 +101,12 @@ class DeleteAUserCommandHandlerTest extends TestCase
         $user = User::create(
             UserId::fromString($actualUserId),
             UserEmail::fromString('test@example.com'),
-            UserPassword::fromString('password123'),
             UserFirstname::fromString('Test'),
             UserLastname::fromString('User'),
             UserLanguagePreference::fromString('fr'),
-            UserConsent::fromBool(true)
+            UserConsent::fromBool(true),
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $registry = UserEmailRegistry::create(

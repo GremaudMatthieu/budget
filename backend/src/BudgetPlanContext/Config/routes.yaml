@@ -1,5 +1,0 @@
-budget_envelope_routes:
-  resource:
-    path: ../../Gateway/BudgetEnvelope/Presentation/HTTP/Controllers/
-    namespace: App\Gateway\BudgetEnvelope\Presentation\HTTP\Controllers
-  type: attribute

@@ -1,0 +1,18 @@
+services:
+    # OAuth controller
+    App\Gateway\User\Presentation\HTTP\Controllers\SignUpOrAuthenticateAGoogleUserController:
+        tags: ['controller.service_arguments']
+        
+    # OAuth repository
+    App\UserContext\Domain\Ports\Inbound\UserOAuthRepositoryInterface:
+        class: App\UserContext\Infrastructure\Repositories\DoctrineUserOAuthRepository
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            
+    # OAuth command handler
+    App\UserContext\Application\Handlers\CommandHandlers\SignUpOrAuthenticateWithOAuth2CommandHandler:
+        tags: ['messenger.message_handler']
+        
+    # Add frontend URL parameter
+parameters:
+    app.frontend_url: '%env(FRONTEND_URL)%'

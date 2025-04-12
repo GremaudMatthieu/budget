@@ -223,6 +223,12 @@ parameters:
 			path: src/Gateway/User/Presentation/Cli/RewindAUserCommand.php
 
 		-
+			message: '#^Part \$frontendUrl \(array\|bool\|float\|int\|string\|UnitEnum\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Gateway/User/Presentation/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
+
+		-
 			message: '#^Property App\\Libraries\\FluxCapacitor\\Anonymizer\\Entities\\EncryptionKey\:\:\$createdAt is unused\.$#'
 			identifier: property.unused
 			count: 1
@@ -541,12 +547,6 @@ parameters:
 			path: src/UserContext/Domain/Aggregates/User.php
 
 		-
-			message: '#^Property App\\UserContext\\Domain\\Aggregates\\User\:\:\$passwordResetToken is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: src/UserContext/Domain/Aggregates/User.php
-
-		-
 			message: '#^Cannot access offset ''isRegistered'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 3
@@ -563,6 +563,12 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: src/UserContext/Domain/Aggregates/UserEmailRegistry.php
+
+		-
+			message: '#^Property App\\UserContext\\Domain\\Entities\\UserOAuth\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/UserContext/Domain/Entities/UserOAuth.php
 
 		-
 			message: '#^Method App\\UserContext\\ReadModels\\Views\\UserView\:\:getRoles\(\) should return array\<string\> but returns array\.$#'
