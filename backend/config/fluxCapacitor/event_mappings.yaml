@@ -28,9 +28,6 @@ events:
   UserFirstnameChangedDomainEvent: App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent
   UserLanguagePreferenceChangedDomainEvent: App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent
   UserLastnameChangedDomainEvent: App\UserContext\Domain\Events\UserLastnameChangedDomainEvent
-  UserPasswordChangedDomainEvent: App\UserContext\Domain\Events\UserPasswordChangedDomainEvent
-  UserPasswordResetDomainEvent: App\UserContext\Domain\Events\UserPasswordResetDomainEvent
-  UserPasswordResetRequestedDomainEvent: App\UserContext\Domain\Events\UserPasswordResetRequestedDomainEvent
   UserReplayedDomainEvent: App\UserContext\Domain\Events\UserReplayedDomainEvent
   UserRewoundDomainEvent: App\UserContext\Domain\Events\UserRewoundDomainEvent
   UserSignedUpDomainEvent: App\UserContext\Domain\Events\UserSignedUpDomainEvent
@@ -74,9 +71,6 @@ event_to_aggregate:
   UserFirstnameChangedDomainEvent: User
   UserLanguagePreferenceChangedDomainEvent: User
   UserLastnameChangedDomainEvent: User
-  UserPasswordChangedDomainEvent: User
-  UserPasswordResetDomainEvent: User
-  UserPasswordResetRequestedDomainEvent: User
   UserReplayedDomainEvent: User
   UserRewoundDomainEvent: User
   UserSignedUpDomainEvent: User

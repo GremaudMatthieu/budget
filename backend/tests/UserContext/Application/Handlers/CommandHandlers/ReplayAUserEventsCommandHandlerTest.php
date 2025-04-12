@@ -16,7 +16,7 @@ use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
 use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserPassword;
+use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -44,11 +44,12 @@ class ReplayAUserEventsCommandHandlerTest extends TestCase
         $user = User::create(
             UserId::fromString($userId),
             UserEmail::fromString('test@example.com'),
-            UserPassword::fromString('password123'),
             UserFirstname::fromString('John'),
             UserLastname::fromString('Doe'),
             UserLanguagePreference::fromString('en'),
-            UserConsent::fromBool(true)
+            UserConsent::fromBool(true),
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $this->eventStore->expects($this->once())

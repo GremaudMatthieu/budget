@@ -14,20 +14,23 @@ class UserSignedUpEventTest extends TestCase
         $event = new UserSignedUpDomainEvent(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             'test@example.com',
-            'password123',
             'John',
             'Doe',
             'fr',
             true,
             ['ROLE_USER'],
             'b7e685be-db83-4866-9f85-102fac30a50b',
+            'google',
+            '1234567890',
+
         );
         $array = $event->toArray();
 
         $this->assertEquals('b7e685be-db83-4866-9f85-102fac30a50b', $array['aggregateId']);
         $this->assertEquals('b7e685be-db83-4866-9f85-102fac30a50b', $array['userId']);
         $this->assertEquals('test@example.com', $array['email']);
-        $this->assertEquals('password123', $array['password']);
+        $this->assertEquals('google', $array['registrationContext']);
+        $this->assertEquals('1234567890', $array['providerUserId']);
         $this->assertEquals('John', $array['firstname']);
         $this->assertEquals('Doe', $array['lastname']);
         $this->assertTrue($array['isConsentGiven']);
@@ -40,13 +43,14 @@ class UserSignedUpEventTest extends TestCase
         $data = [
             'aggregateId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
             'email' => 'test@example.com',
-            'password' => 'password123',
             'firstname' => 'John',
             'lastname' => 'Doe',
             'languagePreference' => 'fr',
             'isConsentGiven' => true,
             'roles' => ['ROLE_USER'],
             'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'registrationContext' => 'google',
+            'providerUserId' => '1234567890',
             'userId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
             'requestId' => '8f636cef-6a4d-40f1-a9cf-4e64f67ce7c0',
         ];
@@ -55,7 +59,8 @@ class UserSignedUpEventTest extends TestCase
 
         $this->assertEquals($data['aggregateId'], $event->aggregateId);
         $this->assertEquals($data['email'], $event->email);
-        $this->assertEquals($data['password'], $event->password);
+        $this->assertEquals($data['registrationContext'], $event->registrationContext);
+        $this->assertEquals($data['providerUserId'], $event->providerUserId);
         $this->assertEquals($data['firstname'], $event->firstname);
         $this->assertEquals($data['lastname'], $event->lastname);
         $this->assertEquals($data['languagePreference'], $event->languagePreference);

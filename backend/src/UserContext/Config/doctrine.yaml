@@ -7,6 +7,12 @@ doctrine:
         dir: '%kernel.project_dir%/src/UserContext/ReadModels/Views'
         prefix: 'App\UserContext\ReadModels\Views'
         alias: UserView
+      UserOAuth:
+        type: attribute
+        is_bundle: false
+        dir: '%kernel.project_dir%/src/UserContext/Domain/Entities'
+        prefix: 'App\UserContext\Domain\Entities'
+        alias: UserOAuth
       RefreshToken:
         type: attribute
         is_bundle: false

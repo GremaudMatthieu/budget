@@ -20,6 +20,12 @@ final readonly class EntityManagerAdapter implements EntityManagerInterface
     }
 
     #[\Override]
+    public function persist(object $object): void
+    {
+        $this->entityManager->persist($object);
+    }
+
+    #[\Override]
     public function flush(): void
     {
         $this->entityManager->flush();

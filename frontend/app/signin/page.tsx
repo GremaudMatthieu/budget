@@ -9,6 +9,7 @@ import { useError } from "../contexts/ErrorContext";
 import TextInput from '../components/inputs/formInputs/textInputs'
 import PasswordInput from '../components/inputs/passwordInput'
 import ActionButton from '../components/buttons/formButton/formButton'
+import GoogleSignInButton from '../components/auth/GoogleSignInButton'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
@@ -17,6 +18,7 @@ export default function SignIn() {
   const router = useRouter()
   const { t } = useTranslation()
   const { error, setError } = useError()
+  
   useEffect(() => {
     const checkAuthAndRedirect = async () => {
       if (isAuthenticated) {
@@ -63,7 +65,6 @@ export default function SignIn() {
         </div>
         <form onSubmit={handleSubmit} className="mt-8 space-y-6 neomorphic p-8 rounded-lg">
           <div className="rounded-md space-y-4">
-
             <TextInput
               id="email"
               name="email"
@@ -92,7 +93,23 @@ export default function SignIn() {
           </div>
           <div>
             <ActionButton type="submit" label={t('signin.signIn')} disabled={loading} className="" />
-
+          </div>
+          
+          <div className="mt-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-background text-gray-500">
+                  {t('signin.or')}
+                </span>
+              </div>
+            </div>
+            
+            <div className="mt-4">
+              <GoogleSignInButton />
+            </div>
           </div>
         </form>
         <p className="mt-2 text-center text-sm text-foreground">

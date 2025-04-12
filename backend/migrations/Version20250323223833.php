@@ -74,11 +74,10 @@ final class Version20250323223833 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN event_store.occurred_on IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE refresh_tokens (id INT NOT NULL, refresh_token VARCHAR(128) NOT NULL, username VARCHAR(255) NOT NULL, valid TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_9BACE7E1C74F2195 ON refresh_tokens (refresh_token)');
-        $this->addSql('CREATE TABLE user_view (id INT NOT NULL, uuid VARCHAR(36) NOT NULL, email VARCHAR(320) NOT NULL, password VARCHAR(255) NOT NULL, firstname VARCHAR(50) NOT NULL, lastname VARCHAR(50) NOT NULL, language_preference VARCHAR(35) NOT NULL, consent_given BOOLEAN NOT NULL, consent_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, roles JSON NOT NULL, password_reset_token VARCHAR(64) DEFAULT NULL, password_reset_token_expiry TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE user_view (id INT NOT NULL, uuid VARCHAR(36) NOT NULL, email VARCHAR(320) NOT NULL, firstname VARCHAR(50) NOT NULL, lastname VARCHAR(50) NOT NULL, language_preference VARCHAR(35) NOT NULL, consent_given BOOLEAN NOT NULL, consent_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, roles JSON NOT NULL, registration_context VARCHAR(32) NOT NULL, provider_user_id VARCHAR(255) NOT NULL,PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_847CE747D17F50A6 ON user_view (uuid)');
         $this->addSql('COMMENT ON COLUMN user_view.consent_date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN user_view.created_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('COMMENT ON COLUMN user_view.password_reset_token_expiry IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('ALTER TABLE budget_envelope_ledger_entry_view ALTER COLUMN id SET DEFAULT nextval(\'budget_envelope_ledger_view_id_seq\')');
         $this->addSql('ALTER TABLE budget_envelope_view ALTER COLUMN id SET DEFAULT nextval(\'budget_envelope_view_id_seq\')');
         $this->addSql('ALTER TABLE budget_plan_income_entry_view ALTER COLUMN id SET DEFAULT nextval(\'budget_plan_income_entry_view_id_seq\')');
@@ -90,6 +89,16 @@ final class Version20250323223833 extends AbstractMigration
         $this->addSql('ALTER TABLE event_store ALTER COLUMN id SET DEFAULT nextval(\'event_store_id_seq\')');
         $this->addSql('ALTER TABLE refresh_tokens ALTER COLUMN id SET DEFAULT nextval(\'refresh_tokens_id_seq\')');
         $this->addSql('ALTER TABLE user_view ALTER COLUMN id SET DEFAULT nextval(\'user_view_id_seq\')');
+        $this->addSql('CREATE TABLE user_oauth (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(255) NOT NULL,
+            provider VARCHAR(255) NOT NULL,
+            provider_user_id VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
+            UNIQUE (provider, provider_user_id),
+            UNIQUE (user_id, provider)
+        )');
+        $this->addSql('COMMENT ON COLUMN user_oauth.created_at IS \'(DC2Type:datetime_immutable)\'');
     }
 
     public function down(Schema $schema): void
@@ -117,5 +126,6 @@ final class Version20250323223833 extends AbstractMigration
         $this->addSql('DROP TABLE event_store');
         $this->addSql('DROP TABLE refresh_tokens');
         $this->addSql('DROP TABLE user_view');
+        $this->addSql('DROP TABLE user_oauth');
     }
 }

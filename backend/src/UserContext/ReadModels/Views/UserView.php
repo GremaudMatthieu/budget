@@ -10,9 +10,6 @@ use App\SharedContext\Domain\ValueObjects\UtcClock;
 use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent;
 use App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent;
 use App\UserContext\Domain\Events\UserLastnameChangedDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordChangedDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordResetDomainEvent;
-use App\UserContext\Domain\Events\UserPasswordResetRequestedDomainEvent;
 use App\UserContext\Domain\Events\UserReplayedDomainEvent;
 use App\UserContext\Domain\Events\UserRewoundDomainEvent;
 use App\UserContext\Domain\Events\UserSignedUpDomainEvent;
@@ -22,15 +19,13 @@ use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
 use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserPassword;
-use App\UserContext\Domain\ValueObjects\UserPasswordResetToken;
+use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'user_view')]
-final class UserView implements UserViewInterface, UserInterface, PasswordAuthenticatedUserInterface, \JsonSerializable
+final class UserView implements UserViewInterface, UserInterface, \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
@@ -43,9 +38,6 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
 
     #[ORM\Column(name: 'email', type: 'string', length: 320)]
     private(set) string $email;
-
-    #[ORM\Column(name: 'password', type: 'string', length: 255)]
-    private(set) string $password;
 
     #[ORM\Column(name: 'firstname', type: 'string', length: 50)]
     private(set) string $firstname;
@@ -71,16 +63,15 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
     #[ORM\Column(name: 'roles', type: 'json')]
     private(set) array $roles = ['ROLE_USER'];
 
-    #[ORM\Column(name: 'password_reset_token', type: 'string', length: 64, nullable: true)]
-    private(set) ?string $passwordResetToken = null;
+    #[ORM\Column(name: 'registration_context', type: 'string', length: 32)]
+    private(set) string $registrationContext;
 
-    #[ORM\Column(name: 'password_reset_token_expiry', type: 'datetime_immutable', nullable: true)]
-    private(set) ?\DateTimeImmutable $passwordResetTokenExpiry = null;
+    #[ORM\Column(name: 'provider_user_id', type: 'string', length: 255)]
+    private(set) string $providerUserId;
 
     public function __construct(
         UserId $userId,
         UserEmail $email,
-        UserPassword $password,
         UserFirstname $firstname,
         UserLastname $lastname,
         UserLanguagePreference $languagePreference,
@@ -89,13 +80,11 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
         \DateTimeImmutable $createdAt,
         \DateTime $updatedAt,
         array $roles,
-        ?UserPasswordResetToken $passwordResetToken = null,
-        ?\DateTimeImmutable $passwordResetTokenExpiry = null,
-
+        UserRegistrationContext $registrationContext,
+        string $providerUserId,
     ) {
         $this->uuid = (string) $userId;
         $this->email = (string) $email;
-        $this->password = (string) $password;
         $this->firstname = (string) $firstname;
         $this->lastname = (string) $lastname;
         $this->languagePreference = (string) $languagePreference;
@@ -104,8 +93,8 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->roles = $roles;
-        $this->passwordResetToken = $passwordResetToken instanceof UserPasswordResetToken ? (string) $passwordResetToken : null;
-        $this->passwordResetTokenExpiry = $passwordResetTokenExpiry;
+        $this->registrationContext = (string) $registrationContext;
+        $this->providerUserId = $providerUserId;
     }
 
     public static function fromRepository(array $user): self
@@ -113,7 +102,6 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
         return new self(
             UserId::fromString($user['uuid']),
             UserEmail::fromString($user['email']),
-            UserPassword::fromString($user['password']),
             UserFirstname::fromString($user['firstname']),
             UserLastname::fromString($user['lastname']),
             UserLanguagePreference::fromString($user['language_preference']),
@@ -122,10 +110,8 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
             new \DateTimeImmutable($user['created_at']),
             new \DateTime($user['updated_at']),
             json_decode($user['roles'], true),
-            $user['password_reset_token'] ? UserPasswordResetToken::fromString($user['password_reset_token']) : null,
-            $user['password_reset_token_expiry'] ?
-                new \DateTimeImmutable($user['password_reset_token_expiry']) :
-                null,
+            UserRegistrationContext::fromString($user['registration_context']),
+            $user['provider_user_id'],
         );
     }
 
@@ -134,7 +120,6 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
         return new self(
             UserId::fromString($event->aggregateId),
             UserEmail::fromString($event->email),
-            UserPassword::fromString($event->password),
             UserFirstname::fromString($event->firstname),
             UserLastname::fromString($event->lastname),
             UserLanguagePreference::fromString($event->languagePreference),
@@ -143,6 +128,35 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
             $event->roles,
+            UserRegistrationContext::fromString($event->registrationContext),
+            $event->providerUserId,
+        );
+    }
+
+    public static function fromOAuth(
+        UserId $userId,
+        UserEmail $email,
+        UserFirstname $firstname,
+        UserLastname $lastname,
+        UserLanguagePreference $languagePreference,
+        UserConsent $consentGiven,
+        UserRegistrationContext $registrationContext,
+        string $providerUserId,
+    ): self
+    {
+        return new self(
+            $userId,
+            $email,
+            $firstname,
+            $lastname,
+            $languagePreference,
+            $consentGiven,
+            UtcClock::immutableNow(),
+            UtcClock::immutableNow(),
+            UtcClock::now(),
+            ['ROLE_USER'],
+            $registrationContext,
+            $providerUserId,
         );
     }
 
@@ -157,11 +171,6 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
     public function fromEvent(DomainEventInterface $event): void
     {
         $this->apply($event);
-    }
-
-    public function getPassword(): string
-    {
-        return $this->password;
     }
 
     public function getUuid(): string
@@ -206,9 +215,6 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
             UserFirstnameChangedDomainEvent::class => $this->applyUserFirstnameChangedDomainEvent($event),
             UserLastnameChangedDomainEvent::class => $this->applyUserLastnameChangedDomainEvent($event),
             UserLanguagePreferenceChangedDomainEvent::class => $this->applyUserLanguagePreferenceChangedDomainEvent($event),
-            UserPasswordChangedDomainEvent::class => $this->applyUserPasswordChangedDomainEvent($event),
-            UserPasswordResetRequestedDomainEvent::class => $this->applyUserPasswordResetRequestedDomainEvent($event),
-            UserPasswordResetDomainEvent::class => $this->applyUserPasswordResetDomainEvent($event),
             UserReplayedDomainEvent::class => $this->applyUserReplayedDomainEvent($event),
             UserRewoundDomainEvent::class => $this->applyUserRewoundDomainEvent($event),
             default => throw new \RuntimeException('users.unknownEvent'),
@@ -219,7 +225,6 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
     {
         $this->uuid = $event->aggregateId;
         $this->email = $event->email;
-        $this->password = $event->password;
         $this->firstname = $event->firstname;
         $this->lastname = $event->lastname;
         $this->languagePreference = $event->languagePreference;
@@ -228,8 +233,8 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
         $this->consentGiven = $event->isConsentGiven;
         $this->consentDate = UtcClock::immutableNow();
         $this->roles = ['ROLE_USER'];
-        $this->passwordResetToken = null;
-        $this->passwordResetTokenExpiry = null;
+        $this->registrationContext = $event->registrationContext;
+        $this->providerUserId = $event->providerUserId;
     }
 
     private function applyUserFirstnameChangedDomainEvent(UserFirstnameChangedDomainEvent $event): void
@@ -251,35 +256,17 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyUserPasswordChangedDomainEvent(UserPasswordChangedDomainEvent $event): void
-    {
-        $this->password = $event->newPassword;
-        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
-    }
-
-    private function applyUserPasswordResetRequestedDomainEvent(UserPasswordResetRequestedDomainEvent $event): void
-    {
-        $this->passwordResetToken = $event->passwordResetToken;
-        $this->passwordResetTokenExpiry = $event->passwordResetTokenExpiry;
-        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
-    }
-
-    private function applyUserPasswordResetDomainEvent(UserPasswordResetDomainEvent $event): void
-    {
-        $this->password = $event->password;
-        $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
-    }
-
     private function applyUserReplayedDomainEvent(UserReplayedDomainEvent $event): void
     {
         $this->firstname = $event->firstname;
         $this->lastname = $event->lastname;
         $this->languagePreference = $event->languagePreference;
         $this->email = $event->email;
-        $this->password = $event->password;
         $this->consentGiven = $event->isConsentGiven;
         $this->consentDate = $event->consentDate;
         $this->updatedAt = $event->updatedAt;
+        $this->registrationContext = $event->registrationContext;
+        $this->providerUserId = $event->providerUserId;
     }
 
     private function applyUserRewoundDomainEvent(UserRewoundDomainEvent $event): void
@@ -288,9 +275,10 @@ final class UserView implements UserViewInterface, UserInterface, PasswordAuthen
         $this->lastname = $event->lastname;
         $this->languagePreference = $event->languagePreference;
         $this->email = $event->email;
-        $this->password = $event->password;
         $this->consentGiven = $event->isConsentGiven;
         $this->consentDate = $event->consentDate;
         $this->updatedAt = $event->updatedAt;
+        $this->registrationContext = $event->registrationContext;
+        $this->providerUserId = $event->providerUserId;
     }
 }

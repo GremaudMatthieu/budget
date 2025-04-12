@@ -11,34 +11,37 @@ use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
 use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserPassword;
+use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 
 final readonly class SignUpAUserCommand implements CommandInterface
 {
     private string $userId;
     private string $userEmail;
-    private string $userPassword;
     private string $userFirstname;
     private string $userLastname;
     private string $userLanguagePreference;
     private bool $userConsentGiven;
+    private string $userRegistrationContext;
+    private string $providerUserId;
 
     public function __construct(
         UserId $userId,
         UserEmail $userEmail,
-        UserPassword $userPassword,
         UserFirstname $userFirstname,
         UserLastname $userLastname,
         UserLanguagePreference $userLanguagePreference,
         UserConsent $userConsentGiven,
+        UserRegistrationContext $userRegistrationContext,
+        string $providerUserId,
     ) {
         $this->userId = (string) $userId;
         $this->userEmail = (string) $userEmail;
-        $this->userPassword = (string) $userPassword;
         $this->userFirstname = (string) $userFirstname;
         $this->userLastname = (string) $userLastname;
         $this->userLanguagePreference = (string) $userLanguagePreference;
         $this->userConsentGiven = $userConsentGiven->toBool();
+        $this->userRegistrationContext = (string) $userRegistrationContext;
+        $this->providerUserId = $providerUserId;
     }
 
     public function getUserId(): UserId
@@ -49,11 +52,6 @@ final readonly class SignUpAUserCommand implements CommandInterface
     public function getUserEmail(): UserEmail
     {
         return UserEmail::fromString($this->userEmail);
-    }
-
-    public function getUserPassword(): UserPassword
-    {
-        return UserPassword::fromString($this->userPassword);
     }
 
     public function getUserFirstname(): UserFirstname
@@ -74,5 +72,15 @@ final readonly class SignUpAUserCommand implements CommandInterface
     public function isUserConsentGiven(): UserConsent
     {
         return UserConsent::fromBool($this->userConsentGiven);
+    }
+
+    public function getUserRegistrationContext(): UserRegistrationContext
+    {
+        return UserRegistrationContext::fromString($this->userRegistrationContext);
+    }
+
+    public function getProviderUserId(): string
+    {
+        return $this->providerUserId;
     }
 }

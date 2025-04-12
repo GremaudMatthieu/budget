@@ -14,8 +14,6 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
     #[PersonalData]
     public string $email;
     #[PersonalData]
-    public string $password;
-    #[PersonalData]
     public string $firstname;
     #[PersonalData]
     public string $lastname;
@@ -25,23 +23,25 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
     public array $roles;
     public string $userId;
     public string $requestId;
+    public string $registrationContext;
+    public string $providerUserId;
     public \DateTimeImmutable $occurredOn;
 
     public function __construct(
         string $aggregateId,
         string $email,
-        string $password,
         string $firstname,
         string $lastname,
         string $languagePreference,
         bool $isConsentGiven,
         array $roles,
         string $userId,
+        string $registrationContext,
+        string $providerUserId,
         string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID
     ) {
         $this->aggregateId = $aggregateId;
         $this->email = $email;
-        $this->password = $password;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
         $this->languagePreference = $languagePreference;
@@ -49,6 +49,8 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
         $this->roles = $roles;
         $this->userId = $userId;
         $this->requestId = $requestId;
+        $this->registrationContext = $registrationContext;
+        $this->providerUserId = $providerUserId;
         $this->occurredOn = UtcClock::immutableNow();
     }
 
@@ -60,12 +62,13 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
             'requestId' => $this->requestId,
             'userId' => $this->userId,
             'email' => $this->email,
-            'password' => $this->password,
             'firstname' => $this->firstname,
             'lastname' => $this->lastname,
             'languagePreference' => $this->languagePreference,
             'isConsentGiven' => $this->isConsentGiven,
             'roles' => $this->roles,
+            'registrationContext' => $this->registrationContext,
+            'providerUserId' => $this->providerUserId,
             'occurredOn' => $this->occurredOn->format(\DateTimeInterface::ATOM),
         ];
     }
@@ -76,13 +79,14 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
         $event = new self(
             $data['aggregateId'],
             $data['email'],
-            $data['password'],
             $data['firstname'],
             $data['lastname'],
             $data['languagePreference'],
             $data['isConsentGiven'],
             $data['roles'],
             $data['userId'],
+            $data['registrationContext'],
+            $data['providerUserId'],
             $data['requestId']
         );
         $event->occurredOn = new \DateTimeImmutable($data['occurredOn']);

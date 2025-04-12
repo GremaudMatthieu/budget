@@ -15,6 +15,7 @@ import PasswordInput from "../components/inputs/passwordInput"
 import CustomSelect from "../components/inputs/customSelect"
 import { languageOptions } from "../constants/languageOptions"
 import ActionButton from "../components/buttons/formButton/formButton"
+import GoogleSignInButton from '../components/auth/GoogleSignInButton'
 
 export default function SignUp() {
     const [firstname, setFirstname] = useState("")
@@ -69,110 +70,127 @@ export default function SignUp() {
                 {successMessage ? (
                     <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md">{successMessage}</div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="mt-8 space-y-6 neomorphic p-8 rounded-lg">
-                        <div className="rounded-md space-y-4">
-                            <div>
-                                <TextInput
-                                    id="firstname"
-                                    name="firstname"
-                                    type="text"
-                                    value={firstname}
-                                    onChange={(e) => setFirstname(e.target.value)}
-                                    className=""
-                                    label={t("signup.firstname")}
-                                    placeholder={t("signup.firstname")}
-                                />
+                    <>
+                        <div className="mt-6">
+                            <GoogleSignInButton />
+                            
+                            <div className="mt-6 relative">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-gray-300"></div>
+                                </div>
+                                <div className="relative flex justify-center text-sm">
+                                    <span className="px-2 bg-background text-gray-500">
+                                        {t('signin.or')}
+                                    </span>
+                                </div>
                             </div>
-                            <div>
-                                <label htmlFor="lastname" className="sr-only">
-                                </label>
-                                <TextInput
-                                    id="lastname"
-                                    name="lastname"
-                                    type="text"
-                                    value={lastname}
-                                    onChange={(e) => setLastname(e.target.value)}
-                                    className=""
-                                    label={t("signup.lastname")}
+                        </div>
+                        
+                        <form onSubmit={handleSubmit} className="mt-6 space-y-6 neomorphic p-8 rounded-lg">
+                            <div className="rounded-md space-y-4">
+                                <div>
+                                    <TextInput
+                                        id="firstname"
+                                        name="firstname"
+                                        type="text"
+                                        value={firstname}
+                                        onChange={(e) => setFirstname(e.target.value)}
+                                        className=""
+                                        label={t("signup.firstname")}
+                                        placeholder={t("signup.firstname")}
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="lastname" className="sr-only">
+                                    </label>
+                                    <TextInput
+                                        id="lastname"
+                                        name="lastname"
+                                        type="text"
+                                        value={lastname}
+                                        onChange={(e) => setLastname(e.target.value)}
+                                        className=""
+                                        label={t("signup.lastname")}
 
-                                    placeholder={t("signup.lastname")}
-                                />
+                                        placeholder={t("signup.lastname")}
+                                    />
 
+                                </div>
+                                <div>
+                                    <label htmlFor="email" className="sr-only">
+                                    </label>
+                                    <TextInput
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className=""
+                                        label={t("signup.email")}
+                                        placeholder={t("signup.email")}
+                                    />
+                                </div>
+                                <div>
+                                    <PasswordInput
+                                        id="password"
+                                        value={password}
+                                        onChange={setPassword}
+                                        placeholder={t("signup.password")}
+                                        label={t("signup.password")}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <PasswordInput
+                                        id="confirmPassword"
+                                        value={confirmPassword}
+                                        onChange={setConfirmPassword}
+                                        placeholder={t("signup.confirmPassword")}
+                                        label={t("signup.confirmPassword")}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="languagePreference" className="block text-sm font-medium text-gray-700 mb-1">
+                                        {t("signup.languagePreference")}
+                                    </label>
+                                    <CustomSelect
+                                        options={languageOptions}
+                                        onChange={(e) => setLanguagePreference(e.target.value)}
+                                        value={languagePreference}
+                                        className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                        t={t}
+                                    />
+                                </div>
                             </div>
-                            <div>
-                                <label htmlFor="email" className="sr-only">
-                                </label>
-                                <TextInput
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className=""
-                                    label={t("signup.email")}
-                                    placeholder={t("signup.email")}
-                                />
-                            </div>
-                            <div>
-                                <PasswordInput
-                                    id="password"
-                                    value={password}
-                                    onChange={setPassword}
-                                    placeholder={t("signup.password")}
-                                    label={t("signup.password")}
+
+                            <div className="flex items-center">
+                                <input
+                                    id="consentGiven"
+                                    name="consentGiven"
+                                    type="checkbox"
+                                    checked={consentGiven}
+                                    onChange={(e) => setConsentGiven(e.target.checked)}
+                                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                                     required
                                 />
-                            </div>
-                            <div>
-                                <PasswordInput
-                                    id="confirmPassword"
-                                    value={confirmPassword}
-                                    onChange={setConfirmPassword}
-                                    placeholder={t("signup.confirmPassword")}
-                                    label={t("signup.confirmPassword")}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="languagePreference" className="block text-sm font-medium text-gray-700 mb-1">
-                                    {t("signup.languagePreference")}
+                                <label htmlFor="consentGiven" className="ml-2 block text-sm text-foreground">
+                                    {t("signup.consentPart1")}{" "}
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsTermsModalOpen(true)}
+                                        className="font-medium text-primary hover:text-primary-dark"
+                                    >
+                                        {t("signup.termsAndConditions")}
+                                    </button>
                                 </label>
-                                <CustomSelect
-                                    options={languageOptions}
-                                    onChange={(e) => setLanguagePreference(e.target.value)}
-                                    value={languagePreference}
-                                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                                    t={t}
-                                />
                             </div>
-                        </div>
-
-                        <div className="flex items-center">
-                            <input
-                                id="consentGiven"
-                                name="consentGiven"
-                                type="checkbox"
-                                checked={consentGiven}
-                                onChange={(e) => setConsentGiven(e.target.checked)}
-                                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                                required
-                            />
-                            <label htmlFor="consentGiven" className="ml-2 block text-sm text-foreground">
-                                {t("signup.consentPart1")}{" "}
-                                <button
-                                    type="button"
-                                    onClick={() => setIsTermsModalOpen(true)}
-                                    className="font-medium text-primary hover:text-primary-dark"
-                                >
-                                    {t("signup.termsAndConditions")}
-                                </button>
-                            </label>
-                        </div>
-                        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-                        <div>
-                            <ActionButton type="submit" label={loading ? t("signup.signingUp") : t("signup.signUp")} disabled={loading} className="" />
-                        </div>
-                    </form>
+                            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+                            <div>
+                                <ActionButton type="submit" label={loading ? t("signup.signingUp") : t("signup.signUp")} disabled={loading} className="" />
+                            </div>
+                        </form>
+                    </>
                 )}
                 <p className="mt-2 text-center text-sm text-foreground">
                     {t("signup.alreadyHaveAccount")}{" "}

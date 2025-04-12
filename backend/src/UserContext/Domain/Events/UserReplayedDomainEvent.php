@@ -20,12 +20,12 @@ final class UserReplayedDomainEvent implements UserDomainEventInterface
     public string $languagePreference;
     #[PersonalData]
     public string $email;
-    #[PersonalData]
-    public string $password;
     public bool $isConsentGiven;
     public \DateTime $updatedAt;
     public \DateTimeImmutable $consentDate;
     public string $userId;
+    public string $registrationContext;
+    public string $providerUserId;
     public string $requestId;
     public \DateTimeImmutable $occurredOn;
 
@@ -35,11 +35,12 @@ final class UserReplayedDomainEvent implements UserDomainEventInterface
         string $lastname,
         string $languagePreference,
         string $email,
-        string $password,
         bool $isConsentGiven,
         string $consentDate,
         string $updatedAt,
         string $userId,
+        string $registrationContext,
+        string $providerUserId,
         string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
     ) {
         $this->aggregateId = $aggregateId;
@@ -47,11 +48,12 @@ final class UserReplayedDomainEvent implements UserDomainEventInterface
         $this->lastname = $lastname;
         $this->languagePreference = $languagePreference;
         $this->email = $email;
-        $this->password = $password;
         $this->isConsentGiven = $isConsentGiven;
         $this->updatedAt = new \DateTime($updatedAt);
         $this->consentDate = new \DateTimeImmutable($consentDate);
         $this->userId = $userId;
+        $this->registrationContext = $registrationContext;
+        $this->providerUserId = $providerUserId;
         $this->requestId = $requestId;
         $this->occurredOn = UtcClock::immutableNow();
     }
@@ -64,13 +66,14 @@ final class UserReplayedDomainEvent implements UserDomainEventInterface
             'requestId' => $this->requestId,
             'userId' => $this->userId,
             'email' => $this->email,
-            'password' => $this->password,
             'firstname' => $this->firstname,
             'lastname' => $this->lastname,
             'languagePreference' => $this->languagePreference,
             'isConsentGiven' => $this->isConsentGiven,
             'consentDate' => $this->consentDate->format(\DateTimeInterface::ATOM),
             'updatedAt' => $this->updatedAt->format(\DateTimeInterface::ATOM),
+            'registrationContext' => $this->registrationContext,
+            'providerUserId' => $this->providerUserId,
             'occurredOn' => $this->occurredOn->format(\DateTimeInterface::ATOM),
         ];
     }
@@ -84,11 +87,12 @@ final class UserReplayedDomainEvent implements UserDomainEventInterface
             $data['lastname'],
             $data['languagePreference'],
             $data['email'],
-            $data['password'],
             $data['isConsentGiven'],
             $data['consentDate'],
             $data['updatedAt'],
             $data['userId'],
+            $data['registrationContext'],
+            $data['providerUserId'],
             $data['requestId'],
         );
         $event->occurredOn = new \DateTimeImmutable($data['occurredOn']);

@@ -26,34 +26,32 @@ final readonly class UserViewRepository implements UserViewRepositoryInterface
     public function save(UserViewInterface $user): void
     {
         $this->connection->executeStatement('
-        INSERT INTO user_view (uuid, created_at, updated_at, email, password, firstname, lastname, language_preference, consent_given, consent_date, roles, password_reset_token, password_reset_token_expiry)
-        VALUES (:uuid, :created_at, :updated_at, :email, :password, :firstname, :lastname, :language_preference, :consent_given, :consent_date, :roles, :password_reset_token, :password_reset_token_expiry)
+        INSERT INTO user_view (uuid, created_at, updated_at, email, firstname, lastname, language_preference, consent_given, consent_date, roles, registration_context, provider_user_id)
+        VALUES (:uuid, :created_at, :updated_at, :email, :firstname, :lastname, :language_preference, :consent_given, :consent_date, :roles, :registration_context, :provider_user_id)
         ON CONFLICT (uuid) DO UPDATE SET
             updated_at = EXCLUDED.updated_at,
             email = EXCLUDED.email,
-            password = EXCLUDED.password,
             firstname = EXCLUDED.firstname,
             lastname = EXCLUDED.lastname,
             language_preference = EXCLUDED.language_preference,
             consent_given = EXCLUDED.consent_given,
             consent_date = EXCLUDED.consent_date,
             roles = EXCLUDED.roles,
-            password_reset_token = EXCLUDED.password_reset_token,
-            password_reset_token_expiry = EXCLUDED.password_reset_token_expiry
+            registration_context = EXCLUDED.registration_context,
+            provider_user_id = EXCLUDED.provider_user_id
     ', [
             'uuid' => $user->uuid,
             'created_at' => $user->createdAt->format(\DateTimeImmutable::ATOM),
             'updated_at' => $user->updatedAt->format(\DateTime::ATOM),
             'email' => $user->email,
-            'password' => $user->password,
             'firstname' => $user->firstname,
             'lastname' => $user->lastname,
             'language_preference' => $user->languagePreference,
             'consent_given' => $user->consentGiven,
             'consent_date' => $user->consentDate->format(\DateTimeImmutable::ATOM),
             'roles' => json_encode($user->roles),
-            'password_reset_token' => $user->passwordResetToken,
-            'password_reset_token_expiry' => $user->passwordResetTokenExpiry?->format(\DateTimeImmutable::ATOM),
+            'registration_context' => $user->registrationContext,
+            'provider_user_id' => $user->providerUserId,
         ]);
     }
 

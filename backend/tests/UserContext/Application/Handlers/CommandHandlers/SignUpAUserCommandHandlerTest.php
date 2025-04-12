@@ -13,21 +13,19 @@ use App\UserContext\Application\Handlers\CommandHandlers\SignUpAUserCommandHandl
 use App\UserContext\Domain\Aggregates\User;
 use App\UserContext\Domain\Aggregates\UserEmailRegistry;
 use App\UserContext\Domain\Exceptions\UserAlreadyExistsException;
-use App\UserContext\Domain\Ports\Outbound\PasswordHasherInterface;
 use App\UserContext\Domain\ValueObjects\UserConsent;
 use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserEmailRegistryId;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
 use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserPassword;
+use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class SignUpAUserCommandHandlerTest extends TestCase
 {
     private EventStoreInterface&MockObject $eventStore;
-    private PasswordHasherInterface&MockObject $passwordHasher;
     private EventSourcedRepository $eventSourcedRepository;
     private SignUpAUserCommandHandler $handler;
 
@@ -35,11 +33,9 @@ class SignUpAUserCommandHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->eventStore = $this->createMock(EventStoreInterface::class);
-        $this->passwordHasher = $this->createMock(PasswordHasherInterface::class);
         $this->eventSourcedRepository = new EventSourcedRepository($this->eventStore);
         $this->handler = new SignUpAUserCommandHandler(
             $this->eventSourcedRepository,
-            $this->passwordHasher
         );
     }
 
@@ -47,8 +43,6 @@ class SignUpAUserCommandHandlerTest extends TestCase
     {
         $userId = '7ac32191-3fa0-4477-8eb2-8dd3b0b7c836';
         $email = 'test@example.com';
-        $password = 'Password123';
-        $hashedPassword = 'hashed_password123';
         $firstname = 'John';
         $lastname = 'Doe';
         $languagePreference = 'en';
@@ -56,18 +50,18 @@ class SignUpAUserCommandHandlerTest extends TestCase
         $command = new SignUpAUserCommand(
             UserId::fromString($userId),
             UserEmail::fromString($email),
-            UserPassword::fromString($password),
             UserFirstname::fromString($firstname),
             UserLastname::fromString($lastname),
             UserLanguagePreference::fromString($languagePreference),
-            UserConsent::fromBool(true)
+            UserConsent::fromBool(true),
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $registry = UserEmailRegistry::create(
             UserEmailRegistryId::fromString(UserEmailRegistry::DEFAULT_ID)
         );
 
-        // First load for user fails, second load for registry succeeds
         $this->eventStore->expects($this->exactly(2))
             ->method('load')
             ->willReturnCallback(function($id) use ($userId, $registry) {
@@ -79,10 +73,6 @@ class SignUpAUserCommandHandlerTest extends TestCase
                 }
                 throw new \RuntimeException("Unexpected ID: $id");
             });
-
-        $this->passwordHasher->expects($this->once())
-            ->method('hash')
-            ->willReturn($hashedPassword);
 
         $this->eventStore->expects($this->once())
             ->method('trackAggregates')
@@ -99,7 +89,6 @@ class SignUpAUserCommandHandlerTest extends TestCase
     {
         $userId = '7ac32191-3fa0-4477-8eb2-8dd3b0b7c836';
         $email = 'test@example.com';
-        $password = 'Password123';
         $firstname = 'John';
         $lastname = 'Doe';
         $languagePreference = 'en';
@@ -107,31 +96,29 @@ class SignUpAUserCommandHandlerTest extends TestCase
         $command = new SignUpAUserCommand(
             UserId::fromString($userId),
             UserEmail::fromString($email),
-            UserPassword::fromString($password),
             UserFirstname::fromString($firstname),
             UserLastname::fromString($lastname),
             UserLanguagePreference::fromString($languagePreference),
-            UserConsent::fromBool(true)
+            UserConsent::fromBool(true),
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $existingUser = User::create(
             UserId::fromString($userId),
             UserEmail::fromString($email),
-            UserPassword::fromString($password),
             UserFirstname::fromString($firstname),
             UserLastname::fromString($lastname),
             UserLanguagePreference::fromString($languagePreference),
-            UserConsent::fromBool(true)
+            UserConsent::fromBool(true),
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
-        // User already exists
         $this->eventStore->expects($this->once())
             ->method('load')
             ->with($userId)
             ->willReturn($existingUser);
-
-        $this->passwordHasher->expects($this->never())
-            ->method('hash');
 
         $this->eventStore->expects($this->never())
             ->method('saveMultiAggregate');
@@ -145,7 +132,6 @@ class SignUpAUserCommandHandlerTest extends TestCase
         $userId = '7ac32191-3fa0-4477-8eb2-8dd3b0b7c836';
         $email = 'existing@example.com';
         $existingUserId = '58a32191-3fa0-4477-8eb2-8dd3b0b7c123';
-        $password = 'Password123';
         $firstname = 'John';
         $lastname = 'Doe';
         $languagePreference = 'en';
@@ -153,11 +139,12 @@ class SignUpAUserCommandHandlerTest extends TestCase
         $command = new SignUpAUserCommand(
             UserId::fromString($userId),
             UserEmail::fromString($email),
-            UserPassword::fromString($password),
             UserFirstname::fromString($firstname),
             UserLastname::fromString($lastname),
             UserLanguagePreference::fromString($languagePreference),
-            UserConsent::fromBool(true)
+            UserConsent::fromBool(true),
+            UserRegistrationContext::fromString('google'),
+            '1234567890',
         );
 
         $registry = UserEmailRegistry::create(
@@ -187,9 +174,6 @@ class SignUpAUserCommandHandlerTest extends TestCase
                 }
                 throw new \RuntimeException("Unexpected ID: $id");
             });
-
-        $this->passwordHasher->expects($this->never())
-            ->method('hash');
 
         $this->eventStore->expects($this->never())
             ->method('saveMultiAggregate');
