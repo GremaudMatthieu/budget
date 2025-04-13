@@ -1,0 +1,36 @@
+services:
+  mobile-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: budget-mobile-app
+    ports:
+      - "19000:19000" # Main Expo server
+      - "19001:19001" # Metro bundler
+      - "19002:19002" # Expo DevTools
+      - "8081:8081"   # React Native dev server
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - REACT_NATIVE_PACKAGER_HOSTNAME=${HOST_IP:-host-gateway}
+      - EXPO_PUBLIC_API_URL=http://host.docker.internal:8000/api
+      - EXPO_PUBLIC_WS_URL=http://host.docker.internal:3001
+      # Force QR code to display in terminal
+      - EXPO_QR=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Use the host IP script to get the correct IP address
+    command: sh -c "export REACT_NATIVE_PACKAGER_HOSTNAME=$$(cat /app/scripts/host-ip.txt) && npx expo start --host lan --clear"
+    # Make sure terminal is interactive to see the QR code
+    tty: true
+    stdin_open: true
+
+networks:
+  budget-network:
+    external: true
+
+volumes:
+  node_modules:
