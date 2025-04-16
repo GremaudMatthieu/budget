@@ -223,6 +223,12 @@ parameters:
 			path: src/Gateway/User/Presentation/Cli/RewindAUserCommand.php
 
 		-
+			message: '#^Cannot access offset ''platform'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Gateway/User/Presentation/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
+
+		-
 			message: '#^Part \$frontendUrl \(array\|bool\|float\|int\|string\|UnitEnum\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1

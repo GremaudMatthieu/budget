@@ -19,6 +19,7 @@ use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use League\OAuth2\Client\Provider\GoogleUser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -33,22 +34,55 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
     }
 
     #[Route('/api/connect/google', name: 'connect_google')]
-    public function connect(): RedirectResponse
+    public function connect(Request $request): RedirectResponse
     {
+        $platform = $request->query->get('platform', 'web');
+        $redirectUri = $request->query->get('redirect_uri');
+
+        $request->getSession()->set('oauth_platform', $platform);
+        if ($redirectUri) {
+            $request->getSession()->set('oauth_redirect_uri', $redirectUri);
+        }
+
+        $params = ['state' => json_encode(['platform' => $platform])];
+        if ($redirectUri && $platform === 'mobile') {
+            $params['redirect_uri'] = $redirectUri;
+        }
+
         return $this->clientRegistry
             ->getClient('google')
             ->redirect(
                 ['email', 'profile'],
-                []
+                $params
             );
     }
 
     #[Route('/api/connect/google/check', name: 'connect_google_check')]
-    public function connectCheck(): Response
+    public function connectCheck(Request $request): Response
     {
         /** @var GoogleUser $googleUser */
         $googleUser = $this->clientRegistry->getClient('google')->fetchUser();
         $email = $googleUser->getEmail();
+
+        $state = $request->query->get('state');
+        $platform = 'web';
+
+        if ($state) {
+            $stateData = json_decode($state, true);
+            if (isset($stateData['platform'])) {
+                $platform = $stateData['platform'];
+            }
+        } else {
+            $platform = $request->getSession()->get('oauth_platform', 'web');
+        }
+
+        $redirectUri = $request->getSession()->get('oauth_redirect_uri');
+        $mobileRedirectUri = $request->getSession()->get('oauth_mobile_redirect');
+
+        if ($platform === 'mobile' && $mobileRedirectUri) {
+            $redirectUri = $mobileRedirectUri;
+        }
+
         $this->commandBus->execute(
             new SignUpOrAuthenticateWithOAuth2Command(
                 UserId::fromString($this->uuidGenerator->generate()),
@@ -63,15 +97,20 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
         );
         $authResult = $this->authenticationService->authenticateByEmail($email);
 
-        return $this->redirect($this->buildRedirectUrl($email, $authResult['token'], $authResult['refresh_token']));
+        return $this->redirect($this->buildRedirectUrl($email, $authResult['token'], $platform, $redirectUri, $authResult['refresh_token']));
     }
 
-    private function buildRedirectUrl(string $email, string $token, ?string $refreshToken = null): string
+    private function buildRedirectUrl(string $email, string $token, string $platform = 'web', ?string $customRedirectUri = null, ?string $refreshToken = null): string
     {
-        $frontendUrl = $this->getParameter('app.frontend_url') ?? 'http://localhost:3000';
-        
-        $url = "{$frontendUrl}/oauth/google/callback?email=" . urlencode($email) .
-            "&token=" . urlencode($token);
+        if ($platform === 'mobile' && $customRedirectUri) {
+            $baseUrl = $customRedirectUri;
+            $separator = (str_contains($baseUrl, '?')) ? '&' : '?';
+            $url = $baseUrl . $separator . "email=" . urlencode($email) . "&token=" . urlencode($token);
+        } else {
+            $frontendUrl = $this->getParameter('app.frontend_url') ?? 'http://localhost:8081';
+            $url = "{$frontendUrl}/oauth/google/callback?email=" . urlencode($email) .
+                "&token=" . urlencode($token);
+        }
         
         if ($refreshToken) {
             $url .= "&refresh_token=" . urlencode($refreshToken);

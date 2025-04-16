@@ -1,0 +1,99 @@
+import React from 'react';
+import { Tabs } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
+import { View, ActivityIndicator } from 'react-native';
+
+/**
+ * This is the layout file for the tab navigation.
+ * It defines the tabs that appear at the bottom of the screen.
+ */
+export default function TabsLayout() {
+  const { user, loading } = useAuth();
+
+  // Show loading indicator while checking authentication
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#0c6cf2" />
+      </View>
+    );
+  }
+
+  // If not logged in, don't show tabs (auth flow will redirect)
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: '#0c6cf2', // primary-600
+        tabBarInactiveTintColor: '#64748b', // text-secondary
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
+        tabBarStyle: {
+          borderTopWidth: 1,
+          borderTopColor: '#e2e8f0', // surface-border
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        headerStyle: {
+          backgroundColor: '#ffffff',
+        },
+        headerShadowVisible: false,
+        headerTitleStyle: {
+          color: '#0f172a', // text-primary
+          fontWeight: '600',
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Dashboard',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+          ),
+          headerTitle: 'Dashboard',
+        }}
+      />
+      
+      <Tabs.Screen
+        name="envelopes"
+        options={{
+          title: 'Envelopes',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="wallet-outline" size={size} color={color} />
+          ),
+          headerTitle: 'My Envelopes',
+        }}
+      />
+      
+      <Tabs.Screen
+        name="budget-plans"
+        options={{
+          title: 'Budget Plans',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="pie-chart-outline" size={size} color={color} />
+          ),
+          headerTitle: 'Budget Plans',
+        }}
+      />
+      
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
+          headerTitle: 'My Profile',
+        }}
+      />
+    </Tabs>
+  );
+}

@@ -7,6 +7,7 @@ import { useBudgetPlans } from "../../domain/budget/budgetHooks"
 import BudgetPlanDetails from "../../components/budget/BudgetPlanDetails"
 import { useTranslation } from "../../hooks/useTranslation"
 import { api } from "../../infrastructure/api"
+import { ArrowLeft, Calendar, PieChart } from "lucide-react"
 import type { Category } from "../../domain/budget/budgetTypes"
 
 export default function BudgetPlanPage({ params }: { params: Promise<{ uuid: string }> }) {
@@ -79,21 +80,36 @@ export default function BudgetPlanPage({ params }: { params: Promise<{ uuid: str
     if (!user) return null
 
     return (
-        <div className="container mx-auto px-4 py-6 sm:py=8">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-6">{t("budgetTracker.planDetails")}</h1>
-            {memoizedBudgetPlan ? (
-                <BudgetPlanDetails budgetPlan={memoizedBudgetPlan} categories={memoizedCategories} />
-            ) : (
-                <div className="text-center">
-                    <p>{t("budgetTracker.planNotFound")}</p>
-                    <button
-                        onClick={() => router.push("/budget-tracker")}
-                        className="mt-4 py-2 px-4 neomorphic-button text-primary hover:text-primary-dark transition-colors"
-                    >
-                        {t("budgetTracker.backToCalendar")}
-                    </button>
-                </div>
-            )}
+        <div className="min-h-screen bg-background">
+            <main className="container mx-auto px-4 py-8 md:py-16">
+                <section className="mb-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <h1 className="text-3xl md:text-4xl font-bold">{t("budgetTracker.planDetails")}</h1>
+                        <button
+                            onClick={() => router.push("/budget-tracker")}
+                            className="inline-flex items-center px-4 py-2 text-base font-semibold text-primary bg-white border-2 border-primary rounded-full neomorphic-button hover:bg-primary hover:text-white transition-colors"
+                        >
+                            <ArrowLeft className="mr-2 h-4 w-4" /> {t("budgetTracker.backToCalendar")}
+                        </button>
+                    </div>
+                    
+                    {memoizedBudgetPlan ? (
+                        <BudgetPlanDetails budgetPlan={memoizedBudgetPlan} categories={memoizedCategories} />
+                    ) : (
+                        <div className="neomorphic p-8 rounded-lg text-center">
+                            <PieChart className="h-16 w-16 text-primary mx-auto mb-6" />
+                            <h2 className="text-2xl font-bold mb-4">{t("budgetTracker.planNotFound")}</h2>
+                            <p className="text-lg text-muted-foreground mb-6">{t("budgetTracker.planNotFoundDesc")}</p>
+                            <button
+                                onClick={() => router.push("/budget-tracker")}
+                                className="inline-flex items-center px-6 py-3 text-lg font-semibold text-primary bg-white border-2 border-primary rounded-full neomorphic-button hover:bg-primary hover:text-white transition-colors"
+                            >
+                                <Calendar className="mr-2 h-5 w-5" /> {t("budgetTracker.backToCalendar")}
+                            </button>
+                        </div>
+                    )}
+                </section>
+            </main>
         </div>
     )
 }

@@ -2,7 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { apiClient } from '../services/apiClient';
+import { apiClient } from '@/services/apiClient';
+import axios from 'axios';
+
+const API_URL = process.env.API_URL || 'http://127.0.0.1:8000/api';
 
 // Define the user type
 type User = {
@@ -18,11 +21,9 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  signup: (userData: any) => Promise<boolean>;
-  updateProfile: (field: 'firstname' | 'lastname', value: string) => Promise<boolean>;
   changePassword: (oldPassword: string, newPassword: string) => Promise<boolean>;
+  loginWithGoogle: (email: string, token: string, refreshToken?: string) => Promise<boolean>;
 };
 
 // Create the context
@@ -85,15 +86,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const loadUser = async () => {
       try {
         const token = await getData('token');
+        console.log('Found stored token on app load:', !!token);
         
         if (token) {
           apiClient.setAuthToken(token);
-          const userData = await apiClient.get('/user');
-          setUser(userData);
+          
+          try {
+            // User and userData API endpoints should now be handled by the apiClient
+            // which uses the centralized API_URL config
+            const userData = await apiClient.get('/users/me');
+            console.log('Successfully loaded user data on app start');
+            setUser(userData);
+          } catch (userDataError) {
+            console.error('Error fetching user data with /users/me:', userDataError);
+            
+            // Fall back to /user endpoint
+            try {
+              const userData = await apiClient.get('/user');
+              console.log('Successfully loaded user data using fallback endpoint');
+              setUser(userData);
+            } catch (fallbackError) {
+              console.error('Fallback user data fetch also failed:', fallbackError);
+              throw fallbackError;
+            }
+          }
         }
       } catch (error) {
         console.error('Failed to load user:', error);
-        // If there's an error, remove the token
         await removeData('token');
         apiClient.removeAuthToken();
       } finally {
@@ -104,24 +123,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loadUser();
   }, []);
 
-  // Login function
-  const login = async (email: string, password: string): Promise<boolean> => {
+  // Google OAuth Login function
+  const loginWithGoogle = async (email: string, token: string, refreshToken?: string): Promise<boolean> => {
     try {
       setLoading(true);
-      const response = await apiClient.post('/login', { email, password });
+      console.log('Starting Google login with email:', email);
       
-      if (response.token) {
-        await storeData('token', response.token);
-        apiClient.setAuthToken(response.token);
-        
-        // Get user data
-        const userData = await apiClient.get('/user');
-        setUser(userData);
-        return true;
+      // Store the tokens
+      await storeData('token', token);
+      if (refreshToken) {
+        await storeData('refreshToken', refreshToken);
       }
-      return false;
+      
+      // Set the auth token in the API client
+      apiClient.setAuthToken(token);
+      
+      try {
+        console.log('Fetching user data from:', `${API_URL}/users/me`);
+        // Use axios directly with our API_URL instead of apiClient
+        const response = await axios.get(`${API_URL}/users/me`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        console.log('Successfully fetched user data');
+        setUser(response.data);
+        return true;
+      } catch (error) {
+        console.error('Failed to fetch user data after Google login:', error);
+        await removeData('token');
+        if (refreshToken) {
+          await removeData('refreshToken');
+        }
+        apiClient.removeAuthToken();
+        return false;
+      }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Google login error:', error);
       return false;
     } finally {
       setLoading(false);
@@ -132,57 +172,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async (): Promise<void> => {
     try {
       setLoading(true);
-      await apiClient.post('/logout');
+      await apiClient.post('users/logout');
       await removeData('token');
+      await removeData('refreshToken');
       apiClient.removeAuthToken();
       setUser(null);
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Signup function
-  const signup = async (userData: any): Promise<boolean> => {
-    try {
-      setLoading(true);
-      const response = await apiClient.post('/register', userData);
-      return true;
-    } catch (error) {
-      console.error('Signup error:', error);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Update profile function
-  const updateProfile = async (field: 'firstname' | 'lastname', value: string): Promise<boolean> => {
-    try {
-      setLoading(true);
-      await apiClient.put(`/user/${field}`, { [field]: value });
-      
-      // Update local user state
-      setUser(prev => prev ? { ...prev, [field]: value } : null);
-      return true;
-    } catch (error) {
-      console.error(`Update ${field} error:`, error);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Change password function
-  const changePassword = async (oldPassword: string, newPassword: string): Promise<boolean> => {
-    try {
-      setLoading(true);
-      await apiClient.put('/user/password', { oldPassword, newPassword });
-      return true;
-    } catch (error) {
-      console.error('Change password error:', error);
-      return false;
     } finally {
       setLoading(false);
     }
@@ -193,11 +189,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     loading,
     isAuthenticated: !!user,
-    login,
     logout,
-    signup,
-    updateProfile,
-    changePassword
+    loginWithGoogle
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

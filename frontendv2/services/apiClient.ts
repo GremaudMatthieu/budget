@@ -1,16 +1,17 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 class ApiClient {
   private client: AxiosInstance;
   private token: string | null = null;
 
   constructor() {
-    // Get the API URL from environment variables or use default
-    const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api';
+    // Use the correct API URL
+    const API_URL = 'http://127.0.0.1:8000/api';
+    console.log('ApiClient initialized with URL:', API_URL);
     
     this.client = axios.create({
-      baseURL: apiUrl,
+      baseURL: API_URL,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

@@ -6,7 +6,7 @@ import { useTranslation } from "../../hooks/useTranslation"
 import { formatCurrency } from "../../utils/envelope/currencyUtils"
 import { useBudgetPlans } from "../../domain/budget/budgetHooks"
 import type { BudgetPlan, Category } from "../../domain/budget/budgetTypes"
-import { Calculator, DollarSign, PiggyBank, ShoppingBag, Plus, Edit2, Trash2, Loader2, Tag } from "lucide-react"
+import { Calculator, DollarSign, PiggyBank, ShoppingBag, Plus, Edit2, Trash2, Loader2, Tag, ChevronRight } from "lucide-react"
 import BudgetItemModal from "./BudgetItemModal"
 import DeleteConfirmationModal from "./DeleteConfirmationModal"
 import { useSocket } from "../../hooks/useSocket"
@@ -208,25 +208,26 @@ export default function BudgetPlanDetails({ budgetPlan, categories }: BudgetPlan
         return categoryList.find((cat) => cat.id === categoryId)?.name || categoryId
     }
 
-    // Render item list based on type
+    // Render item list based on type - redesigned version
     const renderItemList = (type: "need" | "want" | "saving" | "income", items: any[]) => {
         const fields = getFieldNames(type)
+        const typeColor = type === "need" ? "green" : type === "want" ? "blue" : type === "saving" ? "amber" : "purple";
 
         return (
-            <div className="neomorphic-inset p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-semibold flex items-center text-lg">
-                        {type === "need" && <DollarSign className="h-5 w-5 mr-1 text-green-600" />}
-                        {type === "want" && <ShoppingBag className="h-5 w-5 mr-1 text-blue-600" />}
-                        {type === "saving" && <PiggyBank className="h-5 w-5 mr-1 text-amber-600" />}
-                        {type === "income" && <Calculator className="h-5 w-5 mr-1 text-purple-600" />}
+            <div className="neomorphic p-6 rounded-lg">
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-xl md:text-2xl font-bold flex items-center">
+                        {type === "need" && <DollarSign className={`h-6 w-6 mr-2 text-${typeColor}-600`} />}
+                        {type === "want" && <ShoppingBag className={`h-6 w-6 mr-2 text-${typeColor}-600`} />}
+                        {type === "saving" && <PiggyBank className={`h-6 w-6 mr-2 text-${typeColor}-600`} />}
+                        {type === "income" && <Calculator className={`h-6 w-6 mr-2 text-${typeColor}-600`} />}
                         {t(`budgetTracker.${type}s`)}
                         {type !== "income" &&
                             ` (${(type === "need" ? needsPercentage : type === "want" ? wantsPercentage : savingsPercentage).toFixed(0)}%)`}
                     </h3>
                     <button
                         onClick={() => handleOpenAddModal(type)}
-                        className="p-2 neomorphic-button text-primary rounded-full"
+                        className="p-3 neomorphic-button text-primary rounded-full hover:bg-primary hover:text-white transition-colors"
                         aria-label={t("budgetTracker.addItem")}
                         disabled={loading}
                     >
@@ -234,58 +235,68 @@ export default function BudgetPlanDetails({ budgetPlan, categories }: BudgetPlan
                     </button>
                 </div>
 
-                <p className="text-sm text-muted-foreground mb-4">{t(`budgetTracker.${type}Description`)}</p>
+                <p className="text-lg text-muted-foreground mb-6">{t(`budgetTracker.${type}Description`)}</p>
 
-                <ul className="space-y-3">
-                    {items?.map((item) => (
-                        <li key={item.uuid} className="flex justify-between items-center p-3 hover:bg-accent rounded-md group">
-                            <div className="flex items-center">
-                                <span className="font-medium mr-2">{item[fields.name]}</span>
-                                <span className="text-sm bg-gray-200 text-gray-700 px-2 py-1 rounded-full flex items-center">
-                                    <Tag className="w-3 h-3 mr-1" />
-                                    {getCategoryName(type, item[fields.category])}
-                                </span>
-                            </div>
-                            <div className="flex items-center">
-                                <span className="font-semibold mr-3">{formatCurrency(item[fields.amount], planDetails?.currency)}</span>
-                                <div className="flex space-x-2">
-                                    <button
-                                        onClick={() =>
-                                            handleOpenEditModal(
-                                                type,
-                                                item.uuid,
-                                                item[fields.name],
-                                                item[fields.amount],
-                                                item[fields.category],
-                                            )
-                                        }
-                                        className="p-1 text-blue-500 hover:text-blue-700"
-                                        disabled={loading}
-                                    >
-                                        <Edit2 className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => handleOpenDeleteModal(type, item.uuid, item[fields.name])}
-                                        className="p-1 text-red-500 hover:text-red-700"
-                                        disabled={loading}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
+                <div className="space-y-4">
+                    {items?.length === 0 ? (
+                        <div className="text-center text-muted-foreground p-6 neomorphic-inset rounded-lg">
+                            <p>{t(`budgetTracker.no${type.charAt(0).toUpperCase() + type.slice(1)}s`)}</p>
+                        </div>
+                    ) : (
+                        items.map((item) => (
+                            <div 
+                                key={item.uuid} 
+                                className="neomorphic-inset p-4 rounded-lg hover:shadow-md transition-shadow"
+                            >
+                                <div className="flex justify-between items-center">
+                                    <div className="flex flex-col">
+                                        <span className="text-lg font-semibold mb-1">
+                                            {item[fields.name]}
+                                        </span>
+                                        <span className="text-sm inline-flex items-center text-muted-foreground">
+                                            <Tag className="w-3 h-3 mr-1" />
+                                            {getCategoryName(type, item[fields.category])}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center space-x-3">
+                                        <span className="text-xl font-bold">
+                                            {formatCurrency(item[fields.amount], planDetails?.currency)}
+                                        </span>
+                                        <div className="flex space-x-2">
+                                            <button
+                                                onClick={() =>
+                                                    handleOpenEditModal(
+                                                        type,
+                                                        item.uuid,
+                                                        item[fields.name],
+                                                        item[fields.amount],
+                                                        item[fields.category],
+                                                    )
+                                                }
+                                                className="p-2 neomorphic-button text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition-colors"
+                                                disabled={loading}
+                                            >
+                                                <Edit2 className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleOpenDeleteModal(type, item.uuid, item[fields.name])}
+                                                className="p-2 neomorphic-button text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-colors"
+                                                disabled={loading}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </li>
-                    ))}
-                    {items?.length === 0 && (
-                        <li className="text-center text-muted-foreground py-3">
-                            {t(`budgetTracker.no${type.charAt(0).toUpperCase() + type.slice(1)}s`)}
-                        </li>
+                        ))
                     )}
-                </ul>
+                </div>
 
-                <div className="mt-4 pt-3 border-t border-border">
-                    <div className="flex justify-between font-semibold text-lg">
-                        <span>{t(`budgetTracker.total${type.charAt(0).toUpperCase() + type.slice(1)}s`)}</span>
-                        <span>
+                <div className="mt-8 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                        <span className="text-xl font-bold">{t(`budgetTracker.total${type.charAt(0).toUpperCase() + type.slice(1)}s`)}</span>
+                        <span className="text-2xl font-bold text-primary">
                             {formatCurrency(
                                 type === "need"
                                     ? totalNeeds
@@ -294,7 +305,7 @@ export default function BudgetPlanDetails({ budgetPlan, categories }: BudgetPlan
                                         : type === "saving"
                                             ? totalSavings
                                             : totalIncome,
-                                planDetails?.currency,
+                                planDetails?.currency
                             )}
                         </span>
                     </div>
@@ -304,40 +315,49 @@ export default function BudgetPlanDetails({ budgetPlan, categories }: BudgetPlan
     }
 
     if (!selectedBudgetPlan) {
-        return <div className="text-center py-8">Loading budget plan...</div>
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        )
     }
 
     return (
-        <div className="neomorphic p-4 rounded-lg">
-            <div className="flex flex-col mb-6">
-                <h2 className="text-2xl font-semibold mb-2">{planDetails?.date ? formatDate(planDetails.date) : "No Date"}</h2>
-                <div className="text-xl font-semibold text-primary">{formatCurrency(totalIncome, planDetails?.currency)}</div>
+        <div className="neomorphic p-6 rounded-lg">
+            <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold mb-3">{planDetails?.date ? formatDate(planDetails.date) : "No Date"}</h2>
+                <div className="text-2xl font-bold text-primary mb-2">
+                    {formatCurrency(totalIncome, planDetails?.currency)}
+                </div>
+                <p className="text-muted-foreground">{t("budgetTracker.totalMonthlyIncome")}</p>
             </div>
 
-            <div className="mb-6">
-                <div className="flex flex-wrap gap-2 mb-4">
-                    {["overview", "needs", "wants", "savings", "incomes"].map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => handleTabChange(tab as TabType)}
-                            className={`py-2 px-3 rounded-md text-sm ${activeTab === tab
-                                ? "neomorphic-inset text-primary font-semibold"
-                                : "neomorphic-button text-muted-foreground"
-                                }`}
-                        >
-                            {tab === "overview" && <Calculator className="h-4 w-4 inline mr-1" />}
-                            {tab === "needs" && <DollarSign className="h-4 w-4 inline mr-1" />}
-                            {tab === "wants" && <ShoppingBag className="h-4 w-4 inline mr-1" />}
-                            {tab === "savings" && <PiggyBank className="h-4 w-4 inline mr-1" />}
-                            {tab === "incomes" && <Calculator className="h-4 w-4 inline mr-1" />}
-                            {t(`budgetTracker.${tab}`)}
-                        </button>
-                    ))}
-                </div>
+            <div className="grid gap-6 md:grid-cols-5 mb-8">
+                {["overview", "needs", "wants", "savings", "incomes"].map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => handleTabChange(tab as TabType)}
+                        className={`py-3 px-4 rounded-lg text-base font-semibold flex items-center justify-center
+                            ${activeTab === tab 
+                                ? "neomorphic-inset text-primary" 
+                                : "neomorphic-button text-muted-foreground hover:text-primary-600 transition-colors"
+                            }`}
+                    >
+                        {tab === "overview" && <Calculator className="h-5 w-5 mr-2" />}
+                        {tab === "needs" && <DollarSign className="h-5 w-5 mr-2" />}
+                        {tab === "wants" && <ShoppingBag className="h-5 w-5 mr-2" />}
+                        {tab === "savings" && <PiggyBank className="h-5 w-5 mr-2" />}
+                        {tab === "incomes" && <Calculator className="h-5 w-5 mr-2" />}
+                        {t(`budgetTracker.${tab}`)}
+                    </button>
+                ))}
+            </div>
 
-                {activeTab === "overview" && (
-                    <div className="space-y-6">
-                        <div className="h-64 md:h-80">
+            {activeTab === "overview" && (
+                <div className="space-y-8">
+                    <div className="neomorphic-inset p-6 rounded-lg bg-gradient-to-br from-gray-50 to-white">
+                        <h3 className="text-2xl font-bold mb-6 text-center">{t("budgetTracker.expenseBreakdown")}</h3>
+                        <div className="h-80">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
@@ -347,82 +367,135 @@ export default function BudgetPlanDetails({ budgetPlan, categories }: BudgetPlan
                                         innerRadius="40%"
                                         outerRadius="70%"
                                         fill="#8884d8"
-                                        paddingAngle={5}
+                                        paddingAngle={6}
                                         dataKey="value"
                                         label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                        stroke="#ffffff"
+                                        strokeWidth={4}
                                     >
                                         {chartData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                            <Cell key={`cell-${index}`} fill={entry.color} className="drop-shadow-md" />
                                         ))}
                                     </Pie>
-                                    <Tooltip formatter={(value) => formatCurrency(value as number, planDetails?.currency)} />
-                                    <Legend />
+                                    <Tooltip formatter={(value) => formatCurrency(value as number, planDetails?.currency)}
+                                        contentStyle={{
+                                            backgroundColor: "white",
+                                            border: "none",
+                                            borderRadius: "0.5rem",
+                                            boxShadow: "var(--neomorphic-shadow)",
+                                        }}
+                                    />
+                                    <Legend 
+                                        layout="horizontal" 
+                                        verticalAlign="bottom" 
+                                        align="center"
+                                        wrapperStyle={{ paddingTop: "20px" }}
+                                    />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
+                    </div>
 
-                        <div className="space-y-4">
-                            <div className="neomorphic-inset p-4 rounded-lg">
-                                <h3 className="font-semibold mb-2 text-lg">{t("budgetTracker.incomes")}</h3>
-                                <ul className="space-y-2">
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <div className="neomorphic p-6 rounded-lg">
+                            <h3 className="text-xl font-bold mb-4 flex items-center">
+                                <Calculator className="mr-2 h-6 w-6 text-purple-600" />
+                                {t("budgetTracker.incomes")}
+                            </h3>
+                            <div className="neomorphic-inset p-4 rounded-lg mb-4">
+                                <ul className="space-y-3">
                                     {incomes?.map((income) => (
-                                        <li key={income.uuid} className="flex justify-between">
-                                            <span>{income.incomeName}</span>
+                                        <li key={income.uuid} className="flex justify-between items-center py-2">
+                                            <div className="flex items-center">
+                                                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                                                <span className="font-medium">{income.incomeName}</span>
+                                            </div>
                                             <span className="font-semibold">
                                                 {formatCurrency(income.incomeAmount, planDetails?.currency)}
                                             </span>
                                         </li>
                                     ))}
                                 </ul>
-                                <div className="mt-3 pt-3 border-t border-border">
-                                    <div className="flex justify-between font-semibold text-lg">
-                                        <span>{t("budgetTracker.totalIncome")}</span>
-                                        <span>{formatCurrency(totalIncome, planDetails?.currency)}</span>
-                                    </div>
-                                </div>
                             </div>
+                            <div className="flex justify-between items-center p-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg">
+                                <span className="text-lg font-bold">{t("budgetTracker.totalIncome")}</span>
+                                <span className="text-xl font-bold text-purple-600">{formatCurrency(totalIncome, planDetails?.currency)}</span>
+                            </div>
+                            <button 
+                                onClick={() => handleTabChange('incomes')}
+                                className="w-full mt-4 py-2 px-4 neomorphic-button text-primary hover:bg-primary hover:text-white transition-colors flex items-center justify-center rounded-md"
+                            >
+                                {t("budgetTracker.viewDetails")} <ChevronRight className="ml-1 h-4 w-4" />
+                            </button>
+                        </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {[
-                                    {
-                                        title: t("budgetTracker.needs"),
-                                        total: totalNeeds,
-                                        percentage: needsPercentage,
-                                        color: "text-green-600",
-                                    },
-                                    {
-                                        title: t("budgetTracker.wants"),
-                                        total: totalWants,
-                                        percentage: wantsPercentage,
-                                        color: "text-blue-600",
-                                    },
-                                    {
-                                        title: t("budgetTracker.savings"),
-                                        total: totalSavings,
-                                        percentage: savingsPercentage,
-                                        color: "text-amber-600",
-                                    },
-                                ].map((item, index) => (
-                                    <div key={index} className="neomorphic-inset p-4 rounded-lg">
-                                        <h3 className={`font-semibold mb-1 text-lg ${item.color}`}>{item.title}</h3>
-                                        <div className="text-xl font-semibold">{formatCurrency(item.total, planDetails?.currency)}</div>
-                                        <div className="text-sm text-muted-foreground">
-                                            {item.percentage.toFixed(1)}% {t("budgetTracker.ofIncome")}
+                        <div className="space-y-6">
+                            {[
+                                {
+                                    title: t("budgetTracker.needs"),
+                                    total: totalNeeds,
+                                    percentage: needsPercentage,
+                                    color: "green",
+                                    tabKey: "needs",
+                                    icon: <DollarSign className="h-5 w-5" />
+                                },
+                                {
+                                    title: t("budgetTracker.wants"),
+                                    total: totalWants,
+                                    percentage: wantsPercentage,
+                                    color: "blue",
+                                    tabKey: "wants",
+                                    icon: <ShoppingBag className="h-5 w-5" />
+                                },
+                                {
+                                    title: t("budgetTracker.savings"),
+                                    total: totalSavings,
+                                    percentage: savingsPercentage,
+                                    color: "amber",
+                                    tabKey: "savings",
+                                    icon: <PiggyBank className="h-5 w-5" />
+                                }
+                            ].map((item) => (
+                                <div key={item.tabKey} className="neomorphic p-5 rounded-lg">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex items-center">
+                                            <div className={`p-2 rounded-full bg-${item.color}-100 text-${item.color}-600 mr-3`}>
+                                                {item.icon}
+                                            </div>
+                                            <h3 className="text-lg font-bold">{item.title}</h3>
+                                        </div>
+                                        <div className={`py-1 px-3 rounded-full bg-${item.color}-100 text-${item.color}-600 font-medium text-sm`}>
+                                            {item.percentage.toFixed(1)}%
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+                                    <div className="flex justify-between items-center mb-4">
+                                        <span className="text-xl font-bold">{formatCurrency(item.total, planDetails?.currency)}</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div 
+                                            className={`bg-${item.color}-500 h-2.5 rounded-full`} 
+                                            style={{ width: `${item.percentage}%` }}
+                                        ></div>
+                                    </div>
+                                    <button 
+                                        onClick={() => handleTabChange(item.tabKey as TabType)}
+                                        className="w-full mt-4 py-2 px-4 neomorphic-button text-primary hover:bg-primary hover:text-white transition-colors flex items-center justify-center rounded-md"
+                                    >
+                                        {t("budgetTracker.viewDetails")} <ChevronRight className="ml-1 h-4 w-4" />
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     </div>
-                )}
+                </div>
+            )}
 
-                {activeTab === "needs" && renderItemList("need", needs)}
-                {activeTab === "wants" && renderItemList("want", wants)}
-                {activeTab === "savings" && renderItemList("saving", savings)}
-                {activeTab === "incomes" && renderItemList("income", incomes)}
-            </div>
+            {activeTab === "needs" && renderItemList("need", needs)}
+            {activeTab === "wants" && renderItemList("want", wants)}
+            {activeTab === "savings" && renderItemList("saving", savings)}
+            {activeTab === "incomes" && renderItemList("income", incomes)}
 
-            {/* Add Item Modal */}
+            {/* Modals */}
             <BudgetItemModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
@@ -432,7 +505,6 @@ export default function BudgetPlanDetails({ budgetPlan, categories }: BudgetPlan
                 categories={categories}
             />
 
-            {/* Edit Item Modal */}
             <BudgetItemModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
@@ -446,7 +518,6 @@ export default function BudgetPlanDetails({ budgetPlan, categories }: BudgetPlan
                 categories={categories}
             />
 
-            {/* Delete Confirmation Modal */}
             <DeleteConfirmationModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}

@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { useTranslation } from "../../hooks/useTranslation"
 import InputText from "../inputs/envelopeInput/textInput"
 import InputNumber from "../inputs/inputNumber"
-import ActionButton from "../buttons/actionButton"
+import { X, DollarSign, ShoppingBag, PiggyBank, Calculator, Tag } from "lucide-react"
 import type { Category } from "../../domain/budget/budgetTypes"
 
 interface BudgetItemModalProps {
@@ -98,6 +98,26 @@ export default function BudgetItemModal({
 
     const isValid = name.trim() !== "" && amount.trim() !== "" && /^\d+(\.\d{0,2})?$/.test(amount) && category !== ""
 
+    // Get icon based on item type
+    const getIcon = () => {
+        switch (itemType) {
+            case "need": return <DollarSign className="h-6 w-6 text-green-600" />
+            case "want": return <ShoppingBag className="h-6 w-6 text-blue-600" />
+            case "saving": return <PiggyBank className="h-6 w-6 text-amber-600" />
+            case "income": return <Calculator className="h-6 w-6 text-purple-600" />
+        }
+    }
+
+    // Get color scheme based on item type
+    const getColorScheme = () => {
+        switch (itemType) {
+            case "need": return "green"
+            case "want": return "blue"
+            case "saving": return "amber"
+            case "income": return "purple"
+        }
+    }
+
     if (!isOpen) return null
 
     return (
@@ -108,48 +128,82 @@ export default function BudgetItemModal({
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
         >
             <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
+                initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                className="neomorphic p-4 md:p-6 w-full max-w-md bg-white rounded-lg"
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="neomorphic p-6 w-full max-w-md bg-white rounded-lg"
             >
-                <h2 className="text-xl md:text-2xl font-bold mb-4">{title}</h2>
-
-                <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">{t("budgetTracker.itemName")}</label>
-                    <InputText value={name} onChange={setName} placeholder={t("budgetTracker.itemName")} className="mb-0" />
-                </div>
-
-                <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">{t("budgetTracker.itemAmount")}</label>
-                    <InputNumber value={amount} onChange={handleAmountChange} placeholder="0.00" className="w-full mb-0" />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-sm font-medium mb-1">{t("budgetTracker.itemCategory")}</label>
-                    <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center">
+                        {getIcon()}
+                        <h2 className="text-2xl font-bold ml-2">{title}</h2>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 neomorphic-button rounded-full text-gray-500 hover:text-gray-700 transition-colors"
                     >
-                        <option value="">{t("budgetTracker.selectCategory")}</option>
-                        {itemCategories.map((category: Category) => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
+                        <X className="h-5 w-5" />
+                    </button>
                 </div>
 
-                <div className="flex justify-between">
-                    <ActionButton
-                        onClick={handleSubmit}
-                        label={t("budgetTracker.save")}
-                        disabled={!isValid}
-                        className="text-primary"
-                    />
+                <div className="space-y-6">
+                    <div>
+                        <label className="block text-base font-medium mb-2">{t("budgetTracker.itemName")}</label>
+                        <InputText 
+                            value={name} 
+                            onChange={setName} 
+                            placeholder={t("budgetTracker.enterItemName")} 
+                            className="w-full neomorphic-inset p-3 rounded-lg text-base" 
+                        />
+                    </div>
 
-                    <ActionButton onClick={onClose} label={t("budgetTracker.cancel")} className="text-red-500" />
+                    <div>
+                        <label className="block text-base font-medium mb-2">{t("budgetTracker.itemAmount")}</label>
+                        <div className="relative">
+                            <InputNumber 
+                                value={amount} 
+                                onChange={handleAmountChange} 
+                                placeholder="0.00" 
+                                className="w-full neomorphic-inset p-3 pl-8 rounded-lg text-base" 
+                            />
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="flex items-center text-base font-medium mb-2">
+                            <Tag className="h-4 w-4 mr-1" />
+                            {t("budgetTracker.itemCategory")}
+                        </label>
+                        <select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="w-full neomorphic-inset p-3 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                            <option value="">{t("budgetTracker.selectCategory")}</option>
+                            {itemCategories.map((category: Category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="flex justify-between mt-8">
+                    <button
+                        onClick={onClose}
+                        className="px-6 py-3 text-base font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-full neomorphic-button hover:bg-gray-100 transition-colors"
+                    >
+                        {t("budgetTracker.cancel")}
+                    </button>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={!isValid}
+                        className={`px-6 py-3 text-base font-semibold text-white bg-${getColorScheme()}-600 rounded-full neomorphic-button hover:bg-${getColorScheme()}-700 transition-colors ${!isValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {t("budgetTracker.save")}
+                    </button>
                 </div>
             </motion.div>
         </motion.div>

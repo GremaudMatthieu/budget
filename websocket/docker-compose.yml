@@ -7,7 +7,10 @@ services:
     environment:
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
-      - NODE_ENV=production
+      - NODE_ENV=development  # Changed from production to development for easier development
+      - USE_HTTPS=false      # Explicitly disable HTTPS requirement
+      - JWT_SECRET=development_secret_change_in_production
+      - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:8081,http://localhost:19006
     env_file:
       - .env
     networks:

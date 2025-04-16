@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -12,47 +12,28 @@ export function HeaderBar({ title, showBackButton = false, rightComponent }: Hea
   const router = useRouter();
 
   return (
-    <View style={styles.header}>
-      <View style={styles.leftContainer}>
-        {showBackButton && (
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={{ top: 15, right: 15, bottom: 15, left: 15 }}
-          >
-            <Ionicons name="chevron-back" size={24} color="#4a6fa5" />
-          </TouchableOpacity>
-        )}
-        <Text style={styles.title}>{title}</Text>
+    <View className="bg-primary-600 pt-[50px] ios:pt-[50px] android:pt-5 pb-6 shadow-md rounded-b-[20px]">
+      <View className="absolute top-14 right-12 w-16 h-16 bg-primary-500/50 rounded-full" />
+      <View className="absolute bottom-0 left-0 w-24 h-24 bg-primary-500 rounded-tr-full" />
+      
+      <View className="flex-row items-center justify-between px-5 z-10">
+        <View className="flex-row items-center">
+          {showBackButton && (
+            <TouchableOpacity
+              className="bg-white/20 p-2 rounded-full mr-3"
+              onPress={() => router.back()}
+              hitSlop={{ top: 15, right: 15, bottom: 15, left: 15 }}
+            >
+              <Ionicons name="arrow-back" size={20} color="white" />
+            </TouchableOpacity>
+          )}
+          <Text className="text-2xl font-bold text-white">{title}</Text>
+        </View>
+        
+        <View>
+          {rightComponent}
+        </View>
       </View>
-      <View style={styles.rightContainer}>{rightComponent}</View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: Platform.OS === 'ios' ? 50 : 20,
-    paddingBottom: 15,
-    paddingHorizontal: 20,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  leftContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  rightContainer: {},
-  backButton: {
-    marginRight: 10,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#4a6fa5',
-  },
-});

@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* System font stack for native feel on various platforms */
+  * {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  
+  /* Add soft transitions for all interactive elements */
+  button, a, input, select, textarea {
+    @apply transition-all duration-200 ease-in-out;
+  }
+}
+
+@layer components {
+  /* Card styles - refined for financial data */
+  .card {
+    @apply bg-background-light rounded-xl shadow-md border border-surface-border overflow-hidden;
+  }
+  
+  .card-header {
+    @apply p-4 border-b border-surface-border bg-surface-subtle font-medium text-text-primary;
+  }
+  
+  .card-content {
+    @apply p-4;
+  }
+  
+  /* Financial card style - for account balances, etc. */
+  .finance-card {
+    @apply bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl shadow-lg overflow-hidden text-white p-5;
+  }
+  
+  .balance-card {
+    @apply bg-gradient-to-br from-accent-500 to-accent-700 rounded-xl shadow-lg overflow-hidden text-white p-5;
+  }
+  
+  .savings-card {
+    @apply bg-gradient-to-br from-success-500 to-success-700 rounded-xl shadow-lg overflow-hidden text-white p-5;
+  }
+  
+  .expense-card {
+    @apply bg-gradient-to-br from-secondary-500 to-secondary-700 rounded-xl shadow-lg overflow-hidden text-white p-5;
+  }
+
+  /* Button styles - more modern and interactive */
+  .btn {
+    @apply px-4 py-2.5 rounded-lg font-medium active:opacity-80 flex items-center justify-center;
+    @apply shadow-sm active:shadow-inner;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-200 text-secondary-800 hover:bg-secondary-300;
+  }
+  
+  .btn-outline {
+    @apply border border-surface-borderDark text-text-primary bg-transparent hover:bg-secondary-50;
+  }
+  
+  .btn-success {
+    @apply bg-success-600 text-white hover:bg-success-700;
+  }
+  
+  .btn-danger {
+    @apply bg-danger-600 text-white hover:bg-danger-700;
+  }
+  
+  .btn-icon {
+    @apply p-2 rounded-full;
+  }
+
+  /* Form element styles - refined */
+  .input {
+    @apply px-3 py-2.5 rounded-lg border border-surface-borderDark bg-surface-light text-text-primary;
+    @apply focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:outline-none;
+  }
+  
+  .input-label {
+    @apply mb-1.5 text-sm font-medium text-text-secondary;
+  }
+  
+  /* Amount input - specific for financial app */
+  .amount-input {
+    @apply text-xl font-semibold input;
+  }
+
+  /* Navigation styles - enhanced */
+  .nav-item {
+    @apply px-4 py-2.5 text-text-secondary hover:text-primary-600 active:text-primary-700 flex items-center gap-2;
+    @apply hover:bg-primary-50 rounded-lg;
+  }
+  
+  .nav-item-active {
+    @apply text-primary-600 font-medium bg-primary-50;
+  }
+
+  /* Badge styles - more vibrant */
+  .badge {
+    @apply px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800;
+  }
+  
+  .badge-success {
+    @apply bg-success-100 text-success-800;
+  }
+  
+  .badge-warning {
+    @apply bg-warning-100 text-warning-800;
+  }
+  
+  .badge-danger {
+    @apply bg-danger-100 text-danger-800;
+  }
+  
+  /* Transaction list items */
+  .transaction-item {
+    @apply flex items-center justify-between p-3 border-b border-surface-border;
+  }
+  
+  .transaction-icon {
+    @apply p-2 rounded-full;
+  }
+  
+  .transaction-income {
+    @apply text-success-600 font-medium;
+  }
+  
+  .transaction-expense {
+    @apply text-danger-600 font-medium;
+  }
+  
+  /* Financial stats */
+  .stat-container {
+    @apply grid grid-cols-2 gap-4;
+  }
+  
+  .stat-card {
+    @apply p-4 rounded-xl bg-background-subtle border border-surface-border;
+  }
+  
+  .stat-value {
+    @apply text-xl font-bold;
+  }
+  
+  .stat-label {
+    @apply text-sm text-text-secondary;
+  }
+  
+  /* Budget progress bar */
+  .budget-progress-container {
+    @apply h-2 bg-secondary-100 rounded-full overflow-hidden;
+  }
+  
+  .budget-progress-bar {
+    @apply h-full bg-primary-500;
+  }
+  
+  .budget-progress-danger {
+    @apply bg-danger-500;
+  }
+  
+  .budget-progress-warning {
+    @apply bg-warning-500;
+  }
+  
+  .budget-progress-success {
+    @apply bg-success-500;
+  }
+}
+
+@layer utilities {
+  /* Money-related utilities */
+  .currency {
+    @apply font-medium;
+  }
+  
+  .currency-positive {
+    @apply text-success-600;
+  }
+  
+  .currency-negative {
+    @apply text-danger-600;
+  }
+  
+  /* Glass effect for premium features */
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/70 dark:bg-secondary-900/70;
+  }
+}

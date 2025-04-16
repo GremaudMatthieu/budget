@@ -19,7 +19,6 @@ final readonly class ExceptionListener
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
-        dump($exception);
 
         if (null !== $exception->getPrevious() && !$exception instanceof UnprocessableEntityHttpException) {
             $exception = $exception->getPrevious();
