@@ -29,18 +29,18 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
   };
 
   // Choose icon and colors based on action type
-  const icon = actionType === 'credit' 
+  const icon = actionType === 'credit'
     ? "arrow-down-circle-outline"
     : "arrow-up-circle-outline";
-  
+
   const iconColor = actionType === 'credit'
     ? "#16a34a" // success-600
     : "#dc2626"; // danger-600
-  
+
   const iconBgColor = actionType === 'credit'
     ? "bg-success-100"
     : "bg-danger-100";
-  
+
   const actionLabel = actionType === 'credit'
     ? "Add Funds"
     : "Remove Funds";
@@ -62,8 +62,8 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
                 {actionType === 'credit' ? 'Add to Envelope' : 'Remove from Envelope'}
               </Text>
             </View>
-            <TouchableOpacity 
-              onPress={handleClose} 
+            <TouchableOpacity
+              onPress={handleClose}
               className="w-8 h-8 rounded-full bg-surface-subtle items-center justify-center"
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
@@ -75,12 +75,12 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
             <Text className="mb-2 text-sm font-medium text-text-secondary">
               Add a description for this transaction:
             </Text>
-            
+
             <View className="relative">
               <View className="absolute left-3 top-3">
                 <Ionicons name="create-outline" size={18} color="#64748b" />
               </View>
-              
+
               <TextInput
                 value={description}
                 onChangeText={setDescription}
@@ -96,23 +96,16 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
           </View>
 
           <View className="flex-row space-x-3 mt-2">
-            <TouchableOpacity 
+            <ActionButton
+              label={"Cancel"}
               onPress={handleClose}
-              className="flex-1 py-3 rounded-xl bg-surface-light border border-surface-border items-center"
-            >
-              <Text className="text-text-primary font-medium">Cancel</Text>
-            </TouchableOpacity>
-            
-            <ActionButton 
+              className="flex-1"
+             
+            />
+            <ActionButton
               label={actionLabel}
-              variant={actionType === 'credit' ? 'primary' : 'danger'}
               onPress={handleSubmit}
               className="flex-1"
-              icon={<Ionicons 
-                name={actionType === 'credit' ? 'checkmark-circle' : 'arrow-up-circle'} 
-                size={18} 
-                color="white" 
-              />}
             />
           </View>
         </View>
