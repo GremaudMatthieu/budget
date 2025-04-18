@@ -92,9 +92,9 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
                 New Envelope
               </Text>
             </View>
-            <TouchableOpacity 
-              onPress={handleClose} 
-              className="w-8 h-8 rounded-full bg-surface-subtle items-center justify-center" 
+            <TouchableOpacity
+              onPress={handleClose}
+              className="w-8 h-8 rounded-full bg-surface-subtle items-center justify-center"
               disabled={submitted}
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
@@ -137,10 +137,10 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
                   enabled={!submitted}
                 >
                   {currencyOptions.map((option) => (
-                    <Picker.Item 
-                      key={option.value} 
-                      label={option.label} 
-                      value={option.value} 
+                    <Picker.Item
+                      key={option.value}
+                      label={option.label}
+                      value={option.value}
                     />
                   ))}
                 </Picker>
@@ -149,21 +149,17 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
           </ScrollView>
 
           <View className="flex-row space-x-3 mt-2">
-            <TouchableOpacity 
+            <ActionButton
+              label={"Cancel"}
               onPress={handleClose}
-              className="flex-1 py-3 rounded-xl bg-surface-light border border-surface-border items-center"
               disabled={submitted}
-            >
-              <Text className="text-text-primary font-medium">Cancel</Text>
-            </TouchableOpacity>
-            
-            <ActionButton 
+              className="flex-1"
+            />
+            <ActionButton
               label={submitted ? "Creating..." : "Create Envelope"}
-              variant="primary"
               onPress={handleSubmit}
               disabled={submitted}
-              loading={submitted}
-              className="flex-1"
+              className="flex-1 "
             />
           </View>
         </View>
