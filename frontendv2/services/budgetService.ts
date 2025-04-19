@@ -11,7 +11,67 @@ import {
 export class BudgetService {
   // Budget plan queries
   async getBudgetPlansCalendar(year: number): Promise<BudgetPlansCalendar> {
-    return await apiClient.get(`/budget-plans-yearly-calendar?year=${year}`);
+    const response = await apiClient.get(`/budget-plans-yearly-calendar?year=${year}`);
+    
+    // Enhance the calendar data with more details from individual budget plans
+    const calendar = response;
+    const yearKey = year.toString();
+    
+    // Process all months with UUIDs to fetch additional details
+    if (calendar[yearKey]) {
+      const monthsWithPlans = Object.keys(calendar[yearKey])
+        .filter(month => calendar[yearKey][month].uuid !== null);
+      
+      // For each month with a budget plan UUID, load additional details
+      for (const month of monthsWithPlans) {
+        try {
+          const budgetPlanId = calendar[yearKey][month].uuid;
+          if (budgetPlanId) {
+            const budgetPlan = await this.getBudgetPlan(budgetPlanId);
+            
+            // Calculate totals and percentages
+            const totalIncome = budgetPlan.incomes?.reduce(
+              (sum, income) => sum + parseFloat(income.incomeAmount), 
+              0
+            ) || 0;
+            
+            const totalNeeds = budgetPlan.needs?.reduce(
+              (sum, need) => sum + parseFloat(need.needAmount), 
+              0
+            ) || 0;
+            
+            const totalWants = budgetPlan.wants?.reduce(
+              (sum, want) => sum + parseFloat(want.wantAmount), 
+              0
+            ) || 0;
+            
+            const totalSavings = budgetPlan.savings?.reduce(
+              (sum, saving) => sum + parseFloat(saving.savingAmount), 
+              0
+            ) || 0;
+            
+            const totalAllocated = totalNeeds + totalWants + totalSavings;
+            
+            // Update the month data with calculated values
+            calendar[yearKey][month] = {
+              ...calendar[yearKey][month],
+              totalIncome,
+              totalAllocated,
+              allocatedPercentage: totalIncome > 0 ? (totalAllocated / totalIncome) * 100 : 0,
+              needsPercentage: totalIncome > 0 ? (totalNeeds / totalIncome) * 100 : 0,
+              wantsPercentage: totalIncome > 0 ? (totalWants / totalIncome) * 100 : 0,
+              savingsPercentage: totalIncome > 0 ? (totalSavings / totalIncome) * 100 : 0,
+              currency: budgetPlan.budgetPlan.currency
+            };
+          }
+        } catch (error) {
+          console.error(`Failed to load details for budget plan in month ${month}:`, error);
+          // Keep the basic UUID data for this month, but don't add the additional details
+        }
+      }
+    }
+    
+    return calendar;
   }
 
   async getBudgetPlan(uuid: string): Promise<BudgetPlan> {

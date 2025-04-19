@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
 import { currencyOptions } from '@/utils/currencyUtils';
 import AmountInput from '@/components/inputs/AmountInput';
 import NameInput from '@/components/inputs/NameInput';
 import ActionButton from '@/components/buttons/ActionButton';
+import SelectField from '@/components/inputs/SelectField';
+import { SelectOption } from '@/components/modals/SelectModal';
 
 interface CreateEnvelopeModalProps {
   visible: boolean;
@@ -128,23 +129,20 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
             />
 
             <View className="mb-5">
-              <Text className="mb-1 text-sm font-medium text-text-secondary">Currency</Text>
-              <View className="border border-surface-border rounded-xl overflow-hidden bg-white">
-                <Picker
-                  selectedValue={currency}
-                  onValueChange={(value) => setCurrency(value)}
-                  style={{ color: '#334155' }}
-                  enabled={!submitted}
-                >
-                  {currencyOptions.map((option) => (
-                    <Picker.Item
-                      key={option.value}
-                      label={option.label}
-                      value={option.value}
-                    />
-                  ))}
-                </Picker>
-              </View>
+              <SelectField
+                label="Currency"
+                placeholder="Select currency"
+                options={currencyOptions.map(option => ({
+                  id: option.value,
+                  name: option.label,
+                  icon: "cash-outline",
+                  iconColor: "#16a34a"
+                }))}
+                value={currency}
+                onChange={setCurrency}
+                icon={<Ionicons name="cash-outline" size={18} color="#16a34a" />}
+                disabled={submitted}
+              />
             </View>
           </ScrollView>
 

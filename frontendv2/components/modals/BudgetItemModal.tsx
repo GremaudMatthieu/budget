@@ -14,6 +14,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import validateAmount from '@/utils/validateAmount';
 import { Category } from '@/types/budgetTypes';
+import SelectField from '@/components/inputs/SelectField';
+import { SelectOption } from '@/components/modals/SelectModal';
 
 interface BudgetItemModalProps {
   isVisible: boolean;
@@ -128,54 +130,37 @@ const BudgetItemModal: React.FC<BudgetItemModalProps> = ({
               </View>
               
               {/* Category Field */}
-              <View>
-                <Text className="text-gray-700 mb-1">Category</Text>
-                <TouchableOpacity 
-                  onPress={() => setShowCategorySelect(!showCategorySelect)}
-                  className="border border-gray-300 rounded-lg p-3 flex-row justify-between items-center"
-                >
-                  <Text className={category ? 'text-black' : 'text-gray-400'}>
-                    {category || 'Select category'}
-                  </Text>
-                  <Ionicons name="chevron-down" size={18} color="#666" />
-                </TouchableOpacity>
-                
-                {showCategorySelect && (
-                  <View className="border border-gray-300 rounded-lg mt-1 max-h-48">
-                    <ScrollView>
-                      {categories.map((cat) => (
-                        <TouchableOpacity
-                          key={cat.id}
-                          onPress={() => {
-                            setCategory(cat.id);
-                            setShowCategorySelect(false);
-                          }}
-                          className={`p-3 border-b border-gray-200 ${
-                            category === cat.id ? 'bg-primary-50' : ''
-                          }`}
-                        >
-                          <Text className={category === cat.id ? 'text-primary-600 font-medium' : ''}>
-                            {cat.name}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                      <TouchableOpacity
-                        onPress={() => {
-                          const newCategory = prompt('Enter new category');
-                          if (newCategory) {
-                            setCategory(newCategory);
-                            setShowCategorySelect(false);
-                          }
-                        }}
-                        className="p-3 flex-row items-center"
-                      >
-                        <Ionicons name="add-circle-outline" size={18} color="#0c6cf2" />
-                        <Text className="text-primary-600 ml-2">Add New Category</Text>
-                      </TouchableOpacity>
-                    </ScrollView>
-                  </View>
-                )}
-              </View>
+              <SelectField
+                label="Category"
+                placeholder="Select a category"
+                options={categories.map(cat => ({
+                  id: cat.id,
+                  name: cat.name,
+                  icon: itemType === 'need' ? "bag-outline" :
+                        itemType === 'want' ? "cart-outline" :
+                        itemType === 'saving' ? "save-outline" : "wallet-outline",
+                  iconColor: itemType === 'need' ? "#16a34a" :
+                             itemType === 'want' ? "#0284c7" :
+                             itemType === 'saving' ? "#ca8a04" : "#9333ea"
+                }))}
+                value={category}
+                onChange={setCategory}
+                icon={
+                  <Ionicons 
+                    name={
+                      itemType === 'need' ? "bag-outline" :
+                      itemType === 'want' ? "cart-outline" :
+                      itemType === 'saving' ? "save-outline" : "wallet-outline"
+                    } 
+                    size={18} 
+                    color={
+                      itemType === 'need' ? "#16a34a" :
+                      itemType === 'want' ? "#0284c7" :
+                      itemType === 'saving' ? "#ca8a04" : "#9333ea"
+                    } 
+                  />
+                }
+              />
               
               {/* Submit Button */}
               <TouchableOpacity
