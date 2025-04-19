@@ -3,18 +3,19 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import withAnimatedHeader from '@/components/withAnimatedHeader';
+import withAnimatedHeader from '@/components/withAnimatedHeaderf';
+import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 
 // Content component for the profile, which will be wrapped with the animated header
 function ProfileContent() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  
+
   const handleLogout = async () => {
     await logout();
     router.replace('/');
   };
-  
+
   return (
     <View className="flex-1">
       {/* User Profile Card */}
@@ -29,10 +30,10 @@ function ProfileContent() {
           <Text className="text-text-secondary">{user?.email || ''}</Text>
         </View>
       </View>
-      
+
       {/* Settings Menu */}
       <View className="bg-white rounded-xl shadow-sm mb-6 mx-4">
-        <TouchableOpacity 
+        <TouchableOpacity
           className="flex-row items-center justify-between p-4 border-b border-surface-border"
           onPress={() => {
             // Navigate to account settings
@@ -46,8 +47,8 @@ function ProfileContent() {
           </View>
           <Ionicons name="chevron-forward" size={20} color="#64748b" />
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           className="flex-row items-center justify-between p-4 border-b border-surface-border"
           onPress={() => {
             // Navigate to notifications settings
@@ -61,8 +62,8 @@ function ProfileContent() {
           </View>
           <Ionicons name="chevron-forward" size={20} color="#64748b" />
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           className="flex-row items-center justify-between p-4 border-b border-surface-border"
           onPress={() => {
             // Navigate to security settings
@@ -76,8 +77,8 @@ function ProfileContent() {
           </View>
           <Ionicons name="chevron-forward" size={20} color="#64748b" />
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           className="flex-row items-center justify-between p-4"
           onPress={() => {
             // Navigate to appearance settings
@@ -92,10 +93,10 @@ function ProfileContent() {
           <Ionicons name="chevron-forward" size={20} color="#64748b" />
         </TouchableOpacity>
       </View>
-      
+
       {/* Support and About */}
       <View className="bg-white rounded-xl shadow-sm mb-6 mx-4">
-        <TouchableOpacity 
+        <TouchableOpacity
           className="flex-row items-center justify-between p-4 border-b border-surface-border"
           onPress={() => {
             // Navigate to help & support
@@ -109,8 +110,8 @@ function ProfileContent() {
           </View>
           <Ionicons name="chevron-forward" size={20} color="#64748b" />
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           className="flex-row items-center justify-between p-4"
           onPress={() => {
             // Navigate to about page
@@ -125,7 +126,7 @@ function ProfileContent() {
           <Ionicons name="chevron-forward" size={20} color="#64748b" />
         </TouchableOpacity>
       </View>
-      
+
       {/* Logout Button */}
       <TouchableOpacity
         className="bg-danger-100 py-4 rounded-xl mb-6 mx-4"
@@ -133,17 +134,23 @@ function ProfileContent() {
       >
         <Text className="text-danger-600 text-center font-semibold">Log Out</Text>
       </TouchableOpacity>
-      
+
       <Text className="text-center text-text-muted text-xs mb-6">
         Version 1.0.0
       </Text>
     </View>
   );
 }
-
+function ProfileScreen() {
+  return (
+    <AnimatedHeaderLayout
+      title="My Profile"
+      subtitle="Manage your account settings"
+      headerHeight={130}
+    >
+      <ProfileContent />
+    </AnimatedHeaderLayout>
+  );
+}
 // Apply the withAnimatedHeader HOC to wrap the Profile content
-export default withAnimatedHeader(ProfileContent, {
-  title: 'My Profile',
-  subtitle: 'Manage your account settings',
-  headerHeight: 110
-});
+export default ProfileScreen

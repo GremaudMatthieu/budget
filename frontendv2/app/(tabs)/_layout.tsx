@@ -62,7 +62,7 @@ export default function TabsLayout() {
           headerTitle: 'Dashboard',
         }}
       />
-      
+
       <Tabs.Screen
         name="envelopes"
         options={{
@@ -87,29 +87,33 @@ export default function TabsLayout() {
         }}
       />
 
-        <Tabs.Screen
-            name="budget-plans/create"
-            options={{
-                href: null,
-            }}
-        />
+      <Tabs.Screen
+        name="budget-plans/create"
+        options={{
+          href: null,
+        }}
+      />
 
-        <Tabs.Screen
-            name="budget-plans/[uuid]"
-            options={{
-                href: null,
-            }}
-        />
+      <Tabs.Screen
+        name="budget-plans/[uuid]"
+        options={{
+          href: null,
+          headerShown: false,
 
-        <Tabs.Screen
-            name="envelopes/[uuid]"
-            options={{
-                href: null,
-            }}
-        />
+        }}
+      />
+
+      <Tabs.Screen
+        name="envelopes/[uuid]"
+        options={{
+          href: null,
+          headerShown: false,
+
+        }}
+      />
 
 
-        <Tabs.Screen
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
