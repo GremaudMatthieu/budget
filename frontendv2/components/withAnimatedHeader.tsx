@@ -4,13 +4,16 @@ import AnimatedHeader from './AnimatedHeader';
 
 interface AnimatedHeaderLayoutProps {
   children: React.ReactNode;
-  title: string;
+  title: React.ReactNode | string;  // Permettre un titre personnalisé
   subtitle?: string;
   showBackButton?: boolean;
   rightComponent?: React.ReactNode;
   headerHeight?: number;
+  collapsePercentage?: number; // Nouveau paramètre
   onRefresh?: () => void;
   refreshing?: boolean;
+  headerContent?: React.ReactNode;
+  headerButtons?: React.ReactNode;
 }
 
 const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
@@ -20,8 +23,11 @@ const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
   showBackButton,
   rightComponent,
   headerHeight = 125,
+  collapsePercentage = 100, // Valeur par défaut à 100%
   onRefresh,
   refreshing = false,
+  headerContent,
+  headerButtons,
 }) => {
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -38,6 +44,10 @@ const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
         showBackButton={showBackButton}
         rightComponent={rightComponent}
         scrollY={scrollY}
+
+        collapsePercentage={collapsePercentage}   
+        headerContent={headerContent}
+        headerButtons={headerButtons}
       />
 
       <Animated.ScrollView
