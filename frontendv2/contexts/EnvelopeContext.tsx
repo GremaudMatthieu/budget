@@ -251,6 +251,17 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     };
 
     const eventHandlers: Record<string, (event: any) => void> = {
+      'connected': (event) => {
+        console.log('WebSocket connected event received in envelope context:', event);
+        // When socket reconnects, refresh data and clear pending requests
+        debouncedRefresh();
+        
+        // Clear any pending requests that might be stuck
+        if (Object.keys(pendingRequests).length > 0) {
+          console.log('Clearing pending envelope requests after reconnection');
+          setPendingRequests({});
+        }
+      },
       'BudgetEnvelopeAdded': (event) => {
         console.log('Envelope added event received:', event);
         if (event.requestId && pendingRequests[event.requestId]) {
@@ -336,7 +347,7 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
         socket.off(event);
       }
     };
-  }, [socket, refreshEnvelopes, currentEnvelopeDetails]);
+  }, [socket, refreshEnvelopes, currentEnvelopeDetails, pendingRequests]);
 
   // CRUD operations - unchanged...
   const createEnvelope = async (name: string, targetBudget: string, currency: string) => {
@@ -423,6 +434,19 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       await envelopeService.deleteEnvelope(envelopeId, requestId);
       // WebSocket event will handle the UI update
+      
+      // Safety timeout: clear pending state after 5 seconds if no WebSocket event is received
+      setTimeout(() => {
+        setPendingRequests(prev => {
+          if (prev[requestId]) {
+            console.log(`Fallback timeout for delete envelope ${envelopeId}: clearing pending state`);
+            const updated = { ...prev };
+            delete updated[requestId];
+            return updated;
+          }
+          return prev;
+        });
+      }, 5000);
     } catch (err) {
       console.error("Delete envelope error:", err);
       setError("Failed to delete envelope");
@@ -453,6 +477,19 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       await envelopeService.creditEnvelope(envelopeId, amount, description, requestId);
       // WebSocket event will handle the UI update
+      
+      // Safety timeout: clear pending state after 5 seconds if no WebSocket event is received
+      setTimeout(() => {
+        setPendingRequests(prev => {
+          if (prev[requestId]) {
+            console.log(`Fallback timeout for credit envelope ${envelopeId}: clearing pending state`);
+            const updated = { ...prev };
+            delete updated[requestId];
+            return updated;
+          }
+          return prev;
+        });
+      }, 5000);
     } catch (err) {
       console.error("Credit envelope error:", err);
       setError("Failed to credit envelope");
@@ -483,6 +520,19 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       await envelopeService.debitEnvelope(envelopeId, amount, description, requestId);
       // WebSocket event will handle the UI update
+      
+      // Safety timeout: clear pending state after 5 seconds if no WebSocket event is received
+      setTimeout(() => {
+        setPendingRequests(prev => {
+          if (prev[requestId]) {
+            console.log(`Fallback timeout for debit envelope ${envelopeId}: clearing pending state`);
+            const updated = { ...prev };
+            delete updated[requestId];
+            return updated;
+          }
+          return prev;
+        });
+      }, 5000);
     } catch (err) {
       console.error("Debit envelope error:", err);
       setError("Failed to debit envelope");
@@ -513,6 +563,19 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
       // Changed from updateEnvelopeName to nameEnvelope to match service implementation
       await envelopeService.nameEnvelope(envelopeId, name, requestId);
       // WebSocket event will handle the UI update
+      
+      // Safety timeout: clear pending state after 5 seconds if no WebSocket event is received
+      setTimeout(() => {
+        setPendingRequests(prev => {
+          if (prev[requestId]) {
+            console.log(`Fallback timeout for rename envelope ${envelopeId}: clearing pending state`);
+            const updated = { ...prev };
+            delete updated[requestId];
+            return updated;
+          }
+          return prev;
+        });
+      }, 5000);
     } catch (err) {
       console.error("Update envelope name error:", err);
       setError("Failed to update envelope name");
@@ -543,6 +606,19 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       await envelopeService.updateTargetBudget(envelopeId, targetedAmount, currentAmount, requestId);
       // WebSocket event will handle the UI update
+      
+      // Safety timeout: clear pending state after 5 seconds if no WebSocket event is received
+      setTimeout(() => {
+        setPendingRequests(prev => {
+          if (prev[requestId]) {
+            console.log(`Fallback timeout for update target budget ${envelopeId}: clearing pending state`);
+            const updated = { ...prev };
+            delete updated[requestId];
+            return updated;
+          }
+          return prev;
+        });
+      }, 5000);
     } catch (err) {
       console.error("Update target budget error:", err);
       setError("Failed to update target budget");

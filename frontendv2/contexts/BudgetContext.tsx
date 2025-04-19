@@ -173,6 +173,18 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       await budgetService.createBudgetPlan(payload, requestId);
       setNewlyCreatedBudgetPlanId(requestId);
+      
+      // Safety fallback: clear newly created budget plan ID after 5 seconds if no WebSocket event is received
+      setTimeout(() => {
+        setNewlyCreatedBudgetPlanId(currentId => {
+          if (currentId === requestId) {
+            console.log(`Fallback timeout for create budget plan ${requestId}: clearing pending state`);
+            return null;
+          }
+          return currentId;
+        });
+      }, 5000);
+      
       return requestId;
     } catch (err) {
       console.error("Failed to create budget plan:", err);
@@ -205,6 +217,18 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       await budgetService.createBudgetPlanFromExisting(payload, requestId);
       setNewlyCreatedBudgetPlanId(requestId);
+      
+      // Safety fallback: clear newly created budget plan ID after 5 seconds if no WebSocket event is received
+      setTimeout(() => {
+        setNewlyCreatedBudgetPlanId(currentId => {
+          if (currentId === requestId) {
+            console.log(`Fallback timeout for create budget plan from existing ${requestId}: clearing pending state`);
+            return null;
+          }
+          return currentId;
+        });
+      }, 5000);
+      
       return requestId;
     } catch (err) {
       console.error("Failed to create budget plan from existing:", err);
@@ -219,6 +243,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!selectedBudgetPlan) return false;
 
     setLoading(true);
+    const requestId = uuidv4(); // Generate a unique request ID
     
     try {
       await budgetService.addBudgetItem(
@@ -226,8 +251,16 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         type,
         name,
         amount,
-        category
+        category,
+        requestId // Pass the requestId to track the operation
       );
+      
+      // Safety fallback: clear loading state after 5 seconds if no WebSocket event is received
+      const timeoutId = setTimeout(() => {
+        console.log(`Fallback timeout for add ${type} item: clearing loading state`);
+        setLoading(false);
+      }, 5000);
+      
       return true;
     } catch (err) {
       console.error(`Failed to add ${type}:`, err);
@@ -248,6 +281,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!selectedBudgetPlan) return false;
 
     setLoading(true);
+    const requestId = uuidv4(); // Generate a unique request ID
 
     try {
       await budgetService.adjustBudgetItem(
@@ -256,8 +290,16 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         type,
         name,
         amount,
-        category
+        category,
+        requestId // Pass the requestId to track the operation
       );
+      
+      // Safety fallback: clear loading state after 5 seconds if no WebSocket event is received
+      const timeoutId = setTimeout(() => {
+        console.log(`Fallback timeout for adjust ${type} item ${itemId}: clearing loading state`);
+        setLoading(false);
+      }, 5000);
+      
       return true;
     } catch (err) {
       console.error(`Failed to adjust ${type}:`, err);
@@ -272,13 +314,22 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!selectedBudgetPlan) return false;
 
     setLoading(true);
+    const requestId = uuidv4(); // Generate a unique request ID
 
     try {
       await budgetService.removeBudgetItem(
         selectedBudgetPlan.budgetPlan.uuid,
         itemId,
-        type
+        type,
+        requestId // Pass the requestId to track the operation
       );
+      
+      // Safety fallback: clear loading state after 5 seconds if no WebSocket event is received
+      const timeoutId = setTimeout(() => {
+        console.log(`Fallback timeout for remove ${type} item ${itemId}: clearing loading state`);
+        setLoading(false);
+      }, 5000);
+      
       return true;
     } catch (err) {
       console.error(`Failed to remove ${type}:`, err);
@@ -317,6 +368,27 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     };
 
+    // Handler for connection events
+    const handleConnectionEvent = (data: any) => {
+      console.log('WebSocket connected event received in budget context:', data);
+      
+      // When socket reconnects, refresh the current view
+      if (budgetPlansCalendar) {
+        const year = new Date().getFullYear();
+        fetchBudgetPlansCalendar(year);
+      }
+      
+      // If a budget plan is selected, refresh it as well
+      if (selectedBudgetPlan) {
+        fetchBudgetPlan(selectedBudgetPlan.budgetPlan.uuid);
+      }
+      
+      // Clear newlyCreatedBudgetPlanId if it's set (clean up any pending state)
+      if (newlyCreatedBudgetPlanId) {
+        setNewlyCreatedBudgetPlanId(null);
+      }
+    };
+
     const eventTypes = [
       "BudgetPlanCurrencyChanged",
       "BudgetPlanGenerated",
@@ -336,14 +408,19 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       "BudgetPlanWantRemoved",
     ];
 
+    // Register event handlers
     eventTypes.forEach((eventType) => {
       socket.on(eventType, handleBudgetPlanEvent);
     });
+    
+    // Register the connection event handler
+    socket.on('connected', handleConnectionEvent);
 
     return () => {
       eventTypes.forEach((eventType) => {
         socket.off(eventType, handleBudgetPlanEvent);
       });
+      socket.off('connected', handleConnectionEvent);
     };
   }, [
     socket,

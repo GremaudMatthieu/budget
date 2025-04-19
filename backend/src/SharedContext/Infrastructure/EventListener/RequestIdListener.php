@@ -21,7 +21,7 @@ class RequestIdListener implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event): void
     {
         $this->requestIdProvider->requestId = $event->getRequest()->headers->get(
-            'Request-Id',
+            'request-id',
             DomainEventInterface::DEFAULT_REQUEST_ID,
         );
     }

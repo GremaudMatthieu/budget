@@ -24,6 +24,7 @@ type AuthContextType = {
   logout: () => Promise<void>;
   changePassword: (oldPassword: string, newPassword: string) => Promise<boolean>;
   loginWithGoogle: (email: string, token: string, refreshToken?: string) => Promise<boolean>;
+  refreshUserData: () => Promise<void>; // Add this new method
 };
 
 // Create the context
@@ -184,13 +185,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Refresh user data function
+  const refreshUserData = async (): Promise<void> => {
+    try {
+      console.log('Refreshing user data from API');
+      const userData = await apiClient.get('/users/me');
+      console.log('Successfully refreshed user data');
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+    }
+  };
+
   // Create auth value object
   const value = {
     user,
     loading,
     isAuthenticated: !!user,
     logout,
-    loginWithGoogle
+    loginWithGoogle,
+    refreshUserData
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

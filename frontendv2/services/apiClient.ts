@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Platform } from 'react-native';
+import { v4 as uuidv4 } from 'uuid';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -78,7 +79,38 @@ class ApiClient {
 
   // POST request
   async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-    return this.client.post(url, data, config);
+    // Add request ID header if not already present in config
+    if (config?.headers?.['request-id']) {
+      return this.client.post(url, data, config);
+    }
+    
+    const requestConfig = { 
+      ...config,
+      headers: {
+        ...config?.headers,
+        'request-id': uuidv4(),
+      }
+    };
+    
+    return this.client.post(url, data, requestConfig);
+  }
+
+  // POST request with specific request ID
+  async postWithRequestId<T = any>(url: string, data?: any, requestId?: string, config?: AxiosRequestConfig): Promise<T> {
+    const effectiveRequestId = requestId || uuidv4();
+    
+    const requestConfig = { 
+      ...config,
+      headers: {
+        ...config?.headers,
+        'request-id': effectiveRequestId,
+      }
+    };
+    
+    return {
+      requestId: effectiveRequestId,
+      data: await this.client.post(url, data, requestConfig)
+    };
   }
 
   // PUT request

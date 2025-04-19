@@ -112,6 +112,7 @@ final class EventStore implements EventStoreInterface
                 if (is_subclass_of($event::class, UserDomainEventInterface::class)) {
                     $event = $this->eventEncryptor->encrypt($event, $event->userId);
                 }
+                $event->requestId = $this->requestIdProvider->requestId;
 
                 $this->connection->insert('event_store', [
                     'stream_id' => $event->aggregateId,
@@ -120,7 +121,7 @@ final class EventStore implements EventStoreInterface
                     'payload' => json_encode($event->toArray(), JSON_THROW_ON_ERROR),
                     'occurred_on' => $event->occurredOn->format(\DateTimeImmutable::ATOM),
                     'stream_version' => ++$version,
-                    'request_id' => $this->requestIdProvider->requestId,
+                    'request_id' => $event->requestId,
                     'user_id' => $event->userId,
                     'meta_data' => json_encode([], JSON_THROW_ON_ERROR),
                 ]);

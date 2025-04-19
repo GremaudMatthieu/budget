@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SocketProvider } from "@/contexts/SocketContext";
 import { EnvelopeProvider } from "@/contexts/EnvelopeContext";
 import { BudgetProvider } from "@/contexts/BudgetContext";
+import { UserProvider } from "@/contexts/UserContext";
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator } from 'react-native';
 import { useEffect } from "react";
@@ -52,14 +53,16 @@ export default function RootLayout() {
       <AuthProvider>
         <AuthProtection>
           <SocketProvider>
-            <EnvelopeProvider>
-              <BudgetProvider>
-                <View className="flex-1 bg-background-light">
-                  <StatusBar style="auto" />
-                  <Slot />
-                </View>
-              </BudgetProvider>
-            </EnvelopeProvider>
+            <UserProvider>
+              <EnvelopeProvider>
+                <BudgetProvider>
+                  <View className="flex-1 bg-background-light">
+                    <StatusBar style="auto" />
+                    <Slot />
+                  </View>
+                </BudgetProvider>
+              </EnvelopeProvider>
+            </UserProvider>
           </SocketProvider>
         </AuthProtection>
       </AuthProvider>

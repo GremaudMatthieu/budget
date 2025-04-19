@@ -36,7 +36,7 @@ function ProfileContent() {
         <TouchableOpacity
           className="flex-row items-center justify-between p-4 border-b border-surface-border"
           onPress={() => {
-            // Navigate to account settings
+            router.push('/profile/account-settings');
           }}
         >
           <View className="flex-row items-center">

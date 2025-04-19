@@ -20,8 +20,8 @@ final class UserFirstnameChangedDomainEvent implements UserDomainEventInterface
         string $aggregateId,
         string $firstname,
         string $userId,
-        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID)
-    {
+        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
+    ) {
         $this->aggregateId = $aggregateId;
         $this->firstname = $firstname;
         $this->userId = $userId;

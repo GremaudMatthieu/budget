@@ -237,6 +237,10 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       
       socketInstance.on('connected', (data) => {
         console.log('Received connection confirmation:', data);
+        
+        // Notify any listening components about the connection event
+        // This can be used to trigger UI refreshes
+        setLastMessage({ type: 'connected', data });
       });
       
       socketInstance.on('disconnect', (reason) => {

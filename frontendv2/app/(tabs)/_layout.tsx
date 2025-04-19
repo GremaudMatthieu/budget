@@ -112,6 +112,15 @@ export default function TabsLayout() {
         }}
       />
 
+      <Tabs.Screen
+        name="profile/account-settings"
+        options={{
+          href: null,
+          headerShown: false,
+
+        }}
+      />
+
 
       <Tabs.Screen
         name="profile"
