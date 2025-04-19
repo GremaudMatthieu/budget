@@ -36,7 +36,7 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingRequests, setPendingRequests] = useState<Record<string, boolean>>({});
-  
+
   const { socket, connected } = useSocket();
   const { user } = useAuth();
   const userRef = useRef(user);
@@ -55,9 +55,9 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
   const updateEnvelopeState = useCallback((updatedEnvelope: Envelope) => {
     setEnvelopesData(prev => {
       if (!prev) return prev;
-      
+
       const existingEnvelopeIndex = prev.envelopes.findIndex(env => env.uuid === updatedEnvelope.uuid);
-      
+
       if (existingEnvelopeIndex === -1) {
         return {
           ...prev,
@@ -65,10 +65,10 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
           totalItems: prev.totalItems + 1
         };
       }
-      
+
       return {
         ...prev,
-        envelopes: prev.envelopes.map(env => 
+        envelopes: prev.envelopes.map(env =>
           env.uuid === updatedEnvelope.uuid ? updatedEnvelope : env
         )
       };
@@ -122,26 +122,26 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Centralized function to listen for updates to a specific envelope
   const listenToEnvelopeUpdates = useCallback((
-    envelopeId: string, 
+    envelopeId: string,
     onUpdate: () => void,
     onDelete?: () => void
   ) => {
     if (!socket) {
       console.log('Socket not available for envelope update listener');
-      return () => {};
+      return () => { };
     }
 
     console.log(`Setting up WebSocket event listeners for envelope: ${envelopeId}`);
-    
+
     // Store callbacks in the ref to access them in event handlers
     activeListenersRef.current[envelopeId] = { onUpdate, onDelete };
-    
+
     // Handler for envelope events
     const handleEnvelopeEvent = (event: any) => {
       // Check if this event is for the target envelope
       if (event.aggregateId === envelopeId || event.budgetEnvelopeId === envelopeId) {
         console.log(`Envelope event received for ${envelopeId}:`, event.type);
-        
+
         // If it's a delete event and we have a delete callback, call it immediately
         if (event.type === 'BudgetEnvelopeDeleted' || event.__type === 'BudgetEnvelopeDeleted') {
           if (activeListenersRef.current[envelopeId]?.onDelete) {
@@ -149,7 +149,7 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
           }
           return;
         }
-        
+
         // For all other events, we need to:
         // 1. Signal the UI immediately that an update is available (improve responsiveness)
         // 2. Then fetch the latest data to ensure consistency
@@ -160,16 +160,16 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
           console.log(`Triggering immediate UI notification for envelope ${envelopeId}`);
           activeListenersRef.current[envelopeId].onUpdate();
         }
-        
+
         // Then fetch the latest data with a small delay to avoid race conditions
         // with multiple rapid socket events
         const now = Date.now();
         const lastUpdate = lastUpdateTimeRef.current[envelopeId] || 0;
-        
+
         // If we've had a recent update, use a slightly longer delay for the data fetch
         const updateDelay = now - lastUpdate < 300 ? 500 : 200;
         lastUpdateTimeRef.current[envelopeId] = now;
-        
+
         // Use setTimeout to avoid blocking the UI during the fetch
         setTimeout(() => {
           fetchEnvelopeDetails(envelopeId)
@@ -177,7 +177,7 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
               if (details) {
                 console.log(`Updated envelope details fetched for ${envelopeId}`);
                 setCurrentEnvelopeDetails(details);
-                
+
                 // No need to call onUpdate again as we already notified the UI
                 // The UI should be refreshing the data from context or props
               } else {
@@ -212,7 +212,7 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
       for (const eventType of eventTypes) {
         socket.off(eventType, handleEnvelopeEvent);
       }
-      
+
       // Remove from active listeners
       delete activeListenersRef.current[envelopeId];
       delete lastUpdateTimeRef.current[envelopeId];
@@ -224,17 +224,27 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     if (!socket) return;
 
     console.log('Setting up WebSocket event listeners for envelopes list');
-    
+
     // Track last refresh time to prevent multiple refreshes in a short period
     let lastRefreshTime = 0;
     const REFRESH_DEBOUNCE_TIME = 500; // ms
-    
-    // Debounced refresh function
-    const debouncedRefresh = () => {
+
+    // Debounced refresh function that updates both list and details
+    const debouncedRefresh = async (envelopeId?: string) => {
       const currentTime = Date.now();
       if (currentTime - lastRefreshTime > REFRESH_DEBOUNCE_TIME) {
         lastRefreshTime = currentTime;
-        refreshEnvelopes(true);
+        
+        // Refresh envelopes list
+        await refreshEnvelopes(true);
+        
+        // If we have a specific envelope ID and it matches current details, refresh it
+        if (envelopeId && currentEnvelopeDetails?.envelope.uuid === envelopeId) {
+          const updatedDetails = await fetchEnvelopeDetails(envelopeId);
+          if (updatedDetails) {
+            setCurrentEnvelopeDetails(updatedDetails);
+          }
+        }
       } else {
         console.log('Skipping refresh, too soon since last refresh');
       }
@@ -249,7 +259,6 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
             delete updated[event.requestId];
             return updated;
           });
-          // Only refresh when it's not our own request
           return;
         }
         debouncedRefresh();
@@ -262,10 +271,9 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
             delete updated[event.requestId];
             return updated;
           });
-          // Only refresh when it's not our own request
           return;
         }
-        debouncedRefresh();
+        debouncedRefresh(event.aggregateId || event.budgetEnvelopeId);
       },
       'BudgetEnvelopeDebited': (event) => {
         console.log('Envelope debited event received:', event);
@@ -275,10 +283,9 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
             delete updated[event.requestId];
             return updated;
           });
-          // Only refresh when it's not our own request
           return;
         }
-        debouncedRefresh();
+        debouncedRefresh(event.aggregateId || event.budgetEnvelopeId);
       },
       'BudgetEnvelopeDeleted': (event) => {
         console.log('Envelope deleted event received:', event);
@@ -288,10 +295,9 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
             delete updated[event.requestId];
             return updated;
           });
-          // Only refresh when it's not our own request
           return;
         }
-        debouncedRefresh();
+        debouncedRefresh(event.aggregateId || event.budgetEnvelopeId);
       },
       'BudgetEnvelopeRenamed': (event) => {
         console.log('Envelope renamed event received:', event);
@@ -301,10 +307,9 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
             delete updated[event.requestId];
             return updated;
           });
-          // Only refresh when it's not our own request
           return;
         }
-        debouncedRefresh();
+        debouncedRefresh(event.aggregateId || event.budgetEnvelopeId);
       },
       'BudgetEnvelopeTargetedAmountChanged': (event) => {
         console.log('Envelope target amount changed event received:', event);
@@ -314,10 +319,9 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
             delete updated[event.requestId];
             return updated;
           });
-          // Only refresh when it's not our own request
           return;
         }
-        debouncedRefresh();
+        debouncedRefresh(event.aggregateId || event.budgetEnvelopeId);
       }
     };
 
@@ -332,7 +336,7 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
         socket.off(event);
       }
     };
-  }, [socket, refreshEnvelopes]);
+  }, [socket, refreshEnvelopes, currentEnvelopeDetails]);
 
   // CRUD operations - unchanged...
   const createEnvelope = async (name: string, targetBudget: string, currency: string) => {
@@ -342,9 +346,9 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
       ...prev,
       [requestId]: true
     }));
-    
+
     console.log(`Creating envelope with request ID: ${requestId}`);
-    
+
     const newEnvelope: Partial<Envelope> = {
       uuid: requestId,
       name,
@@ -365,7 +369,7 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
           totalItems: 1
         };
       }
-      
+
       return {
         ...prev,
         envelopes: [...prev.envelopes, newEnvelope as Envelope],
@@ -390,13 +394,13 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
         delete updated[requestId];
         return updated;
       });
-      
+
       setError(err.message || "Failed to create envelope");
       console.error(`Error creating envelope: ${err.message || "Failed to create envelope"}`);
-      
+
       setEnvelopesData(prev => {
         if (!prev) return prev;
-        
+
         return {
           ...prev,
           envelopes: prev.envelopes.filter(env => env.uuid !== requestId),
@@ -407,104 +411,104 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
       setLoading(false);
     }
   };
-  
+
   const deleteEnvelope = async (envelopeId: string, setError: (error: string | null) => void) => {
     const requestId = uuidv4();
-    
+
     setPendingRequests(prev => ({
       ...prev,
       [requestId]: true
     }));
-    
+
     try {
       await envelopeService.deleteEnvelope(envelopeId, requestId);
       // WebSocket event will handle the UI update
     } catch (err) {
       console.error("Delete envelope error:", err);
       setError("Failed to delete envelope");
-      
+
       setPendingRequests(prev => {
         const updated = { ...prev };
         delete updated[requestId];
         return updated;
       });
-      
+
       throw err;
     }
   };
-  
+
   const creditEnvelope = async (
-    envelopeId: string, 
-    amount: string, 
-    description: string, 
+    envelopeId: string,
+    amount: string,
+    description: string,
     setError: (error: string | null) => void
   ) => {
     const requestId = uuidv4();
-    
+
     setPendingRequests(prev => ({
       ...prev,
       [requestId]: true
     }));
-    
+
     try {
       await envelopeService.creditEnvelope(envelopeId, amount, description, requestId);
       // WebSocket event will handle the UI update
     } catch (err) {
       console.error("Credit envelope error:", err);
       setError("Failed to credit envelope");
-      
+
       setPendingRequests(prev => {
         const updated = { ...prev };
         delete updated[requestId];
         return updated;
       });
-      
+
       throw err;
     }
   };
-  
+
   const debitEnvelope = async (
-    envelopeId: string, 
-    amount: string, 
-    description: string, 
+    envelopeId: string,
+    amount: string,
+    description: string,
     setError: (error: string | null) => void
   ) => {
     const requestId = uuidv4();
-    
+
     setPendingRequests(prev => ({
       ...prev,
       [requestId]: true
     }));
-    
+
     try {
       await envelopeService.debitEnvelope(envelopeId, amount, description, requestId);
       // WebSocket event will handle the UI update
     } catch (err) {
       console.error("Debit envelope error:", err);
       setError("Failed to debit envelope");
-      
+
       setPendingRequests(prev => {
         const updated = { ...prev };
         delete updated[requestId];
         return updated;
       });
-      
+
       throw err;
     }
   };
-  
+
   const updateEnvelopeName = async (
-    envelopeId: string, 
-    name: string, 
+    envelopeId: string,
+    name: string,
     setError: (error: string | null) => void
   ) => {
     const requestId = uuidv4();
-    
+
     setPendingRequests(prev => ({
       ...prev,
       [requestId]: true
     }));
-    
+
     try {
       // Changed from updateEnvelopeName to nameEnvelope to match service implementation
       await envelopeService.nameEnvelope(envelopeId, name, requestId);
@@ -512,43 +516,43 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     } catch (err) {
       console.error("Update envelope name error:", err);
       setError("Failed to update envelope name");
-      
+
       setPendingRequests(prev => {
         const updated = { ...prev };
         delete updated[requestId];
         return updated;
       });
-      
+
       throw err;
     }
   };
-  
+
   const updateTargetBudget = async (
-    envelopeId: string, 
-    targetedAmount: string, 
-    currentAmount: string, 
+    envelopeId: string,
+    targetedAmount: string,
+    currentAmount: string,
     setError: (error: string | null) => void
   ) => {
     const requestId = uuidv4();
-    
+
     setPendingRequests(prev => ({
       ...prev,
       [requestId]: true
     }));
-    
+
     try {
       await envelopeService.updateTargetBudget(envelopeId, targetedAmount, currentAmount, requestId);
       // WebSocket event will handle the UI update
     } catch (err) {
       console.error("Update target budget error:", err);
       setError("Failed to update target budget");
-      
+
       setPendingRequests(prev => {
         const updated = { ...prev };
         delete updated[requestId];
         return updated;
       });
-      
+
       throw err;
     }
   };

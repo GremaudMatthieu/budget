@@ -19,14 +19,12 @@ import validateAmount from '@/utils/validateAmount';
 import DescriptionModal from '@/components/modals/DescriptionModal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import { useErrorContext } from '@/contexts/ErrorContext';
-import { useSocket } from '@/contexts/SocketContext';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 
 export default function EnvelopeDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { setError } = useErrorContext();
-  const { socket, connected } = useSocket();
   const {
     fetchEnvelopeDetails,
     deleteEnvelope,
@@ -34,7 +32,8 @@ export default function EnvelopeDetailScreen() {
     debitEnvelope,
     updateEnvelopeName,
     updateTargetBudget,
-    currentEnvelopeDetails
+    currentEnvelopeDetails,
+    listenToEnvelopeUpdates
   } = useEnvelopes();
 
   // Access uuid directly from params
@@ -50,34 +49,13 @@ export default function EnvelopeDetailScreen() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [currentAction, setCurrentAction] = useState(null);
-  const [pendingActionTimestamp, setPendingActionTimestamp] = useState(null);
 
   // Ref to track component mount state
   const isMounted = useRef(true);
-  const lastEventTimestampRef = useRef(0);
-  const lastApiFetchTimestampRef = useRef(0);
-
-  // Watch for updates to currentEnvelopeDetails from context
-  useEffect(() => {
-    if (!currentEnvelopeDetails || !uuid) return;
-
-    // Only update if the details are for this envelope
-    if (currentEnvelopeDetails.envelope.uuid === uuid) {
-      // Update our local state with the context data
-      setDetails(currentEnvelopeDetails);
-      // Clear loading state
-      setLoading(false);
-      // Reset pending action timestamp
-      setPendingActionTimestamp(null);
-    }
-  }, [currentEnvelopeDetails, uuid]);
 
   // Load envelope details
   const loadEnvelopeDetails = useCallback(async () => {
-    if (!uuid) return;
-
-    const now = Date.now();
-    lastApiFetchTimestampRef.current = now;
+    if (!uuid || !isMounted.current) return;
 
     try {
       if (!refreshing) {
@@ -85,16 +63,9 @@ export default function EnvelopeDetailScreen() {
       }
 
       const response = await fetchEnvelopeDetails(uuid);
-
-      if (!isMounted.current) {
-        return;
-      }
-
-      if (response) {
-        // Check if we've received a more recent socket event since starting this fetch
-        if (now > lastEventTimestampRef.current) {
-          setDetails(response);
-        }
+      
+      if (isMounted.current && response) {
+        setDetails(response);
       }
     } catch (err) {
       if (isMounted.current) {
@@ -121,51 +92,41 @@ export default function EnvelopeDetailScreen() {
     }, [loadEnvelopeDetails])
   );
 
-  // Setup WebSocket event listeners
+  // Watch for updates to currentEnvelopeDetails from context
   useEffect(() => {
-    if (!socket || !connected || !uuid) {
-      return;
+    if (!currentEnvelopeDetails || !uuid) return;
+
+    // Only update if the details are for this envelope
+    if (currentEnvelopeDetails.envelope.uuid === uuid) {
+      setDetails(currentEnvelopeDetails);
+      setLoading(false);
     }
+  }, [currentEnvelopeDetails, uuid]);
 
-    // All envelope-related events
-    const eventTypes = [
-      'BudgetEnvelopeCredited',
-      'BudgetEnvelopeDebited',
-      'BudgetEnvelopeRenamed',
-      'BudgetEnvelopeTargetedAmountChanged',
-      'BudgetEnvelopeDeleted'
-    ];
+  // Setup envelope updates listener
+  useEffect(() => {
+    if (!uuid) return;
 
-    // Generic event handler for all events
-    const handleSocketEvent = async (event) => {
-      if (!isMounted.current) return;
-
-      // Only process events for this envelope
-      if (event.aggregateId === uuid || event.budgetEnvelopeId === uuid) {
-        // For delete events, navigate back
-        if (event.type === 'BudgetEnvelopeDeleted' || event.__type === 'BudgetEnvelopeDeleted') {
+    // Setup listener for envelope updates
+    const cleanup = listenToEnvelopeUpdates(
+      uuid,
+      // Update callback
+      () => {
+        if (isMounted.current) {
+          loadEnvelopeDetails();
+        }
+      },
+      // Delete callback
+      () => {
+        if (isMounted.current) {
           setError('This envelope has been deleted');
           router.back();
-          return;
         }
-
-        // Refresh envelope details immediately after receiving a socket event
-        await loadEnvelopeDetails();
       }
-    };
+    );
 
-    // Register handlers for all event types
-    eventTypes.forEach(eventType => {
-      socket.on(eventType, handleSocketEvent);
-    });
-
-    // Return cleanup function
-    return () => {
-      eventTypes.forEach(eventType => {
-        socket.off(eventType, handleSocketEvent);
-      });
-    };
-  }, [socket, connected, uuid, loadEnvelopeDetails, router, setError]);
+    return cleanup;
+  }, [uuid, listenToEnvelopeUpdates, loadEnvelopeDetails, router, setError]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -203,10 +164,6 @@ export default function EnvelopeDetailScreen() {
     }
 
     try {
-      // Set a timestamp for this action
-      const actionTimestamp = Date.now();
-      setPendingActionTimestamp(actionTimestamp);
-
       // Update pending state in UI to show loading indicator
       setDetails(prev => ({
         ...prev,
@@ -259,10 +216,6 @@ export default function EnvelopeDetailScreen() {
     }
 
     try {
-      // Set a timestamp for this action
-      const actionTimestamp = Date.now();
-      setPendingActionTimestamp(actionTimestamp);
-
       // Update pending state in UI to show loading indicator
       setDetails(prev => ({
         ...prev,
@@ -347,10 +300,6 @@ export default function EnvelopeDetailScreen() {
     if (!details) return;
 
     try {
-      // Set a timestamp for this action
-      const actionTimestamp = Date.now();
-      setPendingActionTimestamp(actionTimestamp);
-
       // Update pending state in UI
       setDetails(prev => ({
         ...prev,
@@ -381,10 +330,6 @@ export default function EnvelopeDetailScreen() {
     if (!details || !currentAction) return;
 
     try {
-      // Set a timestamp for this action
-      const actionTimestamp = Date.now();
-      setPendingActionTimestamp(actionTimestamp);
-
       // Update pending state in UI
       setDetails(prev => ({
         ...prev,
