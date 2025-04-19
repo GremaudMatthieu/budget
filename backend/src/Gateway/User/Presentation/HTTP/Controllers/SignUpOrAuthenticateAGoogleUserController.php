@@ -102,8 +102,9 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
 
     private function buildRedirectUrl(string $email, string $token, string $platform = 'web', ?string $customRedirectUri = null, ?string $refreshToken = null): string
     {
-        if ($platform === 'mobile' && $customRedirectUri) {
-            $baseUrl = $customRedirectUri;
+        if ($platform === 'mobile') {
+            // Use the app scheme for mobile deep linking
+            $baseUrl = $customRedirectUri ?? 'budgetapp://oauth/google/callback';
             $separator = (str_contains($baseUrl, '?')) ? '&' : '?';
             $url = $baseUrl . $separator . "email=" . urlencode($email) . "&token=" . urlencode($token);
         } else {

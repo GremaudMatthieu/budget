@@ -9,38 +9,30 @@ export default function GoogleCallbackScreen() {
   const params = useLocalSearchParams();
   const { loginWithGoogle } = useAuth();
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get tokens from URL parameters (provided by your backend)
         const token = params.token as string;
         const refreshToken = params.refresh_token as string;
         const email = params.email as string;
 
-        if (!token) {
-          setError('Authentication failed: No token received');
-          setLoading(false);
+        if (!token || !email) {
+          setError('Authentication failed: Missing required parameters');
           return;
         }
 
-        console.log('OAuth callback: Received token, processing authentication');
-
-        // Login with the provided tokens
         const success = await loginWithGoogle(email, token, refreshToken);
         
         if (success) {
-          // Redirect to main app screen
-          router.replace('/envelopes');
+          // Let the natural navigation flow handle the redirect
+          router.back();
         } else {
-          setError('Failed to authenticate with Google. Please try again.');
-          setLoading(false);
+          setError('Failed to authenticate. Please try again.');
         }
       } catch (err) {
         console.error('OAuth callback error:', err);
         setError('An error occurred during authentication. Please try again.');
-        setLoading(false);
       }
     };
 
@@ -100,25 +92,26 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   errorTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#c62828',
-    marginBottom: 10,
+    color: '#dc2626',
+    marginBottom: 12,
   },
   errorText: {
     fontSize: 16,
-    color: '#333',
+    color: '#4b5563',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   returnLink: {
     color: '#4a6fa5',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
 });

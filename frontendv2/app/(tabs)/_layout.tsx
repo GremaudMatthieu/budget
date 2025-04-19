@@ -58,6 +58,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
+          headerShown: false,
           headerTitle: 'Dashboard',
         }}
       />
@@ -69,10 +70,11 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="wallet-outline" size={size} color={color} />
           ),
+          headerShown: false,
           headerTitle: 'My Envelopes',
         }}
       />
-      
+
       <Tabs.Screen
         name="budget-plans"
         options={{
@@ -80,17 +82,41 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="pie-chart-outline" size={size} color={color} />
           ),
+          headerShown: false,
           headerTitle: 'Budget Plans',
         }}
       />
-      
-      <Tabs.Screen
+
+        <Tabs.Screen
+            name="budget-plans/create"
+            options={{
+                href: null,
+            }}
+        />
+
+        <Tabs.Screen
+            name="budget-plans/[uuid]"
+            options={{
+                href: null,
+            }}
+        />
+
+        <Tabs.Screen
+            name="envelopes/[uuid]"
+            options={{
+                href: null,
+            }}
+        />
+
+
+        <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),
+          headerShown: false,
           headerTitle: 'My Profile',
         }}
       />

@@ -2,9 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { 
   View, 
   Text, 
-  ScrollView, 
   TouchableOpacity, 
-  RefreshControl,
   ActivityIndicator,
   Dimensions,
   TextInput
@@ -18,15 +16,15 @@ import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal
 import DescriptionModal from '@/components/modals/DescriptionModal';
 import formatAmount from '@/utils/formatAmount';
 import validateAmount from '@/utils/validateAmount';
-import { StatusBar } from 'expo-status-bar';
 import { useErrorContext } from '@/contexts/ErrorContext';
+import withAnimatedHeaderRefresh from '@/components/withAnimatedHeaderRefresh';
 
-export default function EnvelopesScreen() {
+// Content component for envelopes, which will be wrapped with the animated header
+function EnvelopesContent() {
   const router = useRouter();
-  const { envelopesData, loading, refreshEnvelopes, createEnvelope, deleteEnvelope, creditEnvelope, debitEnvelope, updateEnvelopeName } = useEnvelopes();
+  const { envelopesData, loading, createEnvelope, deleteEnvelope, creditEnvelope, debitEnvelope, updateEnvelopeName } = useEnvelopes();
   const { setError } = useErrorContext();
   const [isCreating, setIsCreating] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const screenWidth = Dimensions.get('window').width;
   const isTablet = screenWidth > 768;
   
@@ -37,12 +35,6 @@ export default function EnvelopesScreen() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [currentAction, setCurrentAction] = useState<{type: 'credit' | 'debit', id: string, amount: string} | null>(null);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await refreshEnvelopes(true);
-    setRefreshing(false);
-  }, [refreshEnvelopes]);
 
   const handleCreateEnvelope = useCallback(async (name: string, targetAmount: string, currency: string) => {
     if (name && targetAmount) {
@@ -184,485 +176,449 @@ export default function EnvelopesScreen() {
     }
   };
 
-  if (loading && !refreshing && !envelopesData) {
+  // If no envelopes yet, display empty state
+  if (!loading && (!envelopesData?.envelopes || envelopesData.envelopes.length === 0)) {
     return (
-      <View className="flex-1 justify-center items-center bg-background-light">
-        <View className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center">
-          <ActivityIndicator size="large" color="#0c6cf2" />
+      <View className="card mt-4">
+        <View className="card-content items-center justify-center py-6">
+          <View className="w-16 h-16 bg-primary-100 rounded-full items-center justify-center mb-4">
+            <Ionicons name="wallet-outline" size={32} color="#0c6cf2" />
+          </View>
+          <Text className="text-xl font-semibold text-text-primary text-center mb-2">
+            No envelopes yet
+          </Text>
+          <Text className="text-text-secondary text-center mb-6">
+            Create your first envelope to start organizing your budget
+          </Text>
+          <TouchableOpacity
+            onPress={() => setIsCreating(true)}
+            className="bg-primary-600 rounded-xl py-3 px-6 items-center shadow-sm"
+          >
+            <Text className="text-white font-semibold">Create Envelope</Text>
+          </TouchableOpacity>
         </View>
-        <Text className="text-secondary-600 mt-4 font-medium">Loading envelopes...</Text>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-background-subtle">
-      <StatusBar style="dark" />
-      
-      {/* Header Section - Same as homepage */}
-      <View className="bg-primary-600 px-6 pt-16 pb-12 rounded-b-3xl shadow-lg">
-        <View className="flex-row justify-between items-center">
-          <Text className="text-3xl font-bold text-white">My Envelopes</Text>
-          <TouchableOpacity 
-            onPress={() => setIsCreating(true)}
-            className="bg-white/20 p-3 rounded-full"
-          >
-            <Ionicons name="add" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-        <Text className="text-lg text-primary-100 mb-6">
-          Organize and track your budgeting categories
-        </Text>
-        <View className="flex-row items-center space-x-2 bg-white/20 p-2 rounded-lg self-start">
-          <Ionicons name="wallet" size={18} color="white" />
-          <Text className="text-white font-medium">
-            {envelopesData?.envelopes?.length || 0} {envelopesData?.envelopes?.length === 1 ? 'Envelope' : 'Envelopes'}
-          </Text>
-        </View>
-      </View>
-
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ padding: 16, paddingBottom: 80 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {!envelopesData?.envelopes?.length ? (
-          <View className="card mt-4">
-            <View className="card-content items-center justify-center py-6">
-              <View className="w-16 h-16 bg-primary-100 rounded-full items-center justify-center mb-4">
-                <Ionicons name="wallet-outline" size={32} color="#0c6cf2" />
-              </View>
-              <Text className="text-xl font-semibold text-text-primary text-center mb-2">
-                No envelopes yet
-              </Text>
-              <Text className="text-text-secondary text-center mb-6">
-                Create your first envelope to start organizing your budget
-              </Text>
-              <TouchableOpacity
-                onPress={() => setIsCreating(true)}
-                className="bg-primary-600 rounded-xl py-3 px-6 items-center shadow-sm"
-              >
-                <Text className="text-white font-semibold">Create Envelope</Text>
-              </TouchableOpacity>
+    <View className="flex-1">
+      <View className="mt-4">
+        <Text className="text-xl font-semibold text-secondary-800 mb-4">Budget Categories</Text>
+        
+        {/* Completed Envelopes */}
+        {envelopesData?.envelopes
+          .filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1)
+          .length > 0 && (
+          <View className="mb-6">
+            <Text className="text-lg font-medium text-secondary-600 mb-2">Completed</Text>
+            <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
+              {envelopesData.envelopes
+                .filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1)
+                .map((envelope) => (
+                  <View
+                    key={envelope.uuid}
+                    className={isTablet ? "w-[49%] mb-4" : "w-full"}
+                  >
+                    <View className="card">
+                      <View className="absolute top-0 right-0 left-0 h-1 bg-success-500 rounded-t-xl" />
+                      <View className="card-content">
+                        {/* Envelope header with name and edit/delete options */}
+                        <View className="flex-row items-center justify-between mb-3">
+                          <View className="flex-row items-center flex-1">
+                            <View className="w-10 h-10 rounded-full bg-success-100 items-center justify-center mr-3">
+                              <Ionicons name="checkmark-circle" size={20} color="#16a34a" />
+                            </View>
+                            
+                            {editingName && editingName.id === envelope.uuid ? (
+                              <View className="flex-row items-center flex-1">
+                                <TextInput
+                                  value={editingName.name}
+                                  onChangeText={handleNameChange}
+                                  className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                  maxLength={25}
+                                  autoFocus
+                                />
+                                <TouchableOpacity 
+                                  onPress={handleUpdateName}
+                                  className="ml-2 p-2 bg-success-100 rounded-full"
+                                >
+                                  <Ionicons name="checkmark" size={18} color="#16a34a" />
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                  onPress={cancelEditingName}
+                                  className="ml-1 p-2 bg-danger-100 rounded-full"
+                                >
+                                  <Ionicons name="close" size={18} color="#dc2626" />
+                                </TouchableOpacity>
+                              </View>
+                            ) : (
+                              <View className="flex-row flex-1 items-center">
+                                <TouchableOpacity 
+                                  onPress={() => navigateToEnvelopeDetail(envelope.uuid)}
+                                  className="flex-1"
+                                >
+                                  <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
+                                </TouchableOpacity>
+                                
+                                <TouchableOpacity 
+                                  onPress={() => startEditingName(envelope.uuid, envelope.name)}
+                                  className="p-2 mr-1"
+                                >
+                                  <Ionicons name="create-outline" size={18} color="#64748b" />
+                                </TouchableOpacity>
+                                
+                                <TouchableOpacity 
+                                  onPress={() => confirmDeleteEnvelope(envelope.uuid, envelope.name)}
+                                  className="p-2"
+                                >
+                                  <Ionicons name="trash-outline" size={18} color="#dc2626" />
+                                </TouchableOpacity>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                        
+                        <EnvelopeCard envelope={envelope} />
+                        
+                        {/* Credit/Debit Controls */}
+                        <View className="mt-3">
+                          <View className="flex-row items-center space-x-2">
+                            <TextInput
+                              value={amounts[envelope.uuid] || ''}
+                              onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
+                              placeholder="Enter amount"
+                              keyboardType="decimal-pad"
+                              className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                            />
+                            
+                            <TouchableOpacity
+                              onPress={() => handleCreditEnvelope(
+                                envelope.uuid,
+                                envelope.currentAmount,
+                                envelope.targetedAmount
+                              )}
+                              className="p-2 bg-success-100 rounded-lg"
+                              disabled={!amounts[envelope.uuid] || envelope.pending}
+                            >
+                              <Text className="text-success-700 font-medium">Add</Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity
+                              onPress={() => handleDebitEnvelope(
+                                envelope.uuid,
+                                envelope.currentAmount
+                              )}
+                              className="p-2 bg-danger-100 rounded-lg"
+                              disabled={!amounts[envelope.uuid] || envelope.pending}
+                            >
+                              <Text className="text-danger-700 font-medium">Spend</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                        
+                        {envelope.pending && (
+                          <View className="mt-2 items-center">
+                            <ActivityIndicator size="small" color="#0c6cf2" />
+                            <Text className="text-secondary-500 text-xs mt-1">Processing...</Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+                ))}
             </View>
-          </View>
-        ) : (
-          <View className="mt-4">
-            <Text className="text-xl font-semibold text-secondary-800 mb-4">Budget Categories</Text>
-            
-            {/* Completed Envelopes */}
-            {envelopesData.envelopes
-              .filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1)
-              .length > 0 && (
-              <View className="mb-6">
-                <Text className="text-lg font-medium text-secondary-600 mb-2">Completed</Text>
-                <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
-                  {envelopesData.envelopes
-                    .filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1)
-                    .map((envelope) => (
-                      <View
-                        key={envelope.uuid}
-                        className={isTablet ? "w-[49%] mb-4" : "w-full"}
-                      >
-                        <View className="card">
-                          <View className="absolute top-0 right-0 left-0 h-1 bg-success-500 rounded-t-xl" />
-                          <View className="card-content">
-                            {/* Envelope header with name and edit/delete options */}
-                            <View className="flex-row items-center justify-between mb-3">
-                              <View className="flex-row items-center flex-1">
-                                <View className="w-10 h-10 rounded-full bg-success-100 items-center justify-center mr-3">
-                                  <Ionicons name="checkmark-circle" size={20} color="#16a34a" />
-                                </View>
-                                
-                                {editingName && editingName.id === envelope.uuid ? (
-                                  <View className="flex-row items-center flex-1">
-                                    <TextInput
-                                      value={editingName.name}
-                                      onChangeText={handleNameChange}
-                                      className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                      maxLength={25}
-                                      autoFocus
-                                    />
-                                    <TouchableOpacity 
-                                      onPress={handleUpdateName}
-                                      className="ml-2 p-2 bg-success-100 rounded-full"
-                                    >
-                                      <Ionicons name="checkmark" size={18} color="#16a34a" />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity 
-                                      onPress={cancelEditingName}
-                                      className="ml-1 p-2 bg-danger-100 rounded-full"
-                                    >
-                                      <Ionicons name="close" size={18} color="#dc2626" />
-                                    </TouchableOpacity>
-                                  </View>
-                                ) : (
-                                  <View className="flex-row flex-1 items-center">
-                                    <TouchableOpacity 
-                                      onPress={() => navigateToEnvelopeDetail(envelope.uuid)}
-                                      className="flex-1"
-                                    >
-                                      <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
-                                    </TouchableOpacity>
-                                    
-                                    <TouchableOpacity 
-                                      onPress={() => startEditingName(envelope.uuid, envelope.name)}
-                                      className="p-2 mr-1"
-                                    >
-                                      <Ionicons name="create-outline" size={18} color="#64748b" />
-                                    </TouchableOpacity>
-                                    
-                                    <TouchableOpacity 
-                                      onPress={() => confirmDeleteEnvelope(envelope.uuid, envelope.name)}
-                                      className="p-2"
-                                    >
-                                      <Ionicons name="trash-outline" size={18} color="#dc2626" />
-                                    </TouchableOpacity>
-                                  </View>
-                                )}
-                              </View>
-                            </View>
-                            
-                            <EnvelopeCard envelope={envelope} />
-                            
-                            {/* Credit/Debit Controls */}
-                            <View className="mt-3">
-                              <View className="flex-row items-center space-x-2">
-                                <TextInput
-                                  value={amounts[envelope.uuid] || ''}
-                                  onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
-                                  placeholder="Enter amount"
-                                  keyboardType="decimal-pad"
-                                  className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                />
-                                
-                                <TouchableOpacity
-                                  onPress={() => handleCreditEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount,
-                                    envelope.targetedAmount
-                                  )}
-                                  className="p-2 bg-success-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-success-700 font-medium">Add</Text>
-                                </TouchableOpacity>
-                                
-                                <TouchableOpacity
-                                  onPress={() => handleDebitEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount
-                                  )}
-                                  className="p-2 bg-danger-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-danger-700 font-medium">Spend</Text>
-                                </TouchableOpacity>
-                              </View>
-                            </View>
-                            
-                            {envelope.pending && (
-                              <View className="mt-2 items-center">
-                                <ActivityIndicator size="small" color="#0c6cf2" />
-                                <Text className="text-secondary-500 text-xs mt-1">Processing...</Text>
-                              </View>
-                            )}
-                          </View>
-                        </View>
-                      </View>
-                    ))}
-                </View>
-              </View>
-            )}
-            
-            {/* In Progress Envelopes */}
-            {envelopesData.envelopes
-              .filter(envelope => {
-                const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
-                return progress > 0 && progress < 1;
-              })
-              .length > 0 && (
-              <View className="mb-6">
-                <Text className="text-lg font-medium text-secondary-600 mb-2">In Progress</Text>
-                <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
-                  {envelopesData.envelopes
-                    .filter(envelope => {
-                      const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
-                      return progress > 0 && progress < 1;
-                    })
-                    .map((envelope) => (
-                      <View
-                        key={envelope.uuid}
-                        className={isTablet ? "w-[49%] mb-4" : "w-full"}
-                      >
-                        <View className="card">
-                          <View className="absolute top-0 right-0 left-0 h-1 bg-primary-500 rounded-t-xl" />
-                          <View className="card-content">
-                            {/* Envelope header with name and edit/delete options */}
-                            <View className="flex-row items-center justify-between mb-3">
-                              <View className="flex-row items-center flex-1">
-                                <View className="w-10 h-10 rounded-full bg-primary-100 items-center justify-center mr-3">
-                                  <Ionicons name="trending-up" size={20} color="#0284c7" />
-                                </View>
-                                
-                                {editingName && editingName.id === envelope.uuid ? (
-                                  <View className="flex-row items-center flex-1">
-                                    <TextInput
-                                      value={editingName.name}
-                                      onChangeText={handleNameChange}
-                                      className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                      maxLength={25}
-                                      autoFocus
-                                    />
-                                    <TouchableOpacity 
-                                      onPress={handleUpdateName}
-                                      className="ml-2 p-2 bg-success-100 rounded-full"
-                                    >
-                                      <Ionicons name="checkmark" size={18} color="#16a34a" />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity 
-                                      onPress={cancelEditingName}
-                                      className="ml-1 p-2 bg-danger-100 rounded-full"
-                                    >
-                                      <Ionicons name="close" size={18} color="#dc2626" />
-                                    </TouchableOpacity>
-                                  </View>
-                                ) : (
-                                  <View className="flex-row flex-1 items-center">
-                                    <TouchableOpacity 
-                                      onPress={() => navigateToEnvelopeDetail(envelope.uuid)}
-                                      className="flex-1"
-                                    >
-                                      <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
-                                    </TouchableOpacity>
-                                    
-                                    <TouchableOpacity 
-                                      onPress={() => startEditingName(envelope.uuid, envelope.name)}
-                                      className="p-2 mr-1"
-                                    >
-                                      <Ionicons name="create-outline" size={18} color="#64748b" />
-                                    </TouchableOpacity>
-                                    
-                                    <TouchableOpacity 
-                                      onPress={() => confirmDeleteEnvelope(envelope.uuid, envelope.name)}
-                                      className="p-2"
-                                    >
-                                      <Ionicons name="trash-outline" size={18} color="#dc2626" />
-                                    </TouchableOpacity>
-                                  </View>
-                                )}
-                              </View>
-                            </View>
-                            
-                            <EnvelopeCard envelope={envelope} />
-                            
-                            {/* Credit/Debit Controls */}
-                            <View className="mt-3">
-                              <View className="flex-row items-center space-x-2">
-                                <TextInput
-                                  value={amounts[envelope.uuid] || ''}
-                                  onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
-                                  placeholder="Enter amount"
-                                  keyboardType="decimal-pad"
-                                  className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                />
-                                
-                                <TouchableOpacity
-                                  onPress={() => handleCreditEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount,
-                                    envelope.targetedAmount
-                                  )}
-                                  className="p-2 bg-success-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-success-700 font-medium">Add</Text>
-                                </TouchableOpacity>
-                                
-                                <TouchableOpacity
-                                  onPress={() => handleDebitEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount
-                                  )}
-                                  className="p-2 bg-danger-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-danger-700 font-medium">Spend</Text>
-                                </TouchableOpacity>
-                              </View>
-                            </View>
-                            
-                            {envelope.pending && (
-                              <View className="mt-2 items-center">
-                                <ActivityIndicator size="small" color="#0c6cf2" />
-                                <Text className="text-secondary-500 text-xs mt-1">Processing...</Text>
-                              </View>
-                            )}
-                          </View>
-                        </View>
-                      </View>
-                    ))}
-                </View>
-              </View>
-            )}
-            
-            {/* Not Started Envelopes */}
-            {envelopesData.envelopes
-              .filter(envelope => Number(envelope.currentAmount) === 0)
-              .length > 0 && (
-              <View className="mb-6">
-                <Text className="text-lg font-medium text-secondary-600 mb-2">Not Started</Text>
-                <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
-                  {envelopesData.envelopes
-                    .filter(envelope => Number(envelope.currentAmount) === 0)
-                    .map((envelope) => (
-                      <View
-                        key={envelope.uuid}
-                        className={isTablet ? "w-[49%] mb-4" : "w-full"}
-                      >
-                        <View className="card">
-                          <View className="absolute top-0 right-0 left-0 h-1 bg-secondary-500 rounded-t-xl" />
-                          <View className="card-content">
-                            {/* Envelope header with name and edit/delete options */}
-                            <View className="flex-row items-center justify-between mb-3">
-                              <View className="flex-row items-center flex-1">
-                                <View className="w-10 h-10 rounded-full bg-secondary-100 items-center justify-center mr-3">
-                                  <Ionicons name="hourglass-outline" size={20} color="#64748b" />
-                                </View>
-                                
-                                {editingName && editingName.id === envelope.uuid ? (
-                                  <View className="flex-row items-center flex-1">
-                                    <TextInput
-                                      value={editingName.name}
-                                      onChangeText={handleNameChange}
-                                      className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                      maxLength={25}
-                                      autoFocus
-                                    />
-                                    <TouchableOpacity 
-                                      onPress={handleUpdateName}
-                                      className="ml-2 p-2 bg-success-100 rounded-full"
-                                    >
-                                      <Ionicons name="checkmark" size={18} color="#16a34a" />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity 
-                                      onPress={cancelEditingName}
-                                      className="ml-1 p-2 bg-danger-100 rounded-full"
-                                    >
-                                      <Ionicons name="close" size={18} color="#dc2626" />
-                                    </TouchableOpacity>
-                                  </View>
-                                ) : (
-                                  <View className="flex-row flex-1 items-center">
-                                    <TouchableOpacity 
-                                      onPress={() => navigateToEnvelopeDetail(envelope.uuid)}
-                                      className="flex-1"
-                                    >
-                                      <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
-                                    </TouchableOpacity>
-                                    
-                                    <TouchableOpacity 
-                                      onPress={() => startEditingName(envelope.uuid, envelope.name)}
-                                      className="p-2 mr-1"
-                                    >
-                                      <Ionicons name="create-outline" size={18} color="#64748b" />
-                                    </TouchableOpacity>
-                                    
-                                    <TouchableOpacity 
-                                      onPress={() => confirmDeleteEnvelope(envelope.uuid, envelope.name)}
-                                      className="p-2"
-                                    >
-                                      <Ionicons name="trash-outline" size={18} color="#dc2626" />
-                                    </TouchableOpacity>
-                                  </View>
-                                )}
-                              </View>
-                            </View>
-                            
-                            <EnvelopeCard envelope={envelope} />
-                            
-                            {/* Credit/Debit Controls */}
-                            <View className="mt-3">
-                              <View className="flex-row items-center space-x-2">
-                                <TextInput
-                                  value={amounts[envelope.uuid] || ''}
-                                  onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
-                                  placeholder="Enter amount"
-                                  keyboardType="decimal-pad"
-                                  className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                />
-                                
-                                <TouchableOpacity
-                                  onPress={() => handleCreditEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount,
-                                    envelope.targetedAmount
-                                  )}
-                                  className="p-2 bg-success-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-success-700 font-medium">Add</Text>
-                                </TouchableOpacity>
-                                
-                                <TouchableOpacity
-                                  onPress={() => handleDebitEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount
-                                  )}
-                                  className="p-2 bg-danger-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-danger-700 font-medium">Spend</Text>
-                                </TouchableOpacity>
-                              </View>
-                            </View>
-                            
-                            {envelope.pending && (
-                              <View className="mt-2 items-center">
-                                <ActivityIndicator size="small" color="#0c6cf2" />
-                                <Text className="text-secondary-500 text-xs mt-1">Processing...</Text>
-                              </View>
-                            )}
-                          </View>
-                        </View>
-                      </View>
-                    ))}
-                </View>
-              </View>
-            )}
-            
-            {/* Budget Summary Section */}
-            {envelopesData.envelopes.length > 0 && (
-              <View className="bg-secondary-900 rounded-xl p-6 mb-8">
-                <View className="bg-secondary-800 rounded-lg p-4 mb-4">
-                  <Text className="text-xl font-bold text-white">Budget Overview</Text>
-                  <Text className="text-secondary-300">
-                    {envelopesData.envelopes.filter(e => Number(e.currentAmount) / Number(e.targetedAmount) >= 1).length} completed of {envelopesData.envelopes.length} envelopes
-                  </Text>
-                </View>
-                <View className="flex-row items-center">
-                  <View className="h-1 flex-1 bg-success-500 rounded-full" />
-                  <View className="h-1 flex-1 bg-primary-500 rounded-full mx-1" />
-                  <View className="h-1 flex-1 bg-secondary-500 rounded-full" />
-                </View>
-              </View>
-            )}
           </View>
         )}
         
-        {/* Add New Envelope Button at Bottom */}
-        {envelopesData?.envelopes?.length > 0 && (
-          <TouchableOpacity
-            className="bg-primary-600 rounded-xl py-4 items-center mb-10 shadow-md"
-            onPress={() => setIsCreating(true)}
-          >
-            <Text className="text-white text-lg font-semibold">Create New Envelope</Text>
-          </TouchableOpacity>
+        {/* In Progress Envelopes */}
+        {/* ...existing code for in progress envelopes... */}
+        {envelopesData?.envelopes
+          .filter(envelope => {
+            const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
+            return progress > 0 && progress < 1;
+          })
+          .length > 0 && (
+          <View className="mb-6">
+            <Text className="text-lg font-medium text-secondary-600 mb-2">In Progress</Text>
+            <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
+              {envelopesData.envelopes
+                .filter(envelope => {
+                  const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
+                  return progress > 0 && progress < 1;
+                })
+                .map((envelope) => (
+                  <View
+                    key={envelope.uuid}
+                    className={isTablet ? "w-[49%] mb-4" : "w-full"}
+                  >
+                    {/* ...envelope card content... */}
+                    <View className="card">
+                      <View className="absolute top-0 right-0 left-0 h-1 bg-primary-500 rounded-t-xl" />
+                      <View className="card-content">
+                        {/* Envelope header with name and edit/delete options */}
+                        <View className="flex-row items-center justify-between mb-3">
+                          <View className="flex-row items-center flex-1">
+                            <View className="w-10 h-10 rounded-full bg-primary-100 items-center justify-center mr-3">
+                              <Ionicons name="trending-up" size={20} color="#0284c7" />
+                            </View>
+                            
+                            {editingName && editingName.id === envelope.uuid ? (
+                              <View className="flex-row items-center flex-1">
+                                <TextInput
+                                  value={editingName.name}
+                                  onChangeText={handleNameChange}
+                                  className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                  maxLength={25}
+                                  autoFocus
+                                />
+                                <TouchableOpacity 
+                                  onPress={handleUpdateName}
+                                  className="ml-2 p-2 bg-success-100 rounded-full"
+                                >
+                                  <Ionicons name="checkmark" size={18} color="#16a34a" />
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                  onPress={cancelEditingName}
+                                  className="ml-1 p-2 bg-danger-100 rounded-full"
+                                >
+                                  <Ionicons name="close" size={18} color="#dc2626" />
+                                </TouchableOpacity>
+                              </View>
+                            ) : (
+                              <View className="flex-row flex-1 items-center">
+                                <TouchableOpacity 
+                                  onPress={() => navigateToEnvelopeDetail(envelope.uuid)}
+                                  className="flex-1"
+                                >
+                                  <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
+                                </TouchableOpacity>
+                                
+                                <TouchableOpacity 
+                                  onPress={() => startEditingName(envelope.uuid, envelope.name)}
+                                  className="p-2 mr-1"
+                                >
+                                  <Ionicons name="create-outline" size={18} color="#64748b" />
+                                </TouchableOpacity>
+                                
+                                <TouchableOpacity 
+                                  onPress={() => confirmDeleteEnvelope(envelope.uuid, envelope.name)}
+                                  className="p-2"
+                                >
+                                  <Ionicons name="trash-outline" size={18} color="#dc2626" />
+                                </TouchableOpacity>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                        
+                        <EnvelopeCard envelope={envelope} />
+                        
+                        {/* Credit/Debit Controls */}
+                        <View className="mt-3">
+                          <View className="flex-row items-center space-x-2">
+                            <TextInput
+                              value={amounts[envelope.uuid] || ''}
+                              onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
+                              placeholder="Enter amount"
+                              keyboardType="decimal-pad"
+                              className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                            />
+                            
+                            <TouchableOpacity
+                              onPress={() => handleCreditEnvelope(
+                                envelope.uuid,
+                                envelope.currentAmount,
+                                envelope.targetedAmount
+                              )}
+                              className="p-2 bg-success-100 rounded-lg"
+                              disabled={!amounts[envelope.uuid] || envelope.pending}
+                            >
+                              <Text className="text-success-700 font-medium">Add</Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity
+                              onPress={() => handleDebitEnvelope(
+                                envelope.uuid,
+                                envelope.currentAmount
+                              )}
+                              className="p-2 bg-danger-100 rounded-lg"
+                              disabled={!amounts[envelope.uuid] || envelope.pending}
+                            >
+                              <Text className="text-danger-700 font-medium">Spend</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                        
+                        {envelope.pending && (
+                          <View className="mt-2 items-center">
+                            <ActivityIndicator size="small" color="#0c6cf2" />
+                            <Text className="text-secondary-500 text-xs mt-1">Processing...</Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+                ))}
+            </View>
+          </View>
         )}
-      </ScrollView>
-
+        
+        {/* Not Started Envelopes */}
+        {/* ...existing code for not started envelopes... */}
+        {envelopesData?.envelopes
+          .filter(envelope => Number(envelope.currentAmount) === 0)
+          .length > 0 && (
+          <View className="mb-6">
+            <Text className="text-lg font-medium text-secondary-600 mb-2">Not Started</Text>
+            <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
+              {envelopesData.envelopes
+                .filter(envelope => Number(envelope.currentAmount) === 0)
+                .map((envelope) => (
+                  <View
+                    key={envelope.uuid}
+                    className={isTablet ? "w-[49%] mb-4" : "w-full"}
+                  >
+                    <View className="card">
+                      <View className="absolute top-0 right-0 left-0 h-1 bg-secondary-500 rounded-t-xl" />
+                      <View className="card-content">
+                        {/* Envelope header with name and edit/delete options */}
+                        <View className="flex-row items-center justify-between mb-3">
+                          <View className="flex-row items-center flex-1">
+                            <View className="w-10 h-10 rounded-full bg-secondary-100 items-center justify-center mr-3">
+                              <Ionicons name="hourglass-outline" size={20} color="#64748b" />
+                            </View>
+                            
+                            {editingName && editingName.id === envelope.uuid ? (
+                              <View className="flex-row items-center flex-1">
+                                <TextInput
+                                  value={editingName.name}
+                                  onChangeText={handleNameChange}
+                                  className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                  maxLength={25}
+                                  autoFocus
+                                />
+                                <TouchableOpacity 
+                                  onPress={handleUpdateName}
+                                  className="ml-2 p-2 bg-success-100 rounded-full"
+                                >
+                                  <Ionicons name="checkmark" size={18} color="#16a34a" />
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                  onPress={cancelEditingName}
+                                  className="ml-1 p-2 bg-danger-100 rounded-full"
+                                >
+                                  <Ionicons name="close" size={18} color="#dc2626" />
+                                </TouchableOpacity>
+                              </View>
+                            ) : (
+                              <View className="flex-row flex-1 items-center">
+                                <TouchableOpacity 
+                                  onPress={() => navigateToEnvelopeDetail(envelope.uuid)}
+                                  className="flex-1"
+                                >
+                                  <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
+                                </TouchableOpacity>
+                                
+                                <TouchableOpacity 
+                                  onPress={() => startEditingName(envelope.uuid, envelope.name)}
+                                  className="p-2 mr-1"
+                                >
+                                  <Ionicons name="create-outline" size={18} color="#64748b" />
+                                </TouchableOpacity>
+                                
+                                <TouchableOpacity 
+                                  onPress={() => confirmDeleteEnvelope(envelope.uuid, envelope.name)}
+                                  className="p-2"
+                                >
+                                  <Ionicons name="trash-outline" size={18} color="#dc2626" />
+                                </TouchableOpacity>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                        
+                        <EnvelopeCard envelope={envelope} />
+                        
+                        {/* Credit/Debit Controls */}
+                        <View className="mt-3">
+                          <View className="flex-row items-center space-x-2">
+                            <TextInput
+                              value={amounts[envelope.uuid] || ''}
+                              onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
+                              placeholder="Enter amount"
+                              keyboardType="decimal-pad"
+                              className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                            />
+                            
+                            <TouchableOpacity
+                              onPress={() => handleCreditEnvelope(
+                                envelope.uuid,
+                                envelope.currentAmount,
+                                envelope.targetedAmount
+                              )}
+                              className="p-2 bg-success-100 rounded-lg"
+                              disabled={!amounts[envelope.uuid] || envelope.pending}
+                            >
+                              <Text className="text-success-700 font-medium">Add</Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity
+                              onPress={() => handleDebitEnvelope(
+                                envelope.uuid,
+                                envelope.currentAmount
+                              )}
+                              className="p-2 bg-danger-100 rounded-lg"
+                              disabled={!amounts[envelope.uuid] || envelope.pending}
+                            >
+                              <Text className="text-danger-700 font-medium">Spend</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                        
+                        {envelope.pending && (
+                          <View className="mt-2 items-center">
+                            <ActivityIndicator size="small" color="#0c6cf2" />
+                            <Text className="text-secondary-500 text-xs mt-1">Processing...</Text>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+                ))}
+            </View>
+          </View>
+        )}
+        
+        {/* Budget Summary Section */}
+        {envelopesData?.envelopes?.length > 0 && (
+          <View className="bg-secondary-900 rounded-xl p-6 mb-8">
+            <View className="bg-secondary-800 rounded-lg p-4 mb-4">
+              <Text className="text-xl font-bold text-white">Budget Overview</Text>
+              <Text className="text-secondary-300">
+                {envelopesData.envelopes.filter(e => Number(e.currentAmount) / Number(e.targetedAmount) >= 1).length} completed of {envelopesData.envelopes.length} envelopes
+              </Text>
+            </View>
+            <View className="flex-row items-center">
+              <View className="h-1 flex-1 bg-success-500 rounded-full" />
+              <View className="h-1 flex-1 bg-primary-500 rounded-full mx-1" />
+              <View className="h-1 flex-1 bg-secondary-500 rounded-full" />
+            </View>
+          </View>
+        )}
+      </View>
+      
+      {/* Add New Envelope Button at Bottom */}
+      {envelopesData?.envelopes?.length > 0 && (
+        <TouchableOpacity
+          className="bg-primary-600 rounded-xl py-4 items-center mb-10 shadow-md"
+          onPress={() => setIsCreating(true)}
+        >
+          <Text className="text-white text-lg font-semibold">Create New Envelope</Text>
+        </TouchableOpacity>
+      )}
+      
+      {/* Modals */}
       <CreateEnvelopeModal
         visible={isCreating}
         onClose={() => setIsCreating(false)}
@@ -685,3 +641,59 @@ export default function EnvelopesScreen() {
     </View>
   );
 }
+
+// Create a header action button component for the add button
+function AddEnvelopeButton({ onPress }: { onPress: () => void }) {
+  return (
+    <TouchableOpacity 
+      onPress={onPress}
+      className="bg-white/20 p-3 rounded-full"
+    >
+      <Ionicons name="add" size={24} color="white" />
+    </TouchableOpacity>
+  );
+}
+
+// Wrap the screen with the animated header HOC for refresh capability
+function EnvelopesScreen() {
+  const { refreshEnvelopes } = useEnvelopes();
+  const [refreshing, setRefreshing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refreshEnvelopes(true);
+    setRefreshing(false);
+  }, [refreshEnvelopes]);
+  
+  // Use the withAnimatedHeaderRefresh HOC to wrap the EnvelopesContent component
+  const EnvelopesWithHeader = withAnimatedHeaderRefresh(EnvelopesContent, {
+    title: 'My Envelopes',
+    subtitle: 'Organize and track your budgeting categories',
+    headerHeight: 130,
+    rightComponent: <AddEnvelopeButton onPress={() => setIsCreating(true)} />,
+    onRefresh: handleRefresh,
+    refreshing: refreshing
+  });
+  
+  return (
+    <>
+      <EnvelopesWithHeader />
+      
+      {/* Create Envelope Modal outside the animated content */}
+      <CreateEnvelopeModal
+        visible={isCreating}
+        onClose={() => setIsCreating(false)}
+        onSubmit={async (name, amount, currency) => {
+          const { createEnvelope } = useEnvelopes();
+          if (name && amount) {
+            await createEnvelope(name, amount, currency);
+            setIsCreating(false);
+          }
+        }}
+      />
+    </>
+  );
+}
+
+export default EnvelopesScreen;

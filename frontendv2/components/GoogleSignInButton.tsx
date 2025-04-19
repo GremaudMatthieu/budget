@@ -15,19 +15,17 @@ export default function GoogleSignInButton() {
     setIsLoading(true);
     try {
       if (Platform.OS === 'web') {
-        // For web, directly redirect to the backend OAuth endpoint
         window.location.href = `${API_URL}/connect/google?platform=web`;
       } else {
-        // For mobile, open the backend OAuth endpoint in the browser
+        // For mobile, use the custom URL scheme
         const result = await WebBrowser.openAuthSessionAsync(
           `${API_URL}/connect/google?platform=mobile`,
-          'http://localhost:8081/oauth/google/callback'
+          'budgetapp://oauth/google/callback'
         );
 
         if (result.type === 'success') {
-          // Extract tokens from the URL parameters
-          const url = result.url;
-          const params = new URLSearchParams(url.split('?')[1]);
+          const url = new URL(result.url);
+          const params = new URLSearchParams(url.search);
           
           const email = params.get('email');
           const token = params.get('token');
