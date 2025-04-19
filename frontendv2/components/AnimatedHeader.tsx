@@ -6,37 +6,43 @@ import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface AnimatedHeaderProps {
-  title: string;
+  title: React.ReactNode | string;
   subtitle?: string;
   showBackButton?: boolean;
   rightComponent?: React.ReactNode;
   scrollY: Animated.Value;
+  headerContent?: React.ReactNode;
+  headerButtons?: React.ReactNode;
+  collapsePercentage?: number;
 }
 
-export default function AnimatedHeader({ 
-  title, 
-  subtitle, 
-  showBackButton = false, 
+export default function AnimatedHeader({
+  title,
+  subtitle,
+  showBackButton = false,
   rightComponent,
-  scrollY 
+  scrollY,
+  headerContent,
+  headerButtons,
+  collapsePercentage
 }: AnimatedHeaderProps) {
   const router = useRouter();
-  
+
   // Header animation values
   const headerHeight = useRef(new Animated.Value(0)).current;
   const headerOpacity = useRef(new Animated.Value(1)).current;
   const textScale = useRef(new Animated.Value(1)).current;
-  
+
   // Set up animations based on scroll position
   useEffect(() => {
     const headerScrollListener = scrollY.addListener(({ value }) => {
       // Get current header state
       const currentHeight = headerHeight.__getValue();
-      
+
       // Determine if we should show or hide the header
       const shouldShowHeader = value <= 0 || value <= currentHeight;
       const newHeight = shouldShowHeader ? 0 : 1;
-      
+
       // Only animate if the state is changing
       if (newHeight !== currentHeight) {
         // Animate the header height
@@ -46,16 +52,16 @@ export default function AnimatedHeader({
           tension: 80,
           friction: 10,
         }).start();
-        
+
         // Animate header opacity and text scale
         Animated.parallel([
           Animated.timing(headerOpacity, {
-            toValue: shouldShowHeader ? 1 : 0.92,
+            toValue: shouldShowHeader ? 1 : Math.max(0.92, (100 - collapsePercentage) / 100),
             duration: 250,
             useNativeDriver: true,
           }),
           Animated.spring(textScale, {
-            toValue: shouldShowHeader ? 1 : 0.95,
+            toValue: shouldShowHeader ? 1 : Math.max(0.95, (100 - collapsePercentage) / 100),
             useNativeDriver: true,
             tension: 80,
             friction: 10,
@@ -67,22 +73,22 @@ export default function AnimatedHeader({
     return () => {
       scrollY.removeListener(headerScrollListener);
     };
-  }, [scrollY, headerHeight, headerOpacity, textScale]);
+  }, [scrollY, headerHeight, headerOpacity, textScale, collapsePercentage]);
 
-  // Calculate header transforms
+  // Calculate header transforms with collapse percentage
   const headerTranslate = headerHeight.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -225],
+    outputRange: [0, -225 * (collapsePercentage / 100)],
     extrapolate: 'clamp',
   });
-  
+
   // Additional fancy animations
   const bgOpacity = scrollY.interpolate({
     inputRange: [-50, 0, 50, 100],
     outputRange: [1.2, 1, 0.98, 0.95],
     extrapolate: 'clamp',
   });
-  
+
   const shadowOpacity = scrollY.interpolate({
     inputRange: [0, 20, 40],
     outputRange: [0.15, 0.2, 0.25],
@@ -90,10 +96,10 @@ export default function AnimatedHeader({
   });
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.headerContainer,
-        { 
+        {
           transform: [{ translateY: headerTranslate }],
           opacity: headerOpacity,
           shadowOpacity: shadowOpacity,
@@ -101,7 +107,7 @@ export default function AnimatedHeader({
       ]}
     >
       <StatusBar style="light" />
-      
+
       {/* Modern gradient background */}
       <Animated.View style={[styles.gradientContainer, { opacity: bgOpacity }]}>
         <LinearGradient
@@ -111,12 +117,12 @@ export default function AnimatedHeader({
           style={styles.gradient}
         />
       </Animated.View>
-      
+
       {/* Background design elements */}
       <View style={styles.bgCircle1} />
       <View style={styles.bgCircle2} />
       <View style={styles.bgCircle3} />
-      
+
       <View style={styles.headerContent}>
         <View style={styles.headerRow}>
           {showBackButton && (
@@ -128,23 +134,39 @@ export default function AnimatedHeader({
               <Ionicons name="chevron-back" size={26} color="white" />
             </TouchableOpacity>
           )}
-          
-          <Animated.View 
+
+          <Animated.View
             style={[
               styles.titleContainer,
               { transform: [{ scale: textScale }] }
             ]}
           >
-            <Text style={styles.title}>{title}</Text>
+            {typeof title === 'string' ? (
+              <Text style={styles.title}>{title}</Text>
+            ) : (
+              title
+            )}
             {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
           </Animated.View>
-          
+
           {rightComponent && (
             <View style={styles.rightComponent}>
               {rightComponent}
             </View>
           )}
         </View>
+
+        {headerContent && (
+          <View style={styles.headerContentContainer}>
+            {headerContent}
+          </View>
+        )}
+
+        {headerButtons && (
+          <View style={styles.headerButtonsContainer}>
+            {headerButtons}
+          </View>
+        )}
       </View>
     </Animated.View>
   );
@@ -152,7 +174,7 @@ export default function AnimatedHeader({
 
 const styles = StyleSheet.create({
   headerContainer: {
-    paddingTop: Platform.OS === 'ios' ? 50 : 22, 
+    paddingTop: Platform.OS === 'ios' ? 50 : 22,
     paddingBottom: 16,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
@@ -181,8 +203,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
   },
   headerContent: {
     paddingHorizontal: 20,
@@ -252,5 +274,13 @@ const styles = StyleSheet.create({
     height: 40,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 9999,
+  },
+  headerContentContainer: {
+    marginTop: 10,
+  },
+  headerButtonsContainer: {
+    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });

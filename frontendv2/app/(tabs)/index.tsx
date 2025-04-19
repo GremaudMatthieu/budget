@@ -3,20 +3,21 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import withAnimatedHeader from '@/components/withAnimatedHeader';
+import withAnimatedHeader from '@/components/withAnimatedHeaderf';
+import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 
 // Content component for the dashboard, which will be wrapped with the animated header
 function DashboardContent() {
   const router = useRouter();
-  
+
   return (
     <View className="flex-1">
       {/* Quick Actions */}
       <View className="mb-6">
         <Text className="text-lg font-semibold text-secondary-800 mb-4">Quick Actions</Text>
-        
+
         <View className="flex-row justify-between mb-4">
-          <TouchableOpacity 
+          <TouchableOpacity
             className="bg-white rounded-xl p-4 shadow-sm items-center justify-center w-[48%]"
             onPress={() => router.push('/envelopes')}
           >
@@ -25,8 +26,8 @@ function DashboardContent() {
             </View>
             <Text className="text-text-primary font-medium">My Envelopes</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             className="bg-white rounded-xl p-4 shadow-sm items-center justify-center w-[48%]"
             onPress={() => router.push('/budget-plans')}
           >
@@ -36,9 +37,9 @@ function DashboardContent() {
             <Text className="text-text-primary font-medium">Budget Plans</Text>
           </TouchableOpacity>
         </View>
-        
+
         <View className="flex-row justify-between">
-          <TouchableOpacity 
+          <TouchableOpacity
             className="bg-white rounded-xl p-4 shadow-sm items-center justify-center w-[48%]"
             onPress={() => router.push('/budget-plans/create')}
           >
@@ -47,8 +48,8 @@ function DashboardContent() {
             </View>
             <Text className="text-text-primary font-medium">New Budget</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             className="bg-white rounded-xl p-4 shadow-sm items-center justify-center w-[48%]"
             onPress={() => router.push('/profile')}
           >
@@ -59,7 +60,7 @@ function DashboardContent() {
           </TouchableOpacity>
         </View>
       </View>
-      
+
       {/* Budget Status Card */}
       <View className="bg-white rounded-xl shadow-sm p-5 mb-6">
         <View className="flex-row justify-between items-center mb-4">
@@ -68,22 +69,22 @@ function DashboardContent() {
             <Text className="text-primary-600 font-medium">View All</Text>
           </TouchableOpacity>
         </View>
-        
+
         <View className="flex-row justify-between mb-2">
           <Text className="text-text-secondary">Spent So Far</Text>
           <Text className="font-semibold">$1,245.00</Text>
         </View>
-        
+
         <View className="w-full h-2 bg-gray-200 rounded-full mb-1">
           <View className="h-2 bg-primary-600 rounded-full" style={{ width: '65%' }} />
         </View>
-        
+
         <View className="flex-row justify-between">
           <Text className="text-xs text-text-muted">$0</Text>
           <Text className="text-xs text-text-muted">$2,500</Text>
         </View>
       </View>
-      
+
       {/* Envelope Summary */}
       <View className="bg-white rounded-xl shadow-sm p-5 mb-6">
         <View className="flex-row justify-between items-center mb-4">
@@ -92,7 +93,7 @@ function DashboardContent() {
             <Text className="text-primary-600 font-medium">View All</Text>
           </TouchableOpacity>
         </View>
-        
+
         <View className="space-y-4">
           <View className="flex-row justify-between items-center">
             <View className="flex-row items-center">
@@ -106,7 +107,7 @@ function DashboardContent() {
             </View>
             <Text className="font-semibold">$850.00</Text>
           </View>
-          
+
           <View className="flex-row justify-between items-center">
             <View className="flex-row items-center">
               <View className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center mr-3">
@@ -119,7 +120,7 @@ function DashboardContent() {
             </View>
             <Text className="font-semibold">$125.50</Text>
           </View>
-          
+
           <View className="flex-row justify-between items-center">
             <View className="flex-row items-center">
               <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
@@ -134,7 +135,7 @@ function DashboardContent() {
           </View>
         </View>
       </View>
-      
+
       {/* Tip Card */}
       <View className="bg-secondary-900 rounded-xl p-5 mb-6">
         <View className="flex-row items-start">
@@ -161,10 +162,16 @@ function DashboardHeader() {
     </>
   );
 }
-
+function DashboardScreen() {
+  return (
+    <AnimatedHeaderLayout
+      title="Dashboard"
+      subtitle="Your financial summary"
+      headerHeight={130}
+    >
+      <DashboardContent />
+    </AnimatedHeaderLayout>
+  );
+}
 // Apply the withAnimatedHeader HOC to wrap the Dashboard content
-export default withAnimatedHeader(DashboardContent, {
-  title: 'Dashboard',
-  subtitle: 'Your financial summary',
-  headerHeight: 120
-});
+export default DashboardScreen
