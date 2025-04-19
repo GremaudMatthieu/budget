@@ -19,6 +19,8 @@ import { useErrorContext } from '@/contexts/ErrorContext';
 import formatAmount from '@/utils/formatAmount';
 import validateAmount from '@/utils/validateAmount';
 import { currencyOptions } from '@/utils/currencyUtils';
+import SelectField from '@/components/inputs/SelectField';
+import { SelectOption } from '@/components/modals/SelectModal';
 
 export default function CreateBudgetPlanScreen() {
   const params = useLocalSearchParams();
@@ -28,7 +30,8 @@ export default function CreateBudgetPlanScreen() {
     createBudgetPlan, 
     newlyCreatedBudgetPlanId, 
     loading,
-    incomesCategories
+    incomesCategories,
+    fetchIncomesCategories
   } = useBudget();
 
   // Form state
@@ -37,6 +40,10 @@ export default function CreateBudgetPlanScreen() {
   const [incomes, setIncomes] = useState([{ name: 'Salary', amount: '', category: 'Employment' }]);
   const [year, setYear] = useState<number>(0);
   const [month, setMonth] = useState<number>(0);
+
+  // State for category selection modal
+  const [categorySelectVisible, setCategorySelectVisible] = useState(false);
+  const [currentEditingIncomeIndex, setCurrentEditingIncomeIndex] = useState<number | null>(null);
 
   // Get year and month from URL params
   useEffect(() => {
@@ -56,6 +63,11 @@ export default function CreateBudgetPlanScreen() {
       router.push(`/budget-plans/${newlyCreatedBudgetPlanId}`);
     }
   }, [newlyCreatedBudgetPlanId, router]);
+  
+  // Fetch income categories when component mounts
+  useEffect(() => {
+    fetchIncomesCategories();
+  }, [fetchIncomesCategories]);
 
   // Format month for display
   const formatMonthYear = (year: number, month: number) => {
@@ -282,12 +294,18 @@ export default function CreateBudgetPlanScreen() {
                   </View>
                   
                   <View>
-                    <Text className="text-text-secondary text-sm mb-1">Category</Text>
-                    <TextInput
+                    <SelectField
+                      label="Category"
+                      placeholder="Select a category"
+                      options={incomesCategories.map(cat => ({
+                        id: cat.id,
+                        name: cat.name,
+                        icon: "pricetag-outline",
+                        iconColor: "#9333ea"
+                      }))}
                       value={income.category}
-                      onChangeText={(value) => handleIncomeCategoryChange(index, value)}
-                      placeholder="e.g. Employment, Investment"
-                      className="border border-surface-border rounded-lg p-3 bg-white"
+                      onChange={(value) => handleIncomeCategoryChange(index, value)}
+                      icon={<Ionicons name="pricetag-outline" size={18} color="#9333ea" />}
                     />
                   </View>
                 </View>
@@ -376,6 +394,57 @@ export default function CreateBudgetPlanScreen() {
                     </View>
                     <Text className={`${currency === option.value ? 'text-primary-600 font-medium' : 'text-text-primary'}`}>
                       {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Category Selector Modal */}
+        <Modal
+          visible={categorySelectVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setCategorySelectVisible(false)}
+        >
+          <View className="flex-1 bg-black/50 justify-center items-center p-6">
+            <View className="bg-white w-full max-h-[70%] rounded-xl overflow-hidden">
+              <View className="flex-row justify-between items-center p-4 border-b border-gray-200">
+                <Text className="text-lg font-semibold text-text-primary">Select Income Category</Text>
+                <TouchableOpacity onPress={() => setCategorySelectVisible(false)}>
+                  <Ionicons name="close" size={24} color="#64748b" />
+                </TouchableOpacity>
+              </View>
+              
+              <ScrollView>
+                {incomesCategories.map((category) => (
+                  <TouchableOpacity
+                    key={category.id}
+                    onPress={() => {
+                      if (currentEditingIncomeIndex !== null) {
+                        handleIncomeCategoryChange(currentEditingIncomeIndex, category.id);
+                      }
+                      setCategorySelectVisible(false);
+                    }}
+                    className={`p-4 border-b border-gray-100 flex-row items-center ${
+                      currentEditingIncomeIndex !== null && 
+                      incomes[currentEditingIncomeIndex].category === category.id 
+                        ? 'bg-primary-50' 
+                        : ''
+                    }`}
+                  >
+                    <View className="w-8 h-8 rounded-full bg-purple-100 items-center justify-center mr-3">
+                      <Ionicons name="pricetag-outline" size={16} color="#9333ea" />
+                    </View>
+                    <Text className={`${
+                      currentEditingIncomeIndex !== null && 
+                      incomes[currentEditingIncomeIndex].category === category.id 
+                        ? 'text-primary-600 font-medium' 
+                        : 'text-text-primary'
+                    }`}>
+                      {category.name}
                     </Text>
                   </TouchableOpacity>
                 ))}

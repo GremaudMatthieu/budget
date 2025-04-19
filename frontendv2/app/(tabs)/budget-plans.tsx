@@ -8,7 +8,8 @@ import {
   RefreshControl,
   Dimensions,
   Animated,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +18,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useBudget } from '@/contexts/BudgetContext';
 import { useErrorContext } from '@/contexts/ErrorContext';
 import { formatCurrency } from '@/utils/currencyUtils';
+import { normalizeMonthYear, createUtcSafeDate, getMonthYearKey, formatMonthYear } from '@/utils/dateUtils';
+import DuplicateBudgetPlanModal from '@/components/modals/DuplicateBudgetPlanModal';
 
 export default function BudgetPlansScreen() {
   const router = useRouter();

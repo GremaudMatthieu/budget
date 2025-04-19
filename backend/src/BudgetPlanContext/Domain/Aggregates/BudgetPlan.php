@@ -109,7 +109,6 @@ final class BudgetPlan implements AggregateRootInterface
                         $budgetPlanToCopy->incomes,
                         $uuidGenerator,
                         $currentDate,
-                        $budgetPlanId,
                     ),
                 ),
                 array_map(fn(BudgetPlanNeed $need) => $need->toArray(),
@@ -117,7 +116,6 @@ final class BudgetPlan implements AggregateRootInterface
                         $budgetPlanToCopy->needs,
                         $uuidGenerator,
                         $currentDate,
-                        $budgetPlanId,
                     ),
                 ),
                 array_map(fn(BudgetPlanWant $want) => $want->toArray(),
@@ -125,7 +123,6 @@ final class BudgetPlan implements AggregateRootInterface
                         $budgetPlanToCopy->wants,
                         $uuidGenerator,
                         $currentDate,
-                        $budgetPlanId,
                     ),
                 ),
                 array_map(fn(BudgetPlanSaving $saving) => $saving->toArray(),
@@ -133,7 +130,6 @@ final class BudgetPlan implements AggregateRootInterface
                         $budgetPlanToCopy->savings,
                         $uuidGenerator,
                         $currentDate,
-                        $budgetPlanId,
                     ),
                 ),
                 (string) $userId,
@@ -712,18 +708,15 @@ final class BudgetPlan implements AggregateRootInterface
         array $existingIncomes,
         UuidGeneratorInterface $uuidGenerator,
         \DateTimeImmutable $currentDate,
-        BudgetPlanId $budgetPlanId,
     ): array {
-        return array_map(function(array $income) use ($uuidGenerator, $currentDate, $budgetPlanId) {
-            $income['uuid'] = $uuidGenerator->generate();
-            $income['budget_plan_uuid'] = (string) $budgetPlanId;
-            $income['created_at'] = UtcClock::fromImmutableToString($currentDate);
-            $income['updated_at'] = UtcClock::fromImmutableToString($currentDate);
-            $income['amount'] = $income->incomeAmount;
-            $income['category'] = $income->category;
-            $income['income_name'] = $income->incomeName;
+        return array_map(function(BudgetPlanIncome $income) use ($uuidGenerator, $currentDate) {
+            $newIncome = [];
+            $newIncome['uuid'] = $uuidGenerator->generate();
+            $newIncome['amount'] = $income->getAmount();
+            $newIncome['category'] = $income->getCategory();
+            $newIncome['incomeName'] = $income->getIncomeName();
 
-            return BudgetPlanIncome::fromArray($income);
+            return BudgetPlanIncome::fromArray($newIncome);
         }, $existingIncomes);
     }
 
@@ -731,15 +724,15 @@ final class BudgetPlan implements AggregateRootInterface
         array $existingNeeds,
         UuidGeneratorInterface $uuidGenerator,
         \DateTimeImmutable $currentDate,
-        BudgetPlanId $budgetPlanId,
     ): array {
-        return array_map(function(array $need) use ($uuidGenerator, $currentDate, $budgetPlanId) {
-            $need['uuid'] = $uuidGenerator->generate();
-            $need['budget_plan_uuid'] = (string) $budgetPlanId;
-            $need['created_at'] = UtcClock::fromImmutableToString($currentDate);
-            $need['updated_at'] = UtcClock::fromImmutableToString($currentDate);
+        return array_map(function(BudgetPlanNeed $need) use ($uuidGenerator, $currentDate) {
+            $newNeed = [];
+            $newNeed['uuid'] = $uuidGenerator->generate();
+            $newNeed['amount'] = $need->getAmount();
+            $newNeed['category'] = $need->getCategory();
+            $newNeed['needName'] = $need->getNeedName();
 
-            return BudgetPlanNeed::fromArray($need);
+            return BudgetPlanNeed::fromArray($newNeed);
         }, $existingNeeds);
     }
 
@@ -747,15 +740,15 @@ final class BudgetPlan implements AggregateRootInterface
         array $existingSavings,
         UuidGeneratorInterface $uuidGenerator,
         \DateTimeImmutable $currentDate,
-        BudgetPlanId $budgetPlanId,
     ): array {
-        return array_map(function(array $saving) use ($uuidGenerator, $currentDate, $budgetPlanId) {
-            $saving['uuid'] = $uuidGenerator->generate();
-            $saving['budget_plan_uuid'] = (string) $budgetPlanId;
-            $saving['created_at'] = UtcClock::fromImmutableToString($currentDate);
-            $saving['updated_at'] = UtcClock::fromImmutableToString($currentDate);
+        return array_map(function(BudgetPlanSaving $saving) use ($uuidGenerator, $currentDate) {
+            $newSaving = [];
+            $newSaving['uuid'] = $uuidGenerator->generate();
+            $newSaving['amount'] = $saving->getAmount();
+            $newSaving['category'] = $saving->getCategory();
+            $newSaving['savingName'] = $saving->getSavingName();
 
-            return BudgetPlanSaving::fromArray($saving);
+            return BudgetPlanSaving::fromArray($newSaving);
         }, $existingSavings);
     }
 
@@ -763,15 +756,15 @@ final class BudgetPlan implements AggregateRootInterface
         array $existingWants,
         UuidGeneratorInterface $uuidGenerator,
         \DateTimeImmutable $currentDate,
-        BudgetPlanId $budgetPlanId,
     ): array {
-        return array_map(function($want) use ($uuidGenerator, $currentDate, $budgetPlanId) {
-            $want['uuid'] = $uuidGenerator->generate();
-            $want['budget_plan_uuid'] = (string) $budgetPlanId;
-            $want['created_at'] = UtcClock::fromImmutableToString($currentDate);
-            $want['updated_at'] = UtcClock::fromImmutableToString($currentDate);
+        return array_map(function(BudgetPlanWant $want) use ($uuidGenerator, $currentDate) {
+            $newWant = [];
+            $newWant['uuid'] = $uuidGenerator->generate();
+            $newWant['amount'] = $want->getAmount();
+            $newWant['category'] = $want->getCategory();
+            $newWant['wantName'] = $want->getWantName();
 
-            return BudgetPlanWant::fromArray($want);
+            return BudgetPlanWant::fromArray($newWant);
         }, $existingWants);
     }
 

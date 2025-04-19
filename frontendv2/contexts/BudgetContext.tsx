@@ -22,6 +22,10 @@ interface BudgetContextType {
   incomesCategories: Category[];
   fetchBudgetPlansCalendar: (year: number) => Promise<void>;
   fetchBudgetPlan: (budgetPlanId: string) => Promise<void>;
+  fetchNeedsCategories: () => Promise<Category[]>;
+  fetchWantsCategories: () => Promise<Category[]>;
+  fetchSavingsCategories: () => Promise<Category[]>;
+  fetchIncomesCategories: () => Promise<Category[]>;
   setSelectedBudgetPlan: (budgetPlan: BudgetPlan | null) => void;
   clearSelectedBudgetPlan: () => void;
   createBudgetPlan: (date: Date | string, currency: string, incomes: Income[]) => Promise<string | null>;
@@ -48,27 +52,62 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const { socket, connected } = useSocket();
   const { setError } = useErrorContext();
   
-  const fetchCategories = useCallback(async () => {
+  // Individual category fetch methods
+  const fetchNeedsCategories = useCallback(async () => {
+    if (needsCategories.length > 0) return needsCategories;
+    
     try {
-      const [needs, wants, savings, incomes] = await Promise.all([
-        budgetService.getNeedsCategories(),
-        budgetService.getWantsCategories(),
-        budgetService.getSavingsCategories(),
-        budgetService.getIncomesCategories(),
-      ]);
-      setNeedsCategories(needs);
-      setWantsCategories(wants);
-      setSavingsCategories(savings);
-      setIncomesCategories(incomes);
+      const categories = await budgetService.getNeedsCategories();
+      setNeedsCategories(categories);
+      return categories;
     } catch (err) {
-      console.error("Failed to fetch categories:", err);
-      setError('Failed to load budget categories');
+      console.error("Failed to fetch needs categories:", err);
+      setError('Failed to load needs categories');
+      return [];
     }
-  }, [setError]);
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+  }, [needsCategories, setError]);
+  
+  const fetchWantsCategories = useCallback(async () => {
+    if (wantsCategories.length > 0) return wantsCategories;
+    
+    try {
+      const categories = await budgetService.getWantsCategories();
+      setWantsCategories(categories);
+      return categories;
+    } catch (err) {
+      console.error("Failed to fetch wants categories:", err);
+      setError('Failed to load wants categories');
+      return [];
+    }
+  }, [wantsCategories, setError]);
+  
+  const fetchSavingsCategories = useCallback(async () => {
+    if (savingsCategories.length > 0) return savingsCategories;
+    
+    try {
+      const categories = await budgetService.getSavingsCategories();
+      setSavingsCategories(categories);
+      return categories;
+    } catch (err) {
+      console.error("Failed to fetch savings categories:", err);
+      setError('Failed to load savings categories');
+      return [];
+    }
+  }, [savingsCategories, setError]);
+  
+  const fetchIncomesCategories = useCallback(async () => {
+    if (incomesCategories.length > 0) return incomesCategories;
+    
+    try {
+      const categories = await budgetService.getIncomesCategories();
+      setIncomesCategories(categories);
+      return categories;
+    } catch (err) {
+      console.error("Failed to fetch incomes categories:", err);
+      setError('Failed to load incomes categories');
+      return [];
+    }
+  }, [incomesCategories, setError]);
 
   const fetchBudgetPlansCalendar = useCallback(async (year: number) => {
     setLoading(true);
@@ -105,7 +144,20 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const requestId = uuidv4();
 
     try {
-      const formattedDate = typeof date === "string" ? date : date.toISOString();
+      // If date is a string, parse it; otherwise use as is
+      const dateObj = typeof date === "string" ? new Date(date) : date;
+      
+      // Create a UTC-safe date to ensure correct month representation across timezones
+      // Use the 15th day of the month to avoid timezone boundary issues
+      const utcSafeDate = new Date(Date.UTC(
+        dateObj.getFullYear(),
+        dateObj.getMonth(),
+        15, // Use the 15th day to avoid timezone edge cases
+        12, // Noon UTC
+        0, 0, 0
+      ));
+      
+      const formattedDate = utcSafeDate.toISOString();
 
       const payload = {
         uuid: requestId,
@@ -136,10 +188,19 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const requestId = uuidv4();
 
     try {
+      // Create a UTC-safe date to ensure correct month representation across timezones
+      const utcSafeDate = new Date(Date.UTC(
+        date.getFullYear(),
+        date.getMonth(),
+        15, // Use the 15th day to avoid timezone edge cases
+        12, // Noon UTC
+        0, 0, 0
+      ));
+      
       const payload = {
         uuid: requestId,
         budgetPlanUuidThatAlreadyExists: existingBudgetPlanId,
-        date: date.toISOString(),
+        date: utcSafeDate.toISOString(),
       };
 
       await budgetService.createBudgetPlanFromExisting(payload, requestId);
@@ -305,6 +366,10 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     incomesCategories,
     fetchBudgetPlansCalendar,
     fetchBudgetPlan,
+    fetchNeedsCategories,
+    fetchWantsCategories,
+    fetchSavingsCategories,
+    fetchIncomesCategories,
     setSelectedBudgetPlan,
     clearSelectedBudgetPlan,
     createBudgetPlan,

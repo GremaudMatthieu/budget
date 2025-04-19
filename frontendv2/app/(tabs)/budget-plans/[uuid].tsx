@@ -21,7 +21,9 @@ import { useSocket } from '@/contexts/SocketContext';
 import BudgetItemPieChart from '@/components/BudgetItemPieChart';
 import BudgetItemModal from '@/components/modals/BudgetItemModal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
+import DuplicateBudgetPlanModal from '@/components/modals/DuplicateBudgetPlanModal';
 import TabNavigation from '@/components/TabNavigation';
+import { normalizeMonthYear } from '@/utils/dateUtils';
 
 // Types for the tab navigation
 type TabType = 'overview' | 'needs' | 'wants' | 'savings' | 'incomes';
@@ -46,7 +48,11 @@ export default function BudgetPlanDetailScreen() {
     needsCategories,
     wantsCategories,
     savingsCategories,
-    incomesCategories
+    incomesCategories,
+    fetchNeedsCategories,
+    fetchWantsCategories,
+    fetchSavingsCategories,
+    fetchIncomesCategories,
   } = useBudget();
   
   // State
@@ -59,6 +65,9 @@ export default function BudgetPlanDetailScreen() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentItemType, setCurrentItemType] = useState<'need' | 'want' | 'saving' | 'income'>('need');
   const [currentItem, setCurrentItem] = useState<{ id: string; name: string; amount: string; category: string } | null>(null);
+  
+  // State for duplicate modal
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
   
   // Ref to track mount state
   const isMounted = useRef(true);
@@ -144,13 +153,34 @@ export default function BudgetPlanDetailScreen() {
   };
   
   // Handle opening add modal
-  const handleOpenAddModal = (type: 'need' | 'want' | 'saving' | 'income') => {
+  const handleOpenAddModal = async (type: 'need' | 'want' | 'saving' | 'income') => {
     setCurrentItemType(type);
+    
+    // Fetch the appropriate categories for the modal
+    try {
+      switch (type) {
+        case 'need':
+          await fetchNeedsCategories();
+          break;
+        case 'want': 
+          await fetchWantsCategories();
+          break;
+        case 'saving':
+          await fetchSavingsCategories();
+          break;
+        case 'income':
+          await fetchIncomesCategories();
+          break;
+      }
+    } catch (err) {
+      console.error(`Failed to fetch ${type} categories:`, err);
+    }
+    
     setIsAddModalOpen(true);
   };
   
   // Handle opening edit modal
-  const handleOpenEditModal = (
+  const handleOpenEditModal = async (
     type: 'need' | 'want' | 'saving' | 'income',
     id: string,
     name: string,
@@ -159,6 +189,27 @@ export default function BudgetPlanDetailScreen() {
   ) => {
     setCurrentItemType(type);
     setCurrentItem({ id, name, amount, category });
+    
+    // Fetch the appropriate categories for the modal
+    try {
+      switch (type) {
+        case 'need':
+          await fetchNeedsCategories();
+          break;
+        case 'want': 
+          await fetchWantsCategories();
+          break;
+        case 'saving':
+          await fetchSavingsCategories();
+          break;
+        case 'income':
+          await fetchIncomesCategories();
+          break;
+      }
+    } catch (err) {
+      console.error(`Failed to fetch ${type} categories:`, err);
+    }
+    
     setIsEditModalOpen(true);
   };
   
@@ -259,6 +310,18 @@ export default function BudgetPlanDetailScreen() {
   
   // Extract budget plan details
   const { budgetPlan: planDetails, needs, wants, savings, incomes } = selectedBudgetPlan || {};
+  
+  // Parse the budget plan date to extract month and year
+  const getBudgetPlanMonthYear = () => {
+    if (!planDetails?.date) return { month: new Date().getMonth() + 1, year: new Date().getFullYear() };
+    
+    // Make sure we parse the date correctly by normalizing it
+    const date = new Date(planDetails.date);
+    return normalizeMonthYear(date);
+  };
+  
+  // Get source month and year for duplicate modal
+  const { month: sourceMonth, year: sourceYear } = getBudgetPlanMonthYear();
   
   // Calculate totals
   const totalIncome = incomes?.reduce((sum, income) => sum + parseFloat(income.incomeAmount), 0) || 0;
@@ -505,7 +568,12 @@ export default function BudgetPlanDetailScreen() {
           <Text className="text-2xl font-bold text-white">
             {planDetails?.date ? formatDate(planDetails.date) : 'Budget Plan'}
           </Text>
-          <View style={{ width: 40 }} />
+          <TouchableOpacity
+            onPress={() => setIsDuplicateModalOpen(true)}
+            className="bg-white/20 p-2 rounded-full"
+          >
+            <Ionicons name="copy-outline" size={20} color="white" />
+          </TouchableOpacity>
         </View>
         
         <View className="flex-row justify-between items-end mb-6">
@@ -853,6 +921,15 @@ export default function BudgetPlanDetailScreen() {
           message={`Are you sure you want to delete "${currentItem.name}"?`}
         />
       )}
+      
+      {/* Duplicate Budget Plan Modal */}
+      <DuplicateBudgetPlanModal
+        visible={isDuplicateModalOpen}
+        onClose={() => setIsDuplicateModalOpen(false)}
+        sourceBudgetPlanId={uuid}
+        sourceMonth={sourceMonth}
+        sourceYear={sourceYear}
+      />
     </View>
   );
 }

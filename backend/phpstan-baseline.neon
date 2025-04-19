@@ -13,45 +13,9 @@ parameters:
 			path: src/BudgetPlanContext/Application/Queries/GetACalendarWithItsBudgetPlansFinancialRatiosByYearQuery.php
 
 		-
-			message: '#^Cannot access offset ''budget_plan_uuid'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
-
-		-
-			message: '#^Cannot access offset ''created_at'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
-
-		-
-			message: '#^Cannot access offset ''updated_at'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
-
-		-
-			message: '#^Cannot access offset ''uuid'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
-
-		-
-			message: '#^Cannot access property \$category on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
-
-		-
-			message: '#^Cannot access property \$incomeAmount on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
-
-		-
-			message: '#^Cannot access property \$incomeName on array\.$#'
-			identifier: property.nonObject
-			count: 1
+			message: '#^Anonymous function has an unused use \$currentDate\.$#'
+			identifier: closure.unusedUse
+			count: 4
 			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
 
 		-
