@@ -1,3 +1,6 @@
+// Import polyfill for crypto.getRandomValues() needed for UUID generation
+import "@/utils/cryptoPolyfill";
+
 import { Slot, useRouter, useSegments } from "expo-router";
 import './globals.css';
 import { ErrorProvider } from "@/contexts/ErrorContext";

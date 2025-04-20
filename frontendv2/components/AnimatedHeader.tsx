@@ -24,63 +24,48 @@ export default function AnimatedHeader({
   scrollY,
   headerContent,
   headerButtons,
-  collapsePercentage
+  collapsePercentage = 100
 }: AnimatedHeaderProps) {
   const router = useRouter();
 
   // Header animation values
-  const headerHeight = useRef(new Animated.Value(0)).current;
   const headerOpacity = useRef(new Animated.Value(1)).current;
   const textScale = useRef(new Animated.Value(1)).current;
+
+  // The translateY value will be directly derived from scrollY
+  // instead of using a separate headerHeight value with useNativeDriver: false
+  const translateY = scrollY.interpolate({
+    inputRange: [-20, 0, 100, 101],
+    outputRange: [0, 0, -Math.min(200, 225 * (collapsePercentage / 100)), -Math.min(200, 225 * (collapsePercentage / 100))],
+    extrapolate: 'clamp',
+  });
 
   // Set up animations based on scroll position
   useEffect(() => {
     const headerScrollListener = scrollY.addListener(({ value }) => {
-      // Get current header state
-      const currentHeight = headerHeight.__getValue();
-
       // Determine if we should show or hide the header
-      const shouldShowHeader = value <= 0 || value <= currentHeight;
-      const newHeight = shouldShowHeader ? 0 : 1;
-
-      // Only animate if the state is changing
-      if (newHeight !== currentHeight) {
-        // Animate the header height
-        Animated.spring(headerHeight, {
-          toValue: newHeight,
-          useNativeDriver: false,
+      const shouldShowHeader = value <= 20;
+      
+      // Animate header opacity and text scale
+      Animated.parallel([
+        Animated.timing(headerOpacity, {
+          toValue: shouldShowHeader ? 1 : Math.max(0.92, (100 - collapsePercentage) / 100),
+          duration: 250,
+          useNativeDriver: true,
+        }),
+        Animated.spring(textScale, {
+          toValue: shouldShowHeader ? 1 : Math.max(0.95, (100 - collapsePercentage) / 100),
+          useNativeDriver: true,
           tension: 80,
           friction: 10,
-        }).start();
-
-        // Animate header opacity and text scale
-        Animated.parallel([
-          Animated.timing(headerOpacity, {
-            toValue: shouldShowHeader ? 1 : Math.max(0.92, (100 - collapsePercentage) / 100),
-            duration: 250,
-            useNativeDriver: true,
-          }),
-          Animated.spring(textScale, {
-            toValue: shouldShowHeader ? 1 : Math.max(0.95, (100 - collapsePercentage) / 100),
-            useNativeDriver: true,
-            tension: 80,
-            friction: 10,
-          })
-        ]).start();
-      }
+        })
+      ]).start();
     });
 
     return () => {
       scrollY.removeListener(headerScrollListener);
     };
-  }, [scrollY, headerHeight, headerOpacity, textScale, collapsePercentage]);
-
-  // Calculate header transforms with collapse percentage
-  const headerTranslate = headerHeight.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -225 * (collapsePercentage / 100)],
-    extrapolate: 'clamp',
-  });
+  }, [scrollY, headerOpacity, textScale, collapsePercentage]);
 
   // Additional fancy animations
   const bgOpacity = scrollY.interpolate({
@@ -100,9 +85,9 @@ export default function AnimatedHeader({
       style={[
         styles.headerContainer,
         {
-          transform: [{ translateY: headerTranslate }],
+          transform: [{ translateY }],
           opacity: headerOpacity,
-          shadowOpacity: shadowOpacity,
+          shadowOpacity,
         }
       ]}
     >

@@ -31,9 +31,10 @@ const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
 }) => {
   const scrollY = useRef(new Animated.Value(0)).current;
 
+  // Fix: Use useNativeDriver: true consistently for scroll events
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    { useNativeDriver: false }
+    { useNativeDriver: true }
   );
 
   return (
@@ -44,7 +45,6 @@ const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
         showBackButton={showBackButton}
         rightComponent={rightComponent}
         scrollY={scrollY}
-
         collapsePercentage={collapsePercentage}   
         headerContent={headerContent}
         headerButtons={headerButtons}
