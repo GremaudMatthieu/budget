@@ -120,7 +120,7 @@ class ApiClient {
 
   // DELETE request
   async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    return this.client.delete(url, config);
+    return this.client.post(url, config);
   }
 
   // PATCH request

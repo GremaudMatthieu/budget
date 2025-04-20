@@ -12,6 +12,8 @@ import { UserProvider } from "@/contexts/UserContext";
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator } from 'react-native';
 import { useEffect } from "react";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StyleSheet } from 'react-native';
 
 // Auth protection component
 function AuthProtection({ children }: { children: React.ReactNode }) {
@@ -52,6 +54,7 @@ function AuthProtection({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   return (
+    <GestureHandlerRootView style={styles.container}>
     <ErrorProvider>
       <AuthProvider>
         <AuthProtection>
@@ -70,5 +73,12 @@ export default function RootLayout() {
         </AuthProtection>
       </AuthProvider>
     </ErrorProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

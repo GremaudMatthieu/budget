@@ -24,6 +24,7 @@ import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal
 import DuplicateBudgetPlanModal from '@/components/modals/DuplicateBudgetPlanModal';
 import TabNavigation from '@/components/TabNavigation';
 import { normalizeMonthYear } from '@/utils/dateUtils';
+import SwipeBackWrapper from '@/components/SwipeBackWrapper';
 
 // Types for the tab navigation
 type TabType = 'overview' | 'needs' | 'wants' | 'savings' | 'incomes';
@@ -367,6 +368,7 @@ export default function BudgetPlanDetailScreen() {
     const { icon, color, bgColor, textColor } = getIconAndColor(type);
     
     return (
+      <SwipeBackWrapper>
       <View className="mb-6">
         <View className="card">
           <View className="card-content">
@@ -511,22 +513,26 @@ export default function BudgetPlanDetailScreen() {
           </View>
         </View>
       </View>
+      </SwipeBackWrapper>
     );
   };
   
   if (loading && !selectedBudgetPlan) {
     return (
+      <SwipeBackWrapper>
       <View className="flex-1 justify-center items-center bg-background-light">
         <View className="w-16 h-16 rounded-full bg-primary-100 items-center justify-center">
           <ActivityIndicator size="large" color="#0c6cf2" />
         </View>
         <Text className="text-secondary-600 mt-4 font-medium">Loading budget plan...</Text>
       </View>
+      </SwipeBackWrapper>
     );
   }
   
   if (!selectedBudgetPlan) {
     return (
+      <SwipeBackWrapper>
       <View className="flex-1 justify-center items-center bg-background-light">
         <View className="w-16 h-16 bg-red-100 rounded-full items-center justify-center mb-4">
           <Ionicons name="alert-circle-outline" size={32} color="#dc2626" />
@@ -542,10 +548,12 @@ export default function BudgetPlanDetailScreen() {
           <Text className="text-white font-medium">Back to Budget Plans</Text>
         </TouchableOpacity>
       </View>
+      </SwipeBackWrapper>
     );
   }
   
   return (
+    <SwipeBackWrapper>
     <View className="flex-1 bg-background-subtle">
       <StatusBar style="dark" />
       
@@ -931,5 +939,6 @@ export default function BudgetPlanDetailScreen() {
         sourceYear={sourceYear}
       />
     </View>
+    </SwipeBackWrapper>
   );
 }

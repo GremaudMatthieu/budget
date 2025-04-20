@@ -20,6 +20,7 @@ import DescriptionModal from '@/components/modals/DescriptionModal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import { useErrorContext } from '@/contexts/ErrorContext';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
+import SwipeBackWrapper from '@/components/SwipeBackWrapper';
 
 export default function EnvelopeDetailScreen() {
   const router = useRouter();
@@ -531,6 +532,7 @@ export default function EnvelopeDetailScreen() {
 
 
   return (
+    <SwipeBackWrapper>
     <View className="flex-1 bg-background-subtle">
       <StatusBar style="light" />
 
@@ -760,6 +762,7 @@ export default function EnvelopeDetailScreen() {
         />
       </AnimatedHeaderLayout>
     </View>
+    </SwipeBackWrapper>
   );
 }
 

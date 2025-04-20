@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             
             // Fall back to /user endpoint
             try {
-              const userData = await apiClient.get('/user');
+              const userData = await apiClient.get('/users/me');
               console.log('Successfully loaded user data using fallback endpoint');
               setUser(userData);
             } catch (fallbackError) {

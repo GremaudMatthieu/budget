@@ -265,9 +265,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }));
     
     try {
-      // Since we don't have a deleteWithRequestId method, we'll use the headers config option
-      await apiClient.delete('/users/account', { 
-        headers: { 'request-id': requestId } // Changed from 'Request-Id' to 'request-id'
+      await apiClient.delete('/users/delete', { 
+        headers: { 'request-id': requestId }
       });
       
       console.log(`Delete request sent successfully with ID: ${requestId}`);
