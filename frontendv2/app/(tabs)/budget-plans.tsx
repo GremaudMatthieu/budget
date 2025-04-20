@@ -8,8 +8,7 @@ import {
   RefreshControl,
   Dimensions,
   Animated,
-  Platform,
-  Alert
+  Platform
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -159,7 +158,7 @@ export default function BudgetPlansScreen() {
 
   // Check if a month has a budget plan
   const hasBudgetPlan = (year: number, month: number): boolean => {
-    return !!budgetPlansCalendar?.[year]?.[month];
+    return !!budgetPlansCalendar?.[year]?.[month]?.uuid;
   };
 
   // Month names
@@ -171,6 +170,122 @@ export default function BudgetPlansScreen() {
   // Get month data
   const getMonthData = (year: number, month: number) => {
     return budgetPlansCalendar?.[year]?.[month];
+  };
+
+  // Get budget summary data from new API response
+  const budgetSummary = budgetPlansCalendar?.budgetSummary;
+  const rule5030 = budgetSummary?.['50/30/20Rule'];
+  const yearlyTotals = budgetSummary?.yearlyTotals;
+
+  // Format number to have exactly 2 decimal places
+  const formatWithTwoDecimals = (num: number): number => {
+    return Math.round(num * 100) / 100;
+  };
+
+  // Render 50/30/20 rule comparison if data available
+  const renderBudgetSummary = () => {
+    if (!budgetSummary || !rule5030 || !yearlyTotals || yearlyTotals.income <= 0) return null;
+    
+    return (
+      <View className="mb-6">
+        <Text className="text-xl font-semibold text-secondary-800 mb-4">Yearly Summary</Text>
+        <View className="card">
+          <View className="card-content">
+            <Text className="text-lg font-semibold text-text-primary mb-2">{currentYear} Overview</Text>
+            
+            <View className="flex-row justify-between items-center mb-2">
+              <Text className="text-sm text-secondary-600">Total Income</Text>
+              <Text 
+                className="font-semibold text-text-primary" 
+                numberOfLines={1} 
+                ellipsizeMode="tail" 
+                style={{ maxWidth: '50%' }}
+              >
+                {formatCurrency(formatWithTwoDecimals(yearlyTotals.income))}
+              </Text>
+            </View>
+            
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-sm text-secondary-600">Total Allocated</Text>
+              <View className="flex-row items-center" style={{ maxWidth: '50%' }}>
+                <Text 
+                  className="font-semibold text-text-primary" 
+                  numberOfLines={1} 
+                  ellipsizeMode="tail" 
+                  style={{ maxWidth: '80%' }}
+                >
+                  {formatCurrency(formatWithTwoDecimals(yearlyTotals.allocated))}
+                </Text>
+                <Text className="text-xs text-secondary-500 ml-1">
+                  ({formatWithTwoDecimals((yearlyTotals.allocated / yearlyTotals.income) * 100)}%)
+                </Text>
+              </View>
+            </View>
+            
+            <Text className="text-sm font-medium text-secondary-700 mb-2">
+              50/30/20 Rule vs. Your Budget
+            </Text>
+            
+            <View className="mb-1">
+              <View className="flex-row justify-between">
+                <Text className="text-xs text-secondary-600">Needs</Text>
+                <Text className="text-xs text-secondary-600">
+                  {formatWithTwoDecimals(rule5030.current.needs)}% vs {rule5030.recommended.needs}%
+                </Text>
+              </View>
+              <View className="flex-row h-2 mt-1 bg-gray-200 rounded-full overflow-hidden">
+                <View 
+                  style={{ width: `${rule5030.current.needs}%` }} 
+                  className="bg-green-500 rounded-full"
+                />
+                <View 
+                  style={{ width: `${Math.max(0, rule5030.recommended.needs - rule5030.current.needs)}%` }} 
+                  className="bg-green-300 opacity-40"
+                />
+              </View>
+            </View>
+            
+            <View className="mb-1">
+              <View className="flex-row justify-between">
+                <Text className="text-xs text-secondary-600">Wants</Text>
+                <Text className="text-xs text-secondary-600">
+                  {formatWithTwoDecimals(rule5030.current.wants)}% vs {rule5030.recommended.wants}%
+                </Text>
+              </View>
+              <View className="flex-row h-2 mt-1 bg-gray-200 rounded-full overflow-hidden">
+                <View 
+                  style={{ width: `${rule5030.current.wants}%` }} 
+                  className="bg-blue-500 rounded-full"
+                />
+                <View 
+                  style={{ width: `${Math.max(0, rule5030.recommended.wants - rule5030.current.wants)}%` }} 
+                  className="bg-blue-300 opacity-40"
+                />
+              </View>
+            </View>
+            
+            <View className="mb-1">
+              <View className="flex-row justify-between">
+                <Text className="text-xs text-secondary-600">Savings</Text>
+                <Text className="text-xs text-secondary-600">
+                  {formatWithTwoDecimals(rule5030.current.savings)}% vs {rule5030.recommended.savings}%
+                </Text>
+              </View>
+              <View className="flex-row h-2 mt-1 bg-gray-200 rounded-full overflow-hidden">
+                <View 
+                  style={{ width: `${rule5030.current.savings}%` }} 
+                  className="bg-amber-500 rounded-full"
+                />
+                <View 
+                  style={{ width: `${Math.max(0, rule5030.recommended.savings - rule5030.current.savings)}%` }} 
+                  className="bg-amber-300 opacity-40"
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
   };
 
   if (loading && !budgetPlansCalendar && !refreshing) {
@@ -376,9 +491,14 @@ export default function BudgetPlansScreen() {
                 <View className="bg-primary-50 p-3 rounded-lg mb-3">
                   <View className="flex-row justify-between mb-2">
                     <Text className="text-text-secondary">Total Income</Text>
-                    <Text className="font-semibold">
+                    <Text 
+                      className="font-semibold" 
+                      numberOfLines={1} 
+                      ellipsizeMode="tail" 
+                      style={{ maxWidth: 150 }}
+                    >
                       {formatCurrency(
-                        getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.totalIncome || 0, 
+                        formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.totalIncome || 0), 
                         getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.currency || 'USD'
                       )}
                     </Text>
@@ -386,9 +506,14 @@ export default function BudgetPlansScreen() {
                   
                   <View className="flex-row justify-between mb-1">
                     <Text className="text-text-secondary">Allocated</Text>
-                    <Text className="font-semibold">
+                    <Text 
+                      className="font-semibold" 
+                      numberOfLines={1} 
+                      ellipsizeMode="tail" 
+                      style={{ maxWidth: 150 }}
+                    >
                       {formatCurrency(
-                        getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.totalAllocated || 0,
+                        formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.totalAllocated || 0),
                         getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.currency || 'USD'
                       )}
                     </Text>
@@ -398,20 +523,32 @@ export default function BudgetPlansScreen() {
                 <View className="flex-row space-x-2">
                   <View className="flex-1 bg-green-100 p-2 rounded-lg items-center">
                     <Text className="text-xs text-green-700 font-medium">Needs</Text>
-                    <Text className="text-sm font-semibold">
-                      {getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.needsPercentage || 0}%
+                    <Text 
+                      className="text-sm font-semibold"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.needsPercentage || 0)}%
                     </Text>
                   </View>
                   <View className="flex-1 bg-blue-100 p-2 rounded-lg items-center">
                     <Text className="text-xs text-blue-700 font-medium">Wants</Text>
-                    <Text className="text-sm font-semibold">
-                      {getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.wantsPercentage || 0}%
+                    <Text 
+                      className="text-sm font-semibold"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.wantsPercentage || 0)}%
                     </Text>
                   </View>
                   <View className="flex-1 bg-amber-100 p-2 rounded-lg items-center">
                     <Text className="text-xs text-amber-700 font-medium">Savings</Text>
-                    <Text className="text-sm font-semibold">
-                      {getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.savingsPercentage || 0}%
+                    <Text 
+                      className="text-sm font-semibold"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.savingsPercentage || 0)}%
                     </Text>
                   </View>
                 </View>
@@ -439,6 +576,9 @@ export default function BudgetPlansScreen() {
             </TouchableOpacity>
           )}
         </View>
+        
+        {/* Yearly Budget Summary - New section using the new API data */}
+        {renderBudgetSummary()}
         
         {/* All Months Grid */}
         <View className="mb-6">
@@ -478,12 +618,49 @@ export default function BudgetPlansScreen() {
                       
                       {hasData && monthData ? (
                         <View>
-                          <Text className="text-lg font-semibold text-text-primary">
-                            {formatCurrency(monthData.totalIncome || 0, monthData.currency || 'USD')}
+                          <Text 
+                            className="text-lg font-semibold text-text-primary"
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {formatCurrency(
+                              formatWithTwoDecimals(monthData.totalIncome || 0), 
+                              monthData.currency || 'USD'
+                            )}
                           </Text>
+                          
+                          {/* Add total allocated amount with color indicators */}
+                          <View className="flex-row justify-between items-center mt-1">
+                            <Text className="text-xs text-secondary-600">Allocated:</Text>
+                            <Text 
+                              className={`text-xs font-medium ${
+                                monthData.allocatedPercentage > 100 
+                                  ? 'text-danger-600' 
+                                  : monthData.allocatedPercentage < 80 
+                                    ? 'text-amber-600' 
+                                    : 'text-success-600'
+                              }`}
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                              style={{ maxWidth: '60%' }}
+                            >
+                              {formatCurrency(
+                                formatWithTwoDecimals(monthData.totalAllocated || 0), 
+                                monthData.currency || 'USD'
+                              )}
+                            </Text>
+                          </View>
+                          
+                          {/* Progress bar with coloring based on allocation percentage */}
                           <View className="h-1 bg-gray-200 rounded-full mt-2">
                             <View 
-                              className="h-1 bg-primary-600 rounded-full" 
+                              className={`h-1 rounded-full ${
+                                monthData.allocatedPercentage > 100 
+                                  ? 'bg-danger-500' 
+                                  : monthData.allocatedPercentage < 80 
+                                    ? 'bg-amber-500' 
+                                    : 'bg-success-500'
+                              }`}
                               style={{ width: `${Math.min(100, monthData.allocatedPercentage || 0)}%` }} 
                             />
                           </View>

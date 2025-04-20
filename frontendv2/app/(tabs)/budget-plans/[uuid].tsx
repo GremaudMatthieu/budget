@@ -72,6 +72,11 @@ export default function BudgetPlanDetailScreen() {
   
   // Ref to track mount state
   const isMounted = useRef(true);
+
+  // Format with exactly two decimal places
+  const formatWithTwoDecimals = (num: number): number => {
+    return Math.round(num * 100) / 100;
+  };
   
   // Load budget plan details and setup cleanup
   useEffect(() => {
@@ -382,8 +387,8 @@ export default function BudgetPlanDetailScreen() {
                     {type.charAt(0).toUpperCase() + type.slice(1)}s
                   </Text>
                   {type !== 'income' && (
-                    <Text className={`text-xs ${textColor}`}>
-                      {Math.round(type === 'need' ? needsPercentage : type === 'want' ? wantsPercentage : savingsPercentage)}% of income
+                    <Text className={`text-xs ${textColor}`} numberOfLines={1} ellipsizeMode="tail">
+                      {formatWithTwoDecimals(type === 'need' ? needsPercentage : type === 'want' ? wantsPercentage : savingsPercentage)}% of income
                     </Text>
                   )}
                 </View>
@@ -428,18 +433,38 @@ export default function BudgetPlanDetailScreen() {
                   <View key={item.uuid} className="neomorphic-inset p-3 rounded-lg">
                     <View className="flex-row justify-between items-center">
                       <View className="flex-1">
-                        <Text className="font-medium text-text-primary">{item[fields.name]}</Text>
+                        <Text 
+                          className="font-medium text-text-primary"
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                          style={{ maxWidth: '95%' }}
+                        >
+                          {item[fields.name]}
+                        </Text>
                         <View className="flex-row items-center">
                           <Ionicons name="pricetag-outline" size={12} color="#64748b" />
-                          <Text className="text-xs text-text-secondary ml-1">
+                          <Text 
+                            className="text-xs text-text-secondary ml-1" 
+                            numberOfLines={1} 
+                            ellipsizeMode="tail"
+                            style={{ maxWidth: 120 }}
+                          >
                             {getCategoryName(type, item[fields.category])}
                           </Text>
                         </View>
                       </View>
                       
                       <View className="flex-row items-center">
-                        <Text className="font-semibold mr-4 text-primary-600">
-                          {formatCurrency(item[fields.amount], planDetails?.currency)}
+                        <Text 
+                          className="font-semibold mr-4 text-primary-600" 
+                          numberOfLines={1} 
+                          ellipsizeMode="tail"
+                          style={{ maxWidth: 100 }}
+                        >
+                          {formatCurrency(
+                            formatWithTwoDecimals(parseFloat(item[fields.amount])), 
+                            planDetails?.currency
+                          )}
                         </Text>
                         
                         <TouchableOpacity
@@ -473,15 +498,22 @@ export default function BudgetPlanDetailScreen() {
             <View className="mt-6 pt-4 border-t border-gray-200">
               <View className="flex-row justify-between items-center">
                 <Text className="font-semibold text-text-primary">Total</Text>
-                <Text className="text-xl font-bold text-primary-600">
+                <Text 
+                  className="text-xl font-bold text-primary-600"
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={{ maxWidth: 150 }}
+                >
                   {formatCurrency(
-                    type === 'need'
-                      ? totalNeeds
-                      : type === 'want'
-                        ? totalWants
-                        : type === 'saving'
-                          ? totalSavings
-                          : totalIncome,
+                    formatWithTwoDecimals(
+                      type === 'need'
+                        ? totalNeeds
+                        : type === 'want'
+                          ? totalWants
+                          : type === 'saving'
+                            ? totalSavings
+                            : totalIncome
+                    ),
                     planDetails?.currency
                   )}
                 </Text>
@@ -573,7 +605,12 @@ export default function BudgetPlanDetailScreen() {
           >
             <Ionicons name="chevron-back" size={24} color="white" />
           </TouchableOpacity>
-          <Text className="text-2xl font-bold text-white">
+          <Text 
+            className="text-2xl font-bold text-white"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={{ maxWidth: 200 }}
+          >
             {planDetails?.date ? formatDate(planDetails.date) : 'Budget Plan'}
           </Text>
           <TouchableOpacity
@@ -587,15 +624,25 @@ export default function BudgetPlanDetailScreen() {
         <View className="flex-row justify-between items-end mb-6">
           <View>
             <Text className="text-primary-100 mb-1">Total Income</Text>
-            <Text className="text-3xl font-bold text-white">
-              {formatCurrency(totalIncome, planDetails?.currency)}
+            <Text 
+              className="text-3xl font-bold text-white"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{ maxWidth: 200 }}
+            >
+              {formatCurrency(formatWithTwoDecimals(totalIncome), planDetails?.currency)}
             </Text>
           </View>
           
           <View className="items-end">
             <Text className="text-primary-100 mb-1">Remaining</Text>
-            <Text className={`text-lg font-bold ${remaining >= 0 ? 'text-white' : 'text-red-300'}`}>
-              {formatCurrency(remaining, planDetails?.currency)}
+            <Text 
+              className={`text-lg font-bold ${remaining >= 0 ? 'text-white' : 'text-red-300'}`}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{ maxWidth: 150 }}
+            >
+              {formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}
             </Text>
           </View>
         </View>
@@ -604,30 +651,52 @@ export default function BudgetPlanDetailScreen() {
         <View className="bg-white/10 p-3 rounded-xl">
           <View className="flex-row justify-between mb-2">
             <Text className="text-primary-100">Allocation Progress</Text>
-            <Text className="text-white font-medium">
-              {Math.min(100, Math.round((totalAllocated / totalIncome) * 100) || 0)}%
+            <Text 
+              className="text-white font-medium"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {formatWithTwoDecimals(totalIncome > 0 ? (totalAllocated / totalIncome) * 100 : 0)}%
             </Text>
           </View>
           
           <View className="h-3 bg-white/10 rounded-full overflow-hidden">
             <View 
               className="h-3 bg-primary-400 rounded-full" 
-              style={{ width: `${Math.min(100, (totalAllocated / totalIncome) * 100 || 0)}%` }} 
+              style={{ width: `${Math.min(100, totalIncome > 0 ? (totalAllocated / totalIncome) * 100 : 0)}%` }} 
             />
           </View>
           
           <View className="flex-row justify-between mt-3">
             <View className="items-center">
               <Text className="text-xs text-primary-100">Needs</Text>
-              <Text className="text-sm font-semibold text-white">{Math.round(needsPercentage)}%</Text>
+              <Text 
+                className="text-sm font-semibold text-white"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {formatWithTwoDecimals(needsPercentage)}%
+              </Text>
             </View>
             <View className="items-center">
               <Text className="text-xs text-primary-100">Wants</Text>
-              <Text className="text-sm font-semibold text-white">{Math.round(wantsPercentage)}%</Text>
+              <Text 
+                className="text-sm font-semibold text-white"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {formatWithTwoDecimals(wantsPercentage)}%
+              </Text>
             </View>
             <View className="items-center">
               <Text className="text-xs text-primary-100">Savings</Text>
-              <Text className="text-sm font-semibold text-white">{Math.round(savingsPercentage)}%</Text>
+              <Text 
+                className="text-sm font-semibold text-white"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {formatWithTwoDecimals(savingsPercentage)}%
+              </Text>
             </View>
           </View>
         </View>
@@ -681,11 +750,16 @@ export default function BudgetPlanDetailScreen() {
                   <View className="w-1/3 pr-2 mb-4">
                     <View className="bg-green-50 p-3 rounded-lg items-center">
                       <Text className="text-green-600 font-medium">Needs</Text>
-                      <Text className="text-lg font-bold text-text-primary">
-                        {formatCurrency(totalNeeds, planDetails?.currency)}
+                      <Text 
+                        className="text-lg font-bold text-text-primary" 
+                        numberOfLines={1} 
+                        ellipsizeMode="tail" 
+                        style={{ maxWidth: '95%' }}
+                      >
+                        {formatCurrency(formatWithTwoDecimals(totalNeeds), planDetails?.currency)}
                       </Text>
                       <Text className="text-xs text-text-secondary">
-                        {needsPercentage.toFixed(1)}%
+                        {formatWithTwoDecimals(needsPercentage)}%
                       </Text>
                     </View>
                   </View>
@@ -693,11 +767,16 @@ export default function BudgetPlanDetailScreen() {
                   <View className="w-1/3 px-1 mb-4">
                     <View className="bg-blue-50 p-3 rounded-lg items-center">
                       <Text className="text-blue-600 font-medium">Wants</Text>
-                      <Text className="text-lg font-bold text-text-primary">
-                        {formatCurrency(totalWants, planDetails?.currency)}
+                      <Text 
+                        className="text-lg font-bold text-text-primary" 
+                        numberOfLines={1} 
+                        ellipsizeMode="tail" 
+                        style={{ maxWidth: '95%' }}
+                      >
+                        {formatCurrency(formatWithTwoDecimals(totalWants), planDetails?.currency)}
                       </Text>
                       <Text className="text-xs text-text-secondary">
-                        {wantsPercentage.toFixed(1)}%
+                        {formatWithTwoDecimals(wantsPercentage)}%
                       </Text>
                     </View>
                   </View>
@@ -705,11 +784,16 @@ export default function BudgetPlanDetailScreen() {
                   <View className="w-1/3 pl-2 mb-4">
                     <View className="bg-amber-50 p-3 rounded-lg items-center">
                       <Text className="text-amber-600 font-medium">Savings</Text>
-                      <Text className="text-lg font-bold text-text-primary">
-                        {formatCurrency(totalSavings, planDetails?.currency)}
+                      <Text 
+                        className="text-lg font-bold text-text-primary" 
+                        numberOfLines={1} 
+                        ellipsizeMode="tail" 
+                        style={{ maxWidth: '95%' }}
+                      >
+                        {formatCurrency(formatWithTwoDecimals(totalSavings), planDetails?.currency)}
                       </Text>
                       <Text className="text-xs text-text-secondary">
-                        {savingsPercentage.toFixed(1)}%
+                        {formatWithTwoDecimals(savingsPercentage)}%
                       </Text>
                     </View>
                   </View>
@@ -718,16 +802,26 @@ export default function BudgetPlanDetailScreen() {
                 <View className="bg-primary-50 rounded-lg p-4 mt-2">
                   <View className="flex-row justify-between mb-1">
                     <Text className="text-primary-700 font-medium">Total Allocation</Text>
-                    <Text className="font-bold text-primary-700">
-                      {formatCurrency(totalAllocated, planDetails?.currency)}
+                    <Text 
+                      className="font-bold text-primary-700"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={{ maxWidth: 150 }}
+                    >
+                      {formatCurrency(formatWithTwoDecimals(totalAllocated), planDetails?.currency)}
                     </Text>
                   </View>
                   <View className="flex-row justify-between">
                     <Text className={`font-medium ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'}`}>
                       Remaining to Allocate
                     </Text>
-                    <Text className={`font-bold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'}`}>
-                      {formatCurrency(remaining, planDetails?.currency)}
+                    <Text 
+                      className={`font-bold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'}`}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={{ maxWidth: 150 }}
+                    >
+                      {formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}
                     </Text>
                   </View>
                 </View>
@@ -776,10 +870,22 @@ export default function BudgetPlanDetailScreen() {
                                 {income.incomeName.charAt(0).toUpperCase()}
                               </Text>
                             </View>
-                            <Text className="font-medium text-text-primary">{income.incomeName}</Text>
+                            <Text 
+                              className="font-medium text-text-primary"
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                              style={{ maxWidth: 150 }}
+                            >
+                              {income.incomeName}
+                            </Text>
                           </View>
-                          <Text className="font-bold text-primary-600">
-                            {formatCurrency(income.incomeAmount, planDetails?.currency)}
+                          <Text 
+                            className="font-bold text-primary-600"
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                            style={{ maxWidth: 120 }}
+                          >
+                            {formatCurrency(formatWithTwoDecimals(parseFloat(income.incomeAmount)), planDetails?.currency)}
                           </Text>
                         </View>
                       ))}
@@ -788,8 +894,13 @@ export default function BudgetPlanDetailScreen() {
                     <View className="mt-3 pt-3 border-t border-gray-200">
                       <View className="flex-row justify-between">
                         <Text className="font-semibold text-text-primary">Total Income</Text>
-                        <Text className="text-xl font-bold text-primary-600">
-                          {formatCurrency(totalIncome, planDetails?.currency)}
+                        <Text 
+                          className="text-xl font-bold text-primary-600"
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                          style={{ maxWidth: 150 }}
+                        >
+                          {formatCurrency(formatWithTwoDecimals(totalIncome), planDetails?.currency)}
                         </Text>
                       </View>
                     </View>
@@ -814,30 +925,57 @@ export default function BudgetPlanDetailScreen() {
                       <View>
                         <View className="flex-row justify-between mb-1">
                           <Text className="text-green-400 text-xs">Needs</Text>
-                          <Text className="text-green-400 text-xs">{Math.round(needsPercentage)}% vs 50%</Text>
+                          <Text 
+                            className="text-green-400 text-xs"
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {formatWithTwoDecimals(needsPercentage)}% vs 50%
+                          </Text>
                         </View>
                         <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
-                          <View className="h-2 bg-green-500 rounded-full" style={{ width: `${Math.min(100, needsPercentage)}%` }} />
+                          <View 
+                            className="h-2 bg-green-500 rounded-full" 
+                            style={{ width: `${Math.min(100, needsPercentage)}%` }} 
+                          />
                         </View>
                       </View>
                       
                       <View>
                         <View className="flex-row justify-between mb-1">
                           <Text className="text-blue-400 text-xs">Wants</Text>
-                          <Text className="text-blue-400 text-xs">{Math.round(wantsPercentage)}% vs 30%</Text>
+                          <Text 
+                            className="text-blue-400 text-xs"
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {formatWithTwoDecimals(wantsPercentage)}% vs 30%
+                          </Text>
                         </View>
                         <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
-                          <View className="h-2 bg-blue-500 rounded-full" style={{ width: `${Math.min(100, wantsPercentage)}%` }} />
+                          <View 
+                            className="h-2 bg-blue-500 rounded-full" 
+                            style={{ width: `${Math.min(100, wantsPercentage)}%` }} 
+                          />
                         </View>
                       </View>
                       
                       <View>
                         <View className="flex-row justify-between mb-1">
                           <Text className="text-amber-400 text-xs">Savings</Text>
-                          <Text className="text-amber-400 text-xs">{Math.round(savingsPercentage)}% vs 20%</Text>
+                          <Text 
+                            className="text-amber-400 text-xs"
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                          >
+                            {formatWithTwoDecimals(savingsPercentage)}% vs 20%
+                          </Text>
                         </View>
                         <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
-                          <View className="h-2 bg-amber-500 rounded-full" style={{ width: `${Math.min(100, savingsPercentage)}%` }} />
+                          <View 
+                            className="h-2 bg-amber-500 rounded-full" 
+                            style={{ width: `${Math.min(100, savingsPercentage)}%` }} 
+                          />
                         </View>
                       </View>
                     </View>

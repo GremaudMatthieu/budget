@@ -225,126 +225,133 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
         ?int $limit = null,
         ?int $offset = null
     ): array {
-        $sql = sprintf(
-            'SELECT
-        EXTRACT(YEAR FROM pv.date) AS year,
-        EXTRACT(MONTH FROM pv.date) AS month,
-        pv.uuid,
-        json_build_object(
-            \'incomeCategories\', jsonb_object_agg(iv.category, CAST(iv.income_amount AS NUMERIC)),
-            \'needCategories\', jsonb_object_agg(nv.category, CAST(nv.need_amount AS NUMERIC)),
-            \'savingCategories\', jsonb_object_agg(sv.category, CAST(sv.saving_amount AS NUMERIC)),
-            \'wantCategories\', jsonb_object_agg(wv.category, CAST(wv.want_amount AS NUMERIC))
-        ) AS categories
-    FROM budget_plan_view pv
-    LEFT JOIN (
+        $sql = '
+    WITH budget_plans AS (
         SELECT
-            budget_plan_uuid,
-            category,
-            income_amount
-        FROM budget_plan_income_entry_view
-    ) iv ON pv.uuid = iv.budget_plan_uuid
-    LEFT JOIN (
-        SELECT
-            budget_plan_uuid,
-            category,
-            need_amount
-        FROM budget_plan_need_entry_view
-    ) nv ON pv.uuid = nv.budget_plan_uuid
-    LEFT JOIN (
-        SELECT
-            budget_plan_uuid,
-            category,
-            saving_amount
-        FROM budget_plan_saving_entry_view
-    ) sv ON pv.uuid = sv.budget_plan_uuid
-    LEFT JOIN (
-        SELECT
-            budget_plan_uuid,
-            category,
-            want_amount
-        FROM budget_plan_want_entry_view
-    ) wv ON pv.uuid = wv.budget_plan_uuid
-    WHERE %s
-    GROUP BY year, month, pv.uuid',
-            $this->buildWhereClauseWithAlias($criteria, 'pv')
-        );
+            EXTRACT(YEAR FROM pv.date) AS year,
+            EXTRACT(MONTH FROM pv.date) AS month,
+            pv.uuid,
+            pv.currency,
+            (SELECT COALESCE(SUM(CAST(income_amount AS DECIMAL)), 0) 
+             FROM budget_plan_income_entry_view 
+             WHERE budget_plan_uuid = pv.uuid) AS total_income,
+            (SELECT COALESCE(SUM(CAST(need_amount AS DECIMAL)), 0) 
+             FROM budget_plan_need_entry_view 
+             WHERE budget_plan_uuid = pv.uuid) AS total_needs,
+            (SELECT COALESCE(SUM(CAST(want_amount AS DECIMAL)), 0) 
+             FROM budget_plan_want_entry_view 
+             WHERE budget_plan_uuid = pv.uuid) AS total_wants,
+            (SELECT COALESCE(SUM(CAST(saving_amount AS DECIMAL)), 0) 
+             FROM budget_plan_saving_entry_view 
+             WHERE budget_plan_uuid = pv.uuid) AS total_savings
+        FROM budget_plan_view pv
+        WHERE ' . $this->buildWhereClauseWithAlias($criteria, 'pv') . '
+        AND pv.user_uuid = :user_uuid
+    )
+    SELECT 
+        bp.*,
+        (bp.total_needs + bp.total_wants + bp.total_savings) AS total_allocated,
+        CASE WHEN bp.total_income > 0 
+             THEN ROUND((bp.total_needs / bp.total_income) * 100, 1) 
+             ELSE 0 
+        END AS needs_percentage,
+        CASE WHEN bp.total_income > 0 
+             THEN ROUND((bp.total_wants / bp.total_income) * 100, 1) 
+             ELSE 0 
+        END AS wants_percentage,
+        CASE WHEN bp.total_income > 0 
+             THEN ROUND((bp.total_savings / bp.total_income) * 100, 1) 
+             ELSE 0 
+        END AS savings_percentage,
+        CASE WHEN bp.total_income > 0 
+             THEN ROUND(((bp.total_needs + bp.total_wants + bp.total_savings) / bp.total_income) * 100, 1) 
+             ELSE 0 
+        END AS allocated_percentage
+    FROM budget_plans bp';
 
         if ($orderBy) {
-            $sql = sprintf(
-                '%s ORDER BY %s',
-                $sql,
-                implode(
-                    ', ',
-                    array_map(fn($key, $value) => sprintf('%s %s', $key, $value), array_keys($orderBy), $orderBy)
-                )
-            );
+            $orderByClauses = [];
+            foreach ($orderBy as $field => $direction) {
+                $orderByClauses[] = "{$field} {$direction}";
+            }
+            $sql .= ' ORDER BY ' . implode(', ', $orderByClauses);
         } else {
             $sql .= ' ORDER BY year DESC, month ASC';
-        }
-
-        if ($limit) {
-            $sql = sprintf('%s LIMIT %d', $sql, $limit);
-        }
-
-        if ($offset) {
-            $sql = sprintf('%s OFFSET %d', $sql, $offset);
         }
 
         $results = $this->connection->prepare($sql)->executeQuery($this->processCriteria($criteria))->fetchAllAssociative();
 
         $formattedResults = [];
         $yearlyTotals = [
-            'incomeCategories' => [],
-            'needCategories' => [],
-            'savingCategories' => [],
-            'wantCategories' => [],
+            'income' => 0,
+            'needs' => 0,
+            'wants' => 0,
+            'savings' => 0
         ];
 
         $year = $criteria['year'] ?? date('Y');
         $formattedResults[$year] = array_fill(1, 12, ['uuid' => null]);
 
-        array_walk($results, function ($result) use (&$formattedResults, &$yearlyTotals) {
+        foreach ($results as $result) {
             $year = (int)$result['year'];
             $month = (int)$result['month'];
+            $planUuid = $result['uuid'];
+
+            $totalIncome = (float)$result['total_income'];
+            $totalNeeds = (float)$result['total_needs'];
+            $totalWants = (float)$result['total_wants'];
+            $totalSavings = (float)$result['total_savings'];
+            $totalAllocated = (float)$result['total_allocated'];
 
             $formattedResults[$year][$month] = [
-                'uuid' => $result['uuid'],
+                'uuid' => $planUuid,
+                'totalIncome' => $totalIncome,
+                'totalAllocated' => $totalAllocated,
+                'allocatedPercentage' => (float)$result['allocated_percentage'],
+                'needsPercentage' => (float)$result['needs_percentage'],
+                'wantsPercentage' => (float)$result['wants_percentage'],
+                'savingsPercentage' => (float)$result['savings_percentage'],
+                'currency' => $result['currency'],
             ];
 
-            $categories = json_decode($result['categories'], true);
+            $yearlyTotals['income'] += $totalIncome;
+            $yearlyTotals['needs'] += $totalNeeds;
+            $yearlyTotals['wants'] += $totalWants;
+            $yearlyTotals['savings'] += $totalSavings;
+        }
 
-            $updateTotals = function (&$totals, $categories) {
-                if (!$categories) return;
+        $totalYearlyIncome = $yearlyTotals['income'];
+        if ($totalYearlyIncome > 0) {
+            $actualNeedsPercentage = round(($yearlyTotals['needs'] / $totalYearlyIncome) * 100);
+            $actualWantsPercentage = round(($yearlyTotals['wants'] / $totalYearlyIncome) * 100);
+            $actualSavingsPercentage = round(($yearlyTotals['savings'] / $totalYearlyIncome) * 100);
+        } else {
+            $actualNeedsPercentage = 0;
+            $actualWantsPercentage = 0;
+            $actualSavingsPercentage = 0;
+        }
 
-                array_walk($categories, function ($amount, $category) use (&$totals) {
-                    if (!isset($totals[$category])) {
-                        $totals[$category] = 0;
-                    }
-                    $totals[$category] += (float) $amount;
-                });
-            };
-
-            foreach ($categories as $categoryType => $categoryAmounts) {
-                if (isset($yearlyTotals[$categoryType])) {
-                    $updateTotals($yearlyTotals[$categoryType], $categoryAmounts);
-                }
-            }
-        });
-
-        array_walk($yearlyTotals, function ($totals, $key) use (&$formattedResults) {
-            $totalAmount = array_sum($totals);
-            $ratios = [];
-
-            if ($totalAmount > 0) {
-                foreach ($totals as $category => $amount) {
-                    $ratios[$category] = $amount / $totalAmount;
-                }
-            }
-
-            $formattedResults[$key . 'Ratio'] = array_map([$this, 'formatPercentage'], $ratios);
-            $formattedResults[$key . 'Total'] = array_map(fn($amount) => (string) round($amount, 2), $totals);
-        });
+        $formattedResults['budgetSummary'] = [
+            '50/30/20Rule' => [
+                'recommended' => [
+                    'needs' => 50,
+                    'wants' => 30,
+                    'savings' => 20
+                ],
+                'current' => [
+                    'needs' => $actualNeedsPercentage,
+                    'wants' => $actualWantsPercentage,
+                    'savings' => $actualSavingsPercentage
+                ]
+            ],
+            'yearlyTotals' => [
+                'income' => round($yearlyTotals['income'], 2),
+                'allocated' => round($yearlyTotals['needs'] + $yearlyTotals['wants'] + $yearlyTotals['savings'], 2),
+                'needs' => round($yearlyTotals['needs'], 2),
+                'wants' => round($yearlyTotals['wants'], 2),
+                'savings' => round($yearlyTotals['savings'], 2)
+            ]
+        ];
 
         return $formattedResults;
     }
