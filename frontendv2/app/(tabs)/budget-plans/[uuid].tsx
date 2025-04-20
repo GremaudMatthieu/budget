@@ -18,6 +18,8 @@ import formatAmount from '@/utils/formatAmount';
 import validateAmount from '@/utils/validateAmount';
 import { useErrorContext } from '@/contexts/ErrorContext';
 import { useSocket } from '@/contexts/SocketContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/utils/useTranslation';
 import BudgetItemPieChart from '@/components/BudgetItemPieChart';
 import BudgetItemModal from '@/components/modals/BudgetItemModal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
@@ -34,6 +36,8 @@ export default function BudgetPlanDetailScreen() {
   const params = useLocalSearchParams();
   const { setError } = useErrorContext();
   const { socket, connected } = useSocket();
+  const { language } = useLanguage();
+  const { t } = useTranslation();
   
   // Get the budget plan ID from route params
   const uuid = params.uuid as string;
@@ -87,7 +91,7 @@ export default function BudgetPlanDetailScreen() {
         await fetchBudgetPlan(uuid);
       } catch (err) {
         if (isMounted.current) {
-          setError('Failed to load budget plan details');
+          setError(t('errors.failedToLoadBudgetPlanDetails'));
         }
       }
     };
@@ -146,7 +150,7 @@ export default function BudgetPlanDetailScreen() {
     try {
       await fetchBudgetPlan(uuid);
     } catch (err) {
-      setError('Failed to refresh budget plan details');
+      setError(t('errors.failedToRefreshBudgetPlan'));
     } finally {
       setRefreshing(false);
     }
@@ -155,7 +159,7 @@ export default function BudgetPlanDetailScreen() {
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+    return date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long' });
   };
   
   // Handle opening add modal
@@ -235,7 +239,7 @@ export default function BudgetPlanDetailScreen() {
         await fetchBudgetPlan(uuid);
       }
     } catch (err) {
-      setError(`Failed to add ${currentItemType}`);
+      setError(t(`errors.failedToAdd${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`));
     }
   }, [addBudgetItem, currentItemType, fetchBudgetPlan, uuid, setError]);
   
@@ -257,7 +261,7 @@ export default function BudgetPlanDetailScreen() {
         await fetchBudgetPlan(uuid);
       }
     } catch (err) {
-      setError(`Failed to update ${currentItemType}`);
+      setError(t(`errors.failedToUpdate${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`));
     }
   }, [adjustBudgetItem, currentItem, currentItemType, fetchBudgetPlan, uuid, setError]);
   
@@ -273,7 +277,7 @@ export default function BudgetPlanDetailScreen() {
         await fetchBudgetPlan(uuid);
       }
     } catch (err) {
-      setError(`Failed to delete ${currentItemType}`);
+      setError(t(`errors.failedToDelete${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`));
     }
   }, [removeBudgetItem, currentItem, currentItemType, fetchBudgetPlan, uuid, setError]);
   
@@ -346,9 +350,9 @@ export default function BudgetPlanDetailScreen() {
   
   // Prepare chart data
   const chartData = [
-    { name: 'Needs', value: totalNeeds, color: '#4CAF50' },
-    { name: 'Wants', value: totalWants, color: '#2196F3' },
-    { name: 'Savings', value: totalSavings, color: '#FFC107' },
+    { name: t('budgetPlans.needs'), value: totalNeeds, color: '#4CAF50' },
+    { name: t('budgetPlans.wants'), value: totalWants, color: '#2196F3' },
+    { name: t('budgetPlans.savings'), value: totalSavings, color: '#FFC107' },
   ];
   
   // Get icon and color for each type
@@ -384,11 +388,14 @@ export default function BudgetPlanDetailScreen() {
                 </View>
                 <View>
                   <Text className="text-lg font-semibold text-text-primary">
-                    {type.charAt(0).toUpperCase() + type.slice(1)}s
+                    {type === 'need' ? t('budgetPlans.needs') : 
+                     type === 'want' ? t('budgetPlans.wants') : 
+                     type === 'saving' ? t('budgetPlans.savings') : 
+                     t('budgetPlans.incomes')}
                   </Text>
                   {type !== 'income' && (
                     <Text className={`text-xs ${textColor}`} numberOfLines={1} ellipsizeMode="tail">
-                      {formatWithTwoDecimals(type === 'need' ? needsPercentage : type === 'want' ? wantsPercentage : savingsPercentage)}% of income
+                      {formatWithTwoDecimals(type === 'need' ? needsPercentage : type === 'want' ? wantsPercentage : savingsPercentage)}% {t('budgetPlans.ofIncome')}
                     </Text>
                   )}
                 </View>
@@ -409,22 +416,22 @@ export default function BudgetPlanDetailScreen() {
             
             <View className="neomorphic-inset p-3 rounded-lg mb-4">
               <Text className="text-text-secondary">
-                {type === 'need' && "Essential expenses you can't avoid like rent, utilities, and groceries."}
-                {type === 'want' && "Non-essential expenses that improve your quality of life like dining out or entertainment."}
-                {type === 'saving' && "Money set aside for future goals like emergency funds, retirement, or major purchases."}
-                {type === 'income' && "Your sources of income for this month."}
+                {type === 'need' && t('budgetPlans.needsDescription')}
+                {type === 'want' && t('budgetPlans.wantsDescription')}
+                {type === 'saving' && t('budgetPlans.savingsDescription')}
+                {type === 'income' && t('budgetPlans.incomesDescription')}
               </Text>
             </View>
             
             {items.length === 0 ? (
               <View className="py-6 items-center">
                 <Ionicons name={icon} size={32} color="#d1d5db" />
-                <Text className="text-gray-400 mt-2">No {type}s added yet</Text>
+                <Text className="text-gray-400 mt-2">{t('budgetPlans.no' + type.charAt(0).toUpperCase() + type.slice(1) + 's')}</Text>
                 <TouchableOpacity
                   onPress={() => handleOpenAddModal(type)}
                   className={`mt-4 px-4 py-2 ${bgColor} rounded-lg`}
                 >
-                  <Text className={textColor}>Add {type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+                  <Text className={textColor}>{t('budgetPlans.add' + type.charAt(0).toUpperCase() + type.slice(1))}</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -497,7 +504,7 @@ export default function BudgetPlanDetailScreen() {
             
             <View className="mt-6 pt-4 border-t border-gray-200">
               <View className="flex-row justify-between items-center">
-                <Text className="font-semibold text-text-primary">Total</Text>
+                <Text className="font-semibold text-text-primary">{t('common.total')}</Text>
                 <Text 
                   className="text-xl font-bold text-primary-600"
                   numberOfLines={1}
@@ -556,7 +563,7 @@ export default function BudgetPlanDetailScreen() {
         <View className="w-16 h-16 rounded-full bg-primary-100 items-center justify-center">
           <ActivityIndicator size="large" color="#0c6cf2" />
         </View>
-        <Text className="text-secondary-600 mt-4 font-medium">Loading budget plan...</Text>
+        <Text className="text-secondary-600 mt-4 font-medium">{t('budgetPlans.loading')}</Text>
       </View>
       </SwipeBackWrapper>
     );
@@ -569,15 +576,15 @@ export default function BudgetPlanDetailScreen() {
         <View className="w-16 h-16 bg-red-100 rounded-full items-center justify-center mb-4">
           <Ionicons name="alert-circle-outline" size={32} color="#dc2626" />
         </View>
-        <Text className="text-text-primary text-lg font-medium mb-2">Budget Plan Not Found</Text>
+        <Text className="text-text-primary text-lg font-medium mb-2">{t('budgetPlans.notFound')}</Text>
         <Text className="text-text-secondary mb-6 text-center px-8">
-          We couldn't find the budget plan you're looking for.
+          {t('budgetPlans.notFoundDescription')}
         </Text>
         <TouchableOpacity
           onPress={() => router.push('/budget-plans')}
           className="bg-primary-600 px-6 py-3 rounded-xl shadow-sm"
         >
-          <Text className="text-white font-medium">Back to Budget Plans</Text>
+          <Text className="text-white font-medium">{t('budgetPlans.backToBudgetPlans')}</Text>
         </TouchableOpacity>
       </View>
       </SwipeBackWrapper>
@@ -611,7 +618,7 @@ export default function BudgetPlanDetailScreen() {
             ellipsizeMode="tail"
             style={{ maxWidth: 200 }}
           >
-            {planDetails?.date ? formatDate(planDetails.date) : 'Budget Plan'}
+            {planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}
           </Text>
           <TouchableOpacity
             onPress={() => setIsDuplicateModalOpen(true)}
@@ -623,7 +630,7 @@ export default function BudgetPlanDetailScreen() {
         
         <View className="flex-row justify-between items-end mb-6">
           <View>
-            <Text className="text-primary-100 mb-1">Total Income</Text>
+            <Text className="text-primary-100 mb-1">{t('budgetPlans.totalIncome')}</Text>
             <Text 
               className="text-3xl font-bold text-white"
               numberOfLines={1}
@@ -635,7 +642,7 @@ export default function BudgetPlanDetailScreen() {
           </View>
           
           <View className="items-end">
-            <Text className="text-primary-100 mb-1">Remaining</Text>
+            <Text className="text-primary-100 mb-1">{t('budgetPlans.remaining')}</Text>
             <Text 
               className={`text-lg font-bold ${remaining >= 0 ? 'text-white' : 'text-red-300'}`}
               numberOfLines={1}
@@ -650,7 +657,7 @@ export default function BudgetPlanDetailScreen() {
         {/* Budget progress */}
         <View className="bg-white/10 p-3 rounded-xl">
           <View className="flex-row justify-between mb-2">
-            <Text className="text-primary-100">Allocation Progress</Text>
+            <Text className="text-primary-100">{t('budgetPlans.allocationProgress')}</Text>
             <Text 
               className="text-white font-medium"
               numberOfLines={1}
@@ -669,7 +676,7 @@ export default function BudgetPlanDetailScreen() {
           
           <View className="flex-row justify-between mt-3">
             <View className="items-center">
-              <Text className="text-xs text-primary-100">Needs</Text>
+              <Text className="text-xs text-primary-100">{t('budgetPlans.needs')}</Text>
               <Text 
                 className="text-sm font-semibold text-white"
                 numberOfLines={1}
@@ -679,7 +686,7 @@ export default function BudgetPlanDetailScreen() {
               </Text>
             </View>
             <View className="items-center">
-              <Text className="text-xs text-primary-100">Wants</Text>
+              <Text className="text-xs text-primary-100">{t('budgetPlans.wants')}</Text>
               <Text 
                 className="text-sm font-semibold text-white"
                 numberOfLines={1}
@@ -689,7 +696,7 @@ export default function BudgetPlanDetailScreen() {
               </Text>
             </View>
             <View className="items-center">
-              <Text className="text-xs text-primary-100">Savings</Text>
+              <Text className="text-xs text-primary-100">{t('budgetPlans.savings')}</Text>
               <Text 
                 className="text-sm font-semibold text-white"
                 numberOfLines={1}
@@ -720,7 +727,7 @@ export default function BudgetPlanDetailScreen() {
                     activeTab === tab ? 'text-primary-600' : 'text-text-secondary'
                   }`}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {t(`budgetPlans.tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -740,7 +747,7 @@ export default function BudgetPlanDetailScreen() {
             {/* Budget Summary Card */}
             <View className="card">
               <View className="card-content">
-                <Text className="text-xl font-semibold text-text-primary mb-4">Budget Summary</Text>
+                <Text className="text-xl font-semibold text-text-primary mb-4">{t('budgetPlans.budgetSummary')}</Text>
                 
                 <View className="items-center py-4">
                   <BudgetItemPieChart data={chartData} />
@@ -749,7 +756,7 @@ export default function BudgetPlanDetailScreen() {
                 <View className="flex-row flex-wrap mt-4">
                   <View className="w-1/3 pr-2 mb-4">
                     <View className="bg-green-50 p-3 rounded-lg items-center">
-                      <Text className="text-green-600 font-medium">Needs</Text>
+                      <Text className="text-green-600 font-medium">{t('budgetPlans.needs')}</Text>
                       <Text 
                         className="text-lg font-bold text-text-primary" 
                         numberOfLines={1} 
@@ -766,7 +773,7 @@ export default function BudgetPlanDetailScreen() {
                   
                   <View className="w-1/3 px-1 mb-4">
                     <View className="bg-blue-50 p-3 rounded-lg items-center">
-                      <Text className="text-blue-600 font-medium">Wants</Text>
+                      <Text className="text-blue-600 font-medium">{t('budgetPlans.wants')}</Text>
                       <Text 
                         className="text-lg font-bold text-text-primary" 
                         numberOfLines={1} 
@@ -783,7 +790,7 @@ export default function BudgetPlanDetailScreen() {
                   
                   <View className="w-1/3 pl-2 mb-4">
                     <View className="bg-amber-50 p-3 rounded-lg items-center">
-                      <Text className="text-amber-600 font-medium">Savings</Text>
+                      <Text className="text-amber-600 font-medium">{t('budgetPlans.savings')}</Text>
                       <Text 
                         className="text-lg font-bold text-text-primary" 
                         numberOfLines={1} 
@@ -801,7 +808,7 @@ export default function BudgetPlanDetailScreen() {
                 
                 <View className="bg-primary-50 rounded-lg p-4 mt-2">
                   <View className="flex-row justify-between mb-1">
-                    <Text className="text-primary-700 font-medium">Total Allocation</Text>
+                    <Text className="text-primary-700 font-medium">{t('budgetPlans.totalAllocated')}</Text>
                     <Text 
                       className="font-bold text-primary-700"
                       numberOfLines={1}
@@ -813,7 +820,7 @@ export default function BudgetPlanDetailScreen() {
                   </View>
                   <View className="flex-row justify-between">
                     <Text className={`font-medium ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'}`}>
-                      Remaining to Allocate
+                      {t('budgetPlans.remainingToAllocate')}
                     </Text>
                     <Text 
                       className={`font-bold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'}`}
@@ -836,7 +843,7 @@ export default function BudgetPlanDetailScreen() {
                     <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
                       <Ionicons name="wallet-outline" size={20} color="#9333ea" />
                     </View>
-                    <Text className="text-lg font-semibold text-text-primary">Income Sources</Text>
+                    <Text className="text-lg font-semibold text-text-primary">{t('budgetPlans.incomeSources')}</Text>
                   </View>
                   
                   <TouchableOpacity
@@ -851,12 +858,12 @@ export default function BudgetPlanDetailScreen() {
                 {incomes?.length === 0 ? (
                   <View className="neomorphic-inset p-6 rounded-lg items-center">
                     <Ionicons name="wallet-outline" size={32} color="#d1d5db" />
-                    <Text className="text-gray-400 mt-2 mb-4">No income sources added yet</Text>
+                    <Text className="text-gray-400 mt-2 mb-4">{t('budgetPlans.noIncomes')}</Text>
                     <TouchableOpacity
                       onPress={() => handleOpenAddModal('income')}
                       className="px-4 py-2 bg-purple-100 rounded-lg"
                     >
-                      <Text className="text-purple-700">Add Income</Text>
+                      <Text className="text-purple-700">{t('budgetPlans.addIncome')}</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
@@ -893,7 +900,7 @@ export default function BudgetPlanDetailScreen() {
                     
                     <View className="mt-3 pt-3 border-t border-gray-200">
                       <View className="flex-row justify-between">
-                        <Text className="font-semibold text-text-primary">Total Income</Text>
+                        <Text className="font-semibold text-text-primary">{t('budgetPlans.totalIncome')}</Text>
                         <Text 
                           className="text-xl font-bold text-primary-600"
                           numberOfLines={1}
@@ -913,24 +920,24 @@ export default function BudgetPlanDetailScreen() {
             {totalIncome > 0 && (
               <View className="card">
                 <View className="card-content">
-                  <Text className="text-lg font-semibold text-text-primary mb-4">Budget Health</Text>
+                  <Text className="text-lg font-semibold text-text-primary mb-4">{t('budgetPlans.budgetHealth')}</Text>
                   
                   <View className="bg-secondary-900 rounded-lg p-4 mb-4">
-                    <Text className="text-white font-medium mb-1">50/30/20 Rule Comparison</Text>
+                    <Text className="text-white font-medium mb-1">{t('budgetPlans.fiftyThirtyTwentyComparison')}</Text>
                     <Text className="text-secondary-300 text-xs mb-3">
-                      Ideal allocation: 50% needs, 30% wants, 20% savings
+                      {t('budgetPlans.idealAllocation')}
                     </Text>
                     
                     <View className="space-y-3">
                       <View>
                         <View className="flex-row justify-between mb-1">
-                          <Text className="text-green-400 text-xs">Needs</Text>
+                          <Text className="text-green-400 text-xs">{t('budgetPlans.needs')}</Text>
                           <Text 
                             className="text-green-400 text-xs"
                             numberOfLines={1}
                             ellipsizeMode="tail"
                           >
-                            {formatWithTwoDecimals(needsPercentage)}% vs 50%
+                            {formatWithTwoDecimals(needsPercentage)}% {t('common.vs')} 50%
                           </Text>
                         </View>
                         <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
@@ -943,13 +950,13 @@ export default function BudgetPlanDetailScreen() {
                       
                       <View>
                         <View className="flex-row justify-between mb-1">
-                          <Text className="text-blue-400 text-xs">Wants</Text>
+                          <Text className="text-blue-400 text-xs">{t('budgetPlans.wants')}</Text>
                           <Text 
                             className="text-blue-400 text-xs"
                             numberOfLines={1}
                             ellipsizeMode="tail"
                           >
-                            {formatWithTwoDecimals(wantsPercentage)}% vs 30%
+                            {formatWithTwoDecimals(wantsPercentage)}% {t('common.vs')} 30%
                           </Text>
                         </View>
                         <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
@@ -962,13 +969,13 @@ export default function BudgetPlanDetailScreen() {
                       
                       <View>
                         <View className="flex-row justify-between mb-1">
-                          <Text className="text-amber-400 text-xs">Savings</Text>
+                          <Text className="text-amber-400 text-xs">{t('budgetPlans.savings')}</Text>
                           <Text 
                             className="text-amber-400 text-xs"
                             numberOfLines={1}
                             ellipsizeMode="tail"
                           >
-                            {formatWithTwoDecimals(savingsPercentage)}% vs 20%
+                            {formatWithTwoDecimals(savingsPercentage)}% {t('common.vs')} 20%
                           </Text>
                         </View>
                         <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
@@ -979,17 +986,6 @@ export default function BudgetPlanDetailScreen() {
                         </View>
                       </View>
                     </View>
-                  </View>
-                  
-                  <View className="bg-primary-50 rounded-lg p-4">
-                    <Text className="text-primary-700 font-medium mb-2">Budget Tips</Text>
-                    <Text className="text-text-secondary text-sm">
-                      {needsPercentage > 50 ? "Your needs allocation is higher than recommended. Consider finding ways to reduce essential expenses." : 
-                       wantsPercentage > 30 ? "Your wants allocation is higher than recommended. Consider reducing non-essential spending." :
-                       savingsPercentage < 20 ? "Your savings allocation is lower than recommended. Try to increase your savings rate." :
-                       remaining > 0 ? "You have unallocated income. Consider putting it toward savings or debt reduction." :
-                       "Your budget looks healthy based on the 50/30/20 rule!"}
-                    </Text>
                   </View>
                 </View>
               </View>
@@ -1019,7 +1015,7 @@ export default function BudgetPlanDetailScreen() {
           isVisible={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onSubmit={handleAddItem}
-          title={`Add ${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`}
+          title={t(`budgetPlans.add${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`)}
           itemType={currentItemType}
           categories={
             currentItemType === 'need'
@@ -1039,7 +1035,7 @@ export default function BudgetPlanDetailScreen() {
           isVisible={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           onSubmit={handleEditItem}
-          title={`Edit ${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`}
+          title={t(`budgetPlans.edit${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`)}
           initialName={currentItem.name}
           initialAmount={currentItem.amount}
           initialCategory={currentItem.category}
@@ -1064,7 +1060,7 @@ export default function BudgetPlanDetailScreen() {
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handleDeleteItem}
           name={currentItem.name}
-          message={`Are you sure you want to delete "${currentItem.name}"?`}
+          message={t('modals.deleteConfirmation', { name: currentItem.name })}
         />
       )}
       

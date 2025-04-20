@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import SelectModal, { SelectOption } from '../modals/SelectModal';
+import { useTranslation } from '@/utils/useTranslation';
 
 interface SelectFieldProps extends Omit<TextInputProps, 'value' | 'onChangeText'> {
   label?: string;
@@ -32,6 +33,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   ...props
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const { t } = useTranslation();
   
   // Find the selected option to display its name
   const selectedOption = options.find(option => option.id === value);
@@ -76,7 +78,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSelect={(option) => onChange(option.id)}
-        title={label || 'Select Option'}
+        title={label || t('modals.selectOption', 'Select Option')}
         options={options}
         selectedId={value}
         showAddOption={showAddOption}

@@ -19,10 +19,12 @@ import { useErrorContext } from '@/contexts/ErrorContext';
 import { formatCurrency } from '@/utils/currencyUtils';
 import { normalizeMonthYear, createUtcSafeDate, getMonthYearKey, formatMonthYear } from '@/utils/dateUtils';
 import DuplicateBudgetPlanModal from '@/components/modals/DuplicateBudgetPlanModal';
+import { useTranslation } from '@/utils/useTranslation';
 
 export default function BudgetPlansScreen() {
   const router = useRouter();
   const { setError } = useErrorContext();
+  const { t } = useTranslation();
   const { 
     budgetPlansCalendar,
     loading,
@@ -163,8 +165,10 @@ export default function BudgetPlansScreen() {
 
   // Month names
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June', 
-    'July', 'August', 'September', 'October', 'November', 'December'
+    t('months.january'), t('months.february'), t('months.march'), 
+    t('months.april'), t('months.may'), t('months.june'), 
+    t('months.july'), t('months.august'), t('months.september'), 
+    t('months.october'), t('months.november'), t('months.december')
   ];
 
   // Get month data
@@ -188,13 +192,13 @@ export default function BudgetPlansScreen() {
     
     return (
       <View className="mb-6">
-        <Text className="text-xl font-semibold text-secondary-800 mb-4">Yearly Summary</Text>
+        <Text className="text-xl font-semibold text-secondary-800 mb-4">{t('budgetPlans.yearlySummary')}</Text>
         <View className="card">
           <View className="card-content">
-            <Text className="text-lg font-semibold text-text-primary mb-2">{currentYear} Overview</Text>
+            <Text className="text-lg font-semibold text-text-primary mb-2">{currentYear} {t('budgetPlans.overview')}</Text>
             
             <View className="flex-row justify-between items-center mb-2">
-              <Text className="text-sm text-secondary-600">Total Income</Text>
+              <Text className="text-sm text-secondary-600">{t('budgetPlans.totalIncome')}</Text>
               <Text 
                 className="font-semibold text-text-primary" 
                 numberOfLines={1} 
@@ -206,7 +210,7 @@ export default function BudgetPlansScreen() {
             </View>
             
             <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-sm text-secondary-600">Total Allocated</Text>
+              <Text className="text-sm text-secondary-600">{t('budgetPlans.totalAllocated')}</Text>
               <View className="flex-row items-center" style={{ maxWidth: '50%' }}>
                 <Text 
                   className="font-semibold text-text-primary" 
@@ -223,12 +227,12 @@ export default function BudgetPlansScreen() {
             </View>
             
             <Text className="text-sm font-medium text-secondary-700 mb-2">
-              50/30/20 Rule vs. Your Budget
+              {t('budgetPlans.ruleVsBudget')}
             </Text>
             
             <View className="mb-1">
               <View className="flex-row justify-between">
-                <Text className="text-xs text-secondary-600">Needs</Text>
+                <Text className="text-xs text-secondary-600">{t('budgetPlans.needs')}</Text>
                 <Text className="text-xs text-secondary-600">
                   {formatWithTwoDecimals(rule5030.current.needs)}% vs {rule5030.recommended.needs}%
                 </Text>
@@ -247,7 +251,7 @@ export default function BudgetPlansScreen() {
             
             <View className="mb-1">
               <View className="flex-row justify-between">
-                <Text className="text-xs text-secondary-600">Wants</Text>
+                <Text className="text-xs text-secondary-600">{t('budgetPlans.wants')}</Text>
                 <Text className="text-xs text-secondary-600">
                   {formatWithTwoDecimals(rule5030.current.wants)}% vs {rule5030.recommended.wants}%
                 </Text>
@@ -266,7 +270,7 @@ export default function BudgetPlansScreen() {
             
             <View className="mb-1">
               <View className="flex-row justify-between">
-                <Text className="text-xs text-secondary-600">Savings</Text>
+                <Text className="text-xs text-secondary-600">{t('budgetPlans.savings')}</Text>
                 <Text className="text-xs text-secondary-600">
                   {formatWithTwoDecimals(rule5030.current.savings)}% vs {rule5030.recommended.savings}%
                 </Text>
@@ -294,7 +298,7 @@ export default function BudgetPlansScreen() {
         <View className="w-16 h-16 rounded-full bg-primary-100 items-center justify-center">
           <ActivityIndicator size="large" color="#0c6cf2" />
         </View>
-        <Text className="text-secondary-600 mt-4 font-medium">Loading budget plans...</Text>
+        <Text className="text-secondary-600 mt-4 font-medium">{t('budgetPlans.loading')}</Text>
       </View>
     );
   }
@@ -393,7 +397,7 @@ export default function BudgetPlansScreen() {
             className="flex-row justify-between items-center"
             style={{ transform: [{ scale: textScale }] }}
           >
-            <Text className="text-2xl font-bold text-white">Budget Plans</Text>
+            <Text className="text-2xl font-bold text-white">{t('budgetPlans.title')}</Text>
             <TouchableOpacity 
               onPress={() => {
                 clearSelectedBudgetPlan();
@@ -418,7 +422,7 @@ export default function BudgetPlansScreen() {
             </TouchableOpacity>
           </Animated.View>
           <Text className="text-base text-primary-100 mb-4">
-            Plan and track your monthly budget allocations
+            {t('budgetPlans.subtitle')}
           </Text>
           
           {/* Year Navigation */}
@@ -465,7 +469,7 @@ export default function BudgetPlansScreen() {
       >
         {/* Current Month Preview */}
         <View className="mb-6">
-          <Text className="text-xl font-semibold text-secondary-800 mb-4">This Month</Text>
+          <Text className="text-xl font-semibold text-secondary-800 mb-4">{t('budgetPlans.thisMonth')}</Text>
           {hasBudgetPlan(new Date().getFullYear(), new Date().getMonth() + 1) ? (
             <TouchableOpacity 
               onPress={() => handleMonthSelect(new Date().getFullYear(), new Date().getMonth() + 1)}
@@ -481,7 +485,7 @@ export default function BudgetPlansScreen() {
                       <Text className="text-lg font-semibold text-text-primary">
                         {months[new Date().getMonth()]} {new Date().getFullYear()}
                       </Text>
-                      <Text className="text-text-secondary">Current budget plan</Text>
+                      <Text className="text-text-secondary">{t('budgetPlans.currentBudgetPlan')}</Text>
                     </View>
                   </View>
                   <Ionicons name="chevron-forward" size={24} color="#64748b" />
@@ -490,7 +494,7 @@ export default function BudgetPlansScreen() {
                 {/* Budget progress */}
                 <View className="bg-primary-50 p-3 rounded-lg mb-3">
                   <View className="flex-row justify-between mb-2">
-                    <Text className="text-text-secondary">Total Income</Text>
+                    <Text className="text-text-secondary">{t('budgetPlans.totalIncome')}</Text>
                     <Text 
                       className="font-semibold" 
                       numberOfLines={1} 
@@ -505,7 +509,7 @@ export default function BudgetPlansScreen() {
                   </View>
                   
                   <View className="flex-row justify-between mb-1">
-                    <Text className="text-text-secondary">Allocated</Text>
+                    <Text className="text-text-secondary">{t('budgetPlans.allocated')}</Text>
                     <Text 
                       className="font-semibold" 
                       numberOfLines={1} 
@@ -522,7 +526,7 @@ export default function BudgetPlansScreen() {
                 
                 <View className="flex-row space-x-2">
                   <View className="flex-1 bg-green-100 p-2 rounded-lg items-center">
-                    <Text className="text-xs text-green-700 font-medium">Needs</Text>
+                    <Text className="text-xs text-green-700 font-medium">{t('budgetPlans.needs')}</Text>
                     <Text 
                       className="text-sm font-semibold"
                       numberOfLines={1}
@@ -532,7 +536,7 @@ export default function BudgetPlansScreen() {
                     </Text>
                   </View>
                   <View className="flex-1 bg-blue-100 p-2 rounded-lg items-center">
-                    <Text className="text-xs text-blue-700 font-medium">Wants</Text>
+                    <Text className="text-xs text-blue-700 font-medium">{t('budgetPlans.wants')}</Text>
                     <Text 
                       className="text-sm font-semibold"
                       numberOfLines={1}
@@ -542,7 +546,7 @@ export default function BudgetPlansScreen() {
                     </Text>
                   </View>
                   <View className="flex-1 bg-amber-100 p-2 rounded-lg items-center">
-                    <Text className="text-xs text-amber-700 font-medium">Savings</Text>
+                    <Text className="text-xs text-amber-700 font-medium">{t('budgetPlans.savings')}</Text>
                     <Text 
                       className="text-sm font-semibold"
                       numberOfLines={1}
@@ -564,13 +568,13 @@ export default function BudgetPlansScreen() {
                   <Ionicons name="add-outline" size={32} color="#0c6cf2" />
                 </View>
                 <Text className="text-lg font-semibold text-text-primary text-center mb-2">
-                  Create This Month's Budget
+                  {t('budgetPlans.createThisMonth')}
                 </Text>
                 <Text className="text-text-secondary text-center mb-4">
-                  Plan your income and expenses for {months[new Date().getMonth()]}
+                  {t('budgetPlans.planIncomeExpenses', { month: months[new Date().getMonth()] })}
                 </Text>
                 <View className="bg-primary-600 px-4 py-2 rounded-xl">
-                  <Text className="text-white font-medium">Create Budget Plan</Text>
+                  <Text className="text-white font-medium">{t('budgetPlans.createBudgetPlan')}</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -582,7 +586,7 @@ export default function BudgetPlansScreen() {
         
         {/* All Months Grid */}
         <View className="mb-6">
-          <Text className="text-xl font-semibold text-secondary-800 mb-4">All Months</Text>
+          <Text className="text-xl font-semibold text-secondary-800 mb-4">{t('budgetPlans.allMonths')}</Text>
           
           <View className={isTablet ? "grid-cols-4 flex-row flex-wrap" : "grid-cols-2 flex-row flex-wrap"}>
             {months.map((month, index) => {
@@ -607,11 +611,11 @@ export default function BudgetPlansScreen() {
                         </Text>
                         {hasData ? (
                           <View className="bg-green-100 px-2 py-1 rounded-full">
-                            <Text className="text-xs text-green-700">Created</Text>
+                            <Text className="text-xs text-green-700">{t('budgetPlans.created')}</Text>
                           </View>
                         ) : (
                           <View className="bg-gray-200 px-2 py-1 rounded-full">
-                            <Text className="text-xs text-gray-700">Empty</Text>
+                            <Text className="text-xs text-gray-700">{t('budgetPlans.empty')}</Text>
                           </View>
                         )}
                       </View>
@@ -631,7 +635,7 @@ export default function BudgetPlansScreen() {
                           
                           {/* Add total allocated amount with color indicators */}
                           <View className="flex-row justify-between items-center mt-1">
-                            <Text className="text-xs text-secondary-600">Allocated:</Text>
+                            <Text className="text-xs text-secondary-600">{t('budgetPlans.allocated')}:</Text>
                             <Text 
                               className={`text-xs font-medium ${
                                 monthData.allocatedPercentage > 100 
@@ -668,7 +672,7 @@ export default function BudgetPlansScreen() {
                       ) : (
                         <View className="flex-row items-center mt-2">
                           <Ionicons name="add-circle-outline" size={16} color="#64748b" />
-                          <Text className="text-text-secondary text-xs ml-1">Create Plan</Text>
+                          <Text className="text-text-secondary text-xs ml-1">{t('budgetPlans.createPlan')}</Text>
                         </View>
                       )}
                     </View>
@@ -686,31 +690,31 @@ export default function BudgetPlansScreen() {
               <Ionicons name="information-circle" size={24} color="#fbbf24" />
             </View>
             <View className="flex-1">
-              <Text className="text-xl font-semibold text-white mb-2">Budget Planning Guide</Text>
+              <Text className="text-xl font-semibold text-white mb-2">{t('budgetPlans.budgetGuide')}</Text>
               <Text className="text-secondary-200 mb-4">
-                Effective budgeting helps you manage your finances and achieve your financial goals.
+                {t('budgetPlans.budgetGuideDescription')}
               </Text>
             </View>
           </View>
           
           <View className="bg-secondary-800 rounded-lg p-4 mb-4">
-            <Text className="text-white font-medium mb-1">50/30/20 Rule</Text>
+            <Text className="text-white font-medium mb-1">{t('budgetPlans.fiftyThirtyTwenty')}</Text>
             <Text className="text-secondary-300">
-              Allocate 50% to needs, 30% to wants, and 20% to savings for balanced budgeting.
+              {t('budgetPlans.fiftyThirtyTwentyDescription')}
             </Text>
           </View>
           
           <View className="flex-row space-x-2">
             <View className="flex-1 bg-secondary-800 rounded-lg p-3">
-              <Text className="text-green-400 font-medium text-center">Needs</Text>
+              <Text className="text-green-400 font-medium text-center">{t('budgetPlans.needs')}</Text>
               <Text className="text-white text-center text-xl font-bold">50%</Text>
             </View>
             <View className="flex-1 bg-secondary-800 rounded-lg p-3">
-              <Text className="text-blue-400 font-medium text-center">Wants</Text>
+              <Text className="text-blue-400 font-medium text-center">{t('budgetPlans.wants')}</Text>
               <Text className="text-white text-center text-xl font-bold">30%</Text>
             </View>
             <View className="flex-1 bg-secondary-800 rounded-lg p-3">
-              <Text className="text-amber-400 font-medium text-center">Savings</Text>
+              <Text className="text-amber-400 font-medium text-center">{t('budgetPlans.savings')}</Text>
               <Text className="text-white text-center text-xl font-bold">20%</Text>
             </View>
           </View>
@@ -730,7 +734,7 @@ export default function BudgetPlansScreen() {
           }}
           className="bg-primary-600 py-4 px-6 rounded-xl mb-10 shadow-md items-center"
         >
-          <Text className="text-white text-lg font-semibold">Create New Budget Plan</Text>
+          <Text className="text-white text-lg font-semibold">{t('budgetPlans.createNewBudgetPlan')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

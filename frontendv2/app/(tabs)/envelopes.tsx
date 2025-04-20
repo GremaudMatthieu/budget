@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useEnvelopes } from '@/contexts/EnvelopeContext';
+import { useTranslation } from '@/utils/useTranslation';
 import EnvelopeCard from '@/components/EnvelopeCard';
 import CreateEnvelopeModal from '@/components/modals/CreateEnvelopeModal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
@@ -21,6 +22,7 @@ import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 
 // Content component for envelopes, which will be wrapped with the animated header
 function EnvelopesContent() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { envelopesData, loading, createEnvelope, deleteEnvelope, creditEnvelope, debitEnvelope, updateEnvelopeName } = useEnvelopes();
   const { setError } = useErrorContext();
@@ -185,16 +187,16 @@ function EnvelopesContent() {
             <Ionicons name="wallet-outline" size={32} color="#0c6cf2" />
           </View>
           <Text className="text-xl font-semibold text-text-primary text-center mb-2">
-            No envelopes yet
+            {t('envelopes.noTransactions')}
           </Text>
           <Text className="text-text-secondary text-center mb-6">
-            Create your first envelope to start organizing your budget
+            {t('envelopes.createEnvelopePrompt')}
           </Text>
           <TouchableOpacity
             onPress={() => setIsCreating(true)}
             className="bg-primary-600 rounded-xl py-3 px-6 items-center shadow-sm"
           >
-            <Text className="text-white font-semibold">Create Envelope</Text>
+            <Text className="text-white font-semibold">{t('envelopes.createEnvelope')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -206,13 +208,13 @@ function EnvelopesContent() {
       <View className="flex-1">
 
         <View className="mt-4">
-          <Text className="text-xl font-semibold text-secondary-800 mb-4">Budget Categories</Text>
+          <Text className="text-xl font-semibold text-secondary-800 mb-4">{t('envelopes.budgetCategories')}</Text>
           {/* Completed Envelopes */}
           {envelopesData?.envelopes
             .filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1)
             .length > 0 && (
               <View className="mb-6">
-                <Text className="text-lg font-medium text-secondary-600 mb-2">Completed</Text>
+                <Text className="text-lg font-medium text-secondary-600 mb-2">{t('envelopes.completed')}</Text>
                 <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
                   {envelopesData.envelopes
                     .filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1)
@@ -288,7 +290,7 @@ function EnvelopesContent() {
                                 <TextInput
                                   value={amounts[envelope.uuid] || ''}
                                   onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
-                                  placeholder="Enter amount"
+                                  placeholder={t('envelopes.enterAmount')}
                                   keyboardType="decimal-pad"
                                   className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
                                 />
@@ -302,7 +304,7 @@ function EnvelopesContent() {
                                   className="p-2 bg-success-100 rounded-lg"
                                   disabled={!amounts[envelope.uuid] || envelope.pending}
                                 >
-                                  <Text className="text-success-700 font-medium">Add</Text>
+                                  <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
@@ -313,7 +315,7 @@ function EnvelopesContent() {
                                   className="p-2 bg-danger-100 rounded-lg"
                                   disabled={!amounts[envelope.uuid] || envelope.pending}
                                 >
-                                  <Text className="text-danger-700 font-medium">Spend</Text>
+                                  <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
                                 </TouchableOpacity>
                               </View>
                             </View>
@@ -321,7 +323,7 @@ function EnvelopesContent() {
                             {envelope.pending && (
                               <View className="mt-2 items-center">
                                 <ActivityIndicator size="small" color="#0c6cf2" />
-                                <Text className="text-secondary-500 text-xs mt-1">Processing...</Text>
+                                <Text className="text-secondary-500 text-xs mt-1">{t('common.loading')}</Text>
                               </View>
                             )}
                           </View>
@@ -333,7 +335,6 @@ function EnvelopesContent() {
             )}
 
           {/* In Progress Envelopes */}
-          {/* ...existing code for in progress envelopes... */}
           {envelopesData?.envelopes
             .filter(envelope => {
               const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
@@ -341,7 +342,7 @@ function EnvelopesContent() {
             })
             .length > 0 && (
               <View className="mb-6">
-                <Text className="text-lg font-medium text-secondary-600 mb-2">In Progress</Text>
+                <Text className="text-lg font-medium text-secondary-600 mb-2">{t('envelopes.inProgress')}</Text>
                 <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
                   {envelopesData.envelopes
                     .filter(envelope => {
@@ -421,7 +422,7 @@ function EnvelopesContent() {
                                 <TextInput
                                   value={amounts[envelope.uuid] || ''}
                                   onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
-                                  placeholder="Enter amount"
+                                  placeholder={t('envelopes.enterAmount')}
                                   keyboardType="decimal-pad"
                                   className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
                                 />
@@ -435,7 +436,7 @@ function EnvelopesContent() {
                                   className="p-2 bg-success-100 rounded-lg"
                                   disabled={!amounts[envelope.uuid] || envelope.pending}
                                 >
-                                  <Text className="text-success-700 font-medium">Add</Text>
+                                  <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
@@ -446,7 +447,7 @@ function EnvelopesContent() {
                                   className="p-2 bg-danger-100 rounded-lg"
                                   disabled={!amounts[envelope.uuid] || envelope.pending}
                                 >
-                                  <Text className="text-danger-700 font-medium">Spend</Text>
+                                  <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
                                 </TouchableOpacity>
                               </View>
                             </View>
@@ -454,7 +455,7 @@ function EnvelopesContent() {
                             {envelope.pending && (
                               <View className="mt-2 items-center">
                                 <ActivityIndicator size="small" color="#0c6cf2" />
-                                <Text className="text-secondary-500 text-xs mt-1">Processing...</Text>
+                                <Text className="text-secondary-500 text-xs mt-1">{t('common.loading')}</Text>
                               </View>
                             )}
                           </View>
@@ -466,12 +467,11 @@ function EnvelopesContent() {
             )}
 
           {/* Not Started Envelopes */}
-          {/* ...existing code for not started envelopes... */}
           {envelopesData?.envelopes
             .filter(envelope => Number(envelope.currentAmount) === 0)
             .length > 0 && (
               <View className="mb-6">
-                <Text className="text-lg font-medium text-secondary-600 mb-2">Not Started</Text>
+                <Text className="text-lg font-medium text-secondary-600 mb-2">{t('envelopes.notStarted')}</Text>
                 <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
                   {envelopesData.envelopes
                     .filter(envelope => Number(envelope.currentAmount) === 0)
@@ -546,7 +546,7 @@ function EnvelopesContent() {
                                 <TextInput
                                   value={amounts[envelope.uuid] || ''}
                                   onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
-                                  placeholder="Enter amount"
+                                  placeholder={t('envelopes.enterAmount')}
                                   keyboardType="decimal-pad"
                                   className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
                                 />
@@ -560,7 +560,7 @@ function EnvelopesContent() {
                                   className="p-2 bg-success-100 rounded-lg"
                                   disabled={!amounts[envelope.uuid] || envelope.pending}
                                 >
-                                  <Text className="text-success-700 font-medium">Add</Text>
+                                  <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
@@ -571,7 +571,7 @@ function EnvelopesContent() {
                                   className="p-2 bg-danger-100 rounded-lg"
                                   disabled={!amounts[envelope.uuid] || envelope.pending}
                                 >
-                                  <Text className="text-danger-700 font-medium">Spend</Text>
+                                  <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
                                 </TouchableOpacity>
                               </View>
                             </View>
@@ -579,7 +579,7 @@ function EnvelopesContent() {
                             {envelope.pending && (
                               <View className="mt-2 items-center">
                                 <ActivityIndicator size="small" color="#0c6cf2" />
-                                <Text className="text-secondary-500 text-xs mt-1">Processing...</Text>
+                                <Text className="text-secondary-500 text-xs mt-1">{t('common.loading')}</Text>
                               </View>
                             )}
                           </View>
@@ -594,9 +594,9 @@ function EnvelopesContent() {
           {envelopesData?.envelopes?.length > 0 && (
             <View className="bg-secondary-900 rounded-xl p-6 mb-8">
               <View className="bg-secondary-800 rounded-lg p-4 mb-4">
-                <Text className="text-xl font-bold text-white">Budget Overview</Text>
+                <Text className="text-xl font-bold text-white">{t('envelopes.budgetOverview')}</Text>
                 <Text className="text-secondary-300">
-                  {envelopesData.envelopes.filter(e => Number(e.currentAmount) / Number(e.targetedAmount) >= 1).length} completed of {envelopesData.envelopes.length} envelopes
+                  {envelopesData.envelopes.filter(e => Number(e.currentAmount) / Number(e.targetedAmount) >= 1).length} {t('envelopes.completedOf')} {envelopesData.envelopes.length} {t('envelopes.title').toLowerCase()}
                 </Text>
               </View>
               <View className="flex-row items-center">
@@ -649,6 +649,7 @@ function AddEnvelopeButton({ onPress }: { onPress: () => void }) {
 
 // Wrap the screen with the animated header HOC for refresh capability
 function EnvelopesScreen() {
+  const { t } = useTranslation();
   const { refreshEnvelopes, envelopesData, createEnvelope } = useEnvelopes();
   const [refreshing, setRefreshing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -670,8 +671,8 @@ function EnvelopesScreen() {
   return (
     <View className="flex-1">
       <AnimatedHeaderLayout
-        title='My Envelopes'
-        subtitle='Organize and track your budgeting categories'
+        title={t('envelopes.title')}
+        subtitle={t('envelopes.subtitle')}
         headerHeight={130}
       >
         <EnvelopesContent />

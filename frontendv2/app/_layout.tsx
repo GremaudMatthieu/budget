@@ -9,6 +9,7 @@ import { SocketProvider } from "@/contexts/SocketContext";
 import { EnvelopeProvider } from "@/contexts/EnvelopeContext";
 import { BudgetProvider } from "@/contexts/BudgetContext";
 import { UserProvider } from "@/contexts/UserContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator } from 'react-native';
 import { useEffect } from "react";
@@ -57,20 +58,22 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.container}>
     <ErrorProvider>
       <AuthProvider>
-        <AuthProtection>
-          <SocketProvider>
-            <UserProvider>
-              <EnvelopeProvider>
-                <BudgetProvider>
-                  <View className="flex-1 bg-background-light">
-                    <StatusBar style="auto" />
-                    <Slot />
-                  </View>
-                </BudgetProvider>
-              </EnvelopeProvider>
-            </UserProvider>
-          </SocketProvider>
-        </AuthProtection>
+        <LanguageProvider>
+          <AuthProtection>
+            <SocketProvider>
+              <UserProvider>
+                <EnvelopeProvider>
+                  <BudgetProvider>
+                    <View className="flex-1 bg-background-light">
+                      <StatusBar style="auto" />
+                      <Slot />
+                    </View>
+                  </BudgetProvider>
+                </EnvelopeProvider>
+              </UserProvider>
+            </SocketProvider>
+          </AuthProtection>
+        </LanguageProvider>
       </AuthProvider>
     </ErrorProvider>
     </GestureHandlerRootView>

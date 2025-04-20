@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, View, Platform } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from '@/utils/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleSignInButton() {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const { loginWithGoogle } = useAuth();
   const API_URL = process.env.API_URL || 'http://127.0.0.1:8000/api';
@@ -53,7 +55,7 @@ export default function GoogleSignInButton() {
       {isLoading ? (
         <View className="flex-row items-center">
           <ActivityIndicator color="#0284c7" size="small" />
-          <Text className="text-primary-600 font-medium ml-3">Connecting...</Text>
+          <Text className="text-primary-600 font-medium ml-3">{t('auth.connecting')}</Text>
         </View>
       ) : (
         <View className="flex-row items-center justify-center">
@@ -67,7 +69,7 @@ export default function GoogleSignInButton() {
               <View className="w-2 h-2 bg-[#34A853] rounded-sm" />
             </View>
           </View>
-          <Text className="text-text-primary font-semibold text-base">Continue with Google</Text>
+          <Text className="text-text-primary font-semibold text-base">{t('auth.continueWithGoogle')}</Text>
         </View>
       )}
     </TouchableOpacity>

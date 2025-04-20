@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from '@/utils/useTranslation';
 
 interface DeleteConfirmationModalProps {
   visible: boolean;
@@ -23,6 +24,8 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
   name,
   message
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Modal
       animationType="fade"
@@ -37,11 +40,11 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
               <Ionicons name="alert-outline" size={32} color="#dc2626" />
             </View>
             
-            <Text className="text-xl font-bold text-text-primary">Confirm Deletion</Text>
+            <Text className="text-xl font-bold text-text-primary">{t('modals.confirmDeletion')}</Text>
           </View>
           
           <Text className="text-center text-text-secondary mb-6">
-            {message || `Are you sure you want to delete "${name}"? This action cannot be undone.`}
+            {message || t('modals.deleteConfirmation', { name })}
           </Text>
           
           <View className="space-y-3">
@@ -49,14 +52,14 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
               onPress={onConfirm}
               className="py-3 bg-danger-600 rounded-xl"
             >
-              <Text className="text-white text-center font-semibold">Delete</Text>
+              <Text className="text-white text-center font-semibold">{t('common.delete')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
               onPress={onClose}
               className="py-3 border border-gray-300 rounded-xl"
             >
-              <Text className="text-text-primary text-center">Cancel</Text>
+              <Text className="text-text-primary text-center">{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -3,18 +3,19 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import withAnimatedHeader from '@/components/withAnimatedHeaderf';
+import { useTranslation } from '@/utils/useTranslation';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 
 // Content component for the dashboard, which will be wrapped with the animated header
 function DashboardContent() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
     <View className="flex-1">
       {/* Quick Actions */}
       <View className="mb-6">
-        <Text className="text-lg font-semibold text-secondary-800 mb-4">Quick Actions</Text>
+        <Text className="text-lg font-semibold text-secondary-800 mb-4">{t('dashboard.quickActions')}</Text>
 
         <View className="flex-row justify-between mb-4">
           <TouchableOpacity
@@ -24,7 +25,7 @@ function DashboardContent() {
             <View className="w-12 h-12 rounded-full bg-primary-100 items-center justify-center mb-2">
               <Ionicons name="wallet-outline" size={24} color="#0c6cf2" />
             </View>
-            <Text className="text-text-primary font-medium">My Envelopes</Text>
+            <Text className="text-text-primary font-medium">{t('dashboard.myEnvelopes')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -34,7 +35,7 @@ function DashboardContent() {
             <View className="w-12 h-12 rounded-full bg-primary-100 items-center justify-center mb-2">
               <Ionicons name="pie-chart-outline" size={24} color="#0c6cf2" />
             </View>
-            <Text className="text-text-primary font-medium">Budget Plans</Text>
+            <Text className="text-text-primary font-medium">{t('dashboard.budgetPlans')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -46,7 +47,7 @@ function DashboardContent() {
             <View className="w-12 h-12 rounded-full bg-accent-100 items-center justify-center mb-2">
               <Ionicons name="add-outline" size={24} color="#4f46e5" />
             </View>
-            <Text className="text-text-primary font-medium">New Budget</Text>
+            <Text className="text-text-primary font-medium">{t('dashboard.newBudget')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -56,7 +57,7 @@ function DashboardContent() {
             <View className="w-12 h-12 rounded-full bg-accent-100 items-center justify-center mb-2">
               <Ionicons name="settings-outline" size={24} color="#4f46e5" />
             </View>
-            <Text className="text-text-primary font-medium">Settings</Text>
+            <Text className="text-text-primary font-medium">{t('dashboard.settings')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -64,14 +65,14 @@ function DashboardContent() {
       {/* Budget Status Card */}
       <View className="bg-white rounded-xl shadow-sm p-5 mb-6">
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-lg font-semibold text-text-primary">This Month's Budget</Text>
+          <Text className="text-lg font-semibold text-text-primary">{t('dashboard.thisMonthBudget')}</Text>
           <TouchableOpacity onPress={() => router.push('/budget-plans')}>
-            <Text className="text-primary-600 font-medium">View All</Text>
+            <Text className="text-primary-600 font-medium">{t('dashboard.viewAll')}</Text>
           </TouchableOpacity>
         </View>
 
         <View className="flex-row justify-between mb-2">
-          <Text className="text-text-secondary">Spent So Far</Text>
+          <Text className="text-text-secondary">{t('dashboard.spentSoFar')}</Text>
           <Text className="font-semibold">$1,245.00</Text>
         </View>
 
@@ -88,9 +89,9 @@ function DashboardContent() {
       {/* Envelope Summary */}
       <View className="bg-white rounded-xl shadow-sm p-5 mb-6">
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-lg font-semibold text-text-primary">Your Envelopes</Text>
+          <Text className="text-lg font-semibold text-text-primary">{t('dashboard.yourEnvelopes')}</Text>
           <TouchableOpacity onPress={() => router.push('/envelopes')}>
-            <Text className="text-primary-600 font-medium">View All</Text>
+            <Text className="text-primary-600 font-medium">{t('dashboard.viewAll')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -102,7 +103,7 @@ function DashboardContent() {
               </View>
               <View>
                 <Text className="font-medium text-text-primary">Housing</Text>
-                <Text className="text-xs text-text-muted">3 days ago</Text>
+                <Text className="text-xs text-text-muted">3 {t('dashboard.daysAgo')}</Text>
               </View>
             </View>
             <Text className="font-semibold">$850.00</Text>
@@ -115,7 +116,7 @@ function DashboardContent() {
               </View>
               <View>
                 <Text className="font-medium text-text-primary">Groceries</Text>
-                <Text className="text-xs text-text-muted">Yesterday</Text>
+                <Text className="text-xs text-text-muted">{t('dashboard.yesterday')}</Text>
               </View>
             </View>
             <Text className="font-semibold">$125.50</Text>
@@ -128,7 +129,7 @@ function DashboardContent() {
               </View>
               <View>
                 <Text className="font-medium text-text-primary">Transport</Text>
-                <Text className="text-xs text-text-muted">Today</Text>
+                <Text className="text-xs text-text-muted">{t('dashboard.today')}</Text>
               </View>
             </View>
             <Text className="font-semibold">$78.25</Text>
@@ -143,8 +144,8 @@ function DashboardContent() {
             <Ionicons name="bulb-outline" size={20} color="#fbbf24" />
           </View>
           <View className="flex-1">
-            <Text className="font-semibold text-white mb-1">Financial Tip</Text>
-            <Text className="text-secondary-200">Using the 50/30/20 rule can help you balance your budget: 50% for needs, 30% for wants, and 20% for savings.</Text>
+            <Text className="font-semibold text-white mb-1">{t('dashboard.financialTip')}</Text>
+            <Text className="text-secondary-200">{t('dashboard.tipText')}</Text>
           </View>
         </View>
       </View>
@@ -154,24 +155,28 @@ function DashboardContent() {
 
 // Get the user name for the header subtitle
 function DashboardHeader() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   return (
     <>
-      <Text className="text-xl text-white mb-1">Welcome back,</Text>
+      <Text className="text-xl text-white mb-1">{t('dashboard.welcome')}</Text>
       <Text className="text-2xl font-bold text-white">{user?.name || 'User'}</Text>
     </>
   );
 }
+
 function DashboardScreen() {
+  const { t } = useTranslation();
   return (
     <AnimatedHeaderLayout
       title="Dashboard"
-      subtitle="Your financial summary"
+      subtitle={t('dashboard.summary')}
       headerHeight={130}
     >
       <DashboardContent />
     </AnimatedHeaderLayout>
   );
 }
+
 // Apply the withAnimatedHeader HOC to wrap the Dashboard content
 export default DashboardScreen

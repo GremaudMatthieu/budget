@@ -21,11 +21,16 @@ import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal
 import { useErrorContext } from '@/contexts/ErrorContext';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 import SwipeBackWrapper from '@/components/SwipeBackWrapper';
+import { useTranslation } from '@/utils/useTranslation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function EnvelopeDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { setError } = useErrorContext();
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+  
   const {
     fetchEnvelopeDetails,
     deleteEnvelope,
@@ -70,16 +75,16 @@ export default function EnvelopeDetailScreen() {
       }
     } catch (err) {
       if (isMounted.current) {
-        setError('Failed to load envelope details');
+        setError(t('errors.loadEnvelopeDetails'));
       }
     } finally {
       if (isMounted.current) {
         setLoading(false);
       }
     }
-  }, [uuid, fetchEnvelopeDetails, setError, refreshing]);
+  }, [uuid, fetchEnvelopeDetails, setError, refreshing, t]);
 
-  // Utilisation de useFocusEffect au lieu de useEffect pour le chargement initial
+  // Use useFocusEffect instead of useEffect for initial loading
   useFocusEffect(
     useCallback(() => {
       console.log('Screen focused, reloading data');
@@ -120,14 +125,14 @@ export default function EnvelopeDetailScreen() {
       // Delete callback
       () => {
         if (isMounted.current) {
-          setError('This envelope has been deleted');
+          setError(t('envelopes.envelopeDeleted'));
           router.back();
         }
       }
     );
 
     return cleanup;
-  }, [uuid, listenToEnvelopeUpdates, loadEnvelopeDetails, router, setError]);
+  }, [uuid, listenToEnvelopeUpdates, loadEnvelopeDetails, router, setError, t]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -137,7 +142,7 @@ export default function EnvelopeDetailScreen() {
 
   function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+    return date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
   }
 
   function handleNameChange(newName) {
@@ -155,12 +160,12 @@ export default function EnvelopeDetailScreen() {
     }
 
     if (newName.length > 25) {
-      setError('Name cannot exceed 25 characters');
+      setError(t('envelopes.nameExceedsLimit'));
       return;
     }
 
     if (newName === '') {
-      setError('Name cannot be empty');
+      setError(t('envelopes.nameCannotBeEmpty'));
       return;
     }
 
@@ -212,7 +217,7 @@ export default function EnvelopeDetailScreen() {
     }
 
     if (Number(newTarget) < Number(currentAmount)) {
-      setError('Target amount cannot be less than current amount');
+      setError(t('envelopes.targetLessThanCurrent'));
       return;
     }
 
@@ -250,14 +255,14 @@ export default function EnvelopeDetailScreen() {
 
   function handleCredit() {
     if (!amount || !validateAmount(amount)) {
-      setError('Please enter a valid amount');
+      setError(t('errors.invalidAmount'));
       return;
     }
 
     const processedAmount = formatAmount(amount);
 
     if (Number(processedAmount) <= 0) {
-      setError('Amount must be greater than zero');
+      setError(t('errors.amountMustBePositive'));
       return;
     }
 
@@ -273,19 +278,19 @@ export default function EnvelopeDetailScreen() {
     if (!details) return;
 
     if (!amount || !validateAmount(amount)) {
-      setError('Please enter a valid amount');
+      setError(t('errors.invalidAmount'));
       return;
     }
 
     const processedAmount = formatAmount(amount);
 
     if (Number(processedAmount) <= 0) {
-      setError('Amount must be greater than zero');
+      setError(t('errors.amountMustBePositive'));
       return;
     }
 
     if (Number(processedAmount) > Number(details.envelope.currentAmount)) {
-      setError('Cannot debit more than current amount');
+      setError(t('errors.cannotDebitMoreThanBalance'));
       return;
     }
 
@@ -396,12 +401,12 @@ export default function EnvelopeDetailScreen() {
   if (!details) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
-        <Text className="text-gray-600 text-lg">Envelope not found</Text>
+        <Text className="text-gray-600 text-lg">{t('envelopes.notFound')}</Text>
         <TouchableOpacity
           className="mt-4 px-4 py-2 bg-indigo-600 rounded-md"
           onPress={() => router.back()}
         >
-          <Text className="text-white">Go Back</Text>
+          <Text className="text-white">{t('common.goBack')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -458,14 +463,14 @@ export default function EnvelopeDetailScreen() {
     <View className="mt-4">
       <View className="flex-row justify-between items-center">
         <View>
-          <Text className="text-primary-100">Current Balance</Text>
+          <Text className="text-primary-100">{t('envelopes.currentBalance')}</Text>
           <Text className="text-3xl font-bold text-white">
             {formatCurrency(details.envelope.currentAmount, details.envelope.currency)}
           </Text>
 
           <View className="flex-row items-center mt-2">
             <Text className="text-primary-100">
-              of {' '}
+              {t('envelopes.of')}{' '}
               {editingTarget ? (
                 <View className="inline-flex flex-row items-center bg-white/20 rounded-lg px-2 py-1">
                   <Text className="text-white">
@@ -504,16 +509,16 @@ export default function EnvelopeDetailScreen() {
                   <Ionicons name="create-outline" size={14} color="white" className="ml-1" />
                 </TouchableOpacity>
               )}
-              {' '}goal
+              {' '}{t('envelopes.goal')}
             </Text>
 
             {progress >= 1 ? (
               <View className="bg-success-50 px-2 py-1 rounded-full ml-2">
-                <Text className="text-success-700 text-xs font-medium">Completed</Text>
+                <Text className="text-success-700 text-xs font-medium">{t('envelopes.completed')}</Text>
               </View>
             ) : (
               <View className="bg-white/20 px-2 py-1 rounded-full ml-2">
-                <Text className="text-white text-xs font-medium">{Math.round(progress * 100)}% Filled</Text>
+                <Text className="text-white text-xs font-medium">{Math.round(progress * 100)}% {t('envelopes.filled')}</Text>
               </View>
             )}
           </View>
@@ -553,7 +558,7 @@ export default function EnvelopeDetailScreen() {
           {/* Quick Actions Card */}
           <View className="card bg-white rounded-2xl shadow-md overflow-hidden mb-6">
             <View className="p-6">
-              <Text className="text-lg font-semibold text-text-primary mb-4">Quick Actions</Text>
+              <Text className="text-lg font-semibold text-text-primary mb-4">{t('envelopes.quickActions')}</Text>
 
               <View className="flex-row space-x-3 mb-4">
                 <TouchableOpacity
@@ -561,7 +566,7 @@ export default function EnvelopeDetailScreen() {
                   className="flex-1 bg-success-100 p-4 rounded-xl flex-row items-center justify-center"
                 >
                   <Ionicons name="arrow-down-circle-outline" size={20} color="#16a34a" />
-                  <Text className="text-success-700 font-medium ml-2">Add $10</Text>
+                  <Text className="text-success-700 font-medium ml-2">{t('envelopes.add')} $10</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -570,7 +575,7 @@ export default function EnvelopeDetailScreen() {
                   disabled={Number(details.envelope.currentAmount) < 10}
                 >
                   <Ionicons name="arrow-up-circle-outline" size={20} color="#dc2626" />
-                  <Text className="text-danger-700 font-medium ml-2">Spend $10</Text>
+                  <Text className="text-danger-700 font-medium ml-2">{t('envelopes.spend')} $10</Text>
                 </TouchableOpacity>
               </View>
 
@@ -580,7 +585,7 @@ export default function EnvelopeDetailScreen() {
                   className="flex-1 bg-success-100 p-4 rounded-xl flex-row items-center justify-center"
                 >
                   <Ionicons name="arrow-down-circle-outline" size={20} color="#16a34a" />
-                  <Text className="text-success-700 font-medium ml-2">Add $25</Text>
+                  <Text className="text-success-700 font-medium ml-2">{t('envelopes.add')} $25</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -589,7 +594,7 @@ export default function EnvelopeDetailScreen() {
                   disabled={Number(details.envelope.currentAmount) < 25}
                 >
                   <Ionicons name="arrow-up-circle-outline" size={20} color="#dc2626" />
-                  <Text className="text-danger-700 font-medium ml-2">Spend $25</Text>
+                  <Text className="text-danger-700 font-medium ml-2">{t('envelopes.spend')} $25</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -598,12 +603,12 @@ export default function EnvelopeDetailScreen() {
           {/* Custom Amount Card */}
           <View className="card bg-white rounded-2xl shadow-md overflow-hidden mb-6">
             <View className="p-6">
-              <Text className="text-lg font-semibold text-text-primary mb-4">Custom Amount</Text>
+              <Text className="text-lg font-semibold text-text-primary mb-4">{t('envelopes.customAmount')}</Text>
 
               <TextInput
                 value={amount}
                 onChangeText={setAmount}
-                placeholder="Enter amount"
+                placeholder={t('envelopes.enterAmount')}
                 keyboardType="decimal-pad"
                 className="border border-surface-border rounded-lg p-3 mb-3 bg-white"
               />
@@ -618,7 +623,7 @@ export default function EnvelopeDetailScreen() {
                     Number(amount) <= 0
                   }
                 >
-                  <Text className="text-white text-center font-semibold">Credit</Text>
+                  <Text className="text-white text-center font-semibold">{t('envelopes.credit')}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -631,7 +636,7 @@ export default function EnvelopeDetailScreen() {
                     Number(amount) > Number(details.envelope.currentAmount)
                   }
                 >
-                  <Text className="text-white text-center font-semibold">Debit</Text>
+                  <Text className="text-white text-center font-semibold">{t('envelopes.debit')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -640,38 +645,38 @@ export default function EnvelopeDetailScreen() {
           {/* Envelope Details Card */}
           <View className="card bg-white rounded-2xl shadow-md overflow-hidden mb-6">
             <View className="p-6">
-              <Text className="text-lg font-semibold text-text-primary mb-4">Envelope Details</Text>
+              <Text className="text-lg font-semibold text-text-primary mb-4">{t('envelopes.details')}</Text>
 
               <View className="space-y-4">
                 <View className="flex-row justify-between">
-                  <Text className="text-text-secondary">Created</Text>
+                  <Text className="text-text-secondary">{t('envelopes.created')}</Text>
                   <Text className="text-text-primary font-medium">
                     {formatDate(details.envelope.createdAt)}
                   </Text>
                 </View>
 
                 <View className="flex-row justify-between">
-                  <Text className="text-text-secondary">Last Updated</Text>
+                  <Text className="text-text-secondary">{t('envelopes.lastUpdated')}</Text>
                   <Text className="text-text-primary font-medium">
                     {formatDate(details.envelope.updatedAt)}
                   </Text>
                 </View>
 
                 <View className="flex-row justify-between">
-                  <Text className="text-text-secondary">Currency</Text>
+                  <Text className="text-text-secondary">{t('envelopes.currency')}</Text>
                   <Text className="text-text-primary font-medium">{details.envelope.currency}</Text>
                 </View>
 
                 <View className="flex-row justify-between">
-                  <Text className="text-text-secondary">Status</Text>
+                  <Text className="text-text-secondary">{t('envelopes.status')}</Text>
                   {progress >= 1 ? (
-                    <Text className="text-success-600 font-medium">Completed</Text>
+                    <Text className="text-success-600 font-medium">{t('envelopes.completed')}</Text>
                   ) : progress > 0.5 ? (
-                    <Text className="text-primary-600 font-medium">Good progress</Text>
+                    <Text className="text-primary-600 font-medium">{t('envelopes.goodProgress')}</Text>
                   ) : progress > 0 ? (
-                    <Text className="text-warning-600 font-medium">Getting started</Text>
+                    <Text className="text-warning-600 font-medium">{t('envelopes.gettingStarted')}</Text>
                   ) : (
-                    <Text className="text-secondary-600 font-medium">Not started</Text>
+                    <Text className="text-secondary-600 font-medium">{t('envelopes.notStarted')}</Text>
                   )}
                 </View>
               </View>
@@ -681,14 +686,14 @@ export default function EnvelopeDetailScreen() {
           {/* Transaction History Card */}
           <View className="card bg-white rounded-2xl shadow-md overflow-hidden mb-6">
             <View className="p-6">
-              <Text className="text-lg font-semibold text-text-primary mb-4">Transaction History</Text>
+              <Text className="text-lg font-semibold text-text-primary mb-4">{t('envelopes.transactionHistory')}</Text>
 
               {details.ledger.length === 0 ? (
                 <View className="py-4 items-center">
                   <View className="w-16 h-16 rounded-full bg-secondary-100 items-center justify-center mb-2">
                     <Ionicons name="document-text-outline" size={24} color="#64748b" />
                   </View>
-                  <Text className="text-text-secondary text-center">No transactions yet</Text>
+                  <Text className="text-text-secondary text-center">{t('envelopes.noTransactions')}</Text>
                 </View>
               ) : (
                 <View className="space-y-3">
@@ -711,7 +716,7 @@ export default function EnvelopeDetailScreen() {
 
                         <View>
                           <Text className="font-medium text-text-primary">
-                            {transaction.description || (transaction.entry_type === "credit" ? "Added funds" : "Spent funds")}
+                            {transaction.description || (transaction.entry_type === "credit" ? t('envelopes.addedFunds') : t('envelopes.spentFunds'))}
                           </Text>
                           <Text className="text-sm text-text-secondary">
                             {formatDate(transaction.created_at)}
@@ -743,7 +748,7 @@ export default function EnvelopeDetailScreen() {
             className="bg-danger-100 rounded-xl p-4 items-center mb-10"
             disabled={details.envelope.pending}
           >
-            <Text className="text-danger-700 font-semibold">Delete Envelope</Text>
+            <Text className="text-danger-700 font-semibold">{t('envelopes.deleteEnvelope')}</Text>
           </TouchableOpacity>
         </ScrollView>
 

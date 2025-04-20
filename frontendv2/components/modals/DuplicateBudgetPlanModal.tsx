@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useBudget } from '@/contexts/BudgetContext';
 import { createUtcSafeDate, formatMonthYear } from '@/utils/dateUtils';
 import { useRouter } from 'expo-router';
+import { useTranslation } from '@/utils/useTranslation';
 
 interface DuplicateBudgetPlanModalProps {
   visible: boolean;
@@ -20,6 +21,7 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
   sourceMonth,
   sourceYear
 }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [targetMonth, setTargetMonth] = useState(new Date().getMonth() + 1);
   const [targetYear, setTargetYear] = useState(new Date().getFullYear());
@@ -35,10 +37,36 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
   // Years to show in the selector (current year and next 2 years)
   const years = [new Date().getFullYear(), new Date().getFullYear() + 1, new Date().getFullYear() + 2];
   
-  // Month names
+  // Month names from translations
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June', 
-    'July', 'August', 'September', 'October', 'November', 'December'
+    t('months.january'),
+    t('months.february'),
+    t('months.march'),
+    t('months.april'),
+    t('months.may'),
+    t('months.june'),
+    t('months.july'),
+    t('months.august'),
+    t('months.september'),
+    t('months.october'),
+    t('months.november'),
+    t('months.december')
+  ];
+  
+  // Month abbreviations for display
+  const monthAbbrevs = [
+    t('months.jan'),
+    t('months.feb'),
+    t('months.mar'),
+    t('months.apr'),
+    t('months.may'),
+    t('months.jun'),
+    t('months.jul'),
+    t('months.aug'),
+    t('months.sep'),
+    t('months.oct'),
+    t('months.nov'),
+    t('months.dec')
   ];
   
   // Set up cleanup on unmount
@@ -92,13 +120,13 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
   const handleDuplicate = async () => {
     // Don't allow duplicating to the same month
     if (targetYear === sourceYear && targetMonth === sourceMonth) {
-      alert('Cannot duplicate to the same month. Please select a different month.');
+      alert(t('budgetPlans.cannotDuplicateToSameMonth'));
       return;
     }
     
     // Warn if the target month already has a budget plan
     if (isMonthOccupied(targetYear, targetMonth)) {
-      alert('The selected month already has a budget plan. Please select a different month.');
+      alert(t('budgetPlans.monthAlreadyHasBudget'));
       return;
     }
     
@@ -114,7 +142,7 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
       console.error('Failed to duplicate budget plan:', error);
       if (isMounted.current) {
         setLoading(false);
-        alert('Failed to duplicate budget plan');
+        alert(t('errors.budgetDuplicationFailed'));
       }
     }
   };
@@ -133,7 +161,7 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
                 <Ionicons name="copy-outline" size={18} color="#0284c7" />
               </View>
               <Text className="text-xl font-bold text-text-primary">
-                Duplicate Budget Plan
+                {t('modals.duplicateBudget')}
               </Text>
             </View>
             <TouchableOpacity
@@ -147,12 +175,14 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
           </View>
 
           <Text className="text-text-secondary mb-5">
-            Duplicate your budget plan from {formatMonthYear(sourceYear, sourceMonth)} to a new month. This will copy all incomes, needs, wants, and savings.
+            {t('budgetPlans.duplicateDescription', {
+              sourceMonth: formatMonthYear(sourceYear, sourceMonth)
+            })}
           </Text>
 
           {/* Source Month Display */}
           <View className="mb-5">
-            <Text className="mb-1 text-sm font-medium text-text-secondary">Source Month</Text>
+            <Text className="mb-1 text-sm font-medium text-text-secondary">{t('modals.fromMonth')}</Text>
             <View className="border border-surface-border rounded-xl p-3 bg-surface-subtle flex-row items-center">
               <View className="w-8 h-8 rounded-full bg-green-100 items-center justify-center mr-2">
                 <Ionicons name="calendar" size={16} color="#16a34a" />
@@ -165,7 +195,7 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
 
           {/* Target Year Selector */}
           <View className="mb-5">
-            <Text className="mb-1 text-sm font-medium text-text-secondary">Target Year</Text>
+            <Text className="mb-1 text-sm font-medium text-text-secondary">{t('budgetPlans.targetYear')}</Text>
             <View className="flex-row space-x-2">
               {years.map(year => (
                 <TouchableOpacity
@@ -190,7 +220,7 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
           
           {/* Target Month Selector */}
           <View className="mb-5">
-            <Text className="mb-1 text-sm font-medium text-text-secondary">Target Month</Text>
+            <Text className="mb-1 text-sm font-medium text-text-secondary">{t('modals.toMonth')}</Text>
             <ScrollView 
               horizontal 
               showsHorizontalScrollIndicator={false}
@@ -222,18 +252,18 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
                             ? 'text-gray-400'
                             : 'text-text-secondary'
                       }`}>
-                        {month.substring(0, 3)}
+                        {monthAbbrevs[index]}
                       </Text>
                       
                       {isOccupied && (
                         <View className="bg-red-100 px-1.5 py-0.5 rounded-full mt-1">
-                          <Text className="text-xs text-red-700">Exists</Text>
+                          <Text className="text-xs text-red-700">{t('budgetPlans.exists')}</Text>
                         </View>
                       )}
                       
                       {isCurrentSource && (
                         <View className="bg-gray-200 px-1.5 py-0.5 rounded-full mt-1">
-                          <Text className="text-xs text-gray-700">Source</Text>
+                          <Text className="text-xs text-gray-700">{t('budgetPlans.source')}</Text>
                         </View>
                       )}
                     </TouchableOpacity>
@@ -250,7 +280,7 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
               disabled={loading}
               className="flex-1 py-3 px-4 border-2 border-gray-300 rounded-xl items-center"
             >
-              <Text className="font-medium text-text-secondary">Cancel</Text>
+              <Text className="font-medium text-text-secondary">{t('common.cancel')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -265,7 +295,7 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
               {loading ? (
                 <ActivityIndicator size="small" color="#ffffff" />
               ) : (
-                <Text className="font-medium text-white">Duplicate</Text>
+                <Text className="font-medium text-white">{t('budgetPlans.duplicate')}</Text>
               )}
             </TouchableOpacity>
           </View>

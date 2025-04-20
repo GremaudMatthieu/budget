@@ -16,6 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import { v4 as uuidv4 } from 'uuid';
 import { useBudget } from '@/contexts/BudgetContext';
 import { useErrorContext } from '@/contexts/ErrorContext';
+import { useTranslation } from '@/utils/useTranslation';
 import formatAmount from '@/utils/formatAmount';
 import validateAmount from '@/utils/validateAmount';
 import { currencyOptions } from '@/utils/currencyUtils';
@@ -26,6 +27,7 @@ export default function CreateBudgetPlanScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
   const { setError } = useErrorContext();
+  const { t } = useTranslation();
   const { 
     createBudgetPlan, 
     newlyCreatedBudgetPlanId, 
@@ -37,7 +39,7 @@ export default function CreateBudgetPlanScreen() {
   // Form state
   const [currency, setCurrency] = useState('USD');
   const [currencySelectVisible, setCurrencySelectVisible] = useState(false);
-  const [incomes, setIncomes] = useState([{ name: 'Salary', amount: '', category: 'Employment' }]);
+  const [incomes, setIncomes] = useState([{ name: t('budgetPlans.defaultIncomeName'), amount: '', category: 'Employment' }]);
   const [year, setYear] = useState<number>(0);
   const [month, setMonth] = useState<number>(0);
 
@@ -73,14 +75,14 @@ export default function CreateBudgetPlanScreen() {
   const formatMonthYear = (year: number, month: number) => {
     if (!year || !month) return '';
     const date = new Date(year, month - 1, 1);
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return date.toLocaleDateString(t('common.locale'), { month: 'long', year: 'numeric' });
   };
 
   // Handle form submission
   const handleSubmit = async () => {
     // Validate form
     if (!isFormValid()) {
-      setError('Please fill in all required fields correctly');
+      setError(t('errors.fillAllRequiredFields'));
       return;
     }
     
@@ -90,7 +92,7 @@ export default function CreateBudgetPlanScreen() {
       await createBudgetPlan(date, currency, incomes);
     } catch (error) {
       console.error('Failed to create budget plan:', error);
-      setError('Failed to create budget plan');
+      setError(t('errors.createBudgetPlanFailed'));
     }
   };
 
@@ -175,14 +177,14 @@ export default function CreateBudgetPlanScreen() {
             >
               <Ionicons name="chevron-back" size={24} color="white" />
             </TouchableOpacity>
-            <Text className="text-2xl font-bold text-white">Create Budget Plan</Text>
+            <Text className="text-2xl font-bold text-white">{t('budgetPlans.createBudgetPlan')}</Text>
             <View style={{ width: 40 }} />
           </View>
           
           <View className="flex-row items-center bg-white/20 p-3 rounded-xl">
             <Ionicons name="calendar" size={24} color="white" style={{ marginRight: 8 }} />
             <View>
-              <Text className="text-primary-100 text-sm">Planning for</Text>
+              <Text className="text-primary-100 text-sm">{t('budgetPlans.planning')}</Text>
               <Text className="text-xl font-bold text-white">
                 {formatMonthYear(year, month)}
               </Text>
@@ -202,9 +204,9 @@ export default function CreateBudgetPlanScreen() {
                   <Ionicons name="information-circle" size={24} color="#0c6cf2" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-lg font-semibold text-text-primary mb-2">Getting Started</Text>
+                  <Text className="text-lg font-semibold text-text-primary mb-2">{t('budgetPlans.gettingStarted')}</Text>
                   <Text className="text-text-secondary">
-                    Create your budget plan by adding income sources. You'll be able to allocate these funds to needs, wants, and savings later.
+                    {t('budgetPlans.gettingStartedText')}
                   </Text>
                 </View>
               </View>
@@ -214,7 +216,7 @@ export default function CreateBudgetPlanScreen() {
           {/* Currency Selection */}
           <View className="card mb-6">
             <View className="card-content">
-              <Text className="text-lg font-semibold text-text-primary mb-4">Select Currency</Text>
+              <Text className="text-lg font-semibold text-text-primary mb-4">{t('budgetPlans.selectCurrency')}</Text>
               
               <TouchableOpacity 
                 onPress={() => setCurrencySelectVisible(true)}
@@ -239,7 +241,7 @@ export default function CreateBudgetPlanScreen() {
                   <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
                     <Ionicons name="wallet-outline" size={20} color="#9333ea" />
                   </View>
-                  <Text className="text-lg font-semibold text-text-primary">Income Sources</Text>
+                  <Text className="text-lg font-semibold text-text-primary">{t('budgetPlans.incomeSources')}</Text>
                 </View>
                 <TouchableOpacity 
                   onPress={handleAddIncome}
@@ -255,7 +257,7 @@ export default function CreateBudgetPlanScreen() {
                   className="neomorphic-inset p-4 rounded-lg mb-4"
                 >
                   <View className="flex-row justify-between items-center mb-3">
-                    <Text className="font-medium text-primary-600">Income Source #{index + 1}</Text>
+                    <Text className="font-medium text-primary-600">{t('budgetPlans.incomeSource')} #{index + 1}</Text>
                     
                     {incomes.length > 1 && (
                       <TouchableOpacity 
@@ -268,17 +270,17 @@ export default function CreateBudgetPlanScreen() {
                   </View>
                   
                   <View className="mb-3">
-                    <Text className="text-text-secondary text-sm mb-1">Name</Text>
+                    <Text className="text-text-secondary text-sm mb-1">{t('common.name')}</Text>
                     <TextInput
                       value={income.name}
                       onChangeText={(value) => handleIncomeNameChange(index, value)}
-                      placeholder="e.g. Salary, Freelance"
+                      placeholder={t('budgetPlans.incomeNamePlaceholder')}
                       className="border border-surface-border rounded-lg p-3 bg-white"
                     />
                   </View>
                   
                   <View className="mb-3">
-                    <Text className="text-text-secondary text-sm mb-1">Amount</Text>
+                    <Text className="text-text-secondary text-sm mb-1">{t('common.amount')}</Text>
                     <View className="flex-row items-center border border-surface-border rounded-lg bg-white overflow-hidden">
                       <View className="px-3 py-3 bg-gray-50 border-r border-surface-border">
                         <Text className="font-medium text-text-secondary">{currency}</Text>
@@ -286,7 +288,7 @@ export default function CreateBudgetPlanScreen() {
                       <TextInput
                         value={income.amount}
                         onChangeText={(value) => handleIncomeAmountChange(index, value)}
-                        placeholder="0.00"
+                        placeholder={t('modals.amountPlaceholder', '0.00')}
                         keyboardType="decimal-pad"
                         className="flex-1 p-3"
                       />
@@ -295,8 +297,8 @@ export default function CreateBudgetPlanScreen() {
                   
                   <View>
                     <SelectField
-                      label="Category"
-                      placeholder="Select a category"
+                      label={t('common.category')}
+                      placeholder={t('modals.selectIncomeCategory')}
                       options={incomesCategories.map(cat => ({
                         id: cat.id,
                         name: cat.name,
@@ -316,7 +318,7 @@ export default function CreateBudgetPlanScreen() {
                 className="flex-row items-center justify-center p-3 border-2 border-dashed border-primary-200 rounded-lg"
               >
                 <Ionicons name="add-circle-outline" size={20} color="#0c6cf2" style={{ marginRight: 8 }} />
-                <Text className="text-primary-600 font-medium">Add Another Income Source</Text>
+                <Text className="text-primary-600 font-medium">{t('budgetPlans.addIncomeSource')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -328,9 +330,9 @@ export default function CreateBudgetPlanScreen() {
                 <Ionicons name="bulb-outline" size={20} color="#fbbf24" />
               </View>
               <View className="flex-1">
-                <Text className="text-white font-semibold mb-1">Budget Tip</Text>
+                <Text className="text-white font-semibold mb-1">{t('budgetPlans.budgetTip')}</Text>
                 <Text className="text-secondary-200">
-                  Including all income sources gives you a more accurate picture of your budget. Don't forget side gigs or occasional income.
+                  {t('budgetPlans.budgetTipText')}
                 </Text>
               </View>
             </View>
@@ -342,7 +344,7 @@ export default function CreateBudgetPlanScreen() {
               onPress={() => router.back()}
               className="flex-1 py-4 px-6 rounded-xl border-2 border-primary-600"
             >
-              <Text className="text-primary-600 text-center font-semibold">Cancel</Text>
+              <Text className="text-primary-600 text-center font-semibold">{t('common.cancel')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -355,7 +357,7 @@ export default function CreateBudgetPlanScreen() {
               {loading ? (
                 <ActivityIndicator color="#ffffff" />
               ) : (
-                <Text className="text-white text-center font-semibold">Create Plan</Text>
+                <Text className="text-white text-center font-semibold">{t('common.create')}</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -371,7 +373,7 @@ export default function CreateBudgetPlanScreen() {
           <View className="flex-1 bg-black/50 justify-center items-center p-6">
             <View className="bg-white w-full max-h-[70%] rounded-xl overflow-hidden">
               <View className="flex-row justify-between items-center p-4 border-b border-gray-200">
-                <Text className="text-lg font-semibold text-text-primary">Select Currency</Text>
+                <Text className="text-lg font-semibold text-text-primary">{t('modals.selectCurrency')}</Text>
                 <TouchableOpacity onPress={() => setCurrencySelectVisible(false)}>
                   <Ionicons name="close" size={24} color="#64748b" />
                 </TouchableOpacity>
@@ -412,7 +414,7 @@ export default function CreateBudgetPlanScreen() {
           <View className="flex-1 bg-black/50 justify-center items-center p-6">
             <View className="bg-white w-full max-h-[70%] rounded-xl overflow-hidden">
               <View className="flex-row justify-between items-center p-4 border-b border-gray-200">
-                <Text className="text-lg font-semibold text-text-primary">Select Income Category</Text>
+                <Text className="text-lg font-semibold text-text-primary">{t('modals.selectIncomeCategory')}</Text>
                 <TouchableOpacity onPress={() => setCategorySelectVisible(false)}>
                   <Ionicons name="close" size={24} color="#64748b" />
                 </TouchableOpacity>

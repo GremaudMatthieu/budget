@@ -1,83 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-  FlatList
-} from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Switch, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useUser } from '@/contexts/UserContext';
+import { useRouter, Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '@/contexts/AuthContext';
-import { useErrorContext } from '@/contexts/ErrorContext';
+import { useUser } from '@/contexts/UserContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/utils/useTranslation';
 import { useSocket } from '@/contexts/SocketContext';
-import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 import SelectField from '@/components/inputs/SelectField';
-import { SelectOption } from '@/components/modals/SelectModal';
 import SwipeBackWrapper from '@/components/SwipeBackWrapper';
-import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 
-interface FormValues {
-  firstname: string;
-  lastname: string;
-  language: 'en' | 'fr';
-}
-
-// Define list item types for our FlatList
-type ListItemType =
-    | { type: 'account_header' }
-    | { type: 'email', email: string }
-    | { type: 'firstname', value: string, editing: boolean, updating: boolean }
-    | { type: 'lastname', value: string, editing: boolean, updating: boolean }
-    | { type: 'preferences_header' }
-    | { type: 'language', value: 'en' | 'fr', updating: boolean }
-    | { type: 'danger_header' }
-    | { type: 'delete_account', deleting: boolean };
-
-function AccountSettingsContent() {
+export default function AccountSettingsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { language, changeLanguage } = useLanguage();
   const { user, logout } = useAuth();
-  const { setError } = useErrorContext();
-  const { socket, lastMessage } = useSocket();
-  const {
-    updateFirstName,
-    updateLastName,
-    updateLanguagePreference,
-    deleteAccount,
-    updating
-  } = useUser();
+  const { updateFirstName, updateLastName, updateLanguagePreference, deleteAccount } = useUser();
+  const { socket, connected, lastMessage } = useSocket();
 
   // State for form values
-  const [formValues, setFormValues] = useState<FormValues>({
-    firstname: user?.firstname || '',
-    lastname: user?.lastname || '',
-    language: (user?.language as 'en' | 'fr') || 'en',
+  const [formValues, setFormValues] = useState({
+    firstName: user?.firstname || '',
+    lastName: user?.lastname || '',
+    email: user?.email || '',
+    language: language
   });
 
   // State for editing
-  const [editing, setEditing] = useState<keyof FormValues | null>(null);
-  const [originalValues, setOriginalValues] = useState<FormValues>({
-    firstname: user?.firstname || '',
-    lastname: user?.lastname || '',
-    language: (user?.language as 'en' | 'fr') || 'en',
+  const [editing, setEditing] = useState<string | null>(null);
+
+  // Keep track of original values to detect changes
+  const [originalValues, setOriginalValues] = useState({
+    firstName: user?.firstname || '',
+    lastName: user?.lastname || '',
+    email: user?.email || '',
+    language: language
   });
 
-  // State for tracking pending updates
+  // State to track fields that are being updated
   const [pendingUpdates, setPendingUpdates] = useState<Record<string, boolean>>({});
 
   // State for tracking delete account process
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // State for delete confirmation modal
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  // Language options for the selector
-  const languageOptions: SelectOption[] = [
-    { id: 'en', name: 'English', icon: 'language', iconColor: '#0284c7' },
-    { id: 'fr', name: 'Français', icon: 'language', iconColor: '#0284c7' }
-  ];
+  // Ref to track if the component is mounted
+  const isMounted = useRef(true);
 
   // Safety timeout to clear pending updates
   useEffect(() => {
@@ -87,25 +55,33 @@ function AccountSettingsContent() {
 
       const timeoutId = setTimeout(() => {
         console.log('Safety timeout triggered, clearing all pending updates');
-        setPendingUpdates({});
+        if (isMounted.current) {
+          setPendingUpdates({});
+        }
       }, 5000); // 5 seconds safety timeout
 
       return () => clearTimeout(timeoutId);
     }
   }, [pendingUpdates]);
 
-  // Update form values when user data changes
+  // Initialize form values when user data is loaded
   useEffect(() => {
     if (user) {
       const newValues = {
-        firstname: user.firstname || '',
-        lastname: user.lastname || '',
-        language: (user?.language as 'en' | 'fr') || 'en',
+        firstName: user.firstname || '',
+        lastName: user.lastname || '',
+        email: user.email || '',
+        language: user.language || language
       };
+
       setFormValues(newValues);
       setOriginalValues(newValues);
     }
-  }, [user]);
+
+    return () => {
+      isMounted.current = false;
+    };
+  }, [user, language]);
 
   // Handle WebSocket reconnection
   useEffect(() => {
@@ -133,7 +109,7 @@ function AccountSettingsContent() {
           // Force clearing the pending state immediately
           setPendingUpdates(prev => {
             const newState = { ...prev };
-            delete newState['firstname'];
+            delete newState['firstName'];
             console.log('New pending updates state after firstname change:', newState);
             return newState;
           });
@@ -149,7 +125,7 @@ function AccountSettingsContent() {
           // Force clearing the pending state immediately
           setPendingUpdates(prev => {
             const newState = { ...prev };
-            delete newState['lastname'];
+            delete newState['lastName'];
             console.log('New pending updates state after lastname change:', newState);
             return newState;
           });
@@ -170,6 +146,32 @@ function AccountSettingsContent() {
             return newState;
           });
         }
+      },
+      'UserUpdated': (event) => {
+        if (event.aggregateId === user?.uuid) {
+          // Update was successful, clear pending state for the field
+          setPendingUpdates(prev => {
+            const updated = { ...prev };
+
+            if (event.payload.firstName !== undefined) {
+              delete updated.firstName;
+            }
+
+            if (event.payload.lastName !== undefined) {
+              delete updated.lastName;
+            }
+
+            if (event.payload.language !== undefined) {
+              delete updated.language;
+            }
+
+            return updated;
+          });
+          
+          if (editing) {
+            setEditing(null);
+          }
+        }
       }
     };
 
@@ -186,10 +188,10 @@ function AccountSettingsContent() {
         socket.off(event);
       }
     };
-  }, [socket, user]);
+  }, [socket, user, editing]);
 
   // Handle starting to edit a field
-  const handleStartEditing = (field: keyof FormValues) => {
+  const handleStartEditing = (field: string) => {
     setEditing(field);
   };
 
@@ -199,19 +201,21 @@ function AccountSettingsContent() {
     setEditing(null);
   };
 
-  // Handle updating a field
-  const handleUpdate = async (field: keyof FormValues) => {
-    const value = formValues[field];
+  // Generic function to update a field
+  const handleUpdate = async (field: string) => {
+    const value = formValues[field as keyof typeof formValues];
 
     // Validate input
-    if (field === 'firstname' || field === 'lastname') {
-      if (value.trim().length === 0) {
-        setError(`${field} cannot be empty`);
+    if (field === 'firstName' || field === 'lastName') {
+      if (typeof value === 'string' && value.trim().length === 0) {
+        // Show error if available
+        Alert.alert(t('errors.validationError'), `${field} cannot be empty`);
         return;
       }
 
-      if (value.trim().length > 50) {
-        setError(`${field} cannot be longer than 50 characters`);
+      if (typeof value === 'string' && value.trim().length > 50) {
+        // Show error if available
+        Alert.alert(t('errors.validationError'), `${field} cannot be longer than 50 characters`);
         return;
       }
     }
@@ -225,12 +229,24 @@ function AccountSettingsContent() {
     let success = false;
 
     try {
-      if (field === 'firstname') {
-        success = await updateFirstName(value);
-      } else if (field === 'lastname') {
-        success = await updateLastName(value);
-      } else if (field === 'language') {
-        success = await updateLanguagePreference(value as 'en' | 'fr');
+      // Call the appropriate update function based on the field
+      switch (field) {
+        case 'firstName':
+          success = await updateFirstName(value as string);
+          break;
+        case 'lastName':
+          success = await updateLastName(value as string);
+          break;
+        case 'language':
+          // Cast to 'en' | 'fr' type
+          const newLanguage = value as 'en' | 'fr';
+          success = await updateLanguagePreference(newLanguage);
+          
+          // Apply language change immediately to the app using our language context
+          if (success) {
+            await changeLanguage(newLanguage);
+          }
+          break;
       }
 
       if (success) {
@@ -242,15 +258,17 @@ function AccountSettingsContent() {
 
         // If no WebSocket event comes within 3 seconds, clear the loading state as a fallback
         setTimeout(() => {
-          setPendingUpdates(prev => {
-            if (prev[field]) {
-              console.log(`Fallback timeout for ${field}: clearing pending state`);
-              const updated = { ...prev };
-              delete updated[field];
-              return updated;
-            }
-            return prev;
-          });
+          if (isMounted.current) {
+            setPendingUpdates(prev => {
+              if (prev[field]) {
+                console.log(`Fallback timeout for ${field}: clearing pending state`);
+                const updated = { ...prev };
+                delete updated[field];
+                return updated;
+              }
+              return prev;
+            });
+          }
         }, 3000);
       }
     } catch (error) {
@@ -270,48 +288,57 @@ function AccountSettingsContent() {
     // Cast to 'en' | 'fr' type
     const newLanguage = languageValue as 'en' | 'fr';
 
-    // Update local state
+    // Update local state first
     setFormValues(prev => ({
       ...prev,
       language: newLanguage
     }));
 
-    // Mark this field as being updated
+    // Mark as updating immediately
     setPendingUpdates(prev => ({
       ...prev,
       language: true
     }));
 
     try {
+      // Send update to backend
       const success = await updateLanguagePreference(newLanguage);
+      
+      // Apply language change immediately to the app using our language context
       if (success) {
+        // Update the original values so if user cancels future edits,
+        // it will use this as the baseline
         setOriginalValues(prev => ({
           ...prev,
           language: newLanguage
         }));
 
-        // If no WebSocket event comes within 3 seconds, clear the loading state as a fallback
-        setTimeout(() => {
-          setPendingUpdates(prev => {
-            if (prev.language) {
-              console.log('Fallback timeout for language: clearing pending state');
-              const updated = { ...prev };
-              delete updated.language;
-              return updated;
-            }
-            return prev;
-          });
-        }, 3000);
+        // Change app language via the language context
+        await changeLanguage(newLanguage);
+      } else {
+        // If not successful, revert form value
+        setFormValues(prev => ({
+          ...prev,
+          language: originalValues.language
+        }));
+        
+        // And clear pending state
+        setPendingUpdates(prev => {
+          const updated = { ...prev };
+          delete updated.language;
+          return updated;
+        });
       }
     } catch (error) {
-      // Revert on failure
+      console.error('Error updating language preference:', error);
+      
+      // On error, revert to original language in the form
       setFormValues(prev => ({
         ...prev,
-        language: formValues.language
+        language: originalValues.language
       }));
-      console.error('Error updating language preference:', error);
-
-      // Clear pending state on error
+      
+      // And clear pending state
       setPendingUpdates(prev => {
         const updated = { ...prev };
         delete updated.language;
@@ -320,17 +347,24 @@ function AccountSettingsContent() {
     }
   };
 
-  // Handle clicking the delete account button
+  // Handle deleting account
   const handleDeleteAccountPress = () => {
-    console.log('Delete account button pressed');
-    setShowDeleteModal(true);
+    Alert.alert(
+      t('profile.deleteAccount'),
+      t('profile.deleteAccountWarning'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('profile.confirmDeletion'),
+          style: 'destructive',
+          onPress: confirmDeleteAccount
+        }
+      ]
+    );
   };
 
   // Handle confirming account deletion
   const confirmDeleteAccount = async () => {
-    // Close the modal
-    setShowDeleteModal(false);
-
     // Set local deleting state
     setIsDeleting(true);
 
@@ -355,203 +389,124 @@ function AccountSettingsContent() {
   };
 
   // Check if a specific field is currently being updated
-  const isFieldUpdating = (field: keyof FormValues) => {
+  const isFieldUpdating = (field: string) => {
     return pendingUpdates[field] === true;
   };
 
-  // Create the list data
-  const getListData = (): ListItemType[] => {
-    return [
-      // Account Information Section
-      { type: 'account_header' },
-      { type: 'email', email: user?.email || '' },
-      {
-        type: 'firstname',
-        value: formValues.firstname,
-        editing: editing === 'firstname',
-        updating: isFieldUpdating('firstname')
-      },
-      {
-        type: 'lastname',
-        value: formValues.lastname,
-        editing: editing === 'lastname',
-        updating: isFieldUpdating('lastname')
-      },
+  // Language options for the dropdown
+  const languageOptions = [
+    { id: 'en', name: t('profile.english'), icon: 'language', iconColor: '#0284c7' },
+    { id: 'fr', name: t('profile.french'), icon: 'language', iconColor: '#0284c7' }
+  ];
 
-      // Preferences Section
-      { type: 'preferences_header' },
-      {
-        type: 'language',
-        value: formValues.language,
-        updating: isFieldUpdating('language')
-      },
-
-      // Danger Zone
-      { type: 'danger_header' },
-      { type: 'delete_account', deleting: isDeleting }
-    ];
-  };
-
-  // Render each item type
-  const renderItem = ({ item }: { item: ListItemType }) => {
-    switch (item.type) {
-      case 'account_header':
+  // Render different card types
+  const renderCard = (type: string, item: any) => {
+    switch (type) {
+      case 'header':
         return (
-            <View className="px-4 pt-6 pb-2">
-              <Text className="text-xl font-semibold text-secondary-800 mb-2">Account Information</Text>
+            <View className="mb-6">
+              <Text className="text-2xl font-bold text-text-primary mb-1">{t('profile.accountSettings')}</Text>
+              <Text className="text-text-secondary">{t('profile.accountSettingsSubtitle')}</Text>
             </View>
         );
 
-      case 'email':
+      case 'section_header':
         return (
-            <View className="px-4 py-2">
-              <View className="card mb-4">
-                <View className="card-content">
-                  <Text className="text-sm text-secondary-600 mb-1">Email</Text>
-                  <View className="flex-row items-center justify-between">
-                    <Text className="text-lg text-text-primary">{item.email}</Text>
-                    <Ionicons name="lock-closed-outline" size={18} color="#94a3b8" />
+            <View className="mb-4 mt-4">
+              <Text className="text-lg font-semibold text-text-primary">{item.title}</Text>
+            </View>
+        );
+
+      case 'text_field':
+        return (
+            <View className="card mb-4">
+              <View className="card-content">
+                <View className="flex-row items-center">
+                  <View className="w-10 h-10 rounded-full bg-primary-100 items-center justify-center mr-3">
+                    <Ionicons name={item.icon} size={20} color="#0284c7" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-sm text-secondary-600 mb-1">{item.label}</Text>
+                    <View className="flex-row items-center">
+                      {editing === item.field ? (
+                          <View className="flex-1 flex-row items-center">
+                            <TextInput
+                                className="flex-1 border-b border-primary-300 py-1 text-text-primary"
+                                value={formValues[item.field as keyof typeof formValues] as string}
+                                onChangeText={(text) => setFormValues(prev => ({ ...prev, [item.field]: text }))}
+                                autoFocus
+                            />
+                            <TouchableOpacity
+                                className="ml-2 p-2"
+                                onPress={() => handleUpdate(item.field)}
+                                disabled={isFieldUpdating(item.field)}
+                            >
+                              {isFieldUpdating(item.field) ? (
+                                <ActivityIndicator size="small" color="#16a34a" />
+                              ) : (
+                                <Ionicons name="checkmark" size={20} color="#16a34a" />
+                              )}
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                className="p-2"
+                                onPress={handleCancel}
+                                disabled={isFieldUpdating(item.field)}
+                            >
+                              <Ionicons name="close" size={20} color="#dc2626" />
+                            </TouchableOpacity>
+                          </View>
+                      ) : (
+                          <>
+                            <Text className="flex-1 text-text-primary font-medium">
+                              {formValues[item.field as keyof typeof formValues]}
+                            </Text>
+                            {item.editable && (
+                                <TouchableOpacity
+                                    className="p-2"
+                                    onPress={() => handleStartEditing(item.field)}
+                                    disabled={isFieldUpdating(item.field)}
+                                >
+                                  {isFieldUpdating(item.field) ? (
+                                      <ActivityIndicator size="small" color="#64748b" />
+                                  ) : (
+                                      <Ionicons name="create-outline" size={20} color="#64748b" />
+                                  )}
+                                </TouchableOpacity>
+                            )}
+                          </>
+                      )}
+                    </View>
                   </View>
                 </View>
               </View>
             </View>
         );
 
-      case 'firstname':
+      case 'select_field':
         return (
-            <View className="px-4 py-2">
-              <View className="card mb-4">
-                <View className="card-content">
-                  <Text className="text-sm text-secondary-600 mb-1">First Name</Text>
-                  {item.editing ? (
-                      <View className="flex-row items-center space-x-2">
-                        <TextInput
-                            value={formValues.firstname}
-                            onChangeText={(text) => setFormValues(prev => ({ ...prev, firstname: text }))}
-                            className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                            autoFocus
-                        />
-                        <TouchableOpacity
-                            onPress={() => handleUpdate('firstname')}
-                            disabled={item.updating}
-                            className="p-2 bg-success-100 rounded-full"
-                        >
-                          {item.updating ? (
-                              <ActivityIndicator size="small" color="#16a34a" />
-                          ) : (
-                              <Ionicons name="checkmark" size={18} color="#16a34a" />
-                          )}
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={handleCancel}
-                            disabled={item.updating}
-                            className="p-2 bg-danger-100 rounded-full"
-                        >
-                          <Ionicons name="close" size={18} color="#dc2626" />
-                        </TouchableOpacity>
-                      </View>
-                  ) : (
-                      <View className="flex-row items-center justify-between">
-                        <Text className="text-lg text-text-primary">{item.value}</Text>
-                        <TouchableOpacity
-                            onPress={() => handleStartEditing('firstname')}
-                            disabled={item.updating}
-                            className="p-2"
-                        >
-                          {item.updating ? (
-                              <ActivityIndicator size="small" color="#64748b" />
-                          ) : (
-                              <Ionicons name="create-outline" size={18} color="#64748b" />
-                          )}
-                        </TouchableOpacity>
-                      </View>
-                  )}
-                </View>
-              </View>
-            </View>
-        );
-
-      case 'lastname':
-        return (
-            <View className="px-4 py-2">
-              <View className="card mb-4">
-                <View className="card-content">
-                  <Text className="text-sm text-secondary-600 mb-1">Last Name</Text>
-                  {item.editing ? (
-                      <View className="flex-row items-center space-x-2">
-                        <TextInput
-                            value={formValues.lastname}
-                            onChangeText={(text) => setFormValues(prev => ({ ...prev, lastname: text }))}
-                            className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                            autoFocus
-                        />
-                        <TouchableOpacity
-                            onPress={() => handleUpdate('lastname')}
-                            disabled={item.updating}
-                            className="p-2 bg-success-100 rounded-full"
-                        >
-                          {item.updating ? (
-                              <ActivityIndicator size="small" color="#16a34a" />
-                          ) : (
-                              <Ionicons name="checkmark" size={18} color="#16a34a" />
-                          )}
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={handleCancel}
-                            disabled={item.updating}
-                            className="p-2 bg-danger-100 rounded-full"
-                        >
-                          <Ionicons name="close" size={18} color="#dc2626" />
-                        </TouchableOpacity>
-                      </View>
-                  ) : (
-                      <View className="flex-row items-center justify-between">
-                        <Text className="text-lg text-text-primary">{item.value}</Text>
-                        <TouchableOpacity
-                            onPress={() => handleStartEditing('lastname')}
-                            disabled={item.updating}
-                            className="p-2"
-                        >
-                          {item.updating ? (
-                              <ActivityIndicator size="small" color="#64748b" />
-                          ) : (
-                              <Ionicons name="create-outline" size={18} color="#64748b" />
-                          )}
-                        </TouchableOpacity>
-                      </View>
-                  )}
-                </View>
-              </View>
-            </View>
-        );
-
-      case 'preferences_header':
-        return (
-            <View className="px-4 pt-4 pb-2">
-              <Text className="text-xl font-semibold text-secondary-800 mb-2">Preferences</Text>
-            </View>
-        );
-
-      case 'language':
-        return (
-            <View className="px-4 py-2">
-              <View className="card mb-4">
-                <View className="card-content">
-                  <Text className="text-sm text-secondary-600 mb-2">Language</Text>
-                  <SelectField
-                      options={languageOptions}
-                      value={item.value}
-                      onChange={handleLanguageChange}
-                      placeholder="Select language"
-                      icon={<Ionicons name="language" size={18} color="#0284c7" />}
-                      disabled={item.updating}
-                  />
-                  {item.updating && (
-                      <View className="mt-2 flex-row items-center">
-                        <ActivityIndicator size="small" color="#0284c7" />
-                        <Text className="ml-2 text-secondary-600">Updating language preference...</Text>
-                      </View>
-                  )}
+            <View className="card mb-4">
+              <View className="card-content">
+                <View className="flex-row items-center">
+                  <View className="w-10 h-10 rounded-full bg-primary-100 items-center justify-center mr-3">
+                    <Ionicons name={item.icon} size={20} color="#0284c7" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-sm text-secondary-600 mb-2">{t('profile.language')}</Text>
+                    <SelectField
+                        options={languageOptions}
+                        value={formValues.language}
+                        onChange={handleLanguageChange}
+                        placeholder={t('modals.selectOption')}
+                        icon={<Ionicons name="language" size={18} color="#0284c7" />}
+                        disabled={isFieldUpdating('language')}
+                    />
+                    {isFieldUpdating('language') && (
+                        <View className="mt-2 flex-row items-center">
+                          <ActivityIndicator size="small" color="#0284c7" />
+                          <Text className="ml-2 text-secondary-600">{t('profile.updatingLanguage')}</Text>
+                        </View>
+                    )}
+                  </View>
                 </View>
               </View>
             </View>
@@ -560,33 +515,31 @@ function AccountSettingsContent() {
       case 'danger_header':
         return (
             <View className="px-4 pt-4 pb-2">
-              <Text className="text-xl font-semibold text-danger-600 mb-2">Danger Zone</Text>
+              <Text className="text-lg font-semibold text-danger-600">{t('profile.dangerZone')}</Text>
             </View>
         );
 
-      case 'delete_account':
+      case 'danger_button':
         return (
-            <View className="px-4 py-2">
-              <View className="card bg-danger-50 mb-4">
-                <View className="card-content">
-                  <View>
-                    <Text className="text-lg text-danger-800">Delete Account</Text>
-                    <Text className="text-sm text-danger-600 mb-4">
-                      This action cannot be undone. All your data will be permanently deleted.
-                    </Text>
+            <View className="card border-danger-200 mb-4">
+              <View className="card-content">
+                <View className="flex-row items-center">
+                  <View className="w-10 h-10 rounded-full bg-danger-100 items-center justify-center mr-3">
+                    <Ionicons name={item.icon} size={20} color="#dc2626" />
                   </View>
-
-                  {/* Delete button */}
-                  <TouchableOpacity
-                      onPress={handleDeleteAccountPress}
-                      disabled={item.deleting}
-                      activeOpacity={0.7}
-                      className="p-3 bg-danger-600 rounded-lg self-start"
+                  <View className="flex-1">
+                    <Text className="text-danger-600 font-medium">{item.title}</Text>
+                    <Text className="text-xs text-danger-500 mt-1">{item.description}</Text>
+                  </View>
+                  <TouchableOpacity 
+                    className="py-2 px-4 bg-danger-100 rounded-lg" 
+                    onPress={item.onPress}
+                    disabled={isDeleting}
                   >
-                    {item.deleting ? (
-                        <ActivityIndicator size="small" color="#ffffff" />
+                    {isDeleting ? (
+                      <ActivityIndicator size="small" color="#dc2626" />
                     ) : (
-                        <Text className="text-white font-medium px-2">Delete Account</Text>
+                      <Text className="text-danger-600 font-medium">{t('profile.deleteAccount')}</Text>
                     )}
                   </TouchableOpacity>
                 </View>
@@ -599,38 +552,84 @@ function AccountSettingsContent() {
     }
   };
 
-  return (
-      <>
-        <FlatList
-            data={getListData()}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => `${item.type}-${index}`}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 30 }}
-        />
+  // Configure all the cards to display
+  const cards = [
+    { type: 'header' },
+    { type: 'section_header', title: t('profile.accountInformation') },
+    {
+      type: 'text_field',
+      field: 'email',
+      label: t('profile.email'),
+      icon: 'mail-outline',
+      editable: false,
+      editing: false,
+    },
+    {
+      type: 'text_field',
+      field: 'firstName',
+      label: t('profile.firstName'),
+      icon: 'person-outline',
+      editable: true,
+    },
+    {
+      type: 'text_field',
+      field: 'lastName',
+      label: t('profile.lastName'),
+      icon: 'people-outline',
+      editable: true,
+    },
+    { type: 'section_header', title: t('profile.preferences') },
+    {
+      type: 'select_field',
+      field: 'language',
+      icon: 'language',
+    },
+    { type: 'danger_header' },
+    {
+      type: 'danger_button',
+      title: t('profile.deleteAccount'),
+      description: t('profile.deleteAccountWarning'),
+      icon: 'trash-outline',
+      onPress: handleDeleteAccountPress,
+    },
+  ];
 
-        {/* Delete confirmation modal */}
-        <DeleteConfirmationModal
-            visible={showDeleteModal}
-            onClose={() => setShowDeleteModal(false)}
-            onConfirm={confirmDeleteAccount}
-            name="your account"
-            message="Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently deleted."
-        />
-      </>
-  );
-}
-
-export default function AccountSettingsScreen() {
   return (
       <SwipeBackWrapper>
-        <AnimatedHeaderLayout
-            title="Account Settings"
-            subtitle="Manage your personal information"
-            headerHeight={130}
-        >
-          <AccountSettingsContent />
-        </AnimatedHeaderLayout>
+        <View className="flex-1 bg-background-subtle">
+          <StatusBar style="dark" />
+
+          <Stack.Screen
+              options={{
+                headerShown: false
+              }}
+          />
+
+          {/* Header */}
+          <View className="bg-primary-600 px-6 pt-16 pb-12 rounded-b-3xl shadow-lg">
+            <View className="flex-row justify-between items-center mb-4">
+              <TouchableOpacity
+                  onPress={() => router.back()}
+                  className="bg-white/20 p-2 rounded-full"
+              >
+                <Ionicons name="chevron-back" size={24} color="white" />
+              </TouchableOpacity>
+              <Text className="text-2xl font-bold text-white">{t('profile.accountSettings')}</Text>
+              <View style={{ width: 40 }} />
+            </View>
+          </View>
+
+          <ScrollView className="flex-1 px-4 pt-6">
+            {cards.map((card, index) => (
+                <React.Fragment key={index}>
+                  {renderCard(card.type, card)}
+                </React.Fragment>
+            ))}
+
+            {/* Empty space at the bottom */}
+            <View className="h-16" />
+          </ScrollView>
+        </View>
       </SwipeBackWrapper>
   );
 }

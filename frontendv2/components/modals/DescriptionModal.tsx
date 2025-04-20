@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from '@/utils/useTranslation';
 import ActionButton from '@/components/buttons/ActionButton';
 
 interface DescriptionModalProps {
@@ -16,6 +17,7 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
   onSubmit,
   actionType
 }) => {
+  const { t } = useTranslation();
   const [description, setDescription] = useState('');
 
   const handleSubmit = () => {
@@ -42,8 +44,12 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
     : "bg-danger-100";
 
   const actionLabel = actionType === 'credit'
-    ? "Add Funds"
-    : "Remove Funds";
+    ? t('envelopes.addFunds')
+    : t('envelopes.withdraw');
+
+  const modalTitle = actionType === 'credit' 
+    ? t('envelopes.confirmDeposit')
+    : t('envelopes.confirmWithdrawal');
 
   return (
     <Modal
@@ -59,7 +65,7 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
                 <Ionicons name={icon} size={18} color={iconColor} />
               </View>
               <Text className="text-xl font-bold text-text-primary">
-                {actionType === 'credit' ? 'Add to Envelope' : 'Remove from Envelope'}
+                {modalTitle}
               </Text>
             </View>
             <TouchableOpacity
@@ -73,7 +79,7 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
 
           <View className="mb-5">
             <Text className="mb-2 text-sm font-medium text-text-secondary">
-              Add a description for this transaction:
+              {t('modals.addDescription')}:
             </Text>
 
             <View className="relative">
@@ -84,7 +90,7 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
               <TextInput
                 value={description}
                 onChangeText={setDescription}
-                placeholder="e.g., Monthly savings, Grocery shopping"
+                placeholder={t('common.description')}
                 placeholderTextColor="#9ca3af"
                 className="p-3 pl-10 border border-surface-border rounded-xl bg-white text-text-primary"
                 multiline
@@ -97,10 +103,9 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
 
           <View className="flex-row space-x-3 mt-2">
             <ActionButton
-              label={"Cancel"}
+              label={t('common.cancel')}
               onPress={handleClose}
               className="flex-1"
-             
             />
             <ActionButton
               label={actionLabel}

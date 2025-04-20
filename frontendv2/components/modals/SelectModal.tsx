@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from '@/utils/useTranslation';
 
 export interface SelectOption {
   id: string;
@@ -37,6 +38,8 @@ const SelectModal: React.FC<SelectModalProps> = ({
   showAddOption = false,
   onAddNew
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <Modal
       visible={visible}
@@ -89,7 +92,7 @@ const SelectModal: React.FC<SelectModalProps> = ({
                   className="p-4 flex-row items-center"
                 >
                   <Ionicons name="add-circle-outline" size={18} color="#0c6cf2" />
-                  <Text className="text-primary-600 ml-2">Add New Option</Text>
+                  <Text className="text-primary-600 ml-2">{t('modals.addNew', 'Add New Option')}</Text>
                 </TouchableOpacity>
               )}
             </ScrollView>

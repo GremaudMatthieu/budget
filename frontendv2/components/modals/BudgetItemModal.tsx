@@ -16,6 +16,7 @@ import validateAmount from '@/utils/validateAmount';
 import { Category } from '@/types/budgetTypes';
 import SelectField from '@/components/inputs/SelectField';
 import { SelectOption } from '@/components/modals/SelectModal';
+import { useTranslation } from '@/utils/useTranslation';
 
 interface BudgetItemModalProps {
   isVisible: boolean;
@@ -46,6 +47,7 @@ const BudgetItemModal: React.FC<BudgetItemModalProps> = ({
   const [amount, setAmount] = useState(initialAmount);
   const [category, setCategory] = useState(initialCategory);
   const [showCategorySelect, setShowCategorySelect] = useState(false);
+  const { t } = useTranslation();
 
   // Reset form when modal opens
   useEffect(() => {
@@ -108,22 +110,22 @@ const BudgetItemModal: React.FC<BudgetItemModalProps> = ({
             <View className="space-y-4">
               {/* Name Field */}
               <View>
-                <Text className="text-gray-700 mb-1">Name</Text>
+                <Text className="text-gray-700 mb-1">{t('common.name')}</Text>
                 <TextInput
                   value={name}
                   onChangeText={setName}
-                  placeholder={`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} name`}
+                  placeholder={t(`modals.${itemType}Name`, `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} name`)}
                   className="border border-gray-300 rounded-lg p-3 bg-white"
                 />
               </View>
               
               {/* Amount Field */}
               <View>
-                <Text className="text-gray-700 mb-1">Amount</Text>
+                <Text className="text-gray-700 mb-1">{t('common.amount')}</Text>
                 <TextInput
                   value={amount}
                   onChangeText={handleAmountChange}
-                  placeholder="0.00"
+                  placeholder={t('modals.amountPlaceholder', '0.00')}
                   keyboardType="decimal-pad"
                   className="border border-gray-300 rounded-lg p-3 bg-white"
                 />
@@ -131,8 +133,8 @@ const BudgetItemModal: React.FC<BudgetItemModalProps> = ({
               
               {/* Category Field */}
               <SelectField
-                label="Category"
-                placeholder="Select a category"
+                label={t('common.category')}
+                placeholder={t('modals.selectCategory')}
                 options={categories.map(cat => ({
                   id: cat.id,
                   name: cat.name,
@@ -171,7 +173,7 @@ const BudgetItemModal: React.FC<BudgetItemModalProps> = ({
                 }`}
               >
                 <Text className="text-white text-center font-medium">
-                  {isEdit ? 'Save Changes' : 'Add Item'}
+                  {isEdit ? t('common.save') : t('common.add')}
                 </Text>
               </TouchableOpacity>
             </View>

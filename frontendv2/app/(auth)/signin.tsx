@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from '../../utils/useTranslation';
 import GoogleSignInButton from '../../components/GoogleSignInButton';
 import { Ionicons } from '@expo/vector-icons';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function SignInScreen() {
+  const { t } = useTranslation();
   const [error] = useState<string | null>(null);
   const router = useRouter();
 
@@ -22,18 +25,22 @@ export default function SignInScreen() {
         <View className="absolute top-12 right-8 w-16 h-16 bg-primary-500/50 rounded-full" />
       </View>
       
-      {/* Back Button */}
-      <TouchableOpacity 
-        className="absolute top-14 left-5 z-10 bg-white/20 p-2 rounded-full"
-        onPress={() => router.back()}
-      >
-        <Ionicons name="arrow-back" size={24} color="white" />
-      </TouchableOpacity>
+      {/* Back Button and Language Switcher */}
+      <View className="absolute top-14 left-0 right-0 z-10 px-5 flex-row justify-between">
+        <TouchableOpacity 
+          className="bg-white/20 p-2 rounded-full"
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        
+        <LanguageSwitcher isDark={true} />
+      </View>
       
       <View className="flex-1 px-6 justify-center max-w-[500px] w-full self-center pt-20">
         <View className="mb-8 items-center">
-          <Text className="text-3xl font-bold text-text-primary mb-2">Welcome Back</Text>
-          <Text className="text-text-secondary text-center">Sign in to continue managing your finances</Text>
+          <Text className="text-3xl font-bold text-text-primary mb-2">{t('auth.welcomeBack')}</Text>
+          <Text className="text-text-secondary text-center">{t('auth.signInSubtitle')}</Text>
         </View>
         
         {error && (
@@ -58,13 +65,13 @@ export default function SignInScreen() {
           className="border border-surface-borderDark bg-surface-light rounded-xl py-4 px-6 flex-row items-center justify-center mb-6 shadow-sm"
         >
           <Ionicons name="mail-outline" size={20} color="#64748b" />
-          <Text className="text-text-primary ml-2 font-medium">Sign in with Email</Text>
+          <Text className="text-text-primary ml-2 font-medium">{t('auth.signInWithEmail')}</Text>
         </TouchableOpacity>
 
         <View className="flex-row justify-center mt-4">
-          <Text className="text-text-secondary">Don't have an account? </Text>
+          <Text className="text-text-secondary">{t('auth.dontHaveAccount')} </Text>
           <TouchableOpacity onPress={() => router.push('/signup')}>
-            <Text className="text-primary-600 font-semibold">Sign Up</Text>
+            <Text className="text-primary-600 font-semibold">{t('auth.signUp')}</Text>
           </TouchableOpacity>
         </View>
         
@@ -72,10 +79,10 @@ export default function SignInScreen() {
         <View className="mt-12 items-center">
           <View className="flex-row items-center mb-2">
             <Ionicons name="shield-checkmark" size={16} color="#64748b" />
-            <Text className="text-text-muted ml-2 text-sm">Secure authentication</Text>
+            <Text className="text-text-muted ml-2 text-sm">{t('auth.secureAuthentication')}</Text>
           </View>
           <Text className="text-text-muted text-xs text-center">
-            Your financial data is encrypted and protected
+            {t('auth.dataProtection')}
           </Text>
         </View>
       </View>

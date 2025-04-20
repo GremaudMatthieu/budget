@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Envelope } from '@/services/envelopeService';
-import { formatCurrency } from '@/utils/currencyUtils';
+import { useCurrencyFormatter } from '@/utils/currencyUtils';
+import { useTranslation } from '@/utils/useTranslation';
 import EnvelopePieChart from './EnvelopePieChart';
 
 interface EnvelopeCardProps {
@@ -11,28 +12,30 @@ interface EnvelopeCardProps {
 
 const EnvelopeCard: React.FC<EnvelopeCardProps> = ({ envelope }) => {
   const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
+  const formatCurrency = useCurrencyFormatter();
+  const { t } = useTranslation();
   
   return (
     <View className="p-4">
       <View className="flex-row justify-between items-center mb-4">
         {progress >= 1 ? (
           <View className="bg-success-50 px-2 py-1 rounded-full">
-            <Text className="text-success-700 text-xs font-medium">Completed</Text>
+            <Text className="text-success-700 text-xs font-medium">{t('envelopes.completed')}</Text>
           </View>
         ) : progress > 0 ? (
           <View className="bg-primary-50 px-2 py-1 rounded-full">
-            <Text className="text-primary-700 text-xs font-medium">{Math.round(progress * 100)}% Filled</Text>
+            <Text className="text-primary-700 text-xs font-medium">{Math.round(progress * 100)}% {t('envelopes.filled')}</Text>
           </View>
         ) : (
           <View className="bg-secondary-50 px-2 py-1 rounded-full">
-            <Text className="text-secondary-700 text-xs font-medium">Not Started</Text>
+            <Text className="text-secondary-700 text-xs font-medium">{t('envelopes.notStarted')}</Text>
           </View>
         )}
         
         {envelope.pending && (
           <View className="bg-warning-50 px-2 py-1 rounded-full flex-row items-center">
             <Ionicons name="sync" size={12} color="#d97706" className="animate-spin mr-1" />
-            <Text className="text-warning-700 text-xs font-medium">Pending</Text>
+            <Text className="text-warning-700 text-xs font-medium">{t('common.pending')}</Text>
           </View>
         )}
       </View>
@@ -43,7 +46,7 @@ const EnvelopeCard: React.FC<EnvelopeCardProps> = ({ envelope }) => {
             {formatCurrency(envelope.currentAmount, envelope.currency)}
           </Text>
           <Text className="text-sm text-text-secondary">
-            of {formatCurrency(envelope.targetedAmount, envelope.currency)}
+            {t('envelopes.of')} {formatCurrency(envelope.targetedAmount, envelope.currency)}
           </Text>
         </View>
         

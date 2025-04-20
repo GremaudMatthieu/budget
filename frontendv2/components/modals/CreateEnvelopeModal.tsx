@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { currencyOptions } from '@/utils/currencyUtils';
+import { useTranslation } from '@/utils/useTranslation';
+import { getCurrencyOptions } from '@/utils/currencyUtils';
 import AmountInput from '@/components/inputs/AmountInput';
 import NameInput from '@/components/inputs/NameInput';
 import ActionButton from '@/components/buttons/ActionButton';
 import SelectField from '@/components/inputs/SelectField';
-import { SelectOption } from '@/components/modals/SelectModal';
 
 interface CreateEnvelopeModalProps {
   visible: boolean;
@@ -19,6 +19,7 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
   onClose,
   onSubmit
 }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [currency, setCurrency] = useState('USD');
@@ -45,17 +46,17 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
 
   const handleSubmit = () => {
     if (!name.trim()) {
-      setError('Please enter a name for your envelope');
+      setError(t('validation.required', { field: t('envelopes.envelopeName') }));
       return;
     }
 
     if (name.length > 25) {
-      setError('Name cannot exceed 25 characters');
+      setError(t('validation.nameTooLong', { field: t('envelopes.envelopeName'), count: 25 }));
       return;
     }
 
     if (!targetAmount || Number(targetAmount) <= 0) {
-      setError('Please enter a valid target amount');
+      setError(t('validation.invalidAmount'));
       return;
     }
 
@@ -76,6 +77,9 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
     onClose();
   };
 
+  // Use the more dynamic currency options with translated labels
+  const currencyOptionsList = getCurrencyOptions();
+
   return (
     <Modal
       visible={visible}
@@ -90,7 +94,7 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
                 <Ionicons name="wallet-outline" size={18} color="#0284c7" />
               </View>
               <Text className="text-xl font-bold text-text-primary">
-                New Envelope
+                {t('modals.createEnvelope')}
               </Text>
             </View>
             <TouchableOpacity
@@ -112,27 +116,28 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
             )}
 
             <NameInput
-              label="Envelope Name"
+              label={t('envelopes.envelopeName')}
               value={name}
               onChangeText={setName}
-              placeholder="e.g., Vacation, Emergency Fund"
+              placeholder={t('modals.nameFieldHint')}
               icon={<Ionicons name="bookmark-outline" size={18} color="#64748b" />}
               editable={!submitted}
             />
 
             <AmountInput
-              label="Target Amount"
+              label={t('envelopes.targetAmount')}
               value={targetAmount}
               onChangeText={setTargetAmount}
               currency="$"
               editable={!submitted}
+              placeholder={t('modals.amountFieldHint')}
             />
 
             <View className="mb-5">
               <SelectField
-                label="Currency"
-                placeholder="Select currency"
-                options={currencyOptions.map(option => ({
+                label={t('common.currency')}
+                placeholder={t('modals.selectCurrency')}
+                options={currencyOptionsList.map(option => ({
                   id: option.value,
                   name: option.label,
                   icon: "cash-outline",
@@ -148,16 +153,16 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
 
           <View className="flex-row space-x-3 mt-2">
             <ActionButton
-              label={"Cancel"}
+              label={t('common.cancel')}
               onPress={handleClose}
               disabled={submitted}
               className="flex-1"
             />
             <ActionButton
-              label={submitted ? "Creating..." : "Create Envelope"}
+              label={submitted ? t('common.loading') : t('envelopes.createEnvelope')}
               onPress={handleSubmit}
               disabled={submitted}
-              className="flex-1 "
+              className="flex-1"
             />
           </View>
         </View>
