@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Switch, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -10,6 +10,7 @@ import { useTranslation } from '@/utils/useTranslation';
 import { useSocket } from '@/contexts/SocketContext';
 import SelectField from '@/components/inputs/SelectField';
 import SwipeBackWrapper from '@/components/SwipeBackWrapper';
+import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 
 export default function AccountSettingsScreen() {
   const router = useRouter();
@@ -595,41 +596,32 @@ export default function AccountSettingsScreen() {
   ];
 
   return (
-      <SwipeBackWrapper>
-        <View className="flex-1 bg-background-subtle">
-          <StatusBar style="dark" />
-
-          <Stack.Screen
-              options={{
-                headerShown: false
-              }}
-          />
-
-          {/* Header */}
-          <View className="bg-primary-600 px-6 pt-16 pb-12 rounded-b-3xl shadow-lg">
-            <View className="flex-row justify-between items-center mb-4">
-              <TouchableOpacity
-                  onPress={() => router.back()}
-                  className="bg-white/20 p-2 rounded-full"
-              >
-                <Ionicons name="chevron-back" size={24} color="white" />
-              </TouchableOpacity>
-              <Text className="text-2xl font-bold text-white">{t('profile.accountSettings')}</Text>
-              <View style={{ width: 40 }} />
-            </View>
-          </View>
-
-          <ScrollView className="flex-1 px-4 pt-6">
+    <SwipeBackWrapper>
+      <View className="flex-1">
+        <Stack.Screen
+          options={{
+            headerShown: false
+          }}
+        />
+        
+        <AnimatedHeaderLayout
+          title={t('profile.accountSettings')}
+          subtitle={t('profile.accountSettingsSubtitle')}
+          showBackButton={true}
+          headerHeight={130}
+        >
+          <View className="px-4 pt-4">
             {cards.map((card, index) => (
-                <React.Fragment key={index}>
-                  {renderCard(card.type, card)}
-                </React.Fragment>
+              <React.Fragment key={index}>
+                {card.type !== 'header' && renderCard(card.type, card)}
+              </React.Fragment>
             ))}
 
             {/* Empty space at the bottom */}
             <View className="h-16" />
-          </ScrollView>
-        </View>
-      </SwipeBackWrapper>
+          </View>
+        </AnimatedHeaderLayout>
+      </View>
+    </SwipeBackWrapper>
   );
 }

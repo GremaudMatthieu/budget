@@ -126,7 +126,8 @@ export default function EnvelopeDetailScreen() {
       () => {
         if (isMounted.current) {
           setError(t('envelopes.envelopeDeleted'));
-          router.back();
+          // Navigate explicitly to the envelopes tab instead of using router.back()
+          router.replace("/(tabs)/envelopes");
         }
       }
     );

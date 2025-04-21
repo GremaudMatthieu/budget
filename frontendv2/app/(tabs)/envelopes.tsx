@@ -169,9 +169,40 @@ function EnvelopesContent() {
     if (!envelopeToDelete) return;
 
     try {
+      // Update the envelope to show pending state in UI
+      const updatedEnvelopes = envelopesData?.envelopes.map(env => 
+        env.uuid === envelopeToDelete.id 
+          ? { ...env, pending: true, deleted: true }
+          : env
+      );
+      
+      if (envelopesData && updatedEnvelopes) {
+        // Update UI state to show loading
+        const updatedData = {
+          ...envelopesData,
+          envelopes: updatedEnvelopes
+        };
+        
+        // Update envelopes data with pending state
+        envelopesData.envelopes = updatedEnvelopes;
+      }
+      
       await deleteEnvelope(envelopeToDelete.id, setError);
+      // WebSocket event will handle the actual deletion from the list
     } catch (err) {
       console.error('Failed to delete envelope:', err);
+      
+      // Reset pending state if there was an error
+      if (envelopesData) {
+        const resetEnvelopes = envelopesData.envelopes.map(env => 
+          env.uuid === envelopeToDelete?.id 
+            ? { ...env, pending: false, deleted: false }
+            : env
+        );
+        
+        // Update UI with reset state
+        envelopesData.envelopes = resetEnvelopes;
+      }
     } finally {
       setDeleteModalOpen(false);
       setEnvelopeToDelete(null);

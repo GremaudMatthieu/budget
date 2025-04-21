@@ -300,15 +300,27 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
       },
       'BudgetEnvelopeDeleted': (event) => {
         console.log('Envelope deleted event received:', event);
+        
+        // Just clear any pending request
         if (event.requestId && pendingRequests[event.requestId]) {
           setPendingRequests(prev => {
             const updated = { ...prev };
             delete updated[event.requestId];
             return updated;
           });
-          return;
         }
-        debouncedRefresh(event.aggregateId || event.budgetEnvelopeId);
+        
+        // Let the server refresh be handled by normal refresh cycle
+        // This is more reliable than optimistic updates
+        debouncedRefresh();
+        
+        // For any components watching this specific envelope (detail view)
+        // they'll get their onDelete callback called which handles navigation
+        const deletedId = event.aggregateId || event.budgetEnvelopeId;
+        if (deletedId && activeListenersRef.current[deletedId]?.onDelete) {
+          console.log(`Calling onDelete callback for envelope ${deletedId}`);
+          activeListenersRef.current[deletedId].onDelete();
+        }
       },
       'BudgetEnvelopeRenamed': (event) => {
         console.log('Envelope renamed event received:', event);

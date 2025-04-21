@@ -20,6 +20,7 @@ import { formatCurrency } from '@/utils/currencyUtils';
 import { normalizeMonthYear, createUtcSafeDate, getMonthYearKey, formatMonthYear } from '@/utils/dateUtils';
 import DuplicateBudgetPlanModal from '@/components/modals/DuplicateBudgetPlanModal';
 import { useTranslation } from '@/utils/useTranslation';
+import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 
 export default function BudgetPlansScreen() {
   const router = useRouter();
@@ -36,80 +37,6 @@ export default function BudgetPlansScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const screenWidth = Dimensions.get('window').width;
   const isTablet = screenWidth > 768;
-  
-  // Animation values for header
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const headerHeight = useRef(new Animated.Value(0)).current;
-  const headerOpacity = useRef(new Animated.Value(1)).current;
-  const textScale = useRef(new Animated.Value(1)).current;
-  
-  // Set up animations based on scroll position
-  useEffect(() => {
-    const headerScrollListener = scrollY.addListener(({ value }) => {
-      // Get current header state
-      const currentHeight = headerHeight.__getValue();
-      
-      // Determine if we should show or hide the header
-      const shouldShowHeader = value <= 0 || value <= currentHeight;
-      const newHeight = shouldShowHeader ? 0 : 1;
-      
-      // Only animate if the state is changing
-      if (newHeight !== currentHeight) {
-        // Animate the header height
-        Animated.spring(headerHeight, {
-          toValue: newHeight,
-          useNativeDriver: false,
-          tension: 80,
-          friction: 10,
-        }).start();
-        
-        // Animate header opacity and text scale
-        Animated.parallel([
-          Animated.timing(headerOpacity, {
-            toValue: shouldShowHeader ? 1 : 0.92,
-            duration: 250,
-            useNativeDriver: true,
-          }),
-          Animated.spring(textScale, {
-            toValue: shouldShowHeader ? 1 : 0.95,
-            useNativeDriver: true,
-            tension: 80,
-            friction: 10,
-          })
-        ]).start();
-      }
-    });
-
-    return () => {
-      scrollY.removeListener(headerScrollListener);
-    };
-  }, [scrollY, headerHeight, headerOpacity, textScale]);
-
-  // Calculate header transforms
-  const headerTranslate = headerHeight.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -150], // Reduced value for smaller header
-    extrapolate: 'clamp',
-  });
-  
-  // Additional fancy animations
-  const bgOpacity = scrollY.interpolate({
-    inputRange: [-50, 0, 50, 100],
-    outputRange: [1.2, 1, 0.98, 0.95],
-    extrapolate: 'clamp',
-  });
-  
-  const shadowOpacity = scrollY.interpolate({
-    inputRange: [0, 20, 40],
-    outputRange: [0.15, 0.2, 0.25],
-    extrapolate: 'clamp',
-  });
-  
-  // Handle scroll events to update the animated value
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    { useNativeDriver: false }
-  );
   
   // Load calendar data on initial mount
   useEffect(() => {
@@ -131,7 +58,7 @@ export default function BudgetPlansScreen() {
     setRefreshing(true);
     await loadCalendarData();
     setRefreshing(false);
-  }, []);
+  }, [currentYear]);
 
   // Month selection handler
   const handleMonthSelect = (year: number, month: number) => {
@@ -302,171 +229,29 @@ export default function BudgetPlansScreen() {
       </View>
     );
   }
-
-  return (
-    <View className="flex-1 bg-background-subtle">
-      <StatusBar style="light" />
-      
-      {/* Modern Animated Header */}
-      <Animated.View 
-        style={{
-          paddingTop: Platform.OS === 'ios' ? 48 : 20, // Reduced padding
-          paddingBottom: 12, // Reduced padding
-          borderBottomLeftRadius: 28,
-          borderBottomRightRadius: 28,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 3 },
-          shadowRadius: 8,
-          elevation: 10,
-          zIndex: 10,
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          transform: [{ translateY: headerTranslate }],
-          opacity: headerOpacity,
-          shadowOpacity: shadowOpacity,
-        }}
-      >
-        {/* Modern gradient background */}
-        <Animated.View 
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            borderBottomLeftRadius: 28,
-            borderBottomRightRadius: 28,
-            opacity: bgOpacity,
-          }}
-        >
-          <LinearGradient
-            colors={['#0284c7', '#0ea5e9', '#38bdf8']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              borderBottomLeftRadius: 28,
-              borderBottomRightRadius: 28,
-            }}
-          />
-        </Animated.View>
-        
-        {/* Background design elements */}
-        <View 
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            width: 90, // Smaller
-            height: 90, // Smaller
-            backgroundColor: 'rgba(255, 255, 255, 0.08)',
-            borderTopRightRadius: 9999,
-          }}
-        />
-        <View 
-          style={{
-            position: 'absolute',
-            top: 48,
-            right: 32,
-            width: 55, // Smaller
-            height: 55, // Smaller
-            backgroundColor: 'rgba(255, 255, 255, 0.12)',
-            borderRadius: 9999,
-          }}
-        />
-        <View 
-          style={{
-            position: 'absolute',
-            bottom: 30,
-            right: 80,
-            width: 32, // Smaller
-            height: 32, // Smaller
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            borderRadius: 9999,
-          }}
-        />
-        
-        <View className="px-6">
-          <Animated.View 
-            className="flex-row justify-between items-center"
-            style={{ transform: [{ scale: textScale }] }}
+  
+  const renderContent = () => {
+    return (
+      <View className="flex-1">
+        {/* Year Navigation - Moved from header to main content */}
+        <View className="flex-row items-center justify-center space-x-4 bg-primary-100 py-3 px-4 rounded-xl mb-6">
+          <TouchableOpacity 
+            onPress={handlePreviousYear}
+            className="bg-white p-1.5 rounded-full shadow-sm"
           >
-            <Text className="text-2xl font-bold text-white">{t('budgetPlans.title')}</Text>
-            <TouchableOpacity 
-              onPress={() => {
-                clearSelectedBudgetPlan();
-                router.push({
-                  pathname: '/budget-plans/create',
-                  params: { 
-                    year: new Date().getFullYear(), 
-                    month: new Date().getMonth() + 1 
-                  }
-                });
-              }}
-              className="bg-white/20 p-2 rounded-full"
-              style={{
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 3,
-                elevation: 3,
-              }}
-            >
-              <Ionicons name="add" size={22} color="white" />
-            </TouchableOpacity>
-          </Animated.View>
-          <Text className="text-base text-primary-100 mb-4">
-            {t('budgetPlans.subtitle')}
-          </Text>
+            <Ionicons name="chevron-back" size={18} color="#0284c7" />
+          </TouchableOpacity>
           
-          {/* Year Navigation */}
-          <View className="flex-row items-center space-x-4 bg-white/20 p-2 rounded-xl mb-1">
-            <TouchableOpacity 
-              onPress={handlePreviousYear}
-              className="bg-white/30 p-1.5 rounded-full"
-            >
-              <Ionicons name="chevron-back" size={18} color="white" />
-            </TouchableOpacity>
-            
-            <Text className="flex-1 text-lg font-bold text-white text-center">{currentYear}</Text>
-            
-            <TouchableOpacity 
-              onPress={handleNextYear}
-              className="bg-white/30 p-1.5 rounded-full"
-            >
-              <Ionicons name="chevron-forward" size={18} color="white" />
-            </TouchableOpacity>
-          </View>
+          <Text className="text-lg font-bold text-primary-700">{currentYear}</Text>
+          
+          <TouchableOpacity 
+            onPress={handleNextYear}
+            className="bg-white p-1.5 rounded-full shadow-sm"
+          >
+            <Ionicons name="chevron-forward" size={18} color="#0284c7" />
+          </TouchableOpacity>
         </View>
-      </Animated.View>
-
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ 
-          padding: 16, 
-          paddingBottom: 80,
-          paddingTop: 150 // Reduced padding to match smaller header
-        }}
-        refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={handleRefresh}
-            progressViewOffset={150} // Reduced to match smaller header
-            colors={['#0284c7', '#0ea5e9']} // Match gradient colors
-            tintColor="#0284c7" // iOS
-            titleColor="#0284c7" // iOS
-            progressBackgroundColor="#ffffff" // Android
-          />
-        }
-        scrollEventThrottle={16}
-        onScroll={handleScroll}
-      >
+        
         {/* Current Month Preview */}
         <View className="mb-6">
           <Text className="text-xl font-semibold text-secondary-800 mb-4">{t('budgetPlans.thisMonth')}</Text>
@@ -719,24 +504,21 @@ export default function BudgetPlansScreen() {
             </View>
           </View>
         </View>
-        
-        {/* Create New Budget Plan Button */}
-        <TouchableOpacity
-          onPress={() => {
-            clearSelectedBudgetPlan();
-            router.push({
-              pathname: '/budget-plans/create',
-              params: { 
-                year: new Date().getFullYear(), 
-                month: new Date().getMonth() + 1 
-              }
-            });
-          }}
-          className="bg-primary-600 py-4 px-6 rounded-xl mb-10 shadow-md items-center"
-        >
-          <Text className="text-white text-lg font-semibold">{t('budgetPlans.createNewBudgetPlan')}</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      </View>
+    );
+  };
+
+  return (
+    <View className="flex-1">
+      <AnimatedHeaderLayout
+        title={t('budgetPlans.title')}
+        subtitle={t('budgetPlans.subtitle')}
+        headerHeight={130}
+        onRefresh={handleRefresh}
+        refreshing={refreshing}
+      >
+        {renderContent()}
+      </AnimatedHeaderLayout>
     </View>
   );
 }

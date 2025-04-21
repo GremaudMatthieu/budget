@@ -5,33 +5,16 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '@/utils/useTranslation';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 
-export default function WelcomeScreen() {
+function WelcomeContent() {
   const router = useRouter();
   const { t } = useTranslation();
-  
-  return (
-    <ScrollView className="flex-1 bg-background-subtle">
-      <StatusBar style="dark" />
-      
-      {/* Header Section with Language Switcher */}
-      <View className="bg-primary-600 px-6 pt-16 pb-12 rounded-b-3xl shadow-lg relative">
-        <View className="absolute top-14 right-5 z-10">
-          <LanguageSwitcher isDark={true} />
-        </View>
-        
-        <Text className="text-4xl font-bold text-white mb-2">{t('auth.welcomeTitle')}</Text>
-        <Text className="text-lg text-primary-100 mb-6">
-          {t('auth.welcomeSubtitle')}
-        </Text>
-        <View className="flex-row items-center space-x-2 bg-white/20 p-2 rounded-lg self-start">
-          <Ionicons name="shield-checkmark" size={18} color="white" />
-          <Text className="text-white font-medium">{t('auth.secureAndPrivate')}</Text>
-        </View>
-      </View>
 
+  return (
+    <View className="flex-1">
       {/* Features Section */}
-      <View className="px-6 mt-8">
+      <View className="px-6 mt-4">
         <Text className="text-xl font-semibold text-secondary-800 mb-4">{t('auth.features')}</Text>
         
         <View className="bg-white p-4 rounded-xl shadow-sm mb-4">
@@ -104,6 +87,30 @@ export default function WelcomeScreen() {
           {t('auth.termsAndPrivacy')}
         </Text>
       </View>
-    </ScrollView>
+    </View>
+  );
+}
+
+export default function WelcomeScreen() {
+  const { t } = useTranslation();
+  
+  // Custom header buttons for language switcher
+  const headerButtons = (
+    <LanguageSwitcher isDark={true} />
+  );
+  
+  return (
+    <View className="flex-1">
+      <AnimatedHeaderLayout
+        title={t('auth.welcomeTitle')}
+        subtitle={t('auth.welcomeSubtitle')}
+        showBackButton={false}
+        headerHeight={150}
+        collapsePercentage={80}
+        rightComponent={headerButtons}
+      >
+        <WelcomeContent />
+      </AnimatedHeaderLayout>
+    </View>
   );
 }
