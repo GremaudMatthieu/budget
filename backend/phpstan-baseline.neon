@@ -19,12 +19,6 @@ parameters:
 			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
 
 		-
-			message: '#^Property App\\BudgetPlanContext\\Domain\\Aggregates\\BudgetPlan\:\:\$date is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
-
-		-
 			message: '#^Property App\\BudgetPlanContext\\Domain\\Aggregates\\BudgetPlan\:\:\$updatedAt is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1

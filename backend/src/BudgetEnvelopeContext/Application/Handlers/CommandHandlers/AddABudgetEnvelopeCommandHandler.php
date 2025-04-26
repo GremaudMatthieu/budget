@@ -30,13 +30,6 @@ final readonly class AddABudgetEnvelopeCommandHandler
                 throw new BudgetEnvelopeAlreadyExistsException();
             }
         } catch (EventsNotFoundForAggregateException) {
-            $aggregate = BudgetEnvelope::create(
-                $command->getBudgetEnvelopeId(),
-                $command->getBudgetEnvelopeUserId(),
-                $command->getBudgetEnvelopeTargetedAmount(),
-                $command->getBudgetEnvelopeName(),
-                $command->getBudgetEnvelopeCurrency(),
-            );
             $aggregatesToSave = BudgetEnvelopeNameRegistryBuilder::build(
                 $this->eventSourcedRepository,
                 $this->uuidGenerator,
@@ -55,7 +48,13 @@ final readonly class AddABudgetEnvelopeCommandHandler
                     $command->getBudgetEnvelopeId(),
                 )
                 ->getRegistryAggregates();
-            $aggregatesToSave[] = $aggregate;
+            $aggregatesToSave[] = BudgetEnvelope::create(
+                $command->getBudgetEnvelopeId(),
+                $command->getBudgetEnvelopeUserId(),
+                $command->getBudgetEnvelopeTargetedAmount(),
+                $command->getBudgetEnvelopeName(),
+                $command->getBudgetEnvelopeCurrency(),
+            );
             $this->eventSourcedRepository->trackAggregates($aggregatesToSave);
         }
     }

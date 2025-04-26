@@ -54,7 +54,7 @@ final class BudgetPlan implements AggregateRootInterface
     private array $needs;
     private array $wants;
     private array $savings;
-    private \DateTimeImmutable $date;
+    private(set) \DateTimeImmutable $date;
     private int $aggregateVersion = 0;
     private bool $isDeleted = false;
     private \DateTime $updatedAt;

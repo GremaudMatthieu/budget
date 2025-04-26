@@ -6,7 +6,9 @@ namespace App\BudgetPlanContext\Application\Handlers\CommandHandlers;
 
 use App\BudgetPlanContext\Application\Commands\GenerateABudgetPlanCommand;
 use App\BudgetPlanContext\Domain\Aggregates\BudgetPlan;
+use App\BudgetPlanContext\Domain\Builders\BudgetPlanDateRegistryBuilder;
 use App\BudgetPlanContext\Domain\Exceptions\BudgetPlanAlreadyExistsException;
+use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanDateRegistryId;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\SharedContext\Domain\Ports\Inbound\EventSourcedRepositoryInterface;
 use App\SharedContext\Domain\Ports\Outbound\TranslatorInterface;
@@ -31,7 +33,25 @@ final readonly class GenerateABudgetPlanCommandHandler
             }
 
         } catch (EventsNotFoundForAggregateException) {
-            $aggregate = BudgetPlan::create(
+            $aggregatesToSave = BudgetPlanDateRegistryBuilder::build(
+                $this->eventSourcedRepository,
+                $this->uuidGenerator,
+            )
+                ->loadOrCreateRegistry(
+                    BudgetPlanDateRegistryId::fromUserIdAndBudgetPlanDate(
+                        $command->getUserId(),
+                        $command->getDate(),
+                        $this->uuidGenerator,
+                    ),
+                )
+                ->ensureDateIsAvailable($command->getDate(), $command->getUserId())
+                ->registerDate(
+                    $command->getDate(),
+                    $command->getUserId(),
+                    $command->getBudgetPlanId(),
+                )
+                ->getRegistryAggregates();
+            $aggregatesToSave[] = BudgetPlan::create(
                 $command->getBudgetPlanId(),
                 $command->getDate(),
                 $command->getIncomes(),
@@ -41,7 +61,7 @@ final readonly class GenerateABudgetPlanCommandHandler
                 $this->uuidGenerator,
                 $this->translator,
             );
-            $this->eventSourcedRepository->trackAggregate($aggregate);
+            $this->eventSourcedRepository->trackAggregates($aggregatesToSave);
         }
     }
 }

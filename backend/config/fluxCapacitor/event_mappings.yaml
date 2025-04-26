@@ -24,6 +24,8 @@ events:
   BudgetPlanWantAddedDomainEvent: App\BudgetPlanContext\Domain\Events\BudgetPlanWantAddedDomainEvent
   BudgetPlanWantAdjustedDomainEvent: App\BudgetPlanContext\Domain\Events\BudgetPlanWantAdjustedDomainEvent
   BudgetPlanWantRemovedDomainEvent: App\BudgetPlanContext\Domain\Events\BudgetPlanWantRemovedDomainEvent
+  BudgetPlanDateRegisteredDomainEvent: App\BudgetPlanContext\Domain\Events\BudgetPlanDateRegisteredDomainEvent
+  BudgetPlanDateReleasedDomainEvent: App\BudgetPlanContext\Domain\Events\BudgetPlanDateReleasedDomainEvent
   UserDeletedDomainEvent: App\UserContext\Domain\Events\UserDeletedDomainEvent
   UserFirstnameChangedDomainEvent: App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent
   UserLanguagePreferenceChangedDomainEvent: App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent
@@ -37,6 +39,7 @@ events:
 aggregates:
   BudgetEnvelope: App\BudgetEnvelopeContext\Domain\Aggregates\BudgetEnvelope
   BudgetPlan: App\BudgetPlanContext\Domain\Aggregates\BudgetPlan
+  BudgetPlanDateRegistry: App\BudgetPlanContext\Domain\Aggregates\BudgetPlanDateRegistry
   BudgetEnvelopeNameRegistry: App\BudgetEnvelopeContext\Domain\Aggregates\BudgetEnvelopeNameRegistry
   User: App\UserContext\Domain\Aggregates\User
   UserEmailRegistry: App\UserContext\Domain\Aggregates\UserEmailRegistry
@@ -52,6 +55,8 @@ event_to_aggregate:
   BudgetEnvelopeReplayedDomainEvent: BudgetEnvelope
   BudgetEnvelopeRewoundDomainEvent: BudgetEnvelope
   BudgetEnvelopeTargetedAmountChangedDomainEvent: BudgetEnvelope
+  BudgetPlanDateRegisteredDomainEvent: BudgetPlanDateRegistry
+  BudgetPlanDateReleasedDomainEvent: BudgetPlanDateRegistry
   BudgetPlanGeneratedDomainEvent: BudgetPlan
   BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent: BudgetPlan
   BudgetPlanIncomeAddedDomainEvent: BudgetPlan
