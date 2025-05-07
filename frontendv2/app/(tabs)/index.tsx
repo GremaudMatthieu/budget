@@ -1,15 +1,45 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, AppState } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/utils/useTranslation';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
+import { useBudget } from '@/contexts/BudgetContext';
+import { useEnvelopes } from '@/contexts/EnvelopeContext';
 
 // Content component for the dashboard, which will be wrapped with the animated header
 function DashboardContent() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { budgetPlansCalendar, loading: budgetLoading, fetchBudgetPlansCalendar } = useBudget();
+  const { envelopesData, loading: envelopesLoading } = useEnvelopes();
+
+  // Get current month/year
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+
+  // Fetch budget plans on mount and when app comes to foreground
+  useEffect(() => {
+    fetchBudgetPlansCalendar(currentYear);
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        fetchBudgetPlansCalendar(currentYear);
+      }
+    });
+    return () => subscription.remove();
+  }, [currentYear, fetchBudgetPlansCalendar]);
+
+  // Get the current month's budget plan from the year/month map
+  const currentBudget = budgetPlansCalendar && budgetPlansCalendar[currentYear]?.[currentMonth];
+  const hasCurrentBudget = !!currentBudget && !!currentBudget.uuid;
+  const spent = currentBudget?.totalAllocated ?? 0;
+  const total = currentBudget?.totalIncome ?? 0;
+  const spentPercent = total > 0 ? Math.min(100, (spent / total) * 100) : 0;
+
+  // Get up to 3 most recent envelopes
+  const envelopes = envelopesData?.envelopes?.slice(0, 3) ?? [];
 
   return (
     <View className="flex-1">
@@ -43,11 +73,16 @@ function DashboardContent() {
           <TouchableOpacity
             className="bg-white rounded-xl p-4 shadow-sm items-center justify-center w-[48%]"
             onPress={() => router.push('/budget-plans/create')}
+            disabled={hasCurrentBudget}
+            style={hasCurrentBudget ? { opacity: 0.5 } : {}}
           >
             <View className="w-12 h-12 rounded-full bg-accent-100 items-center justify-center mb-2">
               <Ionicons name="add-outline" size={24} color="#4f46e5" />
             </View>
             <Text className="text-text-primary font-medium">{t('dashboard.newBudget')}</Text>
+            {!!hasCurrentBudget && (
+              <Text className="text-xs text-red-500 mt-1 text-center">{t('dashboard.budgetExistsThisMonth')}</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -70,20 +105,25 @@ function DashboardContent() {
             <Text className="text-primary-600 font-medium">{t('dashboard.viewAll')}</Text>
           </TouchableOpacity>
         </View>
-
-        <View className="flex-row justify-between mb-2">
-          <Text className="text-text-secondary">{t('dashboard.spentSoFar')}</Text>
-          <Text className="font-semibold">$1,245.00</Text>
-        </View>
-
-        <View className="w-full h-2 bg-gray-200 rounded-full mb-1">
-          <View className="h-2 bg-primary-600 rounded-full" style={{ width: '65%' }} />
-        </View>
-
-        <View className="flex-row justify-between">
-          <Text className="text-xs text-text-muted">$0</Text>
-          <Text className="text-xs text-text-muted">$2,500</Text>
-        </View>
+        {budgetLoading ? (
+          <Text>{t('common.loading')}</Text>
+        ) : currentBudget ? (
+          <>
+            <View className="flex-row justify-between mb-2">
+              <Text className="text-text-secondary">{t('dashboard.spentSoFar')}</Text>
+              <Text className="font-semibold">${spent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+            </View>
+            <View className="w-full h-2 bg-gray-200 rounded-full mb-1">
+              <View className="h-2 bg-primary-600 rounded-full" style={{ width: `${spentPercent}%` }} />
+            </View>
+            <View className="flex-row justify-between">
+              <Text className="text-xs text-text-muted">$0</Text>
+              <Text className="text-xs text-text-muted">${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+            </View>
+          </>
+        ) : (
+          <Text className="text-text-secondary">{t('dashboard.noBudgetThisMonth')}</Text>
+        )}
       </View>
 
       {/* Envelope Summary */}
@@ -94,47 +134,28 @@ function DashboardContent() {
             <Text className="text-primary-600 font-medium">{t('dashboard.viewAll')}</Text>
           </TouchableOpacity>
         </View>
-
-        <View className="space-y-4">
-          <View className="flex-row justify-between items-center">
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 rounded-full bg-green-100 items-center justify-center mr-3">
-                <Ionicons name="home-outline" size={20} color="#16a34a" />
+        {envelopesLoading ? (
+          <Text>{t('common.loading')}</Text>
+        ) : envelopes.length > 0 ? (
+          <View className="space-y-4">
+            {envelopes.map((env) => (
+              <View key={env.uuid} className="flex-row justify-between items-center">
+                <View className="flex-row items-center">
+                  <View className="w-10 h-10 rounded-full bg-green-100 items-center justify-center mr-3">
+                    <Ionicons name="wallet-outline" size={20} color="#16a34a" />
+                  </View>
+                  <View>
+                    <Text className="font-medium text-text-primary">{env.name}</Text>
+                    <Text className="text-xs text-text-muted">{env.updatedAt ? new Date(env.updatedAt).toLocaleDateString() : ''}</Text>
+                  </View>
+                </View>
+                <Text className="font-semibold">${parseFloat(env.currentAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
               </View>
-              <View>
-                <Text className="font-medium text-text-primary">Housing</Text>
-                <Text className="text-xs text-text-muted">3 {t('dashboard.daysAgo')}</Text>
-              </View>
-            </View>
-            <Text className="font-semibold">$850.00</Text>
+            ))}
           </View>
-
-          <View className="flex-row justify-between items-center">
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center mr-3">
-                <Ionicons name="restaurant-outline" size={20} color="#2563eb" />
-              </View>
-              <View>
-                <Text className="font-medium text-text-primary">Groceries</Text>
-                <Text className="text-xs text-text-muted">{t('dashboard.yesterday')}</Text>
-              </View>
-            </View>
-            <Text className="font-semibold">$125.50</Text>
-          </View>
-
-          <View className="flex-row justify-between items-center">
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
-                <Ionicons name="car-outline" size={20} color="#9333ea" />
-              </View>
-              <View>
-                <Text className="font-medium text-text-primary">Transport</Text>
-                <Text className="text-xs text-text-muted">{t('dashboard.today')}</Text>
-              </View>
-            </View>
-            <Text className="font-semibold">$78.25</Text>
-          </View>
-        </View>
+        ) : (
+          <Text className="text-text-secondary">{t('dashboard.noEnvelopes')}</Text>
+        )}
       </View>
 
       {/* Tip Card */}
@@ -160,7 +181,7 @@ function DashboardHeader() {
   return (
     <>
       <Text className="text-xl text-white mb-1">{t('dashboard.welcome')}</Text>
-      <Text className="text-2xl font-bold text-white">{user?.name || 'User'}</Text>
+      <Text className="text-2xl font-bold text-white">{user ? String(user) : 'User'}</Text>
     </>
   );
 }

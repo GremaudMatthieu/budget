@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '@/utils/useTranslation';
 import { getCurrencyOptions } from '@/utils/currencyUtils';
@@ -7,6 +7,8 @@ import AmountInput from '@/components/inputs/AmountInput';
 import NameInput from '@/components/inputs/NameInput';
 import ActionButton from '@/components/buttons/ActionButton';
 import SelectField from '@/components/inputs/SelectField';
+import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
+import validateAmount from '@/utils/validateAmount';
 
 interface CreateEnvelopeModalProps {
   visible: boolean;
@@ -25,6 +27,10 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
   const [currency, setCurrency] = useState('USD');
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [nameTouched, setNameTouched] = useState(false);
+  const [amountTouched, setAmountTouched] = useState(false);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [amountError, setAmountError] = useState<string | null>(null);
 
   // Clear form when modal becomes visible
   useEffect(() => {
@@ -44,24 +50,49 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
     }
   }, [submitted, onClose]);
 
+  // Validate name
+  useEffect(() => {
+    if (!nameTouched) return;
+    if (!name.trim()) setNameError(t('errors.fieldRequired'));
+    else if (name.trim().length < 1) setNameError(t('validation.minLength', { count: 1 }));
+    else if (name.trim().length > 50) setNameError(t('validation.maxLength', { count: 50 }));
+    else setNameError(null);
+  }, [name, nameTouched, t]);
+
+  // Validate amount
+  useEffect(() => {
+    if (!amountTouched) return;
+    const MAX_AMOUNT = 9999999999.99;
+    const normalized = normalizeAmountInput(targetAmount);
+    if (!normalized.trim()) setAmountError(t('errors.fieldRequired'));
+    else if (normalized.trim().length < 1) setAmountError(t('validation.minLength', { count: 1 }));
+    else if (normalized.trim().length > 13) setAmountError(t('validation.maxLength', { count: 13 }));
+    else if (!/^\d{1,10}(\.\d{0,2})?$/.test(normalized)) setAmountError(t('validation.invalidAmount'));
+    else if (isNaN(Number(normalized)) || Number(normalized) <= 0) setAmountError(t('validation.positiveNumber'));
+    else if (Number(normalized) > MAX_AMOUNT) setAmountError(t('validation.maxLength', { count: 13 }));
+    else setAmountError(null);
+  }, [targetAmount, amountTouched, t]);
+
+  const handleNameChange = (v: string) => {
+    setName(v);
+    if (!nameTouched) setNameTouched(true);
+  };
+
+  const handleAmountChange = (v: string) => {
+    const normalized = normalizeAmountInput(v);
+    setTargetAmount(normalized);
+    if (!amountTouched) setAmountTouched(true);
+  };
+
   const handleSubmit = () => {
-    if (!name.trim()) {
-      setError(t('validation.required', { field: t('envelopes.envelopeName') }));
-      return;
-    }
-
-    if (name.length > 25) {
-      setError(t('validation.nameTooLong', { field: t('envelopes.envelopeName'), count: 25 }));
-      return;
-    }
-
-    if (!targetAmount || Number(targetAmount) <= 0) {
-      setError(t('validation.invalidAmount'));
-      return;
-    }
-
+    setNameTouched(true);
+    setAmountTouched(true);
+    const normalized = normalizeAmountInput(targetAmount);
+    if (nameError || amountError || !name.trim() || !normalized.trim()) return;
     setSubmitted(true);
-    onSubmit(name, targetAmount, currency);
+    // Format amount to two decimals
+    const formattedAmount = Number(normalized).toFixed(2);
+    onSubmit(name.trim(), formattedAmount, currency);
   };
 
   const resetForm = () => {
@@ -70,6 +101,10 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
     setCurrency('USD');
     setError(null);
     setSubmitted(false);
+    setNameTouched(false);
+    setAmountTouched(false);
+    setNameError(null);
+    setAmountError(null);
   };
 
   const handleClose = () => {
@@ -84,89 +119,82 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="slide"
+      onRequestClose={onClose}
+      accessibilityViewIsModal
+      accessible
     >
-      <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="w-[90%] max-w-md bg-background-light p-6 rounded-2xl shadow-lg">
-          <View className="flex-row justify-between items-center mb-5">
-            <View className="flex-row items-center">
-              <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center mr-2">
-                <Ionicons name="wallet-outline" size={18} color="#0284c7" />
-              </View>
-              <Text className="text-xl font-bold text-text-primary">
-                {t('modals.createEnvelope')}
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={handleClose}
-              className="w-8 h-8 rounded-full bg-surface-subtle items-center justify-center"
-              disabled={submitted}
-              hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
-            >
-              <Ionicons name="close" size={20} color="#64748b" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1 justify-end"
+      >
+        <TouchableWithoutFeedback onPress={onClose} accessible={false}>
+          <View className="flex-1 bg-black/50" />
+        </TouchableWithoutFeedback>
+        <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10">
+          <View className="flex-row justify-between items-center mb-6">
+            <Text className="text-xl font-bold" accessibilityRole="header">{t('modals.createEnvelope')}</Text>
+            <TouchableOpacity onPress={onClose} className="p-2" accessibilityLabel={t('common.close')}>
+              <Ionicons name="close" size={24} color="#666" />
             </TouchableOpacity>
           </View>
-
-          <ScrollView className="max-h-[400px]">
-            {error && (
-              <View className="bg-danger-50 p-3 rounded-xl mb-4 border border-danger-200 flex-row items-center">
-                <Ionicons name="alert-circle" size={18} color="#dc2626" />
-                <Text className="text-danger-700 ml-2 flex-1">{error}</Text>
-              </View>
-            )}
-
+          <ScrollView className="space-y-4" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
             <NameInput
               label={t('envelopes.envelopeName')}
               value={name}
-              onChangeText={setName}
+              onChangeText={handleNameChange}
               placeholder={t('modals.nameFieldHint')}
               icon={<Ionicons name="bookmark-outline" size={18} color="#64748b" />}
               editable={!submitted}
+              onBlur={() => setNameTouched(true)}
+              onFocus={() => setNameTouched(true)}
+              error={nameTouched && nameError ? nameError : undefined}
             />
-
             <AmountInput
               label={t('envelopes.targetAmount')}
               value={targetAmount}
-              onChangeText={setTargetAmount}
+              onChangeText={handleAmountChange}
               currency="$"
               editable={!submitted}
               placeholder={t('modals.amountFieldHint')}
+              onBlur={() => setAmountTouched(true)}
+              onFocus={() => setAmountTouched(true)}
+              error={amountTouched && amountError ? amountError : undefined}
+              maxLength={13}
             />
-
-            <View className="mb-5">
-              <SelectField
-                label={t('common.currency')}
-                placeholder={t('modals.selectCurrency')}
-                options={currencyOptionsList.map(option => ({
-                  id: option.value,
-                  name: option.label,
-                  icon: "cash-outline",
-                  iconColor: "#16a34a"
-                }))}
-                value={currency}
-                onChange={setCurrency}
-                icon={<Ionicons name="cash-outline" size={18} color="#16a34a" />}
-                disabled={submitted}
-              />
-            </View>
+            <SelectField
+              label={t('common.currency')}
+              placeholder={t('modals.selectCurrency')}
+              options={currencyOptionsList.map(option => ({
+                id: option.value,
+                name: option.label,
+                icon: "cash-outline",
+                iconColor: "#16a34a"
+              }))}
+              value={currency}
+              onChange={setCurrency}
+              icon={<Ionicons name="cash-outline" size={18} color="#16a34a" />}
+              disabled={submitted}
+            />
           </ScrollView>
-
-          <View className="flex-row space-x-3 mt-2">
+          <View className="flex-row space-x-3 mt-6">
             <ActionButton
               label={t('common.cancel')}
-              onPress={handleClose}
+              onPress={onClose}
               disabled={submitted}
               className="flex-1"
+              variant="secondary"
             />
             <ActionButton
               label={submitted ? t('common.loading') : t('envelopes.createEnvelope')}
               onPress={handleSubmit}
-              disabled={submitted}
+              disabled={submitted || !!nameError || !!amountError || !nameTouched || !amountTouched}
               className="flex-1"
+              variant="primary"
             />
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };

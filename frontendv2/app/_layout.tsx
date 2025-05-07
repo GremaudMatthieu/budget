@@ -5,7 +5,6 @@ import { Slot, useRouter, useSegments } from "expo-router";
 import './globals.css';
 import { ErrorProvider } from "@/contexts/ErrorContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { SocketProvider } from "@/contexts/SocketContext";
 import { EnvelopeProvider } from "@/contexts/EnvelopeContext";
 import { BudgetProvider } from "@/contexts/BudgetContext";
 import { UserProvider } from "@/contexts/UserContext";
@@ -15,6 +14,7 @@ import { View, ActivityIndicator } from 'react-native';
 import { useEffect } from "react";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
+import { RootSiblingParent } from 'react-native-root-siblings';
 
 // Auth protection component
 function AuthProtection({ children }: { children: React.ReactNode }) {
@@ -55,12 +55,12 @@ function AuthProtection({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   return (
+    <RootSiblingParent>
     <GestureHandlerRootView style={styles.container}>
     <ErrorProvider>
       <AuthProvider>
         <LanguageProvider>
           <AuthProtection>
-            <SocketProvider>
               <UserProvider>
                 <EnvelopeProvider>
                   <BudgetProvider>
@@ -71,12 +71,12 @@ export default function RootLayout() {
                   </BudgetProvider>
                 </EnvelopeProvider>
               </UserProvider>
-            </SocketProvider>
           </AuthProtection>
         </LanguageProvider>
       </AuthProvider>
     </ErrorProvider>
     </GestureHandlerRootView>
+    </RootSiblingParent>
   );
 }
 

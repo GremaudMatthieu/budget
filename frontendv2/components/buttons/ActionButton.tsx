@@ -6,25 +6,36 @@ interface ActionButtonProps extends TouchableOpacityProps {
   label: string;
   disabled?: boolean;
   className?: string;
+  variant?: 'primary' | 'secondary' | 'danger';
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({
   onPress,
   label,
   disabled = false,
-  className
+  className,
+  variant = 'primary',
 }) => {
-  // Determine styles based on variant
-
-
+  let bgClass = '';
+  let textClass = '';
+  if (variant === 'primary') {
+    bgClass = disabled ? 'bg-gray-300' : 'bg-primary-600';
+    textClass = disabled ? 'text-gray-400' : 'text-white';
+  } else if (variant === 'secondary') {
+    bgClass = disabled ? 'bg-gray-100 border border-gray-200' : 'bg-surface-light border border-surface-border';
+    textClass = disabled ? 'text-gray-400' : 'text-primary-600';
+  } else if (variant === 'danger') {
+    bgClass = disabled ? 'bg-gray-300' : 'bg-danger-600';
+    textClass = disabled ? 'text-gray-400' : 'text-white';
+  }
 
   return (
     <TouchableOpacity
       disabled={disabled}
       onPress={onPress}
-      className="flex-1 py-3 rounded-xl bg-surface-light border border-surface-border items-center"
+      className={`flex-1 py-3 rounded-xl items-center justify-center ${bgClass} ${className || ''}`}
     >
-      <Text className={`${className} text-text-primary`} font-medium>{label}</Text>
+      <Text className={`font-medium ${textClass}`}>{label}</Text>
     </TouchableOpacity>
   );
 };

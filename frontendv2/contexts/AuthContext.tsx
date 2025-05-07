@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '@/services/apiClient';
 import axios from 'axios';
 
-const API_URL = process.env.API_URL || 'http://127.0.0.1:8000/api';
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // Define the user type
 type User = {
@@ -87,40 +87,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const loadUser = async () => {
       try {
         const token = await getData('token');
-        console.log('Found stored token on app load:', !!token);
-        
-        if (token) {
-          apiClient.setAuthToken(token);
-          
-          try {
-            // User and userData API endpoints should now be handled by the apiClient
-            // which uses the centralized API_URL config
-            const userData = await apiClient.get('/users/me');
-            console.log('Successfully loaded user data on app start');
-            setUser(userData);
-          } catch (userDataError) {
-            console.error('Error fetching user data with /users/me:', userDataError);
-            
-            // Fall back to /user endpoint
-            try {
-              const userData = await apiClient.get('/users/me');
-              console.log('Successfully loaded user data using fallback endpoint');
-              setUser(userData);
-            } catch (fallbackError) {
-              console.error('Fallback user data fetch also failed:', fallbackError);
-              throw fallbackError;
-            }
+        if (!token) {
+          setUser(null);
+          return;
+        }
+        apiClient.setAuthToken(token);
+        try {
+          const userData = await apiClient.get('/users/me');
+          setUser(userData);
+        } catch (err: any) {
+          if (err?.response?.status === 401) {
+            // Token invalid/expired, treat as not logged in
+            await removeData('token');
+            await removeData('refresh_token');
+            apiClient.removeAuthToken();
+            setUser(null);
+          } else {
+            // Only log unexpected errors
+            console.error('Error fetching user data:', err);
+            setUser(null);
           }
         }
       } catch (error) {
         console.error('Failed to load user:', error);
-        await removeData('token');
-        apiClient.removeAuthToken();
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
-
     loadUser();
   }, []);
 
@@ -133,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Store the tokens
       await storeData('token', token);
       if (refreshToken) {
-        await storeData('refreshToken', refreshToken);
+        await storeData('refresh_token', refreshToken);
       }
       
       // Set the auth token in the API client
@@ -156,7 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Failed to fetch user data after Google login:', error);
         await removeData('token');
         if (refreshToken) {
-          await removeData('refreshToken');
+          await removeData('refresh_token');
         }
         apiClient.removeAuthToken();
         return false;
@@ -173,9 +167,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async (): Promise<void> => {
     try {
       setLoading(true);
-      await apiClient.post('users/logout');
+      const refreshToken = await getData('refresh_token');
+      await apiClient.post('users/logout', { refreshToken });
       await removeData('token');
-      await removeData('refreshToken');
+      await removeData('refresh_token');
       apiClient.removeAuthToken();
       setUser(null);
     } catch (error) {
@@ -204,7 +199,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: !!user,
     logout,
     loginWithGoogle,
-    refreshUserData
+    refreshUserData,
+    changePassword: async () => false, // No-op to satisfy context type
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

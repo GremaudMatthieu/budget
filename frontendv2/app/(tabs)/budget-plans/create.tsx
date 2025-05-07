@@ -22,6 +22,7 @@ import validateAmount from '@/utils/validateAmount';
 import { currencyOptions } from '@/utils/currencyUtils';
 import SelectField from '@/components/inputs/SelectField';
 import { SelectOption } from '@/components/modals/SelectModal';
+import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 
 export default function CreateBudgetPlanScreen() {
   const params = useLocalSearchParams();
@@ -161,207 +162,184 @@ export default function CreateBudgetPlanScreen() {
     >
       <View className="flex-1 bg-background-subtle">
         <StatusBar style="dark" />
-        
-        <Stack.Screen 
-          options={{
-            headerShown: false
-          }}
-        />
-        
-        {/* Header Section */}
-        <View className="bg-primary-600 px-6 pt-16 pb-12 rounded-b-3xl shadow-lg">
-          <View className="flex-row justify-between items-center mb-4">
-            <TouchableOpacity
-              onPress={() => router.push('/budget-plans')}
-              className="bg-white/20 p-2 rounded-full"
-            >
-              <Ionicons name="chevron-back" size={24} color="white" />
-            </TouchableOpacity>
-            <Text className="text-2xl font-bold text-white">{t('budgetPlans.createBudgetPlan')}</Text>
-            <View style={{ width: 40 }} />
-          </View>
-          
-          <View className="flex-row items-center bg-white/20 p-3 rounded-xl">
-            <Ionicons name="calendar" size={24} color="white" style={{ marginRight: 8 }} />
-            <View>
-              <Text className="text-primary-100 text-sm">{t('budgetPlans.planning')}</Text>
-              <Text className="text-xl font-bold text-white">
-                {formatMonthYear(year, month)}
-              </Text>
-            </View>
-          </View>
-        </View>
-        
-        <ScrollView 
-          className="flex-1 px-4 pt-6"
-          contentContainerStyle={{ paddingBottom: 40 }}
+        <Stack.Screen options={{ headerShown: false }} />
+        <AnimatedHeaderLayout
+          title={t('budgetPlans.createBudgetPlan')}
+          subtitle={formatMonthYear(year, month) ? `${t('budgetPlans.planning')} ${formatMonthYear(year, month)}` : undefined}
+          showBackButton={true}
+          headerHeight={130}
         >
-          {/* Instructions Card */}
-          <View className="card mb-6">
-            <View className="card-content">
-              <View className="flex-row items-start">
-                <View className="w-10 h-10 rounded-full bg-primary-100 items-center justify-center mr-3">
-                  <Ionicons name="information-circle" size={24} color="#0c6cf2" />
+          <ScrollView 
+            className="flex-1 px-4 pt-6"
+            contentContainerStyle={{ paddingBottom: 40 }}
+          >
+            {/* Instructions Card */}
+            <View className="card mb-6">
+              <View className="card-content">
+                <View className="flex-row items-start">
+                  <View className="w-10 h-10 rounded-full bg-primary-100 items-center justify-center mr-3">
+                    <Ionicons name="information-circle" size={24} color="#0c6cf2" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-lg font-semibold text-text-primary mb-2">{t('budgetPlans.gettingStarted')}</Text>
+                    <Text className="text-text-secondary">
+                      {t('budgetPlans.gettingStartedText')}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+            
+            {/* Currency Selection */}
+            <View className="card mb-6">
+              <View className="card-content">
+                <Text className="text-lg font-semibold text-text-primary mb-4">{t('budgetPlans.selectCurrency')}</Text>
+                
+                <TouchableOpacity 
+                  onPress={() => setCurrencySelectVisible(true)}
+                  className="neomorphic-inset p-4 rounded-lg flex-row justify-between items-center"
+                >
+                  <View className="flex-row items-center">
+                    <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center mr-2">
+                      <Text className="text-primary-700 font-bold">{currency.charAt(0)}</Text>
+                    </View>
+                    <Text className="text-text-primary font-medium">{getCurrencyLabel(currency)}</Text>
+                  </View>
+                  <Ionicons name="chevron-down" size={18} color="#64748b" />
+                </TouchableOpacity>
+              </View>
+            </View>
+            
+            {/* Income Entries */}
+            <View className="card mb-6">
+              <View className="card-content">
+                <View className="flex-row justify-between items-center mb-4">
+                  <View className="flex-row items-center">
+                    <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
+                      <Ionicons name="wallet-outline" size={20} color="#9333ea" />
+                    </View>
+                    <Text className="text-lg font-semibold text-text-primary">{t('budgetPlans.incomeSources')}</Text>
+                  </View>
+                  <TouchableOpacity 
+                    onPress={handleAddIncome}
+                    className="bg-primary-100 p-3 rounded-full"
+                  >
+                    <Ionicons name="add" size={20} color="#0c6cf2" />
+                  </TouchableOpacity>
+                </View>
+                
+                {incomes.map((income, index) => (
+                  <View 
+                    key={index} 
+                    className="neomorphic-inset p-4 rounded-lg mb-4"
+                  >
+                    <View className="flex-row justify-between items-center mb-3">
+                      <Text className="font-medium text-primary-600">{t('budgetPlans.incomeSource')} #{index + 1}</Text>
+                      
+                      {incomes.length > 1 && (
+                        <TouchableOpacity 
+                          onPress={() => handleRemoveIncome(index)}
+                          className="p-2 bg-red-50 rounded-full"
+                        >
+                          <Ionicons name="trash-outline" size={16} color="#dc2626" />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                    
+                    <View className="mb-3">
+                      <Text className="text-text-secondary text-sm mb-1">{t('common.name')}</Text>
+                      <TextInput
+                        value={income.name}
+                        onChangeText={(value) => handleIncomeNameChange(index, value)}
+                        placeholder={t('budgetPlans.incomeNamePlaceholder')}
+                        className="border border-surface-border rounded-lg p-3 bg-white"
+                      />
+                    </View>
+                    
+                    <View className="mb-3">
+                      <Text className="text-text-secondary text-sm mb-1">{t('common.amount')}</Text>
+                      <View className="flex-row items-center border border-surface-border rounded-lg bg-white overflow-hidden">
+                        <View className="px-3 py-3 bg-gray-50 border-r border-surface-border">
+                          <Text className="font-medium text-text-secondary">{currency}</Text>
+                        </View>
+                        <TextInput
+                          value={income.amount}
+                          onChangeText={(value) => handleIncomeAmountChange(index, value)}
+                          placeholder={t('modals.amountPlaceholder', '0.00')}
+                          keyboardType="decimal-pad"
+                          className="flex-1 p-3"
+                        />
+                      </View>
+                    </View>
+                    
+                    <View>
+                      <SelectField
+                        label={t('common.category')}
+                        placeholder={t('modals.selectIncomeCategory')}
+                        options={incomesCategories.map(cat => ({
+                          id: cat.id,
+                          name: cat.name,
+                          icon: "pricetag-outline",
+                          iconColor: "#9333ea"
+                        }))}
+                        value={income.category}
+                        onChange={(value) => handleIncomeCategoryChange(index, value)}
+                        icon={<Ionicons name="pricetag-outline" size={18} color="#9333ea" />}
+                      />
+                    </View>
+                  </View>
+                ))}
+                
+                <TouchableOpacity
+                  onPress={handleAddIncome}
+                  className="flex-row items-center justify-center p-3 border-2 border-dashed border-primary-200 rounded-lg"
+                >
+                  <Ionicons name="add-circle-outline" size={20} color="#0c6cf2" style={{ marginRight: 8 }} />
+                  <Text className="text-primary-600 font-medium">{t('budgetPlans.addIncomeSource')}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            
+            {/* Budget Tips */}
+            <View className="bg-secondary-900 rounded-xl p-6 mb-6">
+              <View className="flex-row items-start mb-4">
+                <View className="w-10 h-10 rounded-full bg-secondary-800 items-center justify-center mr-3">
+                  <Ionicons name="bulb-outline" size={20} color="#fbbf24" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-lg font-semibold text-text-primary mb-2">{t('budgetPlans.gettingStarted')}</Text>
-                  <Text className="text-text-secondary">
-                    {t('budgetPlans.gettingStartedText')}
+                  <Text className="text-white font-semibold mb-1">{t('budgetPlans.budgetTip')}</Text>
+                  <Text className="text-secondary-200">
+                    {t('budgetPlans.budgetTipText')}
                   </Text>
                 </View>
               </View>
             </View>
-          </View>
-          
-          {/* Currency Selection */}
-          <View className="card mb-6">
-            <View className="card-content">
-              <Text className="text-lg font-semibold text-text-primary mb-4">{t('budgetPlans.selectCurrency')}</Text>
-              
-              <TouchableOpacity 
-                onPress={() => setCurrencySelectVisible(true)}
-                className="neomorphic-inset p-4 rounded-lg flex-row justify-between items-center"
+            
+            {/* Action Buttons */}
+            <View className="flex-row space-x-4 mb-10">
+              <TouchableOpacity
+                onPress={() => router.back()}
+                className="flex-1 py-4 px-6 rounded-xl border-2 border-primary-600"
               >
-                <View className="flex-row items-center">
-                  <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center mr-2">
-                    <Text className="text-primary-700 font-bold">{currency.charAt(0)}</Text>
-                  </View>
-                  <Text className="text-text-primary font-medium">{getCurrencyLabel(currency)}</Text>
-                </View>
-                <Ionicons name="chevron-down" size={18} color="#64748b" />
+                <Text className="text-primary-600 text-center font-semibold">{t('common.cancel')}</Text>
               </TouchableOpacity>
-            </View>
-          </View>
-          
-          {/* Income Entries */}
-          <View className="card mb-6">
-            <View className="card-content">
-              <View className="flex-row justify-between items-center mb-4">
-                <View className="flex-row items-center">
-                  <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
-                    <Ionicons name="wallet-outline" size={20} color="#9333ea" />
-                  </View>
-                  <Text className="text-lg font-semibold text-text-primary">{t('budgetPlans.incomeSources')}</Text>
-                </View>
-                <TouchableOpacity 
-                  onPress={handleAddIncome}
-                  className="bg-primary-100 p-3 rounded-full"
-                >
-                  <Ionicons name="add" size={20} color="#0c6cf2" />
-                </TouchableOpacity>
-              </View>
-              
-              {incomes.map((income, index) => (
-                <View 
-                  key={index} 
-                  className="neomorphic-inset p-4 rounded-lg mb-4"
-                >
-                  <View className="flex-row justify-between items-center mb-3">
-                    <Text className="font-medium text-primary-600">{t('budgetPlans.incomeSource')} #{index + 1}</Text>
-                    
-                    {incomes.length > 1 && (
-                      <TouchableOpacity 
-                        onPress={() => handleRemoveIncome(index)}
-                        className="p-2 bg-red-50 rounded-full"
-                      >
-                        <Ionicons name="trash-outline" size={16} color="#dc2626" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                  
-                  <View className="mb-3">
-                    <Text className="text-text-secondary text-sm mb-1">{t('common.name')}</Text>
-                    <TextInput
-                      value={income.name}
-                      onChangeText={(value) => handleIncomeNameChange(index, value)}
-                      placeholder={t('budgetPlans.incomeNamePlaceholder')}
-                      className="border border-surface-border rounded-lg p-3 bg-white"
-                    />
-                  </View>
-                  
-                  <View className="mb-3">
-                    <Text className="text-text-secondary text-sm mb-1">{t('common.amount')}</Text>
-                    <View className="flex-row items-center border border-surface-border rounded-lg bg-white overflow-hidden">
-                      <View className="px-3 py-3 bg-gray-50 border-r border-surface-border">
-                        <Text className="font-medium text-text-secondary">{currency}</Text>
-                      </View>
-                      <TextInput
-                        value={income.amount}
-                        onChangeText={(value) => handleIncomeAmountChange(index, value)}
-                        placeholder={t('modals.amountPlaceholder', '0.00')}
-                        keyboardType="decimal-pad"
-                        className="flex-1 p-3"
-                      />
-                    </View>
-                  </View>
-                  
-                  <View>
-                    <SelectField
-                      label={t('common.category')}
-                      placeholder={t('modals.selectIncomeCategory')}
-                      options={incomesCategories.map(cat => ({
-                        id: cat.id,
-                        name: cat.name,
-                        icon: "pricetag-outline",
-                        iconColor: "#9333ea"
-                      }))}
-                      value={income.category}
-                      onChange={(value) => handleIncomeCategoryChange(index, value)}
-                      icon={<Ionicons name="pricetag-outline" size={18} color="#9333ea" />}
-                    />
-                  </View>
-                </View>
-              ))}
               
               <TouchableOpacity
-                onPress={handleAddIncome}
-                className="flex-row items-center justify-center p-3 border-2 border-dashed border-primary-200 rounded-lg"
+                onPress={handleSubmit}
+                disabled={loading || !isFormValid()}
+                className={`flex-1 py-4 px-6 rounded-xl shadow-md ${
+                  loading || !isFormValid() ? 'bg-gray-400' : 'bg-primary-600'
+                }`}
               >
-                <Ionicons name="add-circle-outline" size={20} color="#0c6cf2" style={{ marginRight: 8 }} />
-                <Text className="text-primary-600 font-medium">{t('budgetPlans.addIncomeSource')}</Text>
+                {loading ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <Text className="text-white text-center font-semibold">{t('common.create')}</Text>
+                )}
               </TouchableOpacity>
             </View>
-          </View>
-          
-          {/* Budget Tips */}
-          <View className="bg-secondary-900 rounded-xl p-6 mb-6">
-            <View className="flex-row items-start mb-4">
-              <View className="w-10 h-10 rounded-full bg-secondary-800 items-center justify-center mr-3">
-                <Ionicons name="bulb-outline" size={20} color="#fbbf24" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-white font-semibold mb-1">{t('budgetPlans.budgetTip')}</Text>
-                <Text className="text-secondary-200">
-                  {t('budgetPlans.budgetTipText')}
-                </Text>
-              </View>
-            </View>
-          </View>
-          
-          {/* Action Buttons */}
-          <View className="flex-row space-x-4 mb-10">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="flex-1 py-4 px-6 rounded-xl border-2 border-primary-600"
-            >
-              <Text className="text-primary-600 text-center font-semibold">{t('common.cancel')}</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              onPress={handleSubmit}
-              disabled={loading || !isFormValid()}
-              className={`flex-1 py-4 px-6 rounded-xl shadow-md ${
-                loading || !isFormValid() ? 'bg-gray-400' : 'bg-primary-600'
-              }`}
-            >
-              {loading ? (
-                <ActivityIndicator color="#ffffff" />
-              ) : (
-                <Text className="text-white text-center font-semibold">{t('common.create')}</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </AnimatedHeaderLayout>
         
         {/* Currency Selector Modal */}
         <Modal

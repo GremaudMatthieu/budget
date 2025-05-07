@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { View, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
  * This is the layout file for the tab navigation.
@@ -26,6 +27,7 @@ export default function TabsLayout() {
   }
 
   return (
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#0c6cf2', // primary-600
@@ -38,7 +40,7 @@ export default function TabsLayout() {
           borderTopWidth: 1,
           borderTopColor: '#e2e8f0', // surface-border
           height: 60,
-          paddingBottom: 8,
+            paddingBottom: 0, // SafeAreaView will handle the safe area
           paddingTop: 8,
         },
         headerStyle: {
@@ -117,10 +119,24 @@ export default function TabsLayout() {
         options={{
           href: null,
           headerShown: false,
+          }}
+        />
 
+        <Tabs.Screen
+          name="profile/about"
+          options={{
+            href: null,
+            headerShown: false,
         }}
       />
 
+        <Tabs.Screen
+          name="profile/support"
+          options={{
+            href: null,
+            headerShown: false,
+          }}
+        />
 
       <Tabs.Screen
         name="profile"
@@ -134,5 +150,6 @@ export default function TabsLayout() {
         }}
       />
     </Tabs>
+    </SafeAreaView>
   );
 }

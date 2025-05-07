@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
 import { budgetService } from '../services/budgetService';
 import { useErrorContext } from './ErrorContext';
-import { useSocket } from './SocketContext';
 import { 
   BudgetPlansCalendar,
   BudgetPlan,
@@ -33,6 +32,7 @@ interface BudgetContextType {
   addBudgetItem: (type: "need" | "want" | "saving" | "income", name: string, amount: string, category: string) => Promise<boolean>;
   adjustBudgetItem: (type: "need" | "want" | "saving" | "income", itemId: string, name: string, amount: string, category: string) => Promise<boolean>;
   removeBudgetItem: (type: "need" | "want" | "saving" | "income", itemId: string) => Promise<boolean>;
+  refreshBudgetPlans: () => Promise<void>;
 }
 
 // Create context with default values
@@ -49,7 +49,6 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [savingsCategories, setSavingsCategories] = useState<Category[]>([]);
   const [incomesCategories, setIncomesCategories] = useState<Category[]>([]);
   
-  const { socket, connected } = useSocket();
   const { setError } = useErrorContext();
   
   // Individual category fetch methods
@@ -113,7 +112,22 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setLoading(true);
     try {
       const data = await budgetService.getBudgetPlansCalendar(year);
-      setBudgetPlansCalendar(data);
+      setBudgetPlansCalendar(prev => {
+        const merged: BudgetPlansCalendar = {
+          ...(prev || {}),
+          [year]: data[year],
+          ...(data.budgetSummary ? { budgetSummary: data.budgetSummary } : {}),
+          ...(data.incomeCategoriesRatio ? { incomeCategoriesRatio: data.incomeCategoriesRatio } : {}),
+          ...(data.incomeCategoriesTotal ? { incomeCategoriesTotal: data.incomeCategoriesTotal } : {}),
+          ...(data.needCategoriesRatio ? { needCategoriesRatio: data.needCategoriesRatio } : {}),
+          ...(data.needCategoriesTotal ? { needCategoriesTotal: data.needCategoriesTotal } : {}),
+          ...(data.savingCategoriesRatio ? { savingCategoriesRatio: data.savingCategoriesRatio } : {}),
+          ...(data.savingCategoriesTotal ? { savingCategoriesTotal: data.savingCategoriesTotal } : {}),
+          ...(data.wantCategoriesRatio ? { wantCategoriesRatio: data.wantCategoriesRatio } : {}),
+          ...(data.wantCategoriesTotal ? { wantCategoriesTotal: data.wantCategoriesTotal } : {}),
+        };
+        return merged;
+      });
     } catch (err) {
       console.error("Failed to fetch budget plans calendar:", err);
       setError('Failed to load budget plans calendar');
@@ -141,7 +155,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const createBudgetPlan = useCallback(async (date: Date | string, currency: string, incomes: Income[]) => {
     setLoading(true);
-    const requestId = uuidv4();
+    const requestId = uuid.v4();
 
     try {
       // If date is a string, parse it; otherwise use as is
@@ -164,7 +178,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         currency,
         date: formattedDate,
         incomes: incomes.map((income) => ({
-          uuid: uuidv4(),
+          uuid: uuid.v4(),
           incomeName: income.name,
           amount: income.amount,
           category: income.category,
@@ -197,7 +211,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const createBudgetPlanFromExisting = useCallback(async (date: Date, existingBudgetPlanId: string) => {
     setLoading(true);
-    const requestId = uuidv4();
+    const requestId = uuid.v4();
 
     try {
       // Create a UTC-safe date to ensure correct month representation across timezones
@@ -243,7 +257,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!selectedBudgetPlan) return false;
 
     setLoading(true);
-    const requestId = uuidv4(); // Generate a unique request ID
+    const requestId = uuid.v4(); // Generate a unique request ID
     
     try {
       await budgetService.addBudgetItem(
@@ -251,8 +265,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         type,
         name,
         amount,
-        category,
-        requestId // Pass the requestId to track the operation
+        category
       );
       
       // Safety fallback: clear loading state after 5 seconds if no WebSocket event is received
@@ -281,7 +294,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!selectedBudgetPlan) return false;
 
     setLoading(true);
-    const requestId = uuidv4(); // Generate a unique request ID
+    const requestId = uuid.v4(); // Generate a unique request ID
 
     try {
       await budgetService.adjustBudgetItem(
@@ -290,8 +303,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         type,
         name,
         amount,
-        category,
-        requestId // Pass the requestId to track the operation
+        category
       );
       
       // Safety fallback: clear loading state after 5 seconds if no WebSocket event is received
@@ -314,14 +326,13 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!selectedBudgetPlan) return false;
 
     setLoading(true);
-    const requestId = uuidv4(); // Generate a unique request ID
+    const requestId = uuid.v4(); // Generate a unique request ID
 
     try {
       await budgetService.removeBudgetItem(
         selectedBudgetPlan.budgetPlan.uuid,
         itemId,
-        type,
-        requestId // Pass the requestId to track the operation
+        type
       );
       
       // Safety fallback: clear loading state after 5 seconds if no WebSocket event is received
@@ -340,97 +351,11 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [selectedBudgetPlan, setError]);
 
-  // Listen for budget plan events
-  useEffect(() => {
-    if (!socket || !connected) return;
-
-    const handleBudgetPlanEvent = (event: {
-      aggregateId: string;
-      type: string;
-    }) => {
-      console.log("Received WebSocket event:", event);
-
-      // Refresh calendar after budget plan events
-      if (budgetPlansCalendar) {
+  // Add a method to refresh budget plans for the current year
+  const refreshBudgetPlans = useCallback(async () => {
         const year = new Date().getFullYear();
-        fetchBudgetPlansCalendar(year);
-      }
-
-      // If the event is for the currently selected budget plan, refresh it
-      if (selectedBudgetPlan && event.aggregateId === selectedBudgetPlan.budgetPlan.uuid) {
-        fetchBudgetPlan(event.aggregateId);
-      }
-
-      // If this is a newly created budget plan, set it as the selected plan
-      if (event.type === "BudgetPlanGenerated" && event.aggregateId === newlyCreatedBudgetPlanId) {
-        fetchBudgetPlan(event.aggregateId);
-        setNewlyCreatedBudgetPlanId(null);
-      }
-    };
-
-    // Handler for connection events
-    const handleConnectionEvent = (data: any) => {
-      console.log('WebSocket connected event received in budget context:', data);
-      
-      // When socket reconnects, refresh the current view
-      if (budgetPlansCalendar) {
-        const year = new Date().getFullYear();
-        fetchBudgetPlansCalendar(year);
-      }
-      
-      // If a budget plan is selected, refresh it as well
-      if (selectedBudgetPlan) {
-        fetchBudgetPlan(selectedBudgetPlan.budgetPlan.uuid);
-      }
-      
-      // Clear newlyCreatedBudgetPlanId if it's set (clean up any pending state)
-      if (newlyCreatedBudgetPlanId) {
-        setNewlyCreatedBudgetPlanId(null);
-      }
-    };
-
-    const eventTypes = [
-      "BudgetPlanCurrencyChanged",
-      "BudgetPlanGenerated",
-      "BudgetPlanGeneratedWithOneThatAlreadyExists",
-      "BudgetPlanIncomeAdded",
-      "BudgetPlanIncomeAdjusted",
-      "BudgetPlanIncomeRemoved",
-      "BudgetPlanNeedAdded",
-      "BudgetPlanNeedAdjusted",
-      "BudgetPlanNeedRemoved",
-      "BudgetPlanRemoved",
-      "BudgetPlanSavingAdded",
-      "BudgetPlanSavingAdjusted",
-      "BudgetPlanSavingRemoved",
-      "BudgetPlanWantAdded",
-      "BudgetPlanWantAdjusted",
-      "BudgetPlanWantRemoved",
-    ];
-
-    // Register event handlers
-    eventTypes.forEach((eventType) => {
-      socket.on(eventType, handleBudgetPlanEvent);
-    });
-    
-    // Register the connection event handler
-    socket.on('connected', handleConnectionEvent);
-
-    return () => {
-      eventTypes.forEach((eventType) => {
-        socket.off(eventType, handleBudgetPlanEvent);
-      });
-      socket.off('connected', handleConnectionEvent);
-    };
-  }, [
-    socket,
-    connected,
-    fetchBudgetPlansCalendar,
-    fetchBudgetPlan,
-    selectedBudgetPlan,
-    newlyCreatedBudgetPlanId,
-    budgetPlansCalendar,
-  ]);
+    await fetchBudgetPlansCalendar(year);
+  }, [fetchBudgetPlansCalendar]);
 
   const value = {
     budgetPlansCalendar,
@@ -454,6 +379,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     addBudgetItem,
     adjustBudgetItem,
     removeBudgetItem,
+    refreshBudgetPlans,
   };
 
   return <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>;

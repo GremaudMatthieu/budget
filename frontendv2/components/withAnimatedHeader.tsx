@@ -14,6 +14,7 @@ interface AnimatedHeaderLayoutProps {
   refreshing?: boolean;
   headerContent?: React.ReactNode;
   headerButtons?: React.ReactNode;
+  onBack?: () => void;
 }
 
 const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
@@ -28,6 +29,7 @@ const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
   refreshing = false,
   headerContent,
   headerButtons,
+  onBack,
 }) => {
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -48,12 +50,13 @@ const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
         collapsePercentage={collapsePercentage}   
         headerContent={headerContent}
         headerButtons={headerButtons}
+        onBack={onBack}
       />
 
       <Animated.ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: headerHeight }
+          { paddingTop: headerHeight + 24 }
         ]}
         scrollEventThrottle={16}
         onScroll={handleScroll}

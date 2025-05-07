@@ -1,434 +1,121 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  ActivityIndicator,
-  TextInput
-} from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, Platform, ScrollView, Dimensions, Animated } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { useBudget } from '@/contexts/BudgetContext';
-import { formatCurrency, getCurrencySymbol } from '@/utils/currencyUtils';
-import formatAmount from '@/utils/formatAmount';
-import validateAmount from '@/utils/validateAmount';
-import { useErrorContext } from '@/contexts/ErrorContext';
-import { useSocket } from '@/contexts/SocketContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/useTranslation';
+import { useLanguage } from '@/contexts/LanguageContext';
+import SwipeBackWrapper from '@/components/SwipeBackWrapper';
+import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
+import BudgetItemCard from '@/components/card/BudgetItemCard';
 import BudgetItemPieChart from '@/components/BudgetItemPieChart';
 import BudgetItemModal from '@/components/modals/BudgetItemModal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import DuplicateBudgetPlanModal from '@/components/modals/DuplicateBudgetPlanModal';
 import { normalizeMonthYear } from '@/utils/dateUtils';
-import SwipeBackWrapper from '@/components/SwipeBackWrapper';
-import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
-
-// Types for the tab navigation
-type TabType = 'overview' | 'needs' | 'wants' | 'savings' | 'incomes';
+import { useBudgetPlanData } from '@/hooks/useBudgetPlanData';
+import { formatCurrency } from '@/utils/currencyUtils';
+import { useBudget } from '@/contexts/BudgetContext';
+// @ts-ignore
+import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 
 export default function BudgetPlanDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { setError } = useErrorContext();
-  const { socket, connected } = useSocket();
   const { language } = useLanguage();
   const { t } = useTranslation();
-  
-  // Get the budget plan ID from route params
   const uuid = params.uuid as string;
-  
-  const { 
-    fetchBudgetPlan, 
+  const {
+    setActiveTab,
+    refreshing,
+    onRefresh,
+    isAddModalOpen,
+    setIsAddModalOpen,
+    isEditModalOpen,
+    setIsEditModalOpen,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    currentItemType,
+    currentItem,
+    handleOpenAddModal,
+    handleOpenEditModal,
+    handleOpenDeleteModal,
+    handleAddItem,
+    handleEditItem,
+    handleDeleteItem,
     selectedBudgetPlan,
-    setSelectedBudgetPlan,
-    addBudgetItem,
-    adjustBudgetItem,
-    removeBudgetItem,
     loading,
     needsCategories,
     wantsCategories,
     savingsCategories,
     incomesCategories,
-    fetchNeedsCategories,
-    fetchWantsCategories,
-    fetchSavingsCategories,
-    fetchIncomesCategories,
-  } = useBudget();
-  
-  // State
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
-  const [refreshing, setRefreshing] = useState(false);
-  
-  // State for modals
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [currentItemType, setCurrentItemType] = useState<'need' | 'want' | 'saving' | 'income'>('need');
-  const [currentItem, setCurrentItem] = useState<{ id: string; name: string; amount: string; category: string } | null>(null);
-  
-  // State for duplicate modal
-  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
-  
-  // Ref to track mount state
-  const isMounted = useRef(true);
+  } = useBudgetPlanData(uuid);
+  const { refreshBudgetPlans } = useBudget();
 
-  // Format with exactly two decimal places
-  const formatWithTwoDecimals = (num: number): number => {
-    return Math.round(num * 100) / 100;
-  };
-  
-  // Load budget plan details and setup cleanup
-  useEffect(() => {
-    if (!uuid) return;
-    
-    const loadBudgetPlanDetails = async () => {
-      try {
-        await fetchBudgetPlan(uuid);
-      } catch (err) {
-        if (isMounted.current) {
-          setError(t('errors.failedToLoadBudgetPlanDetails'));
-        }
-      }
-    };
-    
-    loadBudgetPlanDetails();
-    
-    return () => {
-      isMounted.current = false;
-    };
-  }, [uuid, fetchBudgetPlan, setError]);
-  
-  // Set up WebSocket event listeners
-  useEffect(() => {
-    if (!socket || !connected || !uuid) return;
-    
-    const eventTypes = [
-      'BudgetPlanIncomeAdded',
-      'BudgetPlanIncomeAdjusted',
-      'BudgetPlanIncomeRemoved',
-      'BudgetPlanNeedAdded',
-      'BudgetPlanNeedAdjusted',
-      'BudgetPlanNeedRemoved',
-      'BudgetPlanSavingAdded',
-      'BudgetPlanSavingAdjusted',
-      'BudgetPlanSavingRemoved',
-      'BudgetPlanWantAdded',
-      'BudgetPlanWantAdjusted',
-      'BudgetPlanWantRemoved',
-    ];
-    
-    // Generic event handler for all events
-    const handleBudgetPlanEvent = (event: any) => {
-      // Only process events for this budget plan
-      if (event.aggregateId === uuid) {
-        // Refresh the budget plan data
-        fetchBudgetPlan(uuid);
-      }
-    };
-    
-    // Register handlers for all event types
-    eventTypes.forEach(eventType => {
-      socket.on(eventType, handleBudgetPlanEvent);
-    });
-    
-    // Cleanup function to remove event listeners
-    return () => {
-      eventTypes.forEach(eventType => {
-        socket.off(eventType, handleBudgetPlanEvent);
-      });
-    };
-  }, [socket, connected, uuid, fetchBudgetPlan]);
-  
-  // Handle refreshing the data
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await fetchBudgetPlan(uuid);
-    } catch (err) {
-      setError(t('errors.failedToRefreshBudgetPlan'));
-    } finally {
-      setRefreshing(false);
-    }
-  }, [uuid, fetchBudgetPlan, setError]);
-  
-  // Format date
+  // Helper functions for formatting and extracting data
+  const formatWithTwoDecimals = (num: number): number => Math.round(num * 100) / 100;
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long' });
   };
-  
-  // Handle opening add modal
-  const handleOpenAddModal = async (type: 'need' | 'want' | 'saving' | 'income') => {
-    setCurrentItemType(type);
-    
-    // Fetch the appropriate categories for the modal
-    try {
-      switch (type) {
-        case 'need':
-          await fetchNeedsCategories();
-          break;
-        case 'want': 
-          await fetchWantsCategories();
-          break;
-        case 'saving':
-          await fetchSavingsCategories();
-          break;
-        case 'income':
-          await fetchIncomesCategories();
-          break;
-      }
-    } catch (err) {
-      console.error(`Failed to fetch ${type} categories:`, err);
-    }
-    
-    setIsAddModalOpen(true);
-  };
-  
-  // Handle opening edit modal
-  const handleOpenEditModal = async (
-    type: 'need' | 'want' | 'saving' | 'income',
-    id: string,
-    name: string,
-    amount: string,
-    category: string,
-  ) => {
-    setCurrentItemType(type);
-    setCurrentItem({ id, name, amount, category });
-    
-    // Fetch the appropriate categories for the modal
-    try {
-      switch (type) {
-        case 'need':
-          await fetchNeedsCategories();
-          break;
-        case 'want': 
-          await fetchWantsCategories();
-          break;
-        case 'saving':
-          await fetchSavingsCategories();
-          break;
-        case 'income':
-          await fetchIncomesCategories();
-          break;
-      }
-    } catch (err) {
-      console.error(`Failed to fetch ${type} categories:`, err);
-    }
-    
-    setIsEditModalOpen(true);
-  };
-  
-  // Handle opening delete modal
-  const handleOpenDeleteModal = (type: 'need' | 'want' | 'saving' | 'income', id: string, name: string) => {
-    setCurrentItemType(type);
-    setCurrentItem({ id, name, amount: '', category: '' });
-    setIsDeleteModalOpen(true);
-  };
-  
-  // Handle adding a budget item
-  const handleAddItem = useCallback(async (name: string, amount: string, category: string) => {
-    try {
-      const success = await addBudgetItem(currentItemType, name, amount, category);
-      if (success) {
-        setIsAddModalOpen(false);
-        await fetchBudgetPlan(uuid);
-      }
-    } catch (err) {
-      setError(t(`errors.failedToAdd${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`));
-    }
-  }, [addBudgetItem, currentItemType, fetchBudgetPlan, uuid, setError]);
-  
-  // Handle editing a budget item
-  const handleEditItem = useCallback(async (name: string, amount: string, category: string) => {
-    if (!currentItem) return;
-    
-    try {
-      const success = await adjustBudgetItem(
-        currentItemType,
-        currentItem.id,
-        name,
-        amount,
-        category
-      );
-      
-      if (success) {
-        setIsEditModalOpen(false);
-        await fetchBudgetPlan(uuid);
-      }
-    } catch (err) {
-      setError(t(`errors.failedToUpdate${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`));
-    }
-  }, [adjustBudgetItem, currentItem, currentItemType, fetchBudgetPlan, uuid, setError]);
-  
-  // Handle deleting a budget item
-  const handleDeleteItem = useCallback(async () => {
-    if (!currentItem) return;
-    
-    try {
-      const success = await removeBudgetItem(currentItemType, currentItem.id);
-      
-      if (success) {
-        setIsDeleteModalOpen(false);
-        await fetchBudgetPlan(uuid);
-      }
-    } catch (err) {
-      setError(t(`errors.failedToDelete${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`));
-    }
-  }, [removeBudgetItem, currentItem, currentItemType, fetchBudgetPlan, uuid, setError]);
-  
-  // Get the appropriate field names based on item type
   const getFieldNames = (type: 'need' | 'want' | 'saving' | 'income') => {
     switch (type) {
-      case 'need':
-        return { name: 'needName', amount: 'needAmount', category: 'category' };
-      case 'want':
-        return { name: 'wantName', amount: 'wantAmount', category: 'category' };
-      case 'saving':
-        return { name: 'savingName', amount: 'savingAmount', category: 'category' };
-      case 'income':
-        return { name: 'incomeName', amount: 'incomeAmount', category: 'category' };
+      case 'need': return { name: 'needName', amount: 'needAmount', category: 'category' };
+      case 'want': return { name: 'wantName', amount: 'wantAmount', category: 'category' };
+      case 'saving': return { name: 'savingName', amount: 'savingAmount', category: 'category' };
+      case 'income': return { name: 'incomeName', amount: 'incomeAmount', category: 'category' };
     }
   };
-  
-  // Get category name from category ID
+  const getIconAndColor = (type: 'need' | 'want' | 'saving' | 'income') => {
+    switch (type) {
+      case 'need': return { icon: 'cash-outline', color: '#16a34a', bgColor: 'bg-green-100', textColor: 'text-green-700' };
+      case 'want': return { icon: 'cart-outline', color: '#0284c7', bgColor: 'bg-blue-100', textColor: 'text-blue-700' };
+      case 'saving': return { icon: 'save-outline', color: '#ca8a04', bgColor: 'bg-amber-100', textColor: 'text-amber-700' };
+      case 'income': return { icon: 'wallet-outline', color: '#9333ea', bgColor: 'bg-purple-100', textColor: 'text-purple-700' };
+    }
+  };
   const getCategoryName = (type: 'need' | 'want' | 'saving' | 'income', categoryId: string) => {
     let categoryList: any[] = [];
-    
     switch (type) {
-      case 'need':
-        categoryList = needsCategories;
-        break;
-      case 'want':
-        categoryList = wantsCategories;
-        break;
-      case 'saving':
-        categoryList = savingsCategories;
-        break;
-      case 'income':
-        categoryList = incomesCategories;
-        break;
+      case 'need': categoryList = needsCategories; break;
+      case 'want': categoryList = wantsCategories; break;
+      case 'saving': categoryList = savingsCategories; break;
+      case 'income': categoryList = incomesCategories; break;
     }
-    
     const category = categoryList.find(cat => cat.id === categoryId);
     return category ? category.name : categoryId;
   };
-  
+
   // Extract budget plan details
   const { budgetPlan: planDetails, needs, wants, savings, incomes } = selectedBudgetPlan || {};
-  
-  // Parse the budget plan date to extract month and year
   const getBudgetPlanMonthYear = () => {
     if (!planDetails?.date) return { month: new Date().getMonth() + 1, year: new Date().getFullYear() };
-    
-    // Make sure we parse the date correctly by normalizing it
     const date = new Date(planDetails.date);
     return normalizeMonthYear(date);
   };
-  
-  // Get source month and year for duplicate modal
   const { month: sourceMonth, year: sourceYear } = getBudgetPlanMonthYear();
-  
+
   // Calculate totals
   const totalIncome = incomes?.reduce((sum, income) => sum + parseFloat(income.incomeAmount), 0) || 0;
   const totalNeeds = needs?.reduce((sum, need) => sum + parseFloat(need.needAmount), 0) || 0;
   const totalWants = wants?.reduce((sum, want) => sum + parseFloat(want.wantAmount), 0) || 0;
   const totalSavings = savings?.reduce((sum, saving) => sum + parseFloat(saving.savingAmount), 0) || 0;
-  
-  // Calculate percentages
   const needsPercentage = totalIncome > 0 ? (totalNeeds / totalIncome) * 100 : 0;
   const wantsPercentage = totalIncome > 0 ? (totalWants / totalIncome) * 100 : 0;
   const savingsPercentage = totalIncome > 0 ? (totalSavings / totalIncome) * 100 : 0;
-  
-  // Calculate remaining (unallocated) amount
   const totalAllocated = totalNeeds + totalWants + totalSavings;
   const remaining = totalIncome - totalAllocated;
-  
-  // Prepare chart data
   const chartData = [
     { name: t('budgetPlans.needs'), value: totalNeeds, color: '#4CAF50' },
     { name: t('budgetPlans.wants'), value: totalWants, color: '#2196F3' },
     { name: t('budgetPlans.savings'), value: totalSavings, color: '#FFC107' },
   ];
-  
-  // Get icon and color for each type
-  const getIconAndColor = (type: 'need' | 'want' | 'saving' | 'income') => {
-    switch (type) {
-      case 'need':
-        return { icon: 'cash-outline', color: '#16a34a', bgColor: 'bg-green-100', textColor: 'text-green-700' };
-      case 'want':
-        return { icon: 'cart-outline', color: '#0284c7', bgColor: 'bg-blue-100', textColor: 'text-blue-700' };
-      case 'saving':
-        return { icon: 'save-outline', color: '#ca8a04', bgColor: 'bg-amber-100', textColor: 'text-amber-700' };
-      case 'income':
-        return { icon: 'wallet-outline', color: '#9333ea', bgColor: 'bg-purple-100', textColor: 'text-purple-700' };
-    }
-  };
 
-  // Budget Summary component for header
-  const BudgetSummary = () => (
-    <View className="bg-primary-50 p-3 rounded-xl">
-      <View className="flex-row justify-between mb-2">
-        <Text className="text-primary-600">{t('budgetPlans.allocationProgress')}</Text>
-        <Text 
-          className="text-primary-600 font-medium"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {formatWithTwoDecimals(totalIncome > 0 ? (totalAllocated / totalIncome) * 100 : 0)}%
-        </Text>
-      </View>
-      
-      <View className="h-2 bg-primary-100 rounded-full overflow-hidden">
-        <View 
-          className="h-2 bg-primary-500 rounded-full" 
-          style={{ width: `${Math.min(100, totalIncome > 0 ? (totalAllocated / totalIncome) * 100 : 0)}%` }} 
-        />
-      </View>
-      
-      <View className="flex-row justify-between mt-3">
-        <View className="items-center">
-          <Text className="text-xs text-primary-600">{t('budgetPlans.needs')}</Text>
-          <Text 
-            className="text-sm font-semibold text-primary-700"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {formatWithTwoDecimals(needsPercentage)}%
-          </Text>
-        </View>
-        <View className="items-center">
-          <Text className="text-xs text-primary-600">{t('budgetPlans.wants')}</Text>
-          <Text 
-            className="text-sm font-semibold text-primary-700"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {formatWithTwoDecimals(wantsPercentage)}%
-          </Text>
-        </View>
-        <View className="items-center">
-          <Text className="text-xs text-primary-600">{t('budgetPlans.savings')}</Text>
-          <Text 
-            className="text-sm font-semibold text-primary-700"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {formatWithTwoDecimals(savingsPercentage)}%
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
-  
-  // Render a list of budget items
+  // Render a list of budget items using BudgetItemCard
   const renderItemList = (type: 'need' | 'want' | 'saving' | 'income', items: any[]) => {
     if (!items) return null;
-    
     const fields = getFieldNames(type);
     const { icon, color, bgColor, textColor } = getIconAndColor(type);
-    
     return (
       <View className="mb-6">
         <View className="card">
@@ -436,14 +123,11 @@ export default function BudgetPlanDetailScreen() {
             <View className="flex-row justify-between items-center mb-4">
               <View className="flex-row items-center">
                 <View className={`w-10 h-10 rounded-full ${bgColor} items-center justify-center mr-3`}>
-                  <Ionicons name={icon} size={20} color={color} />
+                  <Ionicons name={icon as any} size={20} color={color} />
                 </View>
                 <View>
                   <Text className="text-lg font-semibold text-text-primary">
-                    {type === 'need' ? t('budgetPlans.needs') : 
-                     type === 'want' ? t('budgetPlans.wants') : 
-                     type === 'saving' ? t('budgetPlans.savings') : 
-                     t('budgetPlans.incomes')}
+                    {type === 'need' ? t('budgetPlans.needs') : type === 'want' ? t('budgetPlans.wants') : type === 'saving' ? t('budgetPlans.savings') : t('budgetPlans.incomes')}
                   </Text>
                   {type !== 'income' && (
                     <Text className={`text-xs ${textColor}`} numberOfLines={1} ellipsizeMode="tail">
@@ -452,7 +136,6 @@ export default function BudgetPlanDetailScreen() {
                   )}
                 </View>
               </View>
-              
               <TouchableOpacity
                 onPress={() => handleOpenAddModal(type)}
                 className="bg-primary-100 p-3 rounded-full"
@@ -465,7 +148,6 @@ export default function BudgetPlanDetailScreen() {
                 )}
               </TouchableOpacity>
             </View>
-            
             <View className="neomorphic-inset p-3 rounded-lg mb-4">
               <Text className="text-text-secondary">
                 {type === 'need' && t('budgetPlans.needsDescription')}
@@ -474,10 +156,9 @@ export default function BudgetPlanDetailScreen() {
                 {type === 'income' && t('budgetPlans.incomesDescription')}
               </Text>
             </View>
-            
             {items.length === 0 ? (
               <View className="py-6 items-center">
-                <Ionicons name={icon} size={32} color="#d1d5db" />
+                <Ionicons name={icon as any} size={32} color="#d1d5db" />
                 <Text className="text-gray-400 mt-2">{t('budgetPlans.no' + type.charAt(0).toUpperCase() + type.slice(1) + 's')}</Text>
                 <TouchableOpacity
                   onPress={() => handleOpenAddModal(type)}
@@ -489,114 +170,39 @@ export default function BudgetPlanDetailScreen() {
             ) : (
               <View className="space-y-3">
                 {items.map((item) => (
-                  <View key={item.uuid} className="neomorphic-inset p-3 rounded-lg">
-                    <View className="flex-row justify-between items-center">
-                      <View className="flex-1">
-                        <Text 
-                          className="font-medium text-text-primary"
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                          style={{ maxWidth: '95%' }}
-                        >
-                          {item[fields.name]}
-                        </Text>
-                        <View className="flex-row items-center">
-                          <Ionicons name="pricetag-outline" size={12} color="#64748b" />
-                          <Text 
-                            className="text-xs text-text-secondary ml-1" 
-                            numberOfLines={1} 
-                            ellipsizeMode="tail"
-                            style={{ maxWidth: 120 }}
-                          >
-                            {getCategoryName(type, item[fields.category])}
-                          </Text>
-                        </View>
-                      </View>
-                      
-                      <View className="flex-row items-center">
-                        <Text 
-                          className="font-semibold mr-4 text-primary-600" 
-                          numberOfLines={1} 
-                          ellipsizeMode="tail"
-                          style={{ maxWidth: 100 }}
-                        >
-                          {formatCurrency(
-                            formatWithTwoDecimals(parseFloat(item[fields.amount])), 
-                            planDetails?.currency
-                          )}
-                        </Text>
-                        
-                        <TouchableOpacity
-                          onPress={() => handleOpenEditModal(
-                            type,
-                            item.uuid,
-                            item[fields.name],
-                            item[fields.amount],
-                            item[fields.category]
-                          )}
-                          className="p-2 bg-gray-100 rounded-full mr-1"
-                          disabled={loading}
-                        >
-                          <Ionicons name="create-outline" size={16} color="#64748b" />
-                        </TouchableOpacity>
-                        
-                        <TouchableOpacity
-                          onPress={() => handleOpenDeleteModal(type, item.uuid, item[fields.name])}
-                          className="p-2 bg-red-50 rounded-full"
-                          disabled={loading}
-                        >
-                          <Ionicons name="trash-outline" size={16} color="#dc2626" />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </View>
+                  <BudgetItemCard
+                    key={item.uuid}
+                    name={item[fields.name]}
+                    amount={item[fields.amount]}
+                    category={getCategoryName(type, item[fields.category])}
+                    icon={icon}
+                    color={color}
+                    bgColor={bgColor}
+                    textColor={textColor}
+                    currency={planDetails?.currency}
+                    onEdit={() => handleOpenEditModal(type, item.uuid, item[fields.name], item[fields.amount], item[fields.category])}
+                    onDelete={() => handleOpenDeleteModal(type, item.uuid, item[fields.name])}
+                    loading={loading}
+                  />
                 ))}
               </View>
             )}
-            
             <View className="mt-6 pt-4 border-t border-gray-200">
               <View className="flex-row justify-between items-center">
                 <Text className="font-semibold text-text-primary">{t('common.total')}</Text>
-                <Text 
-                  className="text-xl font-bold text-primary-600"
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={{ maxWidth: 150 }}
-                >
+                <Text className="text-xl font-bold text-primary-600" numberOfLines={1} ellipsizeMode="tail" style={{ maxWidth: 150 }}>
                   {formatCurrency(
                     formatWithTwoDecimals(
-                      type === 'need'
-                        ? totalNeeds
-                        : type === 'want'
-                          ? totalWants
-                          : type === 'saving'
-                            ? totalSavings
-                            : totalIncome
+                      type === 'need' ? totalNeeds : type === 'want' ? totalWants : type === 'saving' ? totalSavings : totalIncome
                     ),
                     planDetails?.currency
                   )}
                 </Text>
               </View>
-              
               {type !== 'income' && (
                 <View className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <View 
-                    className={`h-2 ${
-                      type === 'need' 
-                        ? 'bg-green-500' 
-                        : type === 'want' 
-                          ? 'bg-blue-500' 
-                          : 'bg-amber-500'
-                    }`}
-                    style={{ 
-                      width: `${
-                        Math.min(100, (type === 'need' 
-                          ? needsPercentage 
-                          : type === 'want' 
-                            ? wantsPercentage 
-                            : savingsPercentage))
-                      }%` 
-                    }}
+                  <View className={`h-2 ${type === 'need' ? 'bg-green-500' : type === 'want' ? 'bg-blue-500' : 'bg-amber-500'}`}
+                    style={{ width: `${Math.min(100, (type === 'need' ? needsPercentage : type === 'want' ? wantsPercentage : savingsPercentage))}%` }}
                   />
                 </View>
               )}
@@ -606,7 +212,293 @@ export default function BudgetPlanDetailScreen() {
       </View>
     );
   };
-  
+
+  // --- TabView setup ---
+  const initialLayout = { width: Dimensions.get('window').width };
+  const [index, setIndex] = useState(0);
+  const [fabLock, setFabLock] = useState(false);
+  const [routes] = useState([
+    { key: 'overview', title: t('budgetPlans.tabOverview') },
+    { key: 'needs', title: t('budgetPlans.tabNeeds') },
+    { key: 'wants', title: t('budgetPlans.tabWants') },
+    { key: 'savings', title: t('budgetPlans.tabSavings') },
+    { key: 'incomes', title: t('budgetPlans.tabIncomes') },
+  ]);
+
+  const handleIndexChange = (newIndex: number) => {
+    setFabLock(true);
+    setIndex(newIndex);
+    setTimeout(() => setFabLock(false), 400);
+  };
+
+  // Determine FAB type from current index
+  const key = routes[index].key;
+  let type: 'need' | 'want' | 'saving' | 'income';
+  switch (key) {
+    case 'needs':
+      type = 'need'; break;
+    case 'wants':
+      type = 'want'; break;
+    case 'savings':
+      type = 'saving'; break;
+    case 'incomes':
+      type = 'income'; break;
+    default:
+      type = 'income';
+  }
+
+  // --- Custom TabBar for Tailwind and accessibility ---
+  const tabIcons: Record<string, string> = {
+    overview: 'pie-chart-outline',
+    needs: 'cash-outline',
+    wants: 'cart-outline',
+    savings: 'save-outline',
+    incomes: 'wallet-outline',
+  };
+  const renderTabBar = (props: any) => (
+    <TabBar
+      {...props}
+      scrollEnabled={true}
+      indicatorStyle={{ backgroundColor: '#0c6cf2', height: 4, borderRadius: 2 }}
+      style={{ backgroundColor: 'transparent', marginHorizontal: 0, marginTop: -19, elevation: 0, shadowColor: 'transparent', shadowOpacity: 0, shadowRadius: 0, shadowOffset: { width: 0, height: 0 }, borderRadius: 0 }}
+      tabStyle={{ minWidth: 90, paddingHorizontal: 8, borderRadius: 24, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
+      renderLabel={({ route, focused }: { route: { key: string; title: string }; focused: boolean }) => (
+        <View className="flex-row items-center justify-center">
+          <Ionicons
+            name={tabIcons[route.key] as any}
+            size={18}
+            color={focused ? '#0c6cf2' : '#64748b'}
+            style={{ marginRight: 4 }}
+          />
+          <Text
+            style={{
+              fontSize: 13,
+              fontWeight: '600',
+              color: focused ? '#0c6cf2' : '#64748b',
+              maxWidth: 70,
+            }}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {route.title}
+          </Text>
+        </View>
+      )}
+      accessibilityRole="tablist"
+      activeColor="#0c6cf2"
+      inactiveColor="#64748b"
+      pressColor="#e0e7ff"
+    />
+  );
+
+  // --- Render functions for each tab ---
+  const renderOverview = () => (
+    <ScrollView className="px-2 pt-2 pb-8 w-full" contentContainerStyle={{ paddingBottom: 32 }}>
+      <View className="w-full">
+        {/* --- Compact Summary & Allocation Grid --- */}
+        <View className="bg-white rounded-xl shadow-md px-2 py-2 mb-2">
+          <Text className="text-lg font-bold text-text-primary mb-2 text-center">{t('budgetPlans.budgetSummary')}</Text>
+          <View className="flex-row gap-x-2 mb-2">
+            {/* Needs */}
+            <View className="flex-1 items-center justify-center py-2 px-1">
+              <Ionicons name="cash-outline" size={18} color="#16a34a" className="mb-1" />
+              <Text className="text-green-600 font-semibold text-xs mb-1">{t('budgetPlans.needs')}</Text>
+              <Text className="text-base font-bold text-text-primary text-center min-w-0 max-w-full overflow-hidden" numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: totalNeeds > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(totalNeeds), planDetails?.currency)}</Text>
+              <Text className="text-xs text-text-secondary text-center mt-1">{formatWithTwoDecimals(needsPercentage)}%</Text>
+            </View>
+            {/* Wants */}
+            <View className="flex-1 items-center justify-center py-2 px-1">
+              <Ionicons name="cart-outline" size={18} color="#0284c7" className="mb-1" />
+              <Text className="text-blue-600 font-semibold text-xs mb-1">{t('budgetPlans.wants')}</Text>
+              <Text className="text-base font-bold text-text-primary text-center min-w-0 max-w-full overflow-hidden" numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: totalWants > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(totalWants), planDetails?.currency)}</Text>
+              <Text className="text-xs text-text-secondary text-center mt-1">{formatWithTwoDecimals(wantsPercentage)}%</Text>
+            </View>
+            {/* Savings */}
+            <View className="flex-1 items-center justify-center py-2 px-1">
+              <Ionicons name="save-outline" size={18} color="#ca8a04" className="mb-1" />
+              <Text className="text-amber-600 font-semibold text-xs mb-1">{t('budgetPlans.savings')}</Text>
+              <Text className="text-base font-bold text-text-primary text-center min-w-0 max-w-full overflow-hidden" numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: totalSavings > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(totalSavings), planDetails?.currency)}</Text>
+              <Text className="text-xs text-text-secondary text-center mt-1">{formatWithTwoDecimals(savingsPercentage)}%</Text>
+            </View>
+          </View>
+          {/* --- Total/Remaining Row --- */}
+          <View className="flex-row justify-between items-center border-t border-gray-200 pt-2 mt-2">
+            <Text className="text-primary-700 font-semibold text-xs">{t('budgetPlans.totalAllocated')}</Text>
+            <Text className="font-bold text-primary-700 text-base text-right min-w-0 max-w-[120px] overflow-hidden" numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: totalAllocated > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(totalAllocated), planDetails?.currency)}</Text>
+          </View>
+          <View className="flex-row justify-between items-center mt-1">
+            <Text className={`font-semibold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'} text-xs`}>{t('budgetPlans.remainingToAllocate')}</Text>
+            <Text className={`font-bold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'} text-base text-right min-w-0 max-w-[120px] overflow-hidden`} numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: Math.abs(remaining) > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}</Text>
+          </View>
+        </View>
+        {/* --- Pie Chart & Legend (not boxed) --- */}
+        <View className="w-full items-center justify-center mt-2 mb-2">
+          <BudgetItemPieChart data={chartData} size={160} />
+        </View>
+        {/* --- Budget Health Section (not a card, just a section with divider) --- */}
+        <View className="w-full mt-2 pt-4 border-t border-gray-200">
+          <Text className="text-lg font-bold text-text-primary mb-2 text-center">{t('budgetPlans.budgetHealth')}</Text>
+          <View className="bg-secondary-900 rounded-lg p-4 mb-4">
+            <Text className="text-white font-medium mb-1">{t('budgetPlans.fiftyThirtyTwentyComparison')}</Text>
+            <Text className="text-secondary-300 text-xs mb-3">{t('budgetPlans.idealAllocation')}</Text>
+            <View className="space-y-3">
+              <View>
+                <View className="flex-row justify-between mb-1">
+                  <Text className="text-green-400 text-xs">{t('budgetPlans.needs')}</Text>
+                  <Text className="text-green-400 text-xs" numberOfLines={1} ellipsizeMode="tail">{formatWithTwoDecimals(needsPercentage)}% {t('common.vs')} 50%</Text>
+                </View>
+                <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
+                  <View className="h-2 bg-green-500 rounded-full" style={{ width: `${Math.min(100, needsPercentage)}%` }} />
+                </View>
+              </View>
+              <View>
+                <View className="flex-row justify-between mb-1">
+                  <Text className="text-blue-400 text-xs">{t('budgetPlans.wants')}</Text>
+                  <Text className="text-blue-400 text-xs" numberOfLines={1} ellipsizeMode="tail">{formatWithTwoDecimals(wantsPercentage)}% {t('common.vs')} 30%</Text>
+                </View>
+                <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
+                  <View className="h-2 bg-blue-500 rounded-full" style={{ width: `${Math.min(100, wantsPercentage)}%` }} />
+                </View>
+              </View>
+              <View>
+                <View className="flex-row justify-between mb-1">
+                  <Text className="text-amber-400 text-xs">{t('budgetPlans.savings')}</Text>
+                  <Text className="text-amber-400 text-xs" numberOfLines={1} ellipsizeMode="tail">{formatWithTwoDecimals(savingsPercentage)}% {t('common.vs')} 20%</Text>
+                </View>
+                <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
+                  <View className="h-2 bg-amber-500 rounded-full" style={{ width: `${Math.min(100, savingsPercentage)}%` }} />
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
+  );
+
+  const renderCategoryTab = (
+    type: 'need' | 'want' | 'saving' | 'income',
+    items: any[],
+    total: number,
+    percentage: number,
+    color: string,
+    bgColor: string,
+    textColor: string,
+    icon: string,
+    description: string,
+    categories: any[],
+  ) => (
+    <ScrollView className="px-2 pt-2 pb-8 w-full" contentContainerStyle={{ paddingBottom: 32 }}>
+      {/* --- Compact Summary --- */}
+      <View className="bg-white rounded-xl shadow-md px-2 py-2 mb-2">
+        <View className="flex-row items-center justify-center mb-2">
+          <View className={`w-10 h-10 rounded-full ${bgColor} items-center justify-center mr-3`}>
+            <Ionicons name={icon as any} size={22} color={color} />
+          </View>
+          <View>
+            <Text className={`text-lg font-bold ${textColor}`}>{t(`budgetPlans.${type === 'saving' ? 'savings' : type + 's'}`)}</Text>
+            {type !== 'income' && (
+              <Text className={`text-xs ${textColor}`}>{formatWithTwoDecimals(percentage)}% {t('budgetPlans.ofIncome')}</Text>
+            )}
+          </View>
+        </View>
+        <Text className="text-text-secondary text-xs mb-2 text-center">{description}</Text>
+        <View className="flex-row justify-between items-center mt-1">
+          <Text className="font-semibold text-text-primary text-xs">{t('common.total')}</Text>
+          <Text className={`font-bold ${textColor} text-base text-right min-w-0 max-w-[120px] overflow-hidden`} numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: total > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(total), planDetails?.currency)}</Text>
+        </View>
+        {type !== 'income' && (
+          <View className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <View className={`h-2 ${type === 'need' ? 'bg-green-500' : type === 'want' ? 'bg-blue-500' : 'bg-amber-500'}`}
+              style={{ width: `${Math.min(100, percentage)}%` }}
+            />
+          </View>
+        )}
+      </View>
+      {/* --- List of Items --- */}
+      <View className="space-y-2 w-full mt-2">
+        {items.length === 0 ? (
+          <View className="py-6 items-center">
+            <Ionicons name={icon as any} size={32} color="#d1d5db" />
+            <Text className="text-gray-400 mt-2">{t('budgetPlans.no' + type.charAt(0).toUpperCase() + type.slice(1) + 's')}</Text>
+          </View>
+        ) : (
+          items.map((item) => {
+            const fields = getFieldNames(type);
+            return (
+              <BudgetItemCard
+                key={item.uuid}
+                name={item[fields.name]}
+                amount={item[fields.amount]}
+                category={getCategoryName(type, item[fields.category])}
+                icon={icon}
+                color={color}
+                bgColor={bgColor}
+                textColor={textColor}
+                currency={planDetails?.currency}
+                onEdit={() => handleOpenEditModal(type, item.uuid, item[fields.name], item[fields.amount], item[fields.category])}
+                onDelete={() => handleOpenDeleteModal(type, item.uuid, item[fields.name])}
+                loading={loading}
+              />
+            );
+          })
+        )}
+      </View>
+    </ScrollView>
+  );
+
+  const renderNeeds = () => renderCategoryTab(
+    'need',
+    needs ?? [],
+    totalNeeds,
+    needsPercentage,
+    '#16a34a',
+    'bg-green-100',
+    'text-green-700',
+    'cash-outline',
+    t('budgetPlans.needsDescription'),
+    needsCategories,
+  );
+  const renderWants = () => renderCategoryTab(
+    'want',
+    wants ?? [],
+    totalWants,
+    wantsPercentage,
+    '#0284c7',
+    'bg-blue-100',
+    'text-blue-700',
+    'cart-outline',
+    t('budgetPlans.wantsDescription'),
+    wantsCategories,
+  );
+  const renderSavings = () => renderCategoryTab(
+    'saving',
+    savings ?? [],
+    totalSavings,
+    savingsPercentage,
+    '#ca8a04',
+    'bg-amber-100',
+    'text-amber-700',
+    'save-outline',
+    t('budgetPlans.savingsDescription'),
+    savingsCategories,
+  );
+  const renderIncomes = () => renderCategoryTab(
+    'income',
+    incomes ?? [],
+    totalIncome,
+    0,
+    '#9333ea',
+    'bg-purple-100',
+    'text-purple-700',
+    'wallet-outline',
+    t('budgetPlans.incomesDescription'),
+    incomesCategories,
+  );
+
+  // --- Duplicate modal state ---
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+
   if (loading && !selectedBudgetPlan) {
     return (
       <View className="flex-1 justify-center items-center bg-background-light">
@@ -617,7 +509,6 @@ export default function BudgetPlanDetailScreen() {
       </View>
     );
   }
-  
   if (!selectedBudgetPlan) {
     return (
       <View className="flex-1 justify-center items-center bg-background-light">
@@ -638,400 +529,138 @@ export default function BudgetPlanDetailScreen() {
     );
   }
 
-  // Create a header right component with duplicate button
-  const headerRightComponent = () => (
-    <TouchableOpacity
-      onPress={() => setIsDuplicateModalOpen(true)}
-      className="bg-white/20 p-2 rounded-full"
-    >
-      <Ionicons name="copy-outline" size={20} color="white" />
-    </TouchableOpacity>
-  );
-
-  // Main content component with tab navigation
-  const MainContent = () => (
-    <View className="flex-1">
-      {/* Tab Navigation */}
-      <View className="px-4 mt-4 z-10">
-        <View className="neomorphic rounded-xl shadow-md">
-          <View className="flex-row justify-between">
-            {(['overview', 'needs', 'wants', 'savings', 'incomes'] as TabType[]).map((tab) => (
-              <TouchableOpacity
-                key={tab}
-                onPress={() => setActiveTab(tab)}
-                className={`flex-1 py-3 ${activeTab === tab ? 'bg-primary-50' : ''} 
-                  ${tab === 'overview' ? 'rounded-l-xl' : ''}
-                  ${tab === 'incomes' ? 'rounded-r-xl' : ''}
-                `}
-              >
-                <Text 
-                  className={`text-center text-xs font-medium ${
-                    activeTab === tab ? 'text-primary-600' : 'text-text-secondary'
-                  }`}
-                >
-                  {t(`budgetPlans.tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </View>
-      
-      <View className="flex-1 px-4 pt-6">
-        {activeTab === 'overview' && (
-          <View className="space-y-6">
-            {/* Budget Summary Card */}
-            <View className="card">
-              <View className="card-content">
-                <Text className="text-xl font-semibold text-text-primary mb-4">{t('budgetPlans.budgetSummary')}</Text>
-                
-                <View className="items-center py-4">
-                  <BudgetItemPieChart data={chartData} />
-                </View>
-                
-                <View className="flex-row flex-wrap mt-4">
-                  <View className="w-1/3 pr-2 mb-4">
-                    <View className="bg-green-50 p-3 rounded-lg items-center">
-                      <Text className="text-green-600 font-medium">{t('budgetPlans.needs')}</Text>
-                      <Text 
-                        className="text-lg font-bold text-text-primary" 
-                        numberOfLines={1} 
-                        ellipsizeMode="tail" 
-                        style={{ maxWidth: '95%' }}
-                      >
-                        {formatCurrency(formatWithTwoDecimals(totalNeeds), planDetails?.currency)}
-                      </Text>
-                      <Text className="text-xs text-text-secondary">
-                        {formatWithTwoDecimals(needsPercentage)}%
-                      </Text>
-                    </View>
-                  </View>
-                  
-                  <View className="w-1/3 px-1 mb-4">
-                    <View className="bg-blue-50 p-3 rounded-lg items-center">
-                      <Text className="text-blue-600 font-medium">{t('budgetPlans.wants')}</Text>
-                      <Text 
-                        className="text-lg font-bold text-text-primary" 
-                        numberOfLines={1} 
-                        ellipsizeMode="tail" 
-                        style={{ maxWidth: '95%' }}
-                      >
-                        {formatCurrency(formatWithTwoDecimals(totalWants), planDetails?.currency)}
-                      </Text>
-                      <Text className="text-xs text-text-secondary">
-                        {formatWithTwoDecimals(wantsPercentage)}%
-                      </Text>
-                    </View>
-                  </View>
-                  
-                  <View className="w-1/3 pl-2 mb-4">
-                    <View className="bg-amber-50 p-3 rounded-lg items-center">
-                      <Text className="text-amber-600 font-medium">{t('budgetPlans.savings')}</Text>
-                      <Text 
-                        className="text-lg font-bold text-text-primary" 
-                        numberOfLines={1} 
-                        ellipsizeMode="tail" 
-                        style={{ maxWidth: '95%' }}
-                      >
-                        {formatCurrency(formatWithTwoDecimals(totalSavings), planDetails?.currency)}
-                      </Text>
-                      <Text className="text-xs text-text-secondary">
-                        {formatWithTwoDecimals(savingsPercentage)}%
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                
-                <View className="bg-primary-50 rounded-lg p-4 mt-2">
-                  <View className="flex-row justify-between mb-1">
-                    <Text className="text-primary-700 font-medium">{t('budgetPlans.totalAllocated')}</Text>
-                    <Text 
-                      className="font-bold text-primary-700"
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                      style={{ maxWidth: 150 }}
-                    >
-                      {formatCurrency(formatWithTwoDecimals(totalAllocated), planDetails?.currency)}
-                    </Text>
-                  </View>
-                  <View className="flex-row justify-between">
-                    <Text className={`font-medium ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'}`}>
-                      {t('budgetPlans.remainingToAllocate')}
-                    </Text>
-                    <Text 
-                      className={`font-bold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'}`}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                      style={{ maxWidth: 150 }}
-                    >
-                      {formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-            
-            {/* Income Sources Card */}
-            <View className="card">
-              <View className="card-content">
-                <View className="flex-row justify-between items-center mb-4">
-                  <View className="flex-row items-center">
-                    <View className="w-10 h-10 rounded-full bg-purple-100 items-center justify-center mr-3">
-                      <Ionicons name="wallet-outline" size={20} color="#9333ea" />
-                    </View>
-                    <Text className="text-lg font-semibold text-text-primary">{t('budgetPlans.incomeSources')}</Text>
-                  </View>
-                  
-                  <TouchableOpacity
-                    onPress={() => handleOpenAddModal('income')}
-                    className="bg-primary-100 p-3 rounded-full"
-                    disabled={loading}
-                  >
-                    <Ionicons name="add" size={18} color="#0c6cf2" />
-                  </TouchableOpacity>
-                </View>
-                
-                {incomes?.length === 0 ? (
-                  <View className="neomorphic-inset p-6 rounded-lg items-center">
-                    <Ionicons name="wallet-outline" size={32} color="#d1d5db" />
-                    <Text className="text-gray-400 mt-2 mb-4">{t('budgetPlans.noIncomes')}</Text>
-                    <TouchableOpacity
-                      onPress={() => handleOpenAddModal('income')}
-                      className="px-4 py-2 bg-purple-100 rounded-lg"
-                    >
-                      <Text className="text-purple-700">{t('budgetPlans.addIncome')}</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View className="neomorphic-inset p-3 rounded-lg">
-                    <View className="space-y-3">
-                      {incomes?.map((income) => (
-                        <View key={income.uuid} className="flex-row justify-between items-center p-2">
-                          <View className="flex-row items-center">
-                            <View className="w-8 h-8 rounded-full bg-purple-100 items-center justify-center mr-2">
-                              <Text className="text-purple-700 font-medium">
-                                {income.incomeName.charAt(0).toUpperCase()}
-                              </Text>
-                            </View>
-                            <Text 
-                              className="font-medium text-text-primary"
-                              numberOfLines={1}
-                              ellipsizeMode="tail"
-                              style={{ maxWidth: 150 }}
-                            >
-                              {income.incomeName}
-                            </Text>
-                          </View>
-                          <Text 
-                            className="font-bold text-primary-600"
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            style={{ maxWidth: 120 }}
-                          >
-                            {formatCurrency(formatWithTwoDecimals(parseFloat(income.incomeAmount)), planDetails?.currency)}
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
-                    
-                    <View className="mt-3 pt-3 border-t border-gray-200">
-                      <View className="flex-row justify-between">
-                        <Text className="font-semibold text-text-primary">{t('budgetPlans.totalIncome')}</Text>
-                        <Text 
-                          className="text-xl font-bold text-primary-600"
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                          style={{ maxWidth: 150 }}
-                        >
-                          {formatCurrency(formatWithTwoDecimals(totalIncome), planDetails?.currency)}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                )}
-              </View>
-            </View>
-            
-            {/* Budget Health Card */}
-            {totalIncome > 0 && (
-              <View className="card">
-                <View className="card-content">
-                  <Text className="text-lg font-semibold text-text-primary mb-4">{t('budgetPlans.budgetHealth')}</Text>
-                  
-                  <View className="bg-secondary-900 rounded-lg p-4 mb-4">
-                    <Text className="text-white font-medium mb-1">{t('budgetPlans.fiftyThirtyTwentyComparison')}</Text>
-                    <Text className="text-secondary-300 text-xs mb-3">
-                      {t('budgetPlans.idealAllocation')}
-                    </Text>
-                    
-                    <View className="space-y-3">
-                      <View>
-                        <View className="flex-row justify-between mb-1">
-                          <Text className="text-green-400 text-xs">{t('budgetPlans.needs')}</Text>
-                          <Text 
-                            className="text-green-400 text-xs"
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {formatWithTwoDecimals(needsPercentage)}% {t('common.vs')} 50%
-                          </Text>
-                        </View>
-                        <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
-                          <View 
-                            className="h-2 bg-green-500 rounded-full" 
-                            style={{ width: `${Math.min(100, needsPercentage)}%` }} 
-                          />
-                        </View>
-                      </View>
-                      
-                      <View>
-                        <View className="flex-row justify-between mb-1">
-                          <Text className="text-blue-400 text-xs">{t('budgetPlans.wants')}</Text>
-                          <Text 
-                            className="text-blue-400 text-xs"
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {formatWithTwoDecimals(wantsPercentage)}% {t('common.vs')} 30%
-                          </Text>
-                        </View>
-                        <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
-                          <View 
-                            className="h-2 bg-blue-500 rounded-full" 
-                            style={{ width: `${Math.min(100, wantsPercentage)}%` }} 
-                          />
-                        </View>
-                      </View>
-                      
-                      <View>
-                        <View className="flex-row justify-between mb-1">
-                          <Text className="text-amber-400 text-xs">{t('budgetPlans.savings')}</Text>
-                          <Text 
-                            className="text-amber-400 text-xs"
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {formatWithTwoDecimals(savingsPercentage)}% {t('common.vs')} 20%
-                          </Text>
-                        </View>
-                        <View className="h-2 bg-secondary-800 rounded-full overflow-hidden">
-                          <View 
-                            className="h-2 bg-amber-500 rounded-full" 
-                            style={{ width: `${Math.min(100, savingsPercentage)}%` }} 
-                          />
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            )}
-          </View>
-        )}
-        
-        {activeTab === 'needs' && renderItemList('need', needs)}
-        {activeTab === 'wants' && renderItemList('want', wants)}
-        {activeTab === 'savings' && renderItemList('saving', savings)}
-        {activeTab === 'incomes' && renderItemList('income', incomes)}
-      </View>
-    </View>
-  );
-  
   return (
-    <SwipeBackWrapper>
-      <View className="flex-1">
-        <Stack.Screen 
-          options={{
-            headerShown: false
-          }}
-        />
-        
+    <SwipeBackWrapper hasScrollView>
+      <View className="flex-1 bg-background-light">
+        <Stack.Screen options={{ headerShown: false }} />
         <AnimatedHeaderLayout
           title={planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}
           subtitle={`${formatCurrency(formatWithTwoDecimals(totalIncome), planDetails?.currency)} • ${t('budgetPlans.remaining')}: ${formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}`}
           showBackButton={true}
-          rightComponent={headerRightComponent()}
+          rightComponent={
+            <TouchableOpacity
+              onPress={() => setIsDuplicateModalOpen(true)}
+              className="flex-row items-center px-3 py-2 bg-primary-100 rounded-xl ml-2"
+              accessibilityRole="button"
+              accessibilityLabel={t('budgetPlans.duplicate')}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="copy-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
+              <Text className="text-primary-700 font-semibold">{t('budgetPlans.duplicate')}</Text>
+            </TouchableOpacity>
+          }
           onRefresh={onRefresh}
           refreshing={refreshing}
           headerHeight={180}
-          renderHeaderContent={() => <BudgetSummary />}
         >
-          <MainContent />
+          {/* --- TabView for native swipeable tabs --- */}
+          <TabView
+            navigationState={{ index, routes }}
+            renderScene={({ route }) => {
+              switch (route.key) {
+                case 'overview':
+                  return renderOverview();
+                case 'needs':
+                  return renderNeeds();
+                case 'wants':
+                  return renderWants();
+                case 'savings':
+                  return renderSavings();
+                case 'incomes':
+                  return renderIncomes();
+                default:
+                  return null;
+              }
+            }}
+            onIndexChange={handleIndexChange}
+            initialLayout={initialLayout}
+            renderTabBar={renderTabBar}
+            swipeEnabled={true}
+            lazy
+            style={{ flex: 1 }}
+          />
+          {/* Add/Edit/Delete Modals (unchanged) */}
+          {isAddModalOpen && (
+            <BudgetItemModal
+              isVisible={isAddModalOpen}
+              onClose={() => setIsAddModalOpen(false)}
+              onSubmit={async (name, amount, category) => {
+                await handleAddItem(name, amount, category);
+                await refreshBudgetPlans();
+              }}
+              title={t(`budgetPlans.add${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`)}
+              itemType={currentItemType}
+              categories={
+                currentItemType === 'need'
+                  ? needsCategories
+                  : currentItemType === 'want'
+                    ? wantsCategories
+                    : currentItemType === 'saving'
+                      ? savingsCategories
+                      : incomesCategories
+              }
+            />
+          )}
+          {isEditModalOpen && currentItem && (
+            <BudgetItemModal
+              isVisible={isEditModalOpen}
+              onClose={() => setIsEditModalOpen(false)}
+              onSubmit={async (name, amount, category) => {
+                await handleEditItem(name, amount, category);
+                await refreshBudgetPlans();
+              }}
+              title={t(`budgetPlans.edit${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`)}
+              initialName={currentItem.name}
+              initialAmount={currentItem.amount}
+              initialCategory={currentItem.category}
+              isEdit={true}
+              itemType={currentItemType}
+              categories={
+                currentItemType === 'need'
+                  ? needsCategories
+                  : currentItemType === 'want'
+                    ? wantsCategories
+                    : currentItemType === 'saving'
+                      ? savingsCategories
+                      : incomesCategories
+              }
+            />
+          )}
+          {isDeleteModalOpen && currentItem && (
+            <DeleteConfirmationModal
+              visible={isDeleteModalOpen}
+              onClose={() => setIsDeleteModalOpen(false)}
+              onConfirm={async () => {
+                await handleDeleteItem();
+                await refreshBudgetPlans();
+              }}
+              name={currentItem.name}
+              message={t('modals.deleteConfirmation', { name: currentItem.name })}
+            />
+          )}
+          {/* Duplicate Budget Plan Modal (restored) */}
+          <DuplicateBudgetPlanModal
+            visible={isDuplicateModalOpen}
+            onClose={() => setIsDuplicateModalOpen(false)}
+            sourceBudgetPlanId={uuid}
+            sourceMonth={sourceMonth}
+            sourceYear={sourceYear}
+          />
         </AnimatedHeaderLayout>
-        
-        {/* Floating Action Button */}
-        <View className="absolute bottom-6 right-6">
+        {/* --- Floating Action Button (FAB) fixed to screen --- */}
+        <View style={{ position: 'absolute', bottom: 24, right: 24, zIndex: 30, opacity: fabLock ? 0.5 : 1 }}>
           <TouchableOpacity
-            onPress={() => handleOpenAddModal(activeTab === 'overview' ? 'income' : activeTab.slice(0, -1) as any)}
-            className="bg-primary-600 w-14 h-14 rounded-full shadow-lg items-center justify-center"
+            onPress={() => handleOpenAddModal(type)}
+            disabled={fabLock}
+            className="bg-primary-600 w-16 h-16 rounded-full shadow-lg items-center justify-center active:opacity-80"
+            accessibilityRole="button"
+            accessibilityLabel={t('common.add')}
+            accessibilityHint={t('modals.addItemHint', { defaultValue: 'Add a new item' })}
+            activeOpacity={0.8}
           >
-            <Ionicons name="add" size={28} color="white" />
+            <Ionicons name="add" size={32} color="white" />
           </TouchableOpacity>
         </View>
-        
-        {/* Add Item Modal */}
-        {isAddModalOpen && (
-          <BudgetItemModal
-            isVisible={isAddModalOpen}
-            onClose={() => setIsAddModalOpen(false)}
-            onSubmit={handleAddItem}
-            title={t(`budgetPlans.add${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`)}
-            itemType={currentItemType}
-            categories={
-              currentItemType === 'need'
-                ? needsCategories
-                : currentItemType === 'want'
-                  ? wantsCategories
-                  : currentItemType === 'saving'
-                    ? savingsCategories
-                    : incomesCategories
-            }
-          />
-        )}
-        
-        {/* Edit Item Modal */}
-        {isEditModalOpen && currentItem && (
-          <BudgetItemModal
-            isVisible={isEditModalOpen}
-            onClose={() => setIsEditModalOpen(false)}
-            onSubmit={handleEditItem}
-            title={t(`budgetPlans.edit${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`)}
-            initialName={currentItem.name}
-            initialAmount={currentItem.amount}
-            initialCategory={currentItem.category}
-            isEdit={true}
-            itemType={currentItemType}
-            categories={
-              currentItemType === 'need'
-                ? needsCategories
-                : currentItemType === 'want'
-                  ? wantsCategories
-                  : currentItemType === 'saving'
-                    ? savingsCategories
-                    : incomesCategories
-            }
-          />
-        )}
-        
-        {/* Delete Confirmation Modal */}
-        {isDeleteModalOpen && currentItem && (
-          <DeleteConfirmationModal
-            visible={isDeleteModalOpen}
-            onClose={() => setIsDeleteModalOpen(false)}
-            onConfirm={handleDeleteItem}
-            name={currentItem.name}
-            message={t('modals.deleteConfirmation', { name: currentItem.name })}
-          />
-        )}
-        
-        {/* Duplicate Budget Plan Modal */}
-        <DuplicateBudgetPlanModal
-          visible={isDuplicateModalOpen}
-          onClose={() => setIsDuplicateModalOpen(false)}
-          sourceBudgetPlanId={uuid}
-          sourceMonth={sourceMonth}
-          sourceYear={sourceYear}
-        />
       </View>
     </SwipeBackWrapper>
   );

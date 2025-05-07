@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { ErrorMessage } from '@/components/ErrorMessage';
 import { View } from 'react-native';
+import Toast from 'react-native-root-toast';
 
 type ErrorContextType = {
   error: string | null;
@@ -26,17 +27,42 @@ type ErrorProviderProps = {
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   
-  const clearError = () => {
-    setError(null);
-  };
+  useEffect(() => {
+    let toast: any;
+    if (error) {
+      toast = Toast.show(error, {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
+        shadow: false,
+        animation: true,
+        hideOnPress: true,
+        backgroundColor: 'rgba(30, 41, 59, 0.98)',
+        textColor: '#fff',
+        containerStyle: {
+          borderRadius: 16,
+          marginBottom: 48,
+          paddingHorizontal: 24,
+          paddingVertical: 16,
+          minWidth: 180,
+          maxWidth: '90%',
+          alignSelf: 'center',
+        },
+        textStyle: {
+          color: '#fff',
+          fontSize: 16,
+          fontWeight: '600',
+          textAlign: 'center',
+        },
+        onHidden: () => setError(null),
+      });
+    }
+    return () => {
+      if (toast) Toast.hide(toast);
+    };
+  }, [error]);
 
   return (
     <ErrorContext.Provider value={{ error, setError }}>
-      {error && (
-        <View className="absolute top-2 left-2 right-2 z-50">
-          <ErrorMessage message={error} onDismiss={clearError} />
-        </View>
-      )}
       {children}
     </ErrorContext.Provider>
   );

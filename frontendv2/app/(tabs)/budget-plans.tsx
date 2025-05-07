@@ -11,6 +11,7 @@ import {
   Platform
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -52,6 +53,13 @@ export default function BudgetPlansScreen() {
       setError('Failed to load budget plans calendar');
     }
   };
+
+  // Always fetch latest data when page is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCalendarData();
+    }, [currentYear])
+  );
 
   // Handle refresh
   const handleRefresh = useCallback(async () => {
@@ -317,7 +325,7 @@ export default function BudgetPlansScreen() {
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
-                      {formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.needsPercentage || 0)}%
+                      {formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.needsPercentage ?? 0)}%
                     </Text>
                   </View>
                   <View className="flex-1 bg-blue-100 p-2 rounded-lg items-center">
@@ -327,7 +335,7 @@ export default function BudgetPlansScreen() {
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
-                      {formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.wantsPercentage || 0)}%
+                      {formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.wantsPercentage ?? 0)}%
                     </Text>
                   </View>
                   <View className="flex-1 bg-amber-100 p-2 rounded-lg items-center">
@@ -337,7 +345,7 @@ export default function BudgetPlansScreen() {
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
-                      {formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.savingsPercentage || 0)}%
+                      {formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.savingsPercentage ?? 0)}%
                     </Text>
                   </View>
                 </View>
@@ -347,6 +355,8 @@ export default function BudgetPlansScreen() {
             <TouchableOpacity 
               onPress={() => handleMonthSelect(new Date().getFullYear(), new Date().getMonth() + 1)}
               className="card"
+              disabled={currentYear !== new Date().getFullYear()}
+              style={currentYear !== new Date().getFullYear() ? { opacity: 0.5 } : {}}
             >
               <View className="card-content items-center py-6">
                 <View className="w-16 h-16 bg-primary-100 rounded-full items-center justify-center mb-4">
@@ -358,6 +368,9 @@ export default function BudgetPlansScreen() {
                 <Text className="text-text-secondary text-center mb-4">
                   {t('budgetPlans.planIncomeExpenses', { month: months[new Date().getMonth()] })}
                 </Text>
+                {currentYear !== new Date().getFullYear() && (
+                  <Text className="text-xs text-red-500 mt-1 text-center">{t('budgetPlans.createThisMonthDisabled')}</Text>
+                )}
                 <View className="bg-primary-600 px-4 py-2 rounded-xl">
                   <Text className="text-white font-medium">{t('budgetPlans.createBudgetPlan')}</Text>
                 </View>
@@ -423,9 +436,9 @@ export default function BudgetPlansScreen() {
                             <Text className="text-xs text-secondary-600">{t('budgetPlans.allocated')}:</Text>
                             <Text 
                               className={`text-xs font-medium ${
-                                monthData.allocatedPercentage > 100 
+                                (monthData.allocatedPercentage ?? 0) > 100 
                                   ? 'text-danger-600' 
-                                  : monthData.allocatedPercentage < 80 
+                                  : (monthData.allocatedPercentage ?? 0) < 80 
                                     ? 'text-amber-600' 
                                     : 'text-success-600'
                               }`}
@@ -444,13 +457,13 @@ export default function BudgetPlansScreen() {
                           <View className="h-1 bg-gray-200 rounded-full mt-2">
                             <View 
                               className={`h-1 rounded-full ${
-                                monthData.allocatedPercentage > 100 
+                                (monthData.allocatedPercentage ?? 0) > 100 
                                   ? 'bg-danger-500' 
-                                  : monthData.allocatedPercentage < 80 
+                                  : (monthData.allocatedPercentage ?? 0) < 80 
                                     ? 'bg-amber-500' 
                                     : 'bg-success-500'
                               }`}
-                              style={{ width: `${Math.min(100, monthData.allocatedPercentage || 0)}%` }} 
+                              style={{ width: `${Math.min(100, (monthData.allocatedPercentage ?? 0))}%` }} 
                             />
                           </View>
                         </View>

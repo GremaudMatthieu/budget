@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "GoGoBudgeto",
-    "slug": "go_go_budgeto",
+    "name": "mgremaud",
+    "slug": "go-go-budgeto",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -32,10 +32,24 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e9c03607-6931-4b8a-a632-97e3199d6edc"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e9c03607-6931-4b8a-a632-97e3199d6edc"
     }
   }
 }

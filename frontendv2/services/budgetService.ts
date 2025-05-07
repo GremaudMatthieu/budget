@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'react-native-uuid';
 import { 
   BudgetPlansCalendar, 
   BudgetPlan,
@@ -54,8 +54,8 @@ export class BudgetService {
     amount: string, 
     category: string
   ): Promise<void> {
-    const requestId = uuidv4();
-    const itemId = uuidv4();
+    const requestId = uuid.v4();
+    const itemId = uuid.v4();
     const config = { headers: { 'Request-Id': requestId } };
     const payload = {
       uuid: itemId,
@@ -93,9 +93,10 @@ export class BudgetService {
     amount: string, 
     category: string
   ): Promise<void> {
-    const requestId = uuidv4();
+    const requestId = uuid.v4();
     const config = { headers: { 'Request-Id': requestId } };
     const payload = {
+      uuid: itemId,
       name,
       amount,
       category
@@ -127,7 +128,7 @@ export class BudgetService {
     itemId: string,
     type: 'need' | 'want' | 'saving' | 'income'
   ): Promise<void> {
-    const requestId = uuidv4();
+    const requestId = uuid.v4();
     const config = { headers: { 'Request-Id': requestId } };
 
     let endpoint = '';

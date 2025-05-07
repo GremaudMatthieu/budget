@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { 
   useAnimatedStyle, 
@@ -19,13 +19,18 @@ interface SwipeBackWrapperProps {
 
 export default function SwipeBackWrapper({ 
   children, 
-  threshold = 100, 
-  edgeWidth = 30,
+  threshold = 60, 
+  edgeWidth = 160,
   hasScrollView = false
 }: SwipeBackWrapperProps) {
   const router = useRouter();
   const navigation = useNavigation<any>();
   const pathname = usePathname();
+
+  // Only enable swipe back on iOS for best UX
+  if (Platform.OS !== 'ios') {
+    return <>{children}</>;
+  }
 
   const translateX = useSharedValue(0);
   const startX = useSharedValue(0);
@@ -48,21 +53,21 @@ export default function SwipeBackWrapper({
     if (cleanPath.match(/^\/envelopes\/[^\/]+$/)) {
       // If we're on envelopes/[uuid], go back to /envelopes
       console.log("Navigating from envelope detail to envelopes list");
-      router.push('/envelopes');
+      router.push('/envelopes' as any);
       return;
     } 
     
     if (cleanPath.match(/^\/budget-plans\/[^\/]+$/)) {
       // If we're on budget-plans/[uuid], go back to /budget-plans
       console.log("Navigating from budget plan detail to budget plans list");
-      router.push('/budget-plans');
+      router.push('/budget-plans' as any);
       return;
     }
     
     if (cleanPath.match(/^\/profile\/[^\/]+$/)) {
       // If we're on profile/[screen], go back to /profile
       console.log("Navigating from profile detail screen to profile");
-      router.push('/profile');
+      router.push('/profile' as any);
       return;
     }
     
@@ -73,11 +78,11 @@ export default function SwipeBackWrapper({
       // Get parent path - this works for nested routes within tab routes
       const parentPath = '/' + segments.slice(0, segments.length - 1).join('/');
       console.log("Navigating to parent path:", parentPath);
-      router.push(parentPath);
+      router.push(parentPath as any);
     } else {
       // If on a top-level page like /envelopes, go to dashboard
       console.log("Navigating to dashboard");
-      router.push('/');
+      router.push('/' as any);
     }
   };
 

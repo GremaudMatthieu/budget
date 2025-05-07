@@ -1,3 +1,11 @@
+import { getRandomValues } from 'expo-crypto';
+
+if (typeof global.crypto === 'undefined') {
+  global.crypto = {} as Crypto;
+}
+if (typeof global.crypto.getRandomValues === 'undefined') {
+  global.crypto.getRandomValues = getRandomValues as typeof global.crypto.getRandomValues;
+}
 import { Redirect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 

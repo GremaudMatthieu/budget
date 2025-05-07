@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Animated, View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,6 +14,7 @@ interface AnimatedHeaderProps {
   headerContent?: React.ReactNode;
   headerButtons?: React.ReactNode;
   collapsePercentage?: number;
+  onBack?: () => void;
 }
 
 export default function AnimatedHeader({
@@ -24,9 +25,11 @@ export default function AnimatedHeader({
   scrollY,
   headerContent,
   headerButtons,
-  collapsePercentage = 100
+  collapsePercentage = 100,
+  onBack,
 }: AnimatedHeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   // Header animation values
   const headerOpacity = useRef(new Animated.Value(1)).current;
@@ -113,7 +116,17 @@ export default function AnimatedHeader({
           {showBackButton && (
             <TouchableOpacity
               style={styles.backButton}
-              onPress={() => router.back()}
+              onPress={() => {
+                if (onBack) {
+                  onBack();
+                } else if (/^\/envelopes\/[\w-]+$/.test(pathname)) {
+                  router.replace('/envelopes');
+                } else if (/^\/budget-plans\/[\w-]+$/.test(pathname)) {
+                  router.replace('/budget-plans');
+                } else {
+                  router.back();
+                }
+              }}
               hitSlop={{ top: 15, right: 15, bottom: 15, left: 15 }}
             >
               <Ionicons name="chevron-back" size={26} color="white" />

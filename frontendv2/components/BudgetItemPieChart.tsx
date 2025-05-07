@@ -10,10 +10,11 @@ interface PieChartData {
 
 interface BudgetItemPieChartProps {
   data: PieChartData[];
+  size?: number;
 }
 
 // Custom implementation that works with modern react-native-svg
-const BudgetItemPieChart: React.FC<BudgetItemPieChartProps> = ({ data }) => {
+const BudgetItemPieChart: React.FC<BudgetItemPieChartProps> = ({ data, size = 200 }) => {
   // Filter out zero values
   const filteredData = data.filter(item => item.value > 0);
   
@@ -30,7 +31,7 @@ const BudgetItemPieChart: React.FC<BudgetItemPieChartProps> = ({ data }) => {
   const total = filteredData.reduce((sum, item) => sum + item.value, 0);
   
   // Create pie chart paths
-  const svgSize = 200;
+  const svgSize = size;
   const centerX = svgSize / 2;
   const centerY = svgSize / 2;
   const radius = svgSize * 0.4; // Outer radius

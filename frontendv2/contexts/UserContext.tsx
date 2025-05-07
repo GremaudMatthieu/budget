@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { useSocket } from './SocketContext';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import uuid from 'react-native-uuid';
 import { useAuth } from './AuthContext';
 import { useErrorContext } from './ErrorContext';
 import { apiClient } from '@/services/apiClient';
@@ -35,102 +34,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [pendingRequests, setPendingRequests] = useState<Record<string, boolean>>({});
   
-  const { socket, connected } = useSocket();
   const { user, logout, refreshUserData } = useAuth(); // Get refreshUserData from AuthContext
   const { setError: setGlobalError } = useErrorContext();
-  
-  // Clear pending requests when socket disconnects
-  useEffect(() => {
-    if (!connected && Object.keys(pendingRequests).length > 0) {
-      console.log('Socket disconnected, clearing pending requests');
-      setPendingRequests({});
-    }
-  }, [connected, pendingRequests]);
-  
-  // Setup WebSocket event listeners for user-related events
-  useEffect(() => {
-    if (!socket || !user) return;
-    
-    console.log('Setting up WebSocket event listeners for user updates');
-    
-    // Define a function to handle event processing
-    const processUserEvent = async (event: any) => {
-      console.log(`Processing user event: ${event.type || 'unknown'}`, event);
-      
-      // Make sure we're only processing events for the current user
-      if (event.userId === user.uuid || event.aggregateId === user.uuid) {
-        if (event.requestId && pendingRequests[event.requestId]) {
-          console.log(`Clearing pending request: ${event.requestId}`);
-          
-          // Create a new object without the pending request to ensure state updates
-          const newPendingRequests = { ...pendingRequests };
-          delete newPendingRequests[event.requestId];
-          
-          // Force an immediate state update
-          setPendingRequests(newPendingRequests);
-          
-          // Refresh user data in the AuthContext, which will update UI
-          await refreshUserData();
-        }
-      }
-    };
-    
-    // Define event handlers with a shared processing function
-    const eventHandlers: Record<string, (event: any) => void> = {
-      'UserDeleted': (event) => {
-        console.log('User deleted event received:', event);
-        processUserEvent(event);
-        // Logout the user after processing the event
-        logout();
-      },
-      'UserFirstnameChanged': (event) => {
-        console.log('User firstname changed event received:', event);
-        processUserEvent(event);
-      },
-      'UserLastnameChanged': (event) => {
-        console.log('User lastname changed event received:', event);
-        processUserEvent(event);
-      },
-      'UserLanguagePreferenceChanged': (event) => {
-        console.log('User language preference changed event received:', event);
-        processUserEvent(event);
-      }
-    };
-    
-    // Register event handlers
-    for (const [event, handler] of Object.entries(eventHandlers)) {
-      socket.on(event, handler);
-    }
-    
-    // Cleanup function
-    return () => {
-      console.log('Cleaning up WebSocket event listeners for user updates');
-      // Remove all event handlers
-      for (const event of Object.keys(eventHandlers)) {
-        socket.off(event);
-      }
-    };
-  }, [socket, user, pendingRequests, logout, refreshUserData]);
-  
-  // Check if there are any pending requests and update the updating state
-  useEffect(() => {
-    const hasPendingRequests = Object.keys(pendingRequests).length > 0;
-    setUpdating(hasPendingRequests);
-    
-    // Add a safety timeout to reset updating state after 10 seconds
-    // in case the server doesn't respond with an event
-    if (hasPendingRequests) {
-      const timeoutId = setTimeout(() => {
-        if (Object.keys(pendingRequests).length > 0) {
-          console.log('Safety timeout: clearing pending requests after 10 seconds');
-          setPendingRequests({});
-          setUpdating(false);
-        }
-      }, 10000);
-      
-      return () => clearTimeout(timeoutId);
-    }
-  }, [pendingRequests]);
   
   // Update first name
   const updateFirstName = async (firstName: string): Promise<boolean> => {
@@ -139,7 +44,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return false;
     }
     
-    const requestId = uuidv4();
+    const requestId = uuid.v4();
     console.log(`Updating firstname with request ID: ${requestId}`);
     
     setPendingRequests(prev => ({
@@ -178,7 +83,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return false;
     }
     
-    const requestId = uuidv4();
+    const requestId = uuid.v4();
     console.log(`Updating lastname with request ID: ${requestId}`);
     
     setPendingRequests(prev => ({
@@ -217,7 +122,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return false;
     }
     
-    const requestId = uuidv4();
+    const requestId = uuid.v4();
     console.log(`Updating language preference with request ID: ${requestId}`);
     
     setPendingRequests(prev => ({
@@ -256,7 +161,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return false;
     }
     
-    const requestId = uuidv4();
+    const requestId = uuid.v4();
     console.log(`Deleting account with request ID: ${requestId}`);
     
     setPendingRequests(prev => ({

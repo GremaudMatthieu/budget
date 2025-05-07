@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,8 +14,14 @@ function ProfileContent() {
 
   const handleLogout = async () => {
     await logout();
-    router.replace('/');
+    // Do not navigate here; let useEffect handle it
   };
+
+  useEffect(() => {
+    if (!user) {
+      router.replace('/signin');
+    }
+  }, [user, router]);
 
   return (
     <View className="flex-1">
@@ -35,7 +41,7 @@ function ProfileContent() {
       {/* Settings Menu */}
       <View className="bg-white rounded-xl shadow-sm mb-6 mx-4">
         <TouchableOpacity
-          className="flex-row items-center justify-between p-4 border-b border-surface-border"
+          className="flex-row items-center justify-between p-4"
           onPress={() => {
             router.push('/profile/account-settings');
           }}
@@ -48,51 +54,6 @@ function ProfileContent() {
           </View>
           <Ionicons name="chevron-forward" size={20} color="#64748b" />
         </TouchableOpacity>
-
-        <TouchableOpacity
-          className="flex-row items-center justify-between p-4 border-b border-surface-border"
-          onPress={() => {
-            // Navigate to notifications settings
-          }}
-        >
-          <View className="flex-row items-center">
-            <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center mr-3">
-              <Ionicons name="notifications-outline" size={16} color="#0c6cf2" />
-            </View>
-            <Text className="text-text-primary">{t('profile.notifications')}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#64748b" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          className="flex-row items-center justify-between p-4 border-b border-surface-border"
-          onPress={() => {
-            // Navigate to security settings
-          }}
-        >
-          <View className="flex-row items-center">
-            <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center mr-3">
-              <Ionicons name="shield-checkmark-outline" size={16} color="#0c6cf2" />
-            </View>
-            <Text className="text-text-primary">{t('profile.security')}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#64748b" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          className="flex-row items-center justify-between p-4"
-          onPress={() => {
-            // Navigate to appearance settings
-          }}
-        >
-          <View className="flex-row items-center">
-            <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center mr-3">
-              <Ionicons name="color-palette-outline" size={16} color="#0c6cf2" />
-            </View>
-            <Text className="text-text-primary">{t('profile.appearance')}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#64748b" />
-        </TouchableOpacity>
       </View>
 
       {/* Support and About */}
@@ -100,7 +61,7 @@ function ProfileContent() {
         <TouchableOpacity
           className="flex-row items-center justify-between p-4 border-b border-surface-border"
           onPress={() => {
-            // Navigate to help & support
+            router.push('/profile/support');
           }}
         >
           <View className="flex-row items-center">
@@ -115,7 +76,7 @@ function ProfileContent() {
         <TouchableOpacity
           className="flex-row items-center justify-between p-4"
           onPress={() => {
-            // Navigate to about page
+            router.push('/profile/about');
           }}
         >
           <View className="flex-row items-center">

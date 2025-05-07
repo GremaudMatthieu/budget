@@ -4,6 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from '@/utils/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -11,17 +12,20 @@ export default function GoogleSignInButton() {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const { loginWithGoogle } = useAuth();
-  const API_URL = process.env.API_URL || 'http://127.0.0.1:8000/api';
+  const { language } = useLanguage();
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
+      const stateObj = { platform: Platform.OS === 'web' ? 'web' : 'mobile', languagePreference: language };
+      const state = encodeURIComponent(JSON.stringify(stateObj));
       if (Platform.OS === 'web') {
-        window.location.href = `${API_URL}/connect/google?platform=web`;
+        window.location.href = `${API_URL}/connect/google?platform=web&state=${state}`;
       } else {
         // For mobile, use the custom URL scheme
         const result = await WebBrowser.openAuthSessionAsync(
-          `${API_URL}/connect/google?platform=mobile`,
+          `${API_URL}/connect/google?platform=mobile&state=${state}`,
           'budgetapp://oauth/google/callback'
         );
 

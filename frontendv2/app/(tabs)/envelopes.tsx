@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,12 +19,14 @@ import formatAmount from '@/utils/formatAmount';
 import validateAmount from '@/utils/validateAmount';
 import { useErrorContext } from '@/contexts/ErrorContext';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
+import { useFocusEffect } from 'expo-router';
+import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
 
 // Content component for envelopes, which will be wrapped with the animated header
-function EnvelopesContent() {
+function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }) {
   const { t } = useTranslation();
   const router = useRouter();
-  const { envelopesData, loading, createEnvelope, deleteEnvelope, creditEnvelope, debitEnvelope, updateEnvelopeName } = useEnvelopes();
+  const { envelopesData, loading, createEnvelope, deleteEnvelope, creditEnvelope, debitEnvelope, updateEnvelopeName, refreshEnvelopes } = useEnvelopes();
   const { setError } = useErrorContext();
   const [isCreating, setIsCreating] = useState(false);
   const screenWidth = Dimensions.get('window').width;
@@ -33,18 +35,24 @@ function EnvelopesContent() {
   // State for envelope actions
   const [amounts, setAmounts] = useState<Record<string, string>>({});
   const [editingName, setEditingName] = useState<{ id: string, name: string } | null>(null);
+  const [nameTouched, setNameTouched] = useState<{ [id: string]: boolean }>({});
+  const [nameErrors, setNameErrors] = useState<{ [id: string]: string | null }>({});
+  const [amountTouched, setAmountTouched] = useState<{ [id: string]: boolean }>({});
+  const [amountErrors, setAmountErrors] = useState<{ [id: string]: string | null }>({});
   const [envelopeToDelete, setEnvelopeToDelete] = useState<{ id: string, name: string } | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [currentAction, setCurrentAction] = useState<{ type: 'credit' | 'debit', id: string, amount: string } | null>(null);
+  const [amountFocused, setAmountFocused] = useState<{ [id: string]: boolean }>({});
 
   const handleCreateEnvelope = useCallback(async (name: string, targetAmount: string, currency: string) => {
     if (name && targetAmount) {
       const formattedTarget = formatAmount(targetAmount);
       await createEnvelope(name, formattedTarget, currency);
+      await refreshEnvelopes();
       setIsCreating(false);
     }
-  }, [createEnvelope]);
+  }, [createEnvelope, refreshEnvelopes]);
 
   const navigateToEnvelopeDetail = (uuid: string) => {
     // Navigate to the envelope detail screen using the dynamic route
@@ -52,21 +60,40 @@ function EnvelopesContent() {
   };
 
   const handleAmountChange = (id: string, value: string) => {
+    // Allow ',' as decimal
+    const normalized = value.replace(/,/g, '.');
     // Remove anything that's not a digit or decimal point
-    const filtered = value.replace(/[^0-9.]/g, '');
-
+    const filtered = normalized.replace(/[^0-9.]/g, '');
     // Ensure only one decimal point
     const parts = filtered.split('.');
     let formatted = parts[0];
-
     if (parts.length > 1) {
       formatted += '.' + parts[1];
     }
-
     setAmounts(prev => ({
       ...prev,
       [id]: formatted
     }));
+    setAmountTouched(prev => ({ ...prev, [id]: true }));
+  };
+
+  // Validation for amount
+  const validateAmountField = (value: string) => {
+    const MAX_AMOUNT = 9999999999.99;
+    if (!value.trim()) return t('errors.amountRequired', { defaultValue: 'Amount is required' });
+    if (value.trim().length < 1) return t('errors.amountTooShort', { defaultValue: 'Amount must be at least 1 character' });
+    if (value.trim().length > 13) return t('errors.amountTooLong', { defaultValue: 'Amount must be at most 13 characters (e.g. 9999999999.99)' });
+    if (!validateAmount(value) || parseFloat(value) <= 0) return t('errors.amountInvalid', { defaultValue: 'Enter a valid positive amount' });
+    if (parseFloat(value) > MAX_AMOUNT) return t('errors.amountTooLarge', { defaultValue: 'Amount must be at most 9999999999.99' });
+    return null;
+  };
+
+  // Validation for name
+  const validateNameField = (value: string) => {
+    if (!value.trim()) return t('envelopes.nameCannotBeEmpty', { defaultValue: 'Envelope name cannot be empty' });
+    if (value.trim().length < 1) return t('errors.nameTooShort', { defaultValue: 'Name must be at least 1 character' });
+    if (value.trim().length > 50) return t('errors.nameTooLong', { defaultValue: 'Name must be at most 50 characters' });
+    return null;
   };
 
   const handleNameChange = (value: string) => {
@@ -75,8 +102,21 @@ function EnvelopesContent() {
         ...editingName,
         name: value
       });
+      setNameTouched(prev => ({ ...prev, [editingName.id]: true }));
     }
   };
+
+  // Re-validate on input change
+  useEffect(() => {
+    if (editingName) {
+      setNameErrors(prev => ({ ...prev, [editingName.id]: validateNameField(editingName.name) }));
+    }
+  }, [editingName?.name]);
+  useEffect(() => {
+    Object.entries(amounts).forEach(([id, value]) => {
+      setAmountErrors(prev => ({ ...prev, [id]: validateAmountField(value) }));
+    });
+  }, [amounts]);
 
   const startEditingName = (id: string, name: string) => {
     setEditingName({ id, name });
@@ -88,10 +128,19 @@ function EnvelopesContent() {
 
   const handleUpdateName = async () => {
     if (!editingName) return;
-
+    const error = validateNameField(editingName.name);
+    setNameErrors(prev => ({ ...prev, [editingName.id]: error }));
+    setNameTouched(prev => ({ ...prev, [editingName.id]: true }));
+    if (error) {
+      if (error === t('envelopes.nameCannotBeEmpty', { defaultValue: 'Envelope name cannot be empty' })) {
+        setError(error);
+      }
+      return;
+    }
     try {
       await updateEnvelopeName(editingName.id, editingName.name, setError);
       setEditingName(null);
+      await refreshEnvelopes(true);
     } catch (err) {
       console.error('Failed to update name:', err);
     }
@@ -100,37 +149,44 @@ function EnvelopesContent() {
   const handleCreditEnvelope = (id: string, currentAmount: string, targetedAmount: string) => {
     const amount = amounts[id];
     if (!amount) return;
-
-    const formattedAmount = formatAmount(amount);
-
-    if (validateAmount(formattedAmount, currentAmount, targetedAmount, true)) {
-      setCurrentAction({ type: 'credit', id, amount: formattedAmount });
-      setDescriptionModalOpen(true);
-    } else {
-      const maxCredit = (
-        Number(targetedAmount) - Number(currentAmount)
-      ).toFixed(2);
-      setError(`Cannot credit ${formattedAmount}. Maximum is ${maxCredit}`);
+    const error = validateAmountField(amount);
+    setAmountErrors(prev => ({ ...prev, [id]: error }));
+    setAmountTouched(prev => ({ ...prev, [id]: true }));
+    if (error) return;
+    const current = parseFloat(currentAmount);
+    const target = parseFloat(targetedAmount);
+    const entered = parseFloat(amount);
+    if (entered + current > target) {
+      console.log('setError:', t('envelopes.cannotCreditMoreThanTarget'));
+      setError(t('envelopes.cannotCreditMoreThanTarget'));
+      return;
     }
+    const formattedAmount = Number(formatAmount(amount)).toFixed(2);
+    setCurrentAction({ type: 'credit', id, amount: formattedAmount });
+    setDescriptionModalOpen(true);
   };
 
   const handleDebitEnvelope = (id: string, currentAmount: string) => {
     const amount = amounts[id];
     if (!amount) return;
-
-    const formattedAmount = formatAmount(amount);
-
-    if (validateAmount(formattedAmount, currentAmount, "0", false)) {
-      setCurrentAction({ type: 'debit', id, amount: formattedAmount });
-      setDescriptionModalOpen(true);
-    } else {
-      setError(`Cannot debit ${formattedAmount}. Maximum is ${currentAmount}`);
+    const error = validateAmountField(amount);
+    setAmountErrors(prev => ({ ...prev, [id]: error }));
+    setAmountTouched(prev => ({ ...prev, [id]: true }));
+    if (error) return;
+    const current = parseFloat(currentAmount);
+    const entered = parseFloat(amount);
+    if (entered > current) {
+      console.log('setError:', t('envelopes.cannotDebitMoreThanBalance'));
+      setError(t('envelopes.cannotDebitMoreThanBalance'));
+      return;
     }
+    const formattedAmount = Number(formatAmount(amount)).toFixed(2);
+    setCurrentAction({ type: 'debit', id, amount: formattedAmount });
+    setDescriptionModalOpen(true);
   };
 
   const handleDescriptionSubmit = async (description: string) => {
     if (!currentAction) return;
-
     try {
       if (currentAction.type === 'credit') {
         await creditEnvelope(
@@ -147,11 +203,11 @@ function EnvelopesContent() {
           setError
         );
       }
-      // Clear the amount input after successful transaction
       setAmounts(prev => ({
         ...prev,
         [currentAction.id]: ''
       }));
+      await refreshEnvelopes(true);
     } catch (err) {
       console.error('Failed to process transaction:', err);
     } finally {
@@ -167,41 +223,31 @@ function EnvelopesContent() {
 
   const handleDeleteEnvelope = async () => {
     if (!envelopeToDelete) return;
-
     try {
       // Update the envelope to show pending state in UI
-      const updatedEnvelopes = envelopesData?.envelopes.map(env => 
+      const updatedEnvelopes = envelopesData?.envelopes?.map(env => 
         env.uuid === envelopeToDelete.id 
           ? { ...env, pending: true, deleted: true }
           : env
-      );
-      
+      ) || [];
       if (envelopesData && updatedEnvelopes) {
-        // Update UI state to show loading
         const updatedData = {
           ...envelopesData,
           envelopes: updatedEnvelopes
         };
-        
-        // Update envelopes data with pending state
-        envelopesData.envelopes = updatedEnvelopes;
+        // (no-op, just for UI feedback)
       }
-      
       await deleteEnvelope(envelopeToDelete.id, setError);
-      // WebSocket event will handle the actual deletion from the list
+      await refreshEnvelopes();
     } catch (err) {
       console.error('Failed to delete envelope:', err);
-      
-      // Reset pending state if there was an error
-      if (envelopesData) {
+      if (envelopesData && envelopesData.envelopes) {
         const resetEnvelopes = envelopesData.envelopes.map(env => 
           env.uuid === envelopeToDelete?.id 
             ? { ...env, pending: false, deleted: false }
             : env
         );
-        
-        // Update UI with reset state
-        envelopesData.envelopes = resetEnvelopes;
+        // (no-op, just for UI feedback)
       }
     } finally {
       setDeleteModalOpen(false);
@@ -209,27 +255,17 @@ function EnvelopesContent() {
     }
   };
 
-  // If no envelopes yet, display empty state
-  if (!loading && (!envelopesData?.envelopes || envelopesData.envelopes.length === 0)) {
+  // Fallback UI for empty envelope list
+  if (!loading && (!envelopesData || !envelopesData.envelopes || (envelopesData?.envelopes?.length ?? 0) === 0)) {
     return (
-      <View className="card mt-4">
-        <View className="card-content items-center justify-center py-6">
-          <View className="w-16 h-16 bg-primary-100 rounded-full items-center justify-center mb-4">
-            <Ionicons name="wallet-outline" size={32} color="#0c6cf2" />
-          </View>
-          <Text className="text-xl font-semibold text-text-primary text-center mb-2">
-            {t('envelopes.noTransactions')}
-          </Text>
-          <Text className="text-text-secondary text-center mb-6">
-            {t('envelopes.createEnvelopePrompt')}
-          </Text>
-          <TouchableOpacity
-            onPress={() => setIsCreating(true)}
-            className="bg-primary-600 rounded-xl py-3 px-6 items-center shadow-sm"
-          >
-            <Text className="text-white font-semibold">{t('envelopes.createEnvelope')}</Text>
-          </TouchableOpacity>
-        </View>
+      <View className="flex-1 items-center justify-center px-6">
+        <Text className="text-lg text-text-secondary mb-4 text-center">{t('envelopes.noEnvelopes')}</Text>
+        <TouchableOpacity
+          className="bg-primary-600 px-6 py-3 rounded-xl"
+          onPress={onCreateEnvelope}
+        >
+          <Text className="text-white font-semibold text-base">{t('envelopes.createEnvelope')}</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -241,15 +277,11 @@ function EnvelopesContent() {
         <View className="mt-4">
           <Text className="text-xl font-semibold text-secondary-800 mb-4">{t('envelopes.budgetCategories')}</Text>
           {/* Completed Envelopes */}
-          {envelopesData?.envelopes
-            .filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1)
-            .length > 0 && (
+          {(envelopesData?.envelopes ?? []).filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1).length > 0 && (
               <View className="mb-6">
                 <Text className="text-lg font-medium text-secondary-600 mb-2">{t('envelopes.completed')}</Text>
                 <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
-                  {envelopesData.envelopes
-                    .filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1)
-                    .map((envelope) => (
+                  {(envelopesData?.envelopes ?? []).filter(envelope => Number(envelope.currentAmount) / Number(envelope.targetedAmount) >= 1).map((envelope) => (
                       <View
                         key={envelope.uuid}
                         className={isTablet ? "w-[49%] mb-4" : "w-full"}
@@ -270,8 +302,10 @@ function EnvelopesContent() {
                                       value={editingName.name}
                                       onChangeText={handleNameChange}
                                       className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                      maxLength={25}
+                                      maxLength={50}
                                       autoFocus
+                                      onBlur={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
+                                      onFocus={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
                                     />
                                     <TouchableOpacity
                                       onPress={handleUpdateName}
@@ -317,37 +351,49 @@ function EnvelopesContent() {
 
                             {/* Credit/Debit Controls */}
                             <View className="mt-3">
-                              <View className="flex-row items-center space-x-2">
-                                <TextInput
-                                  value={amounts[envelope.uuid] || ''}
-                                  onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
-                                  placeholder={t('envelopes.enterAmount')}
-                                  keyboardType="decimal-pad"
-                                  className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                />
-
-                                <TouchableOpacity
-                                  onPress={() => handleCreditEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount,
-                                    envelope.targetedAmount
-                                  )}
-                                  className="p-2 bg-success-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                  onPress={() => handleDebitEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount
-                                  )}
-                                  className="p-2 bg-danger-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
-                                </TouchableOpacity>
+                              <View className="flex-1">
+                                {amountTouched[envelope.uuid] && amountFocused[envelope.uuid] && amountErrors[envelope.uuid] && (
+                                  <Text className="text-red-500 text-xs mb-1 ml-1">{amountErrors[envelope.uuid]}</Text>
+                                )}
+                                <View className="flex-row items-center space-x-2">
+                                  <TextInput
+                                    value={amounts[envelope.uuid] || ''}
+                                    onChangeText={text => handleAmountChange(envelope.uuid, normalizeAmountInput(text))}
+                                    placeholder={t('envelopes.enterAmount')}
+                                    keyboardType="decimal-pad"
+                                    className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                    maxLength={13}
+                                    onBlur={() => {
+                                      setAmountTouched(prev => ({ ...prev, [envelope.uuid]: true }));
+                                      setAmountFocused(prev => ({ ...prev, [envelope.uuid]: false }));
+                                    }}
+                                    onFocus={() => {
+                                      setAmountTouched(prev => ({ ...prev, [envelope.uuid]: true }));
+                                      setAmountFocused(prev => ({ ...prev, [envelope.uuid]: true }));
+                                    }}
+                                  />
+                                  <TouchableOpacity
+                                    onPress={() => handleCreditEnvelope(
+                                      envelope.uuid,
+                                      envelope.currentAmount,
+                                      envelope.targetedAmount
+                                    )}
+                                    className="p-2 bg-success-100 rounded-lg"
+                                    disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
+                                  >
+                                    <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
+                                  </TouchableOpacity>
+                                  <TouchableOpacity
+                                    onPress={() => handleDebitEnvelope(
+                                      envelope.uuid,
+                                      envelope.currentAmount
+                                    )}
+                                    className="p-2 bg-danger-100 rounded-lg"
+                                    disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
+                                  >
+                                    <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
+                                  </TouchableOpacity>
+                                </View>
                               </View>
                             </View>
 
@@ -366,21 +412,17 @@ function EnvelopesContent() {
             )}
 
           {/* In Progress Envelopes */}
-          {envelopesData?.envelopes
-            .filter(envelope => {
-              const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
-              return progress > 0 && progress < 1;
-            })
-            .length > 0 && (
+          {(envelopesData?.envelopes ?? []).filter(envelope => {
+            const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
+            return progress > 0 && progress < 1;
+          }).length > 0 && (
               <View className="mb-6">
                 <Text className="text-lg font-medium text-secondary-600 mb-2">{t('envelopes.inProgress')}</Text>
                 <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
-                  {envelopesData.envelopes
-                    .filter(envelope => {
-                      const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
-                      return progress > 0 && progress < 1;
-                    })
-                    .map((envelope) => (
+                  {(envelopesData?.envelopes ?? []).filter(envelope => {
+                    const progress = Number(envelope.currentAmount) / Number(envelope.targetedAmount);
+                    return progress > 0 && progress < 1;
+                  }).map((envelope) => (
                       <View
                         key={envelope.uuid}
                         className={isTablet ? "w-[49%] mb-4" : "w-full"}
@@ -402,8 +444,10 @@ function EnvelopesContent() {
                                       value={editingName.name}
                                       onChangeText={handleNameChange}
                                       className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                      maxLength={25}
+                                      maxLength={50}
                                       autoFocus
+                                      onBlur={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
+                                      onFocus={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
                                     />
                                     <TouchableOpacity
                                       onPress={handleUpdateName}
@@ -449,37 +493,49 @@ function EnvelopesContent() {
 
                             {/* Credit/Debit Controls */}
                             <View className="mt-3">
-                              <View className="flex-row items-center space-x-2">
-                                <TextInput
-                                  value={amounts[envelope.uuid] || ''}
-                                  onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
-                                  placeholder={t('envelopes.enterAmount')}
-                                  keyboardType="decimal-pad"
-                                  className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                />
-
-                                <TouchableOpacity
-                                  onPress={() => handleCreditEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount,
-                                    envelope.targetedAmount
-                                  )}
-                                  className="p-2 bg-success-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                  onPress={() => handleDebitEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount
-                                  )}
-                                  className="p-2 bg-danger-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
-                                </TouchableOpacity>
+                              <View className="flex-1">
+                                {amountTouched[envelope.uuid] && amountFocused[envelope.uuid] && amountErrors[envelope.uuid] && (
+                                  <Text className="text-red-500 text-xs mb-1 ml-1">{amountErrors[envelope.uuid]}</Text>
+                                )}
+                                <View className="flex-row items-center space-x-2">
+                                  <TextInput
+                                    value={amounts[envelope.uuid] || ''}
+                                    onChangeText={text => handleAmountChange(envelope.uuid, normalizeAmountInput(text))}
+                                    placeholder={t('envelopes.enterAmount')}
+                                    keyboardType="decimal-pad"
+                                    className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                    maxLength={13}
+                                    onBlur={() => {
+                                      setAmountTouched(prev => ({ ...prev, [envelope.uuid]: true }));
+                                      setAmountFocused(prev => ({ ...prev, [envelope.uuid]: false }));
+                                    }}
+                                    onFocus={() => {
+                                      setAmountTouched(prev => ({ ...prev, [envelope.uuid]: true }));
+                                      setAmountFocused(prev => ({ ...prev, [envelope.uuid]: true }));
+                                    }}
+                                  />
+                                  <TouchableOpacity
+                                    onPress={() => handleCreditEnvelope(
+                                      envelope.uuid,
+                                      envelope.currentAmount,
+                                      envelope.targetedAmount
+                                    )}
+                                    className="p-2 bg-success-100 rounded-lg"
+                                    disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
+                                  >
+                                    <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
+                                  </TouchableOpacity>
+                                  <TouchableOpacity
+                                    onPress={() => handleDebitEnvelope(
+                                      envelope.uuid,
+                                      envelope.currentAmount
+                                    )}
+                                    className="p-2 bg-danger-100 rounded-lg"
+                                    disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
+                                  >
+                                    <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
+                                  </TouchableOpacity>
+                                </View>
                               </View>
                             </View>
 
@@ -498,15 +554,11 @@ function EnvelopesContent() {
             )}
 
           {/* Not Started Envelopes */}
-          {envelopesData?.envelopes
-            .filter(envelope => Number(envelope.currentAmount) === 0)
-            .length > 0 && (
+          {(envelopesData?.envelopes ?? []).filter(envelope => Number(envelope.currentAmount) === 0).length > 0 && (
               <View className="mb-6">
                 <Text className="text-lg font-medium text-secondary-600 mb-2">{t('envelopes.notStarted')}</Text>
                 <View className={isTablet ? "flex-row flex-wrap justify-between" : "space-y-4"}>
-                  {envelopesData.envelopes
-                    .filter(envelope => Number(envelope.currentAmount) === 0)
-                    .map((envelope) => (
+                  {(envelopesData?.envelopes ?? []).filter(envelope => Number(envelope.currentAmount) === 0).map((envelope) => (
                       <View
                         key={envelope.uuid}
                         className={isTablet ? "w-[49%] mb-4" : "w-full"}
@@ -527,8 +579,10 @@ function EnvelopesContent() {
                                       value={editingName.name}
                                       onChangeText={handleNameChange}
                                       className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                      maxLength={25}
+                                      maxLength={50}
                                       autoFocus
+                                      onBlur={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
+                                      onFocus={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
                                     />
                                     <TouchableOpacity
                                       onPress={handleUpdateName}
@@ -573,37 +627,49 @@ function EnvelopesContent() {
 
                             {/* Credit/Debit Controls */}
                             <View className="mt-3">
-                              <View className="flex-row items-center space-x-2">
-                                <TextInput
-                                  value={amounts[envelope.uuid] || ''}
-                                  onChangeText={(text) => handleAmountChange(envelope.uuid, text)}
-                                  placeholder={t('envelopes.enterAmount')}
-                                  keyboardType="decimal-pad"
-                                  className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                />
-
-                                <TouchableOpacity
-                                  onPress={() => handleCreditEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount,
-                                    envelope.targetedAmount
-                                  )}
-                                  className="p-2 bg-success-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity
-                                  onPress={() => handleDebitEnvelope(
-                                    envelope.uuid,
-                                    envelope.currentAmount
-                                  )}
-                                  className="p-2 bg-danger-100 rounded-lg"
-                                  disabled={!amounts[envelope.uuid] || envelope.pending}
-                                >
-                                  <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
-                                </TouchableOpacity>
+                              <View className="flex-1">
+                                {amountTouched[envelope.uuid] && amountFocused[envelope.uuid] && amountErrors[envelope.uuid] && (
+                                  <Text className="text-red-500 text-xs mb-1 ml-1">{amountErrors[envelope.uuid]}</Text>
+                                )}
+                                <View className="flex-row items-center space-x-2">
+                                  <TextInput
+                                    value={amounts[envelope.uuid] || ''}
+                                    onChangeText={text => handleAmountChange(envelope.uuid, normalizeAmountInput(text))}
+                                    placeholder={t('envelopes.enterAmount')}
+                                    keyboardType="decimal-pad"
+                                    className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                    maxLength={13}
+                                    onBlur={() => {
+                                      setAmountTouched(prev => ({ ...prev, [envelope.uuid]: true }));
+                                      setAmountFocused(prev => ({ ...prev, [envelope.uuid]: false }));
+                                    }}
+                                    onFocus={() => {
+                                      setAmountTouched(prev => ({ ...prev, [envelope.uuid]: true }));
+                                      setAmountFocused(prev => ({ ...prev, [envelope.uuid]: true }));
+                                    }}
+                                  />
+                                  <TouchableOpacity
+                                    onPress={() => handleCreditEnvelope(
+                                      envelope.uuid,
+                                      envelope.currentAmount,
+                                      envelope.targetedAmount
+                                    )}
+                                    className="p-2 bg-success-100 rounded-lg"
+                                    disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
+                                  >
+                                    <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
+                                  </TouchableOpacity>
+                                  <TouchableOpacity
+                                    onPress={() => handleDebitEnvelope(
+                                      envelope.uuid,
+                                      envelope.currentAmount
+                                    )}
+                                    className="p-2 bg-danger-100 rounded-lg"
+                                    disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
+                                  >
+                                    <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
+                                  </TouchableOpacity>
+                                </View>
                               </View>
                             </View>
 
@@ -622,12 +688,12 @@ function EnvelopesContent() {
             )}
 
           {/* Budget Summary Section */}
-          {envelopesData?.envelopes?.length > 0 && (
+          {(envelopesData?.envelopes ?? []).length > 0 && (
             <View className="bg-secondary-900 rounded-xl p-6 mb-8">
               <View className="bg-secondary-800 rounded-lg p-4 mb-4">
                 <Text className="text-xl font-bold text-white">{t('envelopes.budgetOverview')}</Text>
                 <Text className="text-secondary-300">
-                  {envelopesData.envelopes.filter(e => Number(e.currentAmount) / Number(e.targetedAmount) >= 1).length} {t('envelopes.completedOf')} {envelopesData.envelopes.length} {t('envelopes.title').toLowerCase()}
+                  {(envelopesData?.envelopes ?? []).filter(e => Number(e.currentAmount) / Number(e.targetedAmount) >= 1).length} {t('envelopes.completedOf')} {(envelopesData?.envelopes?.length ?? 0)} {t('envelopes.title').toLowerCase()}
                 </Text>
               </View>
               <View className="flex-row items-center">
@@ -684,6 +750,7 @@ function EnvelopesScreen() {
   const { refreshEnvelopes, envelopesData, createEnvelope } = useEnvelopes();
   const [refreshing, setRefreshing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -693,11 +760,18 @@ function EnvelopesScreen() {
 
   const handleCreateEnvelope = useCallback(async (name: string, targetAmount: string, currency: string) => {
     if (name && targetAmount) {
-      const formattedTarget = formatAmount(targetAmount);
-      await createEnvelope(name, formattedTarget, currency);
+      setCreating(true);
+      await createEnvelope(name, targetAmount, currency);
+      setCreating(false);
       setIsCreating(false);
     }
   }, [createEnvelope]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshEnvelopes(true);
+    }, [refreshEnvelopes])
+  );
 
   return (
     <View className="flex-1">
@@ -706,7 +780,7 @@ function EnvelopesScreen() {
         subtitle={t('envelopes.subtitle')}
         headerHeight={130}
       >
-        <EnvelopesContent />
+        <EnvelopesContent onCreateEnvelope={() => setIsCreating(true)} />
       </AnimatedHeaderLayout>
 
       {/* Floating Action Button */}
@@ -739,7 +813,7 @@ function EnvelopesScreen() {
       {/* Create Envelope Modal */}
       <CreateEnvelopeModal
         visible={isCreating}
-        onClose={() => setIsCreating(false)}
+        onClose={() => { if (!creating) setIsCreating(false); }}
         onSubmit={handleCreateEnvelope}
       />
     </View>

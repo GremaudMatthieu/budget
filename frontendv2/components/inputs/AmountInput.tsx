@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
 
 interface AmountInputProps extends TextInputProps {
   label?: string;
@@ -18,19 +19,18 @@ const AmountInput: React.FC<AmountInputProps> = ({
   className,
   ...props 
 }) => {
-  // Handle amount input - only allow numbers and a single decimal point
+  // Handle amount input - only allow numbers and a single decimal point or comma
   const handleAmountChange = (text: string) => {
-    // Remove anything that's not a digit or decimal point
-    const filtered = text.replace(/[^0-9.]/g, '');
-    
+    // Allow digits, period, and comma
+    const filtered = text.replace(/[^0-9.,]/g, '');
+    // Replace commas with periods
+    const normalized = filtered.replace(/,/g, '.');
     // Ensure only one decimal point
-    const parts = filtered.split('.');
+    const parts = normalized.split('.');
     let formatted = parts[0];
-    
     if (parts.length > 1) {
       formatted += '.' + parts[1];
     }
-    
     if (onChangeText) {
       onChangeText(formatted);
     }
@@ -48,7 +48,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
         </View>
         
         <TextInput
-          value={value}
+          value={normalizeAmountInput(value || '')}
           onChangeText={handleAmountChange}
           keyboardType="decimal-pad"
           className={`p-3 pl-8 rounded-xl border ${error ? 'border-danger-500' : 'border-surface-border'} bg-white text-text-primary ${className || ''}`}

@@ -30,6 +30,7 @@ export default {
     pending: 'Pending',
     locale: 'en-US',
     vs: 'vs',
+    total: 'Total',
   },
 
   // Auth screens
@@ -77,7 +78,8 @@ export default {
     newBudget: 'New Budget',
     settings: 'Settings',
     thisMonthBudget: "This Month's Budget",
-    spentSoFar: 'Spent So Far',
+    spentSoFar: 'Allocated So Far',
+    budgetExistsThisMonth: 'Budget already exists for this month',
     viewAll: 'View All',
     yourEnvelopes: 'Your Envelopes',
     today: 'Today',
@@ -85,6 +87,7 @@ export default {
     daysAgo: 'days ago',
     financialTip: 'Financial Tip',
     tipText: 'Using the 50/30/20 rule can help you balance your budget: 50% for needs, 30% for wants, and 20% for savings.',
+    noEnvelopes: 'No envelopes yet',
   },
   
   // Envelopes screens
@@ -122,6 +125,20 @@ export default {
     budgetOverview: 'Budget Overview',
     completedOf: 'completed of',
     inProgress: 'In Progress',
+    cannotCreditMoreThanTarget: 'You cannot add more than the available amount left to this envelope.',
+    cannotDebitMoreThanBalance: 'You cannot withdraw more than the envelope\'s current balance.',
+    nameCannotBeEmpty: 'Envelope name cannot be empty',
+    noEnvelopes: 'No envelopes yet',
+    quickActions: 'Quick Actions',
+    addX: 'Add {{amount}} {{currency}}',
+    spendX: 'Spend {{amount}} {{currency}}',
+    customAmount: 'Custom Amount',
+    credit: 'Credit',
+    debit: 'Debit',
+    enterAmountPlaceholder: 'Enter amount ({{currency}})',
+    transactionHistory: 'Transaction History',
+    addedFunds: 'Added funds',
+    spentFunds: 'Spent funds',
   },
   
   // Budget plans screens
@@ -152,7 +169,6 @@ export default {
     yearlyIncome: 'Yearly Income',
     monthlyAverage: 'Monthly Average',
     yearSummary: 'Yearly Summary',
-    overview: '{year} Overview',
     vs: 'vs',
     gettingStarted: 'Getting Started',
     gettingStartedText: "Create your budget plan by adding income sources. You'll be able to allocate these funds to needs, wants, and savings later.",
@@ -224,6 +240,7 @@ export default {
     wantsDescription: 'Non-essential expenses that improve your quality of life, like dining out, entertainment, and hobbies.',
     savingsDescription: 'Money set aside for future goals, emergencies, investments, and debt repayment.',
     incomesDescription: 'All sources of money coming in, including salary, side gigs, and passive income streams.',
+    createThisMonthDisabled: 'You can only create a budget for the current year.',
   },
   
   // Profile screens
@@ -235,9 +252,12 @@ export default {
     notifications: 'Notifications',
     security: 'Security',
     appearance: 'Appearance',
-    helpAndSupport: 'Help & Support',
+    helpSupport: 'Help & Support',
+    supportDescription: 'Need help? Contact our support team and we will get back to you as soon as possible.',
     about: 'About',
+    aboutDescription: 'A modern budgeting app to help you manage your finances with ease.',
     logOut: 'Log Out',
+    logout: 'Log Out',
     version: 'Version',
     accountInformation: 'Account Information',
     email: 'Email',
@@ -291,6 +311,9 @@ export default {
     wantName: 'Want name',
     savingName: 'Saving name',
     incomeName: 'Income name',
+    enterAmountHint: 'Enter the amount for this item',
+    enterNameHint: 'Enter the name for this item',
+    selectCategoryHint: 'Select a category for this item',
   },
   
   // Error messages
@@ -312,6 +335,14 @@ export default {
     createBudgetPlanFailed: 'Failed to create budget plan. Please try again.',
     fillAllRequiredFields: 'Please fill all required fields',
     failedToLoadBudgetPlanDetails: 'Failed to load budget plan details',
+    amountRequired: 'Amount is required',
+    amountTooShort: 'Amount must be at least 1 character',
+    amountTooLong: 'Amount must be at most 13 characters (e.g. 9999999999.99)',
+    categoryRequired: 'Category is required',
+    descriptionRequired: 'Description is required',
+    descriptionTooShort: 'Description must be at least 1 character',
+    descriptionTooLong: 'Description must be at most 35 characters',
+    nameRequired: 'Envelope name cannot be empty',
   },
   
   // Validation and hints
@@ -334,7 +365,6 @@ export default {
     february: 'February',
     march: 'March',
     april: 'April',
-    may: 'May',
     june: 'June',
     july: 'July',
     august: 'August',
@@ -354,5 +384,13 @@ export default {
     oct: 'Oct',
     nov: 'Nov',
     dec: 'Dec',
+  },
+
+  account: {
+    deleteAccount: 'Delete Account',
+    settings: 'Account Settings',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    language: 'Language',
   },
 };
