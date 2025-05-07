@@ -38,13 +38,13 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
     {
         $platform = $request->query->get('platform', 'web');
         $redirectUri = $request->query->get('redirect_uri');
-
+        $state = $request->query->get('state');
         $request->getSession()->set('oauth_platform', $platform);
         if ($redirectUri) {
             $request->getSession()->set('oauth_redirect_uri', $redirectUri);
         }
 
-        $params = ['state' => json_encode(['platform' => $platform])];
+        $params = ['state' => $state ?: json_encode(['platform' => $platform])];
         if ($redirectUri && $platform === 'mobile') {
             $params['redirect_uri'] = $redirectUri;
         }
@@ -63,14 +63,17 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
         /** @var GoogleUser $googleUser */
         $googleUser = $this->clientRegistry->getClient('google')->fetchUser();
         $email = $googleUser->getEmail();
-
         $state = $request->query->get('state');
         $platform = 'web';
+        $languagePreference = null;
 
         if ($state) {
             $stateData = json_decode($state, true);
             if (isset($stateData['platform'])) {
                 $platform = $stateData['platform'];
+            }
+            if (isset($stateData['languagePreference'])) {
+                $languagePreference = $stateData['languagePreference'];
             }
         } else {
             $platform = $request->getSession()->get('oauth_platform', 'web');
@@ -89,7 +92,7 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
                 UserEmail::fromString($googleUser->getEmail()),
                 UserFirstname::fromString($googleUser->getFirstName() ?? 'N/A'),
                 UserLastname::fromString($googleUser->getLastName() ?? 'N/A'),
-                UserLanguagePreference::fromString($googleUser->getLocale() ?? 'en'),
+                UserLanguagePreference::fromString($languagePreference ?? 'en'),
                 UserConsent::fromBool(true),
                 UserRegistrationContext::fromString('google'),
                 $googleUser->getId(),
@@ -104,11 +107,11 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
     {
         if ($platform === 'mobile') {
             // Use the app scheme for mobile deep linking
-            $baseUrl = $customRedirectUri ?? 'budgetapp://oauth/google/callback';
+            $baseUrl = $customRedirectUri ?? $this->getParameter('MOBILE_APP_SCHEME');
             $separator = (str_contains($baseUrl, '?')) ? '&' : '?';
             $url = $baseUrl . $separator . "email=" . urlencode($email) . "&token=" . urlencode($token);
         } else {
-            $frontendUrl = $this->getParameter('app.frontend_url') ?? 'http://localhost:8081';
+            $frontendUrl = $this->getParameter('FRONTEND_URL');
             $url = "{$frontendUrl}/oauth/google/callback?email=" . urlencode($email) .
                 "&token=" . urlencode($token);
         }

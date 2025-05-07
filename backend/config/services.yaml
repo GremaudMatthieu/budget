@@ -13,18 +13,8 @@ services:
         autowire: true
         autoconfigure: true
 
-    PhpAmqpLib\Connection\AMQPStreamConnection:
-        arguments:
-            $host: '%env(RABBITMQ_HOST)%'
-            $port: '%env(RABBITMQ_PORT)%'
-            $user: '%env(RABBITMQ_USER)%'
-            $password: '%env(RABBITMQ_PASSWORD)%'
-
     Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface:
         alias: 'security.password_hasher'
-
-    App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventPublisherInterface:
-        '@App\SharedContext\Infrastructure\Adapters\PublisherAdapter'
 
     App\SharedContext\Infrastructure\EventListener\RequestIdListener:
         arguments:

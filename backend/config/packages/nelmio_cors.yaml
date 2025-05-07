@@ -1,14 +1,19 @@
 nelmio_cors:
     defaults:
         origin_regex: true
-        allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+        allow_origin: ['https://gogobudgeto.com', 'http://localhost:8081']
         allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
         allow_headers: ['Content-Type', 'Authorization']
         expose_headers: ['Link']
         max_age: 3600
     paths:
+        '^/':
+            allow_origin: ['https://gogobudgeto.com', 'http://localhost:8081']
+            allow_headers: ['Content-Type', 'Authorization', 'Request-Id']
+            allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE']
+            max_age: 3600
         '^/api/':
-            allow_origin: [ '*' ]
-            allow_headers: [ 'Content-Type', 'Authorization', 'Request-Id']
-            allow_methods: [ 'GET', 'OPTIONS', 'POST', 'PUT', 'DELETE' ]
+            allow_origin: ['https://gogobudgeto.com', 'http://localhost:8081', '*']
+            allow_headers: ['Content-Type', 'Authorization', 'Request-Id']
+            allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE']
             max_age: 3600

@@ -6,7 +6,6 @@ namespace App\Tests\UserContext\ReadModels\Projections;
 
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
-use App\SharedContext\Domain\Ports\Outbound\PublisherInterface;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Domain\Events\UserDeletedDomainEvent;
 use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent;
@@ -31,7 +30,6 @@ use PHPUnit\Framework\TestCase;
 class UserProjectionTest extends TestCase
 {
     private UserViewRepositoryInterface&MockObject $userViewRepository;
-    private PublisherInterface&MockObject $publisher;
     private UserProjection $userProjection;
     private KeyManagementRepositoryInterface&MockObject $keyManagementRepository;
     private EventEncryptorInterface&MockObject $eventEncryptor;
@@ -40,7 +38,6 @@ class UserProjectionTest extends TestCase
     protected function setUp(): void
     {
         $this->userViewRepository = $this->createMock(UserViewRepositoryInterface::class);
-        $this->publisher = $this->createMock(PublisherInterface::class);
         $this->keyManagementRepository = $this->createMock(KeyManagementRepositoryInterface::class);
         $this->eventEncryptor = $this->createMock(EventEncryptorInterface::class);
         $this->refreshTokenManager = $this->createMock(RefreshTokenManagerInterface::class);
@@ -49,7 +46,6 @@ class UserProjectionTest extends TestCase
             $this->keyManagementRepository,
             $this->eventEncryptor,
             $this->refreshTokenManager,
-            $this->publisher,
         );
 
         $this->eventEncryptor->method('decrypt')->willReturnCallback(
@@ -77,8 +73,6 @@ class UserProjectionTest extends TestCase
         $this->keyManagementRepository->expects($this->once())
             ->method('getKey')
             ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -114,8 +108,6 @@ class UserProjectionTest extends TestCase
                     && $view->consentGiven === $event->isConsentGiven
                     && $view->roles === $event->roles;
             }));
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -151,8 +143,6 @@ class UserProjectionTest extends TestCase
         $this->userViewRepository->expects($this->once())
             ->method('save')
             ->with($userView);
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -188,8 +178,6 @@ class UserProjectionTest extends TestCase
         $this->userViewRepository->expects($this->once())
             ->method('save')
             ->with($userView);
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -225,8 +213,6 @@ class UserProjectionTest extends TestCase
         $this->userViewRepository->expects($this->once())
             ->method('save')
             ->with($userView);
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -261,8 +247,6 @@ class UserProjectionTest extends TestCase
         $this->userViewRepository->expects($this->once())
             ->method('delete')
             ->with($userView);
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -281,8 +265,6 @@ class UserProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId])
             ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -301,8 +283,6 @@ class UserProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId])
             ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -321,8 +301,6 @@ class UserProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId])
             ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -340,8 +318,6 @@ class UserProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId])
             ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -386,8 +362,6 @@ class UserProjectionTest extends TestCase
         $this->userViewRepository->expects($this->once())
             ->method('save')
             ->with($userView);
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -414,8 +388,6 @@ class UserProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId])
             ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -460,8 +432,6 @@ class UserProjectionTest extends TestCase
         $this->userViewRepository->expects($this->once())
             ->method('save')
             ->with($userView);
-        $this->publisher->expects($this->once())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }
@@ -488,8 +458,6 @@ class UserProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId])
             ->willReturn(null);
-        $this->publisher->expects($this->never())
-            ->method('publishNotificationEvents');
 
         $this->userProjection->__invoke($event);
     }

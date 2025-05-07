@@ -11,18 +11,15 @@ use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAdjustedDomainEvent;
 use App\BudgetPlanContext\Domain\Events\BudgetPlanWantRemovedDomainEvent;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanWantEntryViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanWantEntryViewRepositoryInterface;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanWantAddedNotificationEvent;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanWantAdjustedNotificationEvent;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanWantRemovedNotificationEvent;
 use App\BudgetPlanContext\ReadModels\Views\BudgetPlanWantEntryView;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\SharedContext\Domain\Ports\Outbound\PublisherInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class BudgetPlanWantEntryProjection
 {
     public function __construct(
         private BudgetPlanWantEntryViewRepositoryInterface $budgetPlanWantEntryViewRepository,
-        private PublisherInterface $publisher,
     ) {
     }
 
@@ -49,16 +46,6 @@ final readonly class BudgetPlanWantEntryProjection
                     $event->occurredOn,
                 ),
             );
-            try {
-                $this->publisher->publishNotificationEvents(
-                    [
-                        BudgetPlanWantAddedNotificationEvent::fromBudgetPlanGeneratedDomainEvent(
-                            $event,
-                        ),
-                    ],
-                );
-            } catch (\Exception $e) {
-            }
         }
     }
 
@@ -73,16 +60,6 @@ final readonly class BudgetPlanWantEntryProjection
                     $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent->occurredOn,
                 ),
             );
-            try {
-                $this->publisher->publishNotificationEvents(
-                    [
-                        BudgetPlanWantAddedNotificationEvent::fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-                            $budgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent,
-                        ),
-                    ],
-                );
-            } catch (\Exception $e) {
-            }
         }
     }
 
@@ -92,16 +69,6 @@ final readonly class BudgetPlanWantEntryProjection
         $this->budgetPlanWantEntryViewRepository->save(
             BudgetPlanWantEntryView::fromBudgetPlanWantAddedDomainEvent($budgetPlanWantAddedDomainEvent),
         );
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanWantAddedNotificationEvent::fromBudgetPlanWantAddedDomainEvent(
-                        $budgetPlanWantAddedDomainEvent,
-                    ),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanWantAdjustedDomainEvent(
@@ -117,31 +84,11 @@ final readonly class BudgetPlanWantEntryProjection
 
         $budgetPlanWantView->fromEvent($budgetPlanWantAdjustedDomainEvent);
         $this->budgetPlanWantEntryViewRepository->save($budgetPlanWantView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanWantAdjustedNotificationEvent::fromBudgetPlanWantAdjustedDomainEvent(
-                        $budgetPlanWantAdjustedDomainEvent,
-                    ),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanWantRemovedDomainEvent(
         BudgetPlanWantRemovedDomainEvent $budgetPlanWantRemovedDomainEvent,
     ): void {
         $this->budgetPlanWantEntryViewRepository->delete($budgetPlanWantRemovedDomainEvent->uuid);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanWantRemovedNotificationEvent::fromDomainEvent(
-                        $budgetPlanWantRemovedDomainEvent,
-                    ),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 }

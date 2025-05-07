@@ -15,25 +15,15 @@ use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRewoundDomainEvent;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedDomainEvent;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewInterface;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeAddedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeCreditedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeCurrencyChangedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeDebitedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeDeletedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeRenamedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeReplayedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeRewoundNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeTargetedAmountChangedNotificationEvent;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\SharedContext\Domain\Ports\Outbound\PublisherInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class BudgetEnvelopeProjection
 {
-    public function __construct(
-        private BudgetEnvelopeViewRepositoryInterface $budgetEnvelopeViewRepository,
-        private PublisherInterface $publisher,
-    ) {
+    public function __construct(private BudgetEnvelopeViewRepositoryInterface $budgetEnvelopeViewRepository)
+    {
     }
 
     public function __invoke(DomainEventInterface $event): void
@@ -55,12 +45,6 @@ final readonly class BudgetEnvelopeProjection
     private function handleBudgetEnvelopeAddedDomainEvent(BudgetEnvelopeAddedDomainEvent $event): void
     {
         $this->budgetEnvelopeViewRepository->save(BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent($event));
-        try {
-            $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeAddedNotificationEvent::fromDomainEvent($event)],
-            );
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeCreditedDomainEvent(BudgetEnvelopeCreditedDomainEvent $event): void
@@ -75,12 +59,6 @@ final readonly class BudgetEnvelopeProjection
 
         $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeCreditedNotificationEvent::fromDomainEvent($event)],
-            );
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeDebitedDomainEvent(BudgetEnvelopeDebitedDomainEvent $event): void
@@ -95,12 +73,6 @@ final readonly class BudgetEnvelopeProjection
 
         $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeDebitedNotificationEvent::fromDomainEvent($event)],
-            );
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeNamedDomainEvent(BudgetEnvelopeRenamedDomainEvent $event): void
@@ -115,12 +87,6 @@ final readonly class BudgetEnvelopeProjection
 
         $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeRenamedNotificationEvent::fromDomainEvent($event)],
-            );
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeDeletedDomainEvent(BudgetEnvelopeDeletedDomainEvent $event): void {
@@ -134,12 +100,6 @@ final readonly class BudgetEnvelopeProjection
 
         $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeDeletedNotificationEvent::fromDomainEvent($event)],
-            );
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeRewoundDomainEvent(BudgetEnvelopeRewoundDomainEvent $event): void
@@ -154,12 +114,6 @@ final readonly class BudgetEnvelopeProjection
 
         $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeRewoundNotificationEvent::fromDomainEvent($event)],
-            );
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeReplayedDomainEvent(BudgetEnvelopeReplayedDomainEvent $event): void
@@ -174,12 +128,6 @@ final readonly class BudgetEnvelopeProjection
 
         $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [BudgetEnvelopeReplayedNotificationEvent::fromDomainEvent($event)],
-            );
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeTargetedAmountChangedDomainEvent(
@@ -195,12 +143,6 @@ final readonly class BudgetEnvelopeProjection
 
         $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-        try {
-            $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeTargetedAmountChangedNotificationEvent::fromDomainEvent($event),
-            ]);
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeCurrencyChangedDomainEvent(
@@ -216,11 +158,5 @@ final readonly class BudgetEnvelopeProjection
 
         $budgetEnvelopeView->fromEvent($event);
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-        try {
-            $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeCurrencyChangedNotificationEvent::fromDomainEvent($event),
-            ]);
-        } catch (\Exception) {
-        }
     }
 }

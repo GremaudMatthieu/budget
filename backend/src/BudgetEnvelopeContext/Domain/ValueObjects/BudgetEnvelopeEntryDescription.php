@@ -11,7 +11,7 @@ final readonly class BudgetEnvelopeEntryDescription
     private function __construct(protected string $budgetEnvelopeLedgerEntryDescription)
     {
         Assert::that($budgetEnvelopeLedgerEntryDescription)
-            ->maxLength(35, 'The description must be at most 35 characters long.')
+            ->maxLength(13, 'The description must be at most 13 characters long.')
             ->regex('/^[\p{L}\p{N} ]+$/u', 'The description can only contain letters (including letters with accents), numbers (0-9), and spaces. No special characters are allowed.')
         ;
     }

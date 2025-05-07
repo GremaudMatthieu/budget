@@ -11,19 +11,15 @@ use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedAdjustedDomainEvent;
 use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedRemovedDomainEvent;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanNeedEntryViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanNeedEntryViewRepositoryInterface;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanNeedAddedNotificationEvent;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanNeedAdjustedNotificationEvent;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanNeedRemovedNotificationEvent;
 use App\BudgetPlanContext\ReadModels\Views\BudgetPlanNeedEntryView;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\SharedContext\Domain\Ports\Outbound\PublisherInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class BudgetPlanNeedEntryProjection
 {
-    public function __construct(
-        private BudgetPlanNeedEntryViewRepositoryInterface $budgetPlanNeedEntryViewRepository,
-        private PublisherInterface $publisher,
-    ) {
+    public function __construct(private BudgetPlanNeedEntryViewRepositoryInterface $budgetPlanNeedEntryViewRepository)
+    {
     }
 
     public function __invoke(DomainEventInterface $event): void
@@ -48,14 +44,6 @@ final readonly class BudgetPlanNeedEntryProjection
                     $event->occurredOn,
                 ),
             );
-            try {
-                $this->publisher->publishNotificationEvents(
-                    [
-                        BudgetPlanNeedAddedNotificationEvent::fromBudgetPlanGeneratedDomainEvent($event),
-                    ],
-                );
-            } catch (\Exception $e) {
-            }
         }
     }
 
@@ -70,16 +58,6 @@ final readonly class BudgetPlanNeedEntryProjection
                     $event->occurredOn,
                 ),
             );
-            try {
-                $this->publisher->publishNotificationEvents(
-                    [
-                        BudgetPlanNeedAddedNotificationEvent::fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-                            $event,
-                        ),
-                    ],
-                );
-            } catch (\Exception $e) {
-            }
         }
     }
 
@@ -88,14 +66,6 @@ final readonly class BudgetPlanNeedEntryProjection
         $this->budgetPlanNeedEntryViewRepository->save(
             BudgetPlanNeedEntryView::fromBudgetPlanNeedAddedDomainEvent($event),
         );
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanNeedAddedNotificationEvent::fromBudgetPlanNeedAddedDomainEvent($event),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanNeedAdjustedDomainEvent(BudgetPlanNeedAdjustedDomainEvent $event): void
@@ -108,26 +78,10 @@ final readonly class BudgetPlanNeedEntryProjection
 
         $budgetPlanNeedView->fromEvent($event);
         $this->budgetPlanNeedEntryViewRepository->save($budgetPlanNeedView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanNeedAdjustedNotificationEvent::fromBudgetPlanNeedAdjustedDomainEvent($event),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanNeedRemovedDomainEvent(BudgetPlanNeedRemovedDomainEvent $event): void
     {
         $this->budgetPlanNeedEntryViewRepository->delete($event->uuid);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanNeedRemovedNotificationEvent::fromDomainEvent($event),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 }

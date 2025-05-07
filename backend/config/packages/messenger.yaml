@@ -1,8 +1,3 @@
-imports:
-    - { resource: '../../src/BudgetEnvelopeContext/Config/messenger.yaml' }
-    - { resource: '../../src/BudgetPlanContext/Config/messenger.yaml' }
-    - { resource: '../../src/UserContext/Config/messenger.yaml' }
-
 framework:
     messenger:
         default_bus: command_bus
@@ -16,23 +11,6 @@ framework:
                 default_middleware: true
                 middleware:
                     - validation
-
-        transports:
-            sync: 'sync://'
-            domain_events:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-                serializer: messenger.transport.symfony_serializer
-                options:
-                    exchange:
-                        name: 'domain_events'
-                        type: fanout
-            notification_events:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-                serializer: messenger.transport.symfony_serializer
-                options:
-                    exchange:
-                        name: 'notification_events'
-                        type: fanout
 
         routing:
 # when@test:

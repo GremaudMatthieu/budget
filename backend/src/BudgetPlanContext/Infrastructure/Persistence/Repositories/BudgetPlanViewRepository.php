@@ -70,10 +70,8 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
             ->select('*')
             ->from('budget_plan_view')
             ->setMaxResults(1);
-
         $this->addWhereClauses($qb, $criteria);
         $this->addOrderByClauses($qb, $orderBy);
-
         $result = $qb->executeQuery()->fetchAssociative();
 
         return $result ? BudgetPlanView::fromRepository($result) : null;
@@ -198,6 +196,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
         }
 
         $totalAmount = array_sum($totals);
+
         if ($totalAmount > 0) {
             foreach ($totals as $category => $amount) {
                 $ratios[$category] = $this->formatPercentage($amount / $totalAmount);
@@ -280,7 +279,6 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
         }
 
         $results = $this->connection->prepare($sql)->executeQuery($this->processCriteria($criteria))->fetchAllAssociative();
-
         $formattedResults = [];
         $yearlyTotals = [
             'income' => 0,
@@ -288,32 +286,28 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
             'wants' => 0,
             'savings' => 0
         ];
-
         $year = $criteria['year'] ?? date('Y');
         $formattedResults[$year] = array_fill(1, 12, ['uuid' => null]);
 
         foreach ($results as $result) {
-            $year = (int)$result['year'];
-            $month = (int)$result['month'];
+            $year = (int) $result['year'];
+            $month = (int) $result['month'];
             $planUuid = $result['uuid'];
-
-            $totalIncome = (float)$result['total_income'];
-            $totalNeeds = (float)$result['total_needs'];
-            $totalWants = (float)$result['total_wants'];
-            $totalSavings = (float)$result['total_savings'];
-            $totalAllocated = (float)$result['total_allocated'];
-
+            $totalIncome = (float) $result['total_income'];
+            $totalNeeds = (float) $result['total_needs'];
+            $totalWants = (float) $result['total_wants'];
+            $totalSavings = (float) $result['total_savings'];
+            $totalAllocated = (float) $result['total_allocated'];
             $formattedResults[$year][$month] = [
                 'uuid' => $planUuid,
                 'totalIncome' => $totalIncome,
                 'totalAllocated' => $totalAllocated,
-                'allocatedPercentage' => (float)$result['allocated_percentage'],
-                'needsPercentage' => (float)$result['needs_percentage'],
-                'wantsPercentage' => (float)$result['wants_percentage'],
-                'savingsPercentage' => (float)$result['savings_percentage'],
+                'allocatedPercentage' => (float) $result['allocated_percentage'],
+                'needsPercentage' => (float) $result['needs_percentage'],
+                'wantsPercentage' => (float) $result['wants_percentage'],
+                'savingsPercentage' => (float) $result['savings_percentage'],
                 'currency' => $result['currency'],
             ];
-
             $yearlyTotals['income'] += $totalIncome;
             $yearlyTotals['needs'] += $totalNeeds;
             $yearlyTotals['wants'] += $totalWants;
@@ -321,6 +315,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
         }
 
         $totalYearlyIncome = $yearlyTotals['income'];
+
         if ($totalYearlyIncome > 0) {
             $actualNeedsPercentage = round(($yearlyTotals['needs'] / $totalYearlyIncome) * 100);
             $actualWantsPercentage = round(($yearlyTotals['wants'] / $totalYearlyIncome) * 100);

@@ -22,19 +22,15 @@ use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAdjustedDomainEvent;
 use App\BudgetPlanContext\Domain\Events\BudgetPlanWantRemovedDomainEvent;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanViewRepositoryInterface;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanCurrencyChangedNotificationEvent;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanGeneratedNotificationEvent;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanGeneratedWithOneThatAlreadyExistsNotificationEvent;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanRemovedNotificationEvent;
 use App\BudgetPlanContext\ReadModels\Views\BudgetPlanView;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\SharedContext\Domain\Ports\Outbound\PublisherInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class BudgetPlanProjection
 {
     public function __construct(
         private BudgetPlanViewRepositoryInterface $budgetPlanViewRepository,
-        private PublisherInterface $publisher,
     ) {
     }
 
@@ -64,14 +60,6 @@ final readonly class BudgetPlanProjection
     private function handleBudgetPlanGeneratedDomainEvent(BudgetPlanGeneratedDomainEvent $event): void
     {
         $this->budgetPlanViewRepository->save(BudgetPlanView::fromBudgetPlanGeneratedDomainEvent($event));
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanGeneratedNotificationEvent::fromDomainEvent($event),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
@@ -80,14 +68,6 @@ final readonly class BudgetPlanProjection
         $this->budgetPlanViewRepository->save(
             BudgetPlanView::fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent($event),
         );
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanGeneratedWithOneThatAlreadyExistsNotificationEvent::fromDomainEvent($event),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanRemovedDomainEvent(BudgetPlanRemovedDomainEvent $event): void
@@ -102,10 +82,6 @@ final readonly class BudgetPlanProjection
 
         $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
-        try {
-            $this->publisher->publishNotificationEvents([BudgetPlanRemovedNotificationEvent::fromDomainEvent($event)]);
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanCurrencyChangedDomainEvent(BudgetPlanCurrencyChangedDomainEvent $event): void
@@ -120,12 +96,6 @@ final readonly class BudgetPlanProjection
 
         $budgetPlanView->fromEvent($event);
         $this->budgetPlanViewRepository->save($budgetPlanView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [BudgetPlanCurrencyChangedNotificationEvent::fromDomainEvent($event)],
-            );
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): void {

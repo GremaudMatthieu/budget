@@ -11,18 +11,15 @@ use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAdjustedDomainEvent;
 use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeRemovedDomainEvent;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanIncomeEntryViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanIncomeEntryViewRepositoryInterface;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanIncomeAddedNotificationEvent;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanIncomeAdjustedNotificationEvent;
-use App\BudgetPlanContext\Infrastructure\Events\Notifications\BudgetPlanIncomeRemovedNotificationEvent;
 use App\BudgetPlanContext\ReadModels\Views\BudgetPlanIncomeEntryView;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\SharedContext\Domain\Ports\Outbound\PublisherInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class BudgetPlanIncomeEntryProjection
 {
     public function __construct(
         private BudgetPlanIncomeEntryViewRepositoryInterface $budgetPlanIncomeEntryViewRepository,
-        private PublisherInterface $publisher,
     ) {
     }
 
@@ -47,14 +44,6 @@ final readonly class BudgetPlanIncomeEntryProjection
                     $event->occurredOn,
                 ),
             );
-            try {
-                $this->publisher->publishNotificationEvents(
-                    [
-                        BudgetPlanIncomeAddedNotificationEvent::fromBudgetPlanGeneratedDomainEvent($event),
-                    ],
-                );
-            } catch (\Exception $e) {
-            }
         }
     }
 
@@ -69,16 +58,6 @@ final readonly class BudgetPlanIncomeEntryProjection
                     $event->occurredOn,
                 ),
             );
-            try {
-                $this->publisher->publishNotificationEvents(
-                    [
-                        BudgetPlanIncomeAddedNotificationEvent::fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-                            $event,
-                        ),
-                    ],
-                );
-            } catch (\Exception $e) {
-            }
         }
     }
 
@@ -87,14 +66,6 @@ final readonly class BudgetPlanIncomeEntryProjection
         $this->budgetPlanIncomeEntryViewRepository->save(
             BudgetPlanIncomeEntryView::fromBudgetPlanIncomeAddedDomainEvent($event),
         );
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanIncomeAddedNotificationEvent::fromBudgetPlanIncomeAddedDomainEvent($event),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanIncomeAdjustedDomainEvent(BudgetPlanIncomeAdjustedDomainEvent $event): void
@@ -109,26 +80,10 @@ final readonly class BudgetPlanIncomeEntryProjection
 
         $budgetPlanIncomeView->fromEvent($event);
         $this->budgetPlanIncomeEntryViewRepository->save($budgetPlanIncomeView);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanIncomeAdjustedNotificationEvent::fromBudgetPlanIncomeAdjustedDomainEvent($event),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 
     private function handleBudgetPlanIncomeRemovedDomainEvent(BudgetPlanIncomeRemovedDomainEvent $event): void
     {
         $this->budgetPlanIncomeEntryViewRepository->delete($event->uuid);
-        try {
-            $this->publisher->publishNotificationEvents(
-                [
-                    BudgetPlanIncomeRemovedNotificationEvent::fromDomainEvent($event),
-                ],
-            );
-        } catch (\Exception $e) {
-        }
     }
 }

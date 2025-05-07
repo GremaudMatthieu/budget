@@ -14,21 +14,18 @@ use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedD
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
 use App\BudgetEnvelopeContext\ReadModels\Projections\BudgetEnvelopeProjection;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
-use App\SharedContext\Domain\Ports\Outbound\PublisherInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class BudgetEnvelopeProjectionTest extends TestCase
 {
     private BudgetEnvelopeViewRepositoryInterface&MockObject $envelopeViewRepository;
-    private PublisherInterface&MockObject $publisher;
     private BudgetEnvelopeProjection $budgetEnvelopeProjection;
 
     protected function setUp(): void
     {
         $this->envelopeViewRepository = $this->createMock(BudgetEnvelopeViewRepositoryInterface::class);
-        $this->publisher = $this->createMock(PublisherInterface::class);
-        $this->budgetEnvelopeProjection = new BudgetEnvelopeProjection($this->envelopeViewRepository, $this->publisher);
+        $this->budgetEnvelopeProjection = new BudgetEnvelopeProjection($this->envelopeViewRepository);
     }
 
     public function testHandleEnvelopeAddedEvent(): void
@@ -54,7 +51,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
                     && $view->userUuid === $event->userId
                     && $view->currency === $event->currency;
             }));
-        $this->publisher->expects($this->once())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -81,7 +77,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn($envelopeView);
-        $this->publisher->expects($this->once())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -99,7 +94,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn(null);
-        $this->publisher->expects($this->never())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -126,7 +120,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn($envelopeView);
-        $this->publisher->expects($this->once())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -144,7 +137,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn(null);
-        $this->publisher->expects($this->never())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -170,7 +162,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn($envelopeView);
-        $this->publisher->expects($this->once())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -187,7 +178,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn(null);
-        $this->publisher->expects($this->never())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -213,7 +203,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn($envelopeView);
-        $this->publisher->expects($this->once())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -230,7 +219,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn(null);
-        $this->publisher->expects($this->never())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -256,7 +244,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn($envelopeView);
-        $this->publisher->expects($this->once())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -282,7 +269,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn($envelopeView);
-        $this->publisher->expects($this->once())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -299,7 +285,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn(null);
-        $this->publisher->expects($this->never())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -317,7 +302,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn(null);
-        $this->publisher->expects($this->never())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -349,7 +333,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn($envelopeView);
-        $this->publisher->expects($this->once())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -372,7 +355,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn(null);
-        $this->publisher->expects($this->never())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -403,7 +385,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn($envelopeView);
-        $this->publisher->expects($this->once())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -425,7 +406,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
             ->method('findOneBy')
             ->with(['uuid' => $event->aggregateId, 'is_deleted' => false])
             ->willReturn(null);
-        $this->publisher->expects($this->never())->method('publishNotificationEvents');
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }

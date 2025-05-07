@@ -9,23 +9,19 @@ use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeReplayedDomainEvent;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRewoundDomainEvent;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeLedgerEntryViewRepositoryInterface;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeLedgerCreditEntryAddedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeLedgerDebitEntryAddedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeLedgerEntriesReplayedNotificationEvent;
-use App\BudgetEnvelopeContext\Infrastructure\Events\Notifications\BudgetEnvelopeLedgerEntriesRewoundNotificationEvent;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeLedgerEntryView;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface;
 use App\SharedContext\Domain\Ports\Inbound\EventSourcedRepositoryInterface;
-use App\SharedContext\Domain\Ports\Outbound\PublisherInterface;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class BudgetEnvelopeLedgerEntryProjection
 {
     public function __construct(
         private BudgetEnvelopeLedgerEntryViewRepositoryInterface $budgetEnvelopeLedgerEntryViewRepository,
         private EventSourcedRepositoryInterface $eventSourcedRepository,
-        private PublisherInterface $publisher,
         private EventClassMapInterface $eventClassMap,
     ) {
     }
@@ -46,12 +42,6 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
         $this->budgetEnvelopeLedgerEntryViewRepository->save(
             BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeCreditedDomainEvent($event),
         );
-        try {
-            $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeLedgerCreditEntryAddedNotificationEvent::fromDomainEvent($event),
-            ]);
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeDebitedDomainEvent(BudgetEnvelopeDebitedDomainEvent $event): void
@@ -59,12 +49,6 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
         $this->budgetEnvelopeLedgerEntryViewRepository->save(
             BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeDebitedDomainEvent($event),
         );
-        try {
-            $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeLedgerDebitEntryAddedNotificationEvent::fromDomainEvent($event),
-            ]);
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeRewoundDomainEvent(BudgetEnvelopeRewoundDomainEvent $event): void
@@ -92,13 +76,6 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
                 default => null,
             };
         }
-
-        try {
-            $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeLedgerEntriesRewoundNotificationEvent::fromDomainEvent($event),
-            ]);
-        } catch (\Exception) {
-        }
     }
 
     private function handleBudgetEnvelopeReplayedDomainEvent(BudgetEnvelopeReplayedDomainEvent $event): void
@@ -125,13 +102,6 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
                 ),
                 default => null,
             };
-        }
-
-        try {
-            $this->publisher->publishNotificationEvents([
-                BudgetEnvelopeLedgerEntriesReplayedNotificationEvent::fromDomainEvent($event),
-            ]);
-        } catch (\Exception) {
         }
     }
 }

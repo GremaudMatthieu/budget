@@ -9,7 +9,7 @@ use App\Libraries\FluxCapacitor\Anonymizer\Ports\UserDomainEventInterface;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\PublishDomainEventsException;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventPublisherInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventBusInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\UserAggregateInterface;
@@ -26,7 +26,7 @@ final class EventStore implements EventStoreInterface
 
     public function __construct(
         private Connection $connection,
-        private DomainEventPublisherInterface $publisher,
+        private EventBusInterface $eventBus,
         private RequestIdProvider $requestIdProvider,
         private EventClassMapInterface $eventClassMap,
         private EventEncryptorInterface $eventEncryptor,
@@ -127,7 +127,7 @@ final class EventStore implements EventStoreInterface
                 ]);
             }
 
-            $this->publisher->publishDomainEvents($aggregate->raisedDomainEvents());
+            $this->eventBus->execute($aggregate->raisedDomainEvents());
             $this->connection->commit();
             $aggregate->clearRaisedDomainEvents();
 
