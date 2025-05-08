@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, AppState } from 'react-native';
+import { View, Text, TouchableOpacity, AppState, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
@@ -169,6 +169,7 @@ function DashboardContent() {
           </View>
         </View>
       </View>
+      {Platform.OS === 'web' && <div className="h-32" />}
     </View>
   );
 }
@@ -187,6 +188,23 @@ function DashboardHeader() {
 
 function DashboardScreen() {
   const { t } = useTranslation();
+
+  if (Platform.OS === 'web') {
+    return (
+      <div className="mb-8 mt-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-1">Dashboard</h1>
+            <p className="text-slate-500">{t('dashboard.summary')}</p>
+          </div>
+          {/* Place any important actions/info from the blue header here if needed */}
+        </div>
+        <DashboardContent />
+      </div>
+    );
+  }
+
+  // Mobile: keep animated header
   return (
     <AnimatedHeaderLayout
       title="Dashboard"

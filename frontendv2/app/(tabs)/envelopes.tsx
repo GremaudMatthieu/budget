@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
-  TextInput
+  TextInput,
+  Platform
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -728,6 +729,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
           actionType={currentAction?.type || 'credit'}
         />
       </View>
+      {Platform.OS === 'web' && <div className="h-32" />}
     </View>
   );
 }
@@ -772,6 +774,36 @@ function EnvelopesScreen() {
       refreshEnvelopes(true);
     }, [refreshEnvelopes])
   );
+
+  if (Platform.OS === 'web') {
+    return (
+      <div className="mb-8 mt-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-1">{t('envelopes.title')}</h1>
+            <p className="text-slate-500">{t('envelopes.subtitle')}</p>
+          </div>
+          {/* Place any important actions/info from the blue header here if needed */}
+        </div>
+        <EnvelopesContent onCreateEnvelope={() => setIsCreating(true)} />
+        {/* Floating Action Button for web (optional) */}
+        <div className="fixed bottom-24 right-8 z-50">
+          <button
+            onClick={() => setIsCreating(true)}
+            className="bg-primary-600 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-white text-2xl hover:bg-primary-700 transition"
+            style={{ boxShadow: '0 4px 16px rgba(44, 120, 220, 0.15)' }}
+          >
+            <Ionicons name="add" size={28} color="white" />
+          </button>
+        </div>
+        <CreateEnvelopeModal
+          visible={isCreating}
+          onClose={() => { if (!creating) setIsCreating(false); }}
+          onSubmit={handleCreateEnvelope}
+        />
+      </div>
+    );
+  }
 
   return (
     <View className="flex-1">

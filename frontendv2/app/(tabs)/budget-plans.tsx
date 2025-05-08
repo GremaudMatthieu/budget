@@ -521,6 +521,22 @@ export default function BudgetPlansScreen() {
     );
   };
 
+  if (Platform.OS === 'web') {
+    return (
+      <div className="mb-8 mt-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-1">{t('budgetPlans.title')}</h1>
+            <p className="text-slate-500">{t('budgetPlans.subtitle')}</p>
+          </div>
+          {/* Place any important actions/info from the blue header here if needed */}
+        </div>
+        {renderContent()}
+        <div className="h-32" />
+      </div>
+    );
+  }
+
   return (
     <View className="flex-1">
       <AnimatedHeaderLayout

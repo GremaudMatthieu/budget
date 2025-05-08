@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Modal, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useBudget } from '@/contexts/BudgetContext';
 import { createUtcSafeDate, formatMonthYear } from '@/utils/dateUtils';
@@ -221,31 +221,27 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
           {/* Target Month Selector */}
           <View className="mb-5">
             <Text className="mb-1 text-sm font-medium text-text-secondary">{t('modals.toMonth')}</Text>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              className="pb-2"
-            >
-              <View className="flex-row space-x-2">
+            {Platform.OS === 'web' ? (
+              <div className="flex flex-row space-x-2 overflow-x-auto pb-2" style={{ WebkitOverflowScrolling: 'touch' }}>
                 {months.map((month, index) => {
                   const monthNumber = index + 1;
                   const isOccupied = isMonthOccupied(targetYear, monthNumber);
                   const isCurrentSource = targetYear === sourceYear && monthNumber === sourceMonth;
-                  
                   return (
-                    <TouchableOpacity
+                    <button
                       key={month}
-                      onPress={() => setTargetMonth(monthNumber)}
+                      onClick={() => setTargetMonth(monthNumber)}
                       disabled={loading || isCurrentSource}
-                      className={`border rounded-xl p-3 min-w-[80px] items-center justify-center ${
+                      className={`border rounded-xl p-3 min-w-[80px] flex flex-col items-center justify-center ${
                         targetMonth === monthNumber && !isCurrentSource
                           ? 'bg-primary-100 border-primary-300'
                           : isOccupied || isCurrentSource
                             ? 'bg-gray-100 border-gray-200 opacity-50'
                             : 'bg-white border-surface-border'
                       }`}
+                      style={{ outline: 'none' }}
                     >
-                      <Text className={`font-medium ${
+                      <span className={`font-medium ${
                         targetMonth === monthNumber && !isCurrentSource
                           ? 'text-primary-700'
                           : isOccupied || isCurrentSource
@@ -253,24 +249,66 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
                             : 'text-text-secondary'
                       }`}>
                         {monthAbbrevs[index]}
-                      </Text>
-                      
+                      </span>
                       {isOccupied && (
-                        <View className="bg-red-100 px-1.5 py-0.5 rounded-full mt-1">
-                          <Text className="text-xs text-red-700">{t('budgetPlans.exists')}</Text>
-                        </View>
+                        <span className="bg-red-100 px-1.5 py-0.5 rounded-full mt-1 text-xs text-red-700">{t('budgetPlans.exists')}</span>
                       )}
-                      
                       {isCurrentSource && (
-                        <View className="bg-gray-200 px-1.5 py-0.5 rounded-full mt-1">
-                          <Text className="text-xs text-gray-700">{t('budgetPlans.source')}</Text>
-                        </View>
+                        <span className="bg-gray-200 px-1.5 py-0.5 rounded-full mt-1 text-xs text-gray-700">{t('budgetPlans.source')}</span>
                       )}
-                    </TouchableOpacity>
+                    </button>
                   );
                 })}
-              </View>
-            </ScrollView>
+              </div>
+            ) : (
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                className="pb-2"
+              >
+                <View className="flex-row space-x-2">
+                  {months.map((month, index) => {
+                    const monthNumber = index + 1;
+                    const isOccupied = isMonthOccupied(targetYear, monthNumber);
+                    const isCurrentSource = targetYear === sourceYear && monthNumber === sourceMonth;
+                    return (
+                      <TouchableOpacity
+                        key={month}
+                        onPress={() => setTargetMonth(monthNumber)}
+                        disabled={loading || isCurrentSource}
+                        className={`border rounded-xl p-3 min-w-[80px] items-center justify-center ${
+                          targetMonth === monthNumber && !isCurrentSource
+                            ? 'bg-primary-100 border-primary-300'
+                            : isOccupied || isCurrentSource
+                              ? 'bg-gray-100 border-gray-200 opacity-50'
+                              : 'bg-white border-surface-border'
+                        }`}
+                      >
+                        <Text className={`font-medium ${
+                          targetMonth === monthNumber && !isCurrentSource
+                            ? 'text-primary-700'
+                            : isOccupied || isCurrentSource
+                              ? 'text-gray-400'
+                              : 'text-text-secondary'
+                        }`}>
+                          {monthAbbrevs[index]}
+                        </Text>
+                        {isOccupied && (
+                          <View className="bg-red-100 px-1.5 py-0.5 rounded-full mt-1">
+                            <Text className="text-xs text-red-700">{t('budgetPlans.exists')}</Text>
+                          </View>
+                        )}
+                        {isCurrentSource && (
+                          <View className="bg-gray-200 px-1.5 py-0.5 rounded-full mt-1">
+                            <Text className="text-xs text-gray-700">{t('budgetPlans.source')}</Text>
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            )}
           </View>
 
           {/* Action Buttons */}

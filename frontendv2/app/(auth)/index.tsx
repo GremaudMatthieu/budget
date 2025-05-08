@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '@/utils/useTranslation';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
+import WebContainer from '@/components/web/WebContainer';
 
 function WelcomeContent() {
   const router = useRouter();
@@ -99,6 +100,15 @@ export default function WelcomeScreen() {
     <LanguageSwitcher isDark={true} />
   );
   
+  if (Platform.OS === 'web') {
+    return (
+      <WebContainer>
+        <View className="flex min-h-screen justify-center items-center">
+          <WelcomeContent />
+        </View>
+      </WebContainer>
+    );
+  }
   return (
     <View className="flex-1">
       <AnimatedHeaderLayout

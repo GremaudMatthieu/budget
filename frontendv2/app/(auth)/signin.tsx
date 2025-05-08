@@ -7,6 +7,7 @@ import GoogleSignInButton from '../../components/GoogleSignInButton';
 import { Ionicons } from '@expo/vector-icons';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
+import WebContainer from '@/components/web/WebContainer';
 
 function SignInContent() {
   const { t } = useTranslation();
@@ -69,12 +70,19 @@ function SignInContent() {
 export default function SignInScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-
   // Custom header buttons for language switcher
   const headerButtons = (
     <LanguageSwitcher isDark={true} />
   );
-
+  if (Platform.OS === 'web') {
+    return (
+      <WebContainer>
+        <View className="flex min-h-screen justify-center items-center">
+          <SignInContent />
+        </View>
+      </WebContainer>
+    );
+  }
   return (
     <KeyboardAvoidingView
       className="flex-1"

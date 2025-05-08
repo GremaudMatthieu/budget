@@ -7,6 +7,7 @@ import GoogleSignInButton from '../../components/GoogleSignInButton';
 import { Ionicons } from '@expo/vector-icons';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
+import WebContainer from '@/components/web/WebContainer';
 
 function SignupContent() {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ function SignupContent() {
       {/* Email Sign Up Option */}
       <TouchableOpacity 
         className="border border-surface-borderDark bg-surface-light rounded-xl py-4 px-6 flex-row items-center justify-center mb-6 shadow-sm"
-        onPress={() => router.push('/email-signup')}
+        onPress={() => router.push('/(auth)/email-signup')}
       >
         <Ionicons name="mail-outline" size={20} color="#64748b" />
         <Text className="text-text-primary ml-2 font-medium">{t('auth.signUpWithEmail')}</Text>
@@ -70,12 +71,19 @@ function SignupContent() {
 export default function SignupScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-
   // Custom header buttons for language switcher
   const headerButtons = (
     <LanguageSwitcher isDark={true} />
   );
-
+  if (Platform.OS === 'web') {
+    return (
+      <WebContainer>
+        <View className="flex min-h-screen justify-center items-center">
+          <SignupContent />
+        </View>
+      </WebContainer>
+    );
+  }
   return (
     <KeyboardAvoidingView
       className="flex-1"

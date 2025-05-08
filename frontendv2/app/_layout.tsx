@@ -10,7 +10,7 @@ import { BudgetProvider } from "@/contexts/BudgetContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Platform } from 'react-native';
 import { useEffect } from "react";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
@@ -53,7 +53,40 @@ function AuthProtection({ children }: { children: React.ReactNode }) {
   return children;
 }
 
+// Web-only components
+import HeaderWeb from '@/components/web/HeaderWeb';
+import BottomTabWeb from '@/components/web/BottomTabWeb';
+import WebContainer from '@/components/web/WebContainer';
+import FooterWeb from '@/components/web/FooterWeb';
+
 export default function RootLayout() {
+  if (Platform.OS === 'web') {
+    return (
+      <RootSiblingParent>
+        <GestureHandlerRootView className="flex-1">
+          <ErrorProvider>
+            <AuthProvider>
+              <LanguageProvider>
+                <AuthProtection>
+                  <UserProvider>
+                    <EnvelopeProvider>
+                      <BudgetProvider>
+                        <HeaderWeb />
+                        <WebContainer>
+                          <Slot />
+                        </WebContainer>
+                        <FooterWeb />
+                      </BudgetProvider>
+                    </EnvelopeProvider>
+                  </UserProvider>
+                </AuthProtection>
+              </LanguageProvider>
+            </AuthProvider>
+          </ErrorProvider>
+        </GestureHandlerRootView>
+      </RootSiblingParent>
+    );
+  }
   return (
     <RootSiblingParent>
     <GestureHandlerRootView className="flex-1">

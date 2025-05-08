@@ -529,6 +529,101 @@ export default function BudgetPlanDetailScreen() {
     );
   }
 
+  if (Platform.OS === 'web') {
+    return (
+      <div className="mb-8 mt-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-1">{planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}</h1>
+            <p className="text-slate-500">{`${formatCurrency(formatWithTwoDecimals(totalIncome), planDetails?.currency)} • ${t('budgetPlans.remaining')}: ${formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}`}</p>
+          </div>
+          <button
+            onClick={() => setIsDuplicateModalOpen(true)}
+            className="flex-row items-center px-3 py-2 bg-primary-100 rounded-xl ml-2 hover:bg-primary-200 transition"
+            style={{ display: 'flex' }}
+          >
+            <Ionicons name="copy-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
+            <span className="text-primary-700 font-semibold">{t('budgetPlans.duplicate')}</span>
+          </button>
+        </div>
+        <div className="space-y-8">
+          {renderOverview()}
+          {renderNeeds()}
+          {renderWants()}
+          {renderSavings()}
+          {renderIncomes()}
+          <div className="h-32" />
+        </div>
+        {/* Modals */}
+        {isAddModalOpen && (
+          <BudgetItemModal
+            isVisible={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
+            onSubmit={async (name, amount, category) => {
+              await handleAddItem(name, amount, category);
+              await refreshBudgetPlans();
+            }}
+            title={t(`budgetPlans.add${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`)}
+            itemType={currentItemType}
+            categories={
+              currentItemType === 'need'
+                ? needsCategories
+                : currentItemType === 'want'
+                  ? wantsCategories
+                  : currentItemType === 'saving'
+                    ? savingsCategories
+                    : incomesCategories
+            }
+          />
+        )}
+        {isEditModalOpen && currentItem && (
+          <BudgetItemModal
+            isVisible={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            onSubmit={async (name, amount, category) => {
+              await handleEditItem(name, amount, category);
+              await refreshBudgetPlans();
+            }}
+            title={t(`budgetPlans.edit${currentItemType.charAt(0).toUpperCase() + currentItemType.slice(1)}`)}
+            initialName={currentItem.name}
+            initialAmount={currentItem.amount}
+            initialCategory={currentItem.category}
+            isEdit={true}
+            itemType={currentItemType}
+            categories={
+              currentItemType === 'need'
+                ? needsCategories
+                : currentItemType === 'want'
+                  ? wantsCategories
+                  : currentItemType === 'saving'
+                    ? savingsCategories
+                    : incomesCategories
+            }
+          />
+        )}
+        {isDeleteModalOpen && currentItem && (
+          <DeleteConfirmationModal
+            visible={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={async () => {
+              await handleDeleteItem();
+              await refreshBudgetPlans();
+            }}
+            name={currentItem.name}
+            message={t('modals.deleteConfirmation', { name: currentItem.name })}
+          />
+        )}
+        <DuplicateBudgetPlanModal
+          visible={isDuplicateModalOpen}
+          onClose={() => setIsDuplicateModalOpen(false)}
+          sourceBudgetPlanId={uuid}
+          sourceMonth={sourceMonth}
+          sourceYear={sourceYear}
+        />
+      </div>
+    );
+  }
+
   return (
     <SwipeBackWrapper hasScrollView>
       <View className="flex-1 bg-background-light">

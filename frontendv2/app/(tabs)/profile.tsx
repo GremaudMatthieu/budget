@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
@@ -106,7 +106,22 @@ function ProfileContent() {
 
 function ProfileScreen() {
   const { t } = useTranslation();
-  
+
+  if (Platform.OS === 'web') {
+    return (
+      <div className="mb-8 mt-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-1">{t('profile.title')}</h1>
+            <p className="text-slate-500">{t('profile.subtitle')}</p>
+          </div>
+          {/* Place any important actions/info from the blue header here if needed */}
+        </div>
+        <ProfileContent />
+      </div>
+    );
+  }
+
   return (
     <AnimatedHeaderLayout
       title={t('profile.title')}

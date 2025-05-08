@@ -2,8 +2,9 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Slot } from 'expo-router';
 
 /**
  * This is the layout file for the tab navigation.
@@ -24,6 +25,11 @@ export default function TabsLayout() {
   // If not logged in, don't show tabs (auth flow will redirect)
   if (!user) {
     return null;
+  }
+
+  if (Platform.OS === 'web') {
+    // On web, just render the children (Slot) and let BottomTabWeb handle navigation
+    return <Slot />;
   }
 
   return (
