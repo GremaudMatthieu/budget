@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
@@ -41,13 +41,13 @@ export default function GoogleCallbackScreen() {
 
   if (error) {
     return (
-      <View style={styles.container}>
+      <View className="flex-1 bg-background-light items-center justify-center p-5">
         <StatusBar style="auto" />
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorTitle}>Authentication Error</Text>
-          <Text style={styles.errorText}>{error}</Text>
+        <View className="bg-white rounded-xl p-6 items-center justify-center w-full max-w-lg shadow-md">
+          <Text className="text-2xl font-bold text-danger-600 mb-3">Authentication Error</Text>
+          <Text className="text-base text-text-secondary text-center mb-4">{error}</Text>
           <Text 
-            style={styles.returnLink}
+            className="text-primary-600 text-base font-semibold underline"
             onPress={() => router.replace('/signin')}
           >
             Return to Sign In
@@ -58,60 +58,10 @@ export default function GoogleCallbackScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-background-light items-center justify-center p-5">
       <StatusBar style="auto" />
       <ActivityIndicator size="large" color="#4a6fa5" />
-      <Text style={styles.loadingText}>Completing authentication...</Text>
+      <Text className="mt-5 text-base text-text-secondary">Completing authentication...</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f7fa',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  loadingText: {
-    marginTop: 20,
-    fontSize: 16,
-    color: '#333',
-  },
-  errorContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    maxWidth: 400,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  errorTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#dc2626',
-    marginBottom: 12,
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#4b5563',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  returnLink: {
-    color: '#4a6fa5',
-    fontSize: 16,
-    fontWeight: '500',
-    textDecorationLine: 'underline',
-  },
-});

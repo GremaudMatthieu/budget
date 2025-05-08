@@ -37,7 +37,7 @@ const EnvelopeProgressCard: React.FC<EnvelopeProgressCardProps> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <View className="card bg-white rounded-2xl shadow-md overflow-hidden mb-6 p-6">
+    <View className="bg-white rounded-xl shadow-md p-4 mb-4">
       {/* Name editing */}
       <View className="flex-row items-center mb-2">
         {editingName !== null ? (
@@ -59,7 +59,7 @@ const EnvelopeProgressCard: React.FC<EnvelopeProgressCardProps> = ({
           </>
         ) : (
           <>
-            <Text className="flex-1 text-2xl font-bold text-gray-900">{name}</Text>
+            <Text className="text-lg font-semibold text-text-primary mb-2">{name}</Text>
             <TouchableOpacity onPress={() => setEditingName(name)} disabled={pending} className="ml-2">
               <Ionicons name="create-outline" size={20} color="#222" />
             </TouchableOpacity>

@@ -648,17 +648,17 @@ export default function BudgetPlanDetailScreen() {
           />
         </AnimatedHeaderLayout>
         {/* --- Floating Action Button (FAB) fixed to screen --- */}
-        <View style={{ position: 'absolute', bottom: 24, right: 24, zIndex: 30, opacity: fabLock ? 0.5 : 1 }}>
+        <View className={`absolute bottom-6 right-6 z-30${fabLock ? ' opacity-50' : ''}`}>
           <TouchableOpacity
             onPress={() => handleOpenAddModal(type)}
             disabled={fabLock}
-            className="bg-primary-600 w-16 h-16 rounded-full shadow-lg items-center justify-center active:opacity-80"
+            className="bg-primary-600 w-14 h-14 rounded-full shadow-lg items-center justify-center active:opacity-80"
             accessibilityRole="button"
             accessibilityLabel={t('common.add')}
             accessibilityHint={t('modals.addItemHint', { defaultValue: 'Add a new item' })}
             activeOpacity={0.8}
           >
-            <Ionicons name="add" size={32} color="white" />
+            <Ionicons name="add" size={28} color="white" />
           </TouchableOpacity>
         </View>
       </View>

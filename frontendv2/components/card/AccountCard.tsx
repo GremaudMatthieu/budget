@@ -31,7 +31,7 @@ const AccountCard: React.FC<AccountCardProps> = ({
   loading = false,
 }) => {
   return (
-    <View className="card mb-4">
+    <View className="bg-white dark:bg-background-dark rounded-xl shadow-md p-4 mb-4">
       <View className="card-content">
         <View className="flex-row items-center">
           <View className="w-10 h-10 rounded-full bg-primary-100 items-center justify-center mr-3">

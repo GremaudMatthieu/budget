@@ -27,7 +27,7 @@ export default function TabsLayout() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView className="flex-1" edges={['bottom']}>
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#0c6cf2', // primary-600

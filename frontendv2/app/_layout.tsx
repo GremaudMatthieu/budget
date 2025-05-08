@@ -56,7 +56,7 @@ function AuthProtection({ children }: { children: React.ReactNode }) {
 export default function RootLayout() {
   return (
     <RootSiblingParent>
-    <GestureHandlerRootView style={styles.container}>
+    <GestureHandlerRootView className="flex-1">
     <ErrorProvider>
       <AuthProvider>
         <LanguageProvider>
@@ -65,7 +65,7 @@ export default function RootLayout() {
                 <EnvelopeProvider>
                   <BudgetProvider>
                     <View className="flex-1 bg-background-light">
-                      <StatusBar style="auto" />
+                      <StatusBar style="dark" />
                       <Slot />
                     </View>
                   </BudgetProvider>
@@ -79,9 +79,3 @@ export default function RootLayout() {
     </RootSiblingParent>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

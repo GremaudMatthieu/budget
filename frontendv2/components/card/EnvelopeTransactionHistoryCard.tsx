@@ -24,8 +24,8 @@ const EnvelopeTransactionHistoryCard: React.FC<EnvelopeTransactionHistoryCardPro
 }) => {
   const { t } = useTranslation();
   return (
-    <View className="card bg-white rounded-2xl shadow-md overflow-hidden mb-6 p-6">
-      <Text className="text-lg font-semibold text-gray-900 mb-4">{t('envelopes.transactionHistory')}</Text>
+    <View className="bg-white rounded-xl shadow-md p-4 mb-4">
+      <Text className="text-lg font-semibold text-text-primary mb-2">{t('envelopes.transactionHistory')}</Text>
       {loading ? (
         <Text>{t('common.loading')}</Text>
       ) : ledger.length === 0 ? (

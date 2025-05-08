@@ -21,8 +21,8 @@ const EnvelopeQuickActionsCard: React.FC<EnvelopeQuickActionsCardProps> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <View className="card bg-white rounded-2xl shadow-md overflow-hidden mb-6 p-6">
-      <Text className="text-lg font-semibold text-gray-900 mb-4">{t('envelopes.quickActions')}</Text>
+    <View className="bg-white rounded-xl shadow-md p-4 mb-4">
+      <Text className="text-lg font-semibold text-text-primary mb-2">{t('envelopes.quickActions')}</Text>
       <View className="flex-row space-x-3 mb-4">
         <TouchableOpacity
           onPress={() => onQuickCredit('10')}

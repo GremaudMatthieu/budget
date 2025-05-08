@@ -784,27 +784,11 @@ function EnvelopesScreen() {
       </AnimatedHeaderLayout>
 
       {/* Floating Action Button */}
-      <View 
-        style={{
-          position: 'absolute',
-          bottom: 24,
-          right: 24,
-          zIndex: 50,
-        }}
-      >
+      <View className="absolute bottom-6 right-6 z-50">
         <TouchableOpacity
           onPress={() => setIsCreating(true)}
           className="bg-primary-600 w-14 h-14 rounded-full shadow-lg items-center justify-center"
-          style={{
-            elevation: 8, // Pour Android
-            shadowColor: "#000", // Pour iOS
-            shadowOffset: {
-              width: 0,
-              height: 4,
-            },
-            shadowOpacity: 0.30,
-            shadowRadius: 4.65,
-          }}
+          style={{ elevation: 8 }}
         >
           <Ionicons name="add" size={28} color="white" />
         </TouchableOpacity>

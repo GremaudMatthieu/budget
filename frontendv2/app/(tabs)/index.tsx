@@ -71,10 +71,9 @@ function DashboardContent() {
 
         <View className="flex-row justify-between">
           <TouchableOpacity
-            className="bg-white rounded-xl p-4 shadow-sm items-center justify-center w-[48%]"
+            className={`bg-white rounded-xl p-4 shadow-sm items-center justify-center w-[48%]${hasCurrentBudget ? ' opacity-50' : ''}`}
             onPress={() => router.push('/budget-plans/create')}
             disabled={hasCurrentBudget}
-            style={hasCurrentBudget ? { opacity: 0.5 } : {}}
           >
             <View className="w-12 h-12 rounded-full bg-accent-100 items-center justify-center mb-2">
               <Ionicons name="add-outline" size={24} color="#4f46e5" />

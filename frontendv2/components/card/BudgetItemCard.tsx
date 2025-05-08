@@ -33,14 +33,14 @@ const BudgetItemCard: React.FC<BudgetItemCardProps> = ({
   loading = false,
 }) => {
   return (
-    <View className="neomorphic-inset p-3 rounded-lg mb-2">
+    <View className="bg-white rounded-xl shadow-md p-4 mb-4">
       <View className="flex-row justify-between items-center">
         <View className="flex-row items-center flex-1">
           <View className={`w-8 h-8 rounded-full ${bgColor} items-center justify-center mr-2`}>
             <Ionicons name={icon as any} size={18} color={color} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text className="font-medium text-text-primary" numberOfLines={1} ellipsizeMode="tail">
+            <Text className="text-lg font-semibold text-text-primary mb-2" numberOfLines={1} ellipsizeMode="tail">
               {name}
             </Text>
             <Text className="text-xs text-text-secondary" numberOfLines={1} ellipsizeMode="tail">
