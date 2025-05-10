@@ -49,7 +49,7 @@ final readonly class GenerateABudgetPlanInput
                         new Assert\NotBlank(),
                         new Assert\Type('string'),
                         new Assert\Regex(
-                            pattern: '/^\d+(\.\d{2})?$/',
+                            pattern: '/^\d+(\.\d{1,2})?$/',
                             message: 'budgetPlan.amountInvalid'
                         ),
                     ]),

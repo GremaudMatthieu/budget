@@ -10,6 +10,7 @@ import EnvelopeQuickActionsCard from '@/components/card/EnvelopeQuickActionsCard
 import EnvelopeCustomAmountCard from '@/components/card/EnvelopeCustomAmountCard';
 import EnvelopeTransactionHistoryCard from '@/components/card/EnvelopeTransactionHistoryCard';
 import DescriptionModal from '@/components/modals/DescriptionModal';
+import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import { Ionicons } from '@expo/vector-icons';
 import { useEnvelopeData } from '@/hooks/useEnvelopeData';
 
@@ -45,6 +46,8 @@ export default function EnvelopeDetailScreen() {
     handleQuickDebit,
     handleDescriptionSubmit,
     setError,
+    editingTargetError,
+    deleteEnvelope,
   } = useEnvelopeData(uuid as string);
 
   // Always fetch latest details when page is focused
@@ -53,6 +56,17 @@ export default function EnvelopeDetailScreen() {
       loadEnvelopeDetails();
     }, [loadEnvelopeDetails])
   );
+
+  const handleDeleteEnvelope = async () => {
+    if (!details) return;
+    try {
+      await deleteEnvelope(details.envelope.uuid, setError);
+      setDeleteModalOpen(false);
+      router.push('/envelopes');
+    } catch (err) {
+      setError(t('envelopes.failedToDeleteEnvelope'));
+    }
+  };
 
   if (loading) {
     return (
@@ -73,6 +87,45 @@ export default function EnvelopeDetailScreen() {
   }
 
   const progress = Number(details.envelope.currentAmount) / Number(details.envelope.targetedAmount);
+
+  // Web-specific delete confirmation dialog
+  const renderWebDeleteDialog = () => {
+    if (!deleteModalOpen) return null;
+    return (
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-envelope-title"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+        tabIndex={-1}
+      >
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full bg-danger-100 flex items-center justify-center mb-4">
+            <Ionicons name="alert-outline" size={32} color="#dc2626" />
+          </div>
+          <h2 id="delete-envelope-title" className="text-2xl font-bold text-text-primary mb-2">{t('modals.confirmDeletion')}</h2>
+          <p className="text-center text-text-secondary mb-6">
+            {t('modals.deleteConfirmation', { name: details.envelope.name })}
+          </p>
+          <div className="flex w-full gap-3 mt-2">
+            <button
+              onClick={() => setDeleteModalOpen(false)}
+              className="flex-1 py-3 border border-gray-300 rounded-xl text-text-primary text-base font-medium bg-white hover:bg-gray-50 transition"
+              autoFocus
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              onClick={handleDeleteEnvelope}
+              className="flex-1 py-3 bg-danger-600 rounded-xl text-white text-base font-semibold hover:bg-danger-700 transition"
+            >
+              {t('common.delete')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (Platform.OS === 'web') {
     return (
@@ -97,6 +150,7 @@ export default function EnvelopeDetailScreen() {
           onUpdateName={handleUpdateName}
           onUpdateTarget={handleUpdateTarget}
           pending={!!details.envelope.pending}
+          editingTargetError={editingTargetError ?? undefined}
         />
         <EnvelopeQuickActionsCard
           onQuickCredit={handleQuickCredit}
@@ -132,6 +186,7 @@ export default function EnvelopeDetailScreen() {
             <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
             <Text className="text-red-700 font-semibold text-base">{t('envelopes.deleteEnvelope')}</Text>
           </TouchableOpacity>
+          {renderWebDeleteDialog()}
           <DescriptionModal
             visible={descriptionModalOpen}
             onClose={() => setDescriptionModalOpen(false)}
@@ -170,6 +225,7 @@ export default function EnvelopeDetailScreen() {
               onUpdateName={handleUpdateName}
               onUpdateTarget={handleUpdateTarget}
               pending={!!details.envelope.pending}
+              editingTargetError={editingTargetError ?? undefined}
             />
             <EnvelopeQuickActionsCard
               onQuickCredit={handleQuickCredit}
@@ -203,6 +259,12 @@ export default function EnvelopeDetailScreen() {
               <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
               <Text className="text-red-700 font-semibold text-base">{t('envelopes.deleteEnvelope')}</Text>
             </TouchableOpacity>
+            <DeleteConfirmationModal
+              visible={deleteModalOpen}
+              onClose={() => setDeleteModalOpen(false)}
+              onConfirm={handleDeleteEnvelope}
+              name={details.envelope.name}
+            />
             <DescriptionModal
               visible={descriptionModalOpen}
               onClose={() => setDescriptionModalOpen(false)}

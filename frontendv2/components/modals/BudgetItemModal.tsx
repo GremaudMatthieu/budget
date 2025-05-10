@@ -17,6 +17,8 @@ import { Category } from '@/types/budgetTypes';
 import SelectField from '@/components/inputs/SelectField';
 import { SelectOption } from '@/components/modals/SelectModal';
 import { useTranslation } from '@/utils/useTranslation';
+import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
+import { validateEnvelopeAmountField } from '@/utils/validateEnvelopeAmount';
 
 interface BudgetItemModalProps {
   isVisible: boolean;
@@ -76,21 +78,27 @@ const BudgetItemModal: React.FC<BudgetItemModalProps> = ({
     if (!name.trim()) newErrors.name = t('errors.nameRequired', { defaultValue: 'Name is required' });
     else if (name.trim().length < 3) newErrors.name = t('errors.nameTooShort', { defaultValue: 'Name must be at least 3 characters' });
     else if (name.trim().length > 35) newErrors.name = t('errors.nameTooLong', { defaultValue: 'Name must be at most 35 characters' });
-    if (!amount.trim()) newErrors.amount = t('errors.amountRequired', { defaultValue: 'Amount is required' });
-    else if (amount.trim().length < 1) newErrors.amount = t('errors.amountTooShort', { defaultValue: 'Amount must be at least 1 character' });
-    else if (amount.trim().length > 13) newErrors.amount = t('errors.amountTooLong', { defaultValue: 'Amount must be at most 13 characters (e.g. 9999999999.99)' });
-    else if (!validateAmount(amount) || parseFloat(amount) <= 0) newErrors.amount = t('errors.amountInvalid', { defaultValue: 'Enter a valid positive amount' });
+    const amountError = validateEnvelopeAmountField(amount, t);
+    if (amountError) newErrors.amount = amountError;
     if (!category.trim()) newErrors.category = t('errors.categoryRequired', { defaultValue: 'Category is required' });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleAmountChange = (value: string) => {
-    // Replace commas with periods
-    const normalized = value.replace(/,/g, '.');
-    if (normalized === '' || validateAmount(normalized)) {
-      setAmount(normalized);
+    // Allow ',' as decimal separator, convert to '.'
+    let input = value.replace(/,/g, '.');
+    // Remove anything that's not a digit or decimal point
+    input = input.replace(/[^0-9.]/g, '');
+    // Ensure only one decimal point
+    const parts = input.split('.');
+    let intPart = parts[0].slice(0, 10);
+    let formatted = intPart;
+    if (parts.length > 1) {
+      let decPart = parts[1].slice(0, 2);
+      formatted += '.' + decPart;
     }
+    setAmount(formatted);
   };
 
   const handleSubmit = () => {

@@ -21,18 +21,11 @@ const AmountInput: React.FC<AmountInputProps> = ({
 }) => {
   // Handle amount input - only allow numbers and a single decimal point or comma
   const handleAmountChange = (text: string) => {
-    // Allow digits, period, and comma
-    const filtered = text.replace(/[^0-9.,]/g, '');
-    // Replace commas with periods
-    const normalized = filtered.replace(/,/g, '.');
-    // Ensure only one decimal point
-    const parts = normalized.split('.');
-    let formatted = parts[0];
-    if (parts.length > 1) {
-      formatted += '.' + parts[1];
-    }
+    // Filter out all non-numeric characters except '.'
+    let input = text.replace(/[^0-9.]/g, '');
+    const normalized = normalizeAmountInput(input);
     if (onChangeText) {
-      onChangeText(formatted);
+      onChangeText(normalized);
     }
   };
 

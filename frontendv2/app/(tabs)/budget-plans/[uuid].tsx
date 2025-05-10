@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Platform, ScrollView, Dimensions, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Platform, ScrollView, Dimensions, Animated, Alert } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
@@ -50,7 +50,7 @@ export default function BudgetPlanDetailScreen() {
     savingsCategories,
     incomesCategories,
   } = useBudgetPlanData(uuid);
-  const { refreshBudgetPlans } = useBudget();
+  const { refreshBudgetPlans, removeBudgetPlan } = useBudget();
 
   // Helper functions for formatting and extracting data
   const formatWithTwoDecimals = (num: number): number => Math.round(num * 100) / 100;
@@ -111,6 +111,26 @@ export default function BudgetPlanDetailScreen() {
     { name: t('budgetPlans.savings'), value: totalSavings, color: '#FFC107' },
   ];
 
+  const getBudgetAdvice = () => {
+    if (totalIncome === 0) return t('budgetPlans.advice.noIncome');
+    const diffNeeds = Math.abs(needsPercentage - 50);
+    const diffWants = Math.abs(wantsPercentage - 30);
+    const diffSavings = Math.abs(savingsPercentage - 20);
+    if (diffNeeds < 5 && diffWants < 5 && diffSavings < 5) {
+      return t('budgetPlans.advice.ideal');
+    }
+    if (needsPercentage > 55) {
+      return t('budgetPlans.advice.needsHigh');
+    }
+    if (wantsPercentage > 35) {
+      return t('budgetPlans.advice.wantsHigh');
+    }
+    if (savingsPercentage < 15) {
+      return t('budgetPlans.advice.savingsLow');
+    }
+    return t('budgetPlans.advice.general');
+  };
+
   // Render a list of budget items using BudgetItemCard
   const renderItemList = (type: 'need' | 'want' | 'saving' | 'income', items: any[]) => {
     if (!items) return null;
@@ -136,9 +156,26 @@ export default function BudgetPlanDetailScreen() {
                   )}
                 </View>
               </View>
+              {Platform.OS === 'web' ? (
+                <button
+                  onClick={() => handleOpenAddModal(type)}
+                  className="bg-primary-100 p-3 rounded-full ml-2 hover:bg-primary-200 transition flex items-center justify-center"
+                  aria-label={t('common.add')}
+                  disabled={loading}
+                  type="button"
+                >
+                  {loading ? (
+                    <ActivityIndicator size="small" color="#0c6cf2" />
+                  ) : (
+                    <Ionicons name="add" size={20} color="#0c6cf2" />
+                  )}
+                </button>
+              ) : (
               <TouchableOpacity
                 onPress={() => handleOpenAddModal(type)}
-                className="bg-primary-100 p-3 rounded-full"
+                  className="bg-primary-100 p-3 rounded-full ml-2"
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.add')}
                 disabled={loading}
               >
                 {loading ? (
@@ -147,6 +184,7 @@ export default function BudgetPlanDetailScreen() {
                   <Ionicons name="add" size={20} color="#0c6cf2" />
                 )}
               </TouchableOpacity>
+              )}
             </View>
             <View className="neomorphic-inset p-3 rounded-lg mb-4">
               <Text className="text-text-secondary">
@@ -371,7 +409,89 @@ export default function BudgetPlanDetailScreen() {
               </View>
             </View>
           </View>
+          {/* Budget advice */}
+          <View className="bg-primary-50 rounded-lg p-4 mb-4">
+            <Text className="text-primary-700 font-semibold mb-1">{t('budgetPlans.advice.title')}</Text>
+            <Text className="text-primary-700 text-sm">{getBudgetAdvice()}</Text>
+          </View>
         </View>
+        {/* Delete Budget Plan Button (web and mobile) */}
+        {Platform.OS === 'web'
+          ? (() => {
+              // Web-specific delete confirmation dialog for budget plan
+              const renderWebDeleteDialog = () => {
+                if (!isDeletePlanModalOpen) return null;
+                return (
+                  <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="delete-plan-title"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                    tabIndex={-1}
+                  >
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-full bg-danger-100 flex items-center justify-center mb-4">
+                        <Ionicons name="alert-outline" size={32} color="#dc2626" />
+                      </div>
+                      <h2 id="delete-plan-title" className="text-2xl font-bold text-text-primary mb-2">{t('modals.confirmDeletion')}</h2>
+                      <p className="text-center text-text-secondary mb-6">
+                        {t('modals.deleteConfirmation', { name: planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan') })}
+                      </p>
+                      <div className="flex w-full gap-3 mt-2">
+                        <button
+                          onClick={() => setIsDeletePlanModalOpen(false)}
+                          className="flex-1 py-3 border border-gray-300 rounded-xl text-text-primary text-base font-medium bg-white hover:bg-gray-50 transition"
+                          autoFocus
+                        >
+                          {t('common.cancel')}
+                        </button>
+                        <button
+                          onClick={handleDeleteBudgetPlan}
+                          className="flex-1 py-3 bg-danger-600 rounded-xl text-white text-base font-semibold hover:bg-danger-700 transition"
+                        >
+                          {t('common.delete')}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              };
+              return (
+                <div className="flex flex-col items-center w-full">
+                  <TouchableOpacity
+                    onPress={() => setIsDeletePlanModalOpen(true)}
+                    className="bg-red-100 rounded-xl p-4 items-center mt-6 mb-10"
+                    accessibilityRole="button"
+                    accessibilityLabel={t('budgetPlans.deletePlan')}
+                    style={{ display: 'flex', justifyContent: 'center' }}
+                  >
+                    <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
+                    <Text className="text-red-700 font-semibold text-base">{t('budgetPlans.deletePlan')}</Text>
+                  </TouchableOpacity>
+                  {renderWebDeleteDialog()}
+                </div>
+              );
+            })()
+          : (
+            <View className="flex flex-col items-center w-full">
+              <TouchableOpacity
+                onPress={() => setIsDeletePlanModalOpen(true)}
+                className="bg-red-100 rounded-xl p-4 items-center mt-6 mb-10"
+                accessibilityRole="button"
+                accessibilityLabel={t('budgetPlans.deletePlan')}
+              >
+                <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
+                <Text className="text-red-700 font-semibold text-base">{t('budgetPlans.deletePlan')}</Text>
+              </TouchableOpacity>
+              <DeleteConfirmationModal
+                visible={isDeletePlanModalOpen}
+                onClose={() => setIsDeletePlanModalOpen(false)}
+                onConfirm={handleDeleteBudgetPlan}
+                name={planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}
+                message={t('modals.deleteConfirmation', { name: planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan') })}
+              />
+            </View>
+          )}
       </View>
     </ScrollView>
   );
@@ -391,7 +511,8 @@ export default function BudgetPlanDetailScreen() {
     <ScrollView className="px-2 pt-2 pb-8 w-full" contentContainerStyle={{ paddingBottom: 32 }}>
       {/* --- Compact Summary --- */}
       <View className="bg-white rounded-xl shadow-md px-2 py-2 mb-2">
-        <View className="flex-row items-center justify-center mb-2">
+        <View className="flex-row items-center justify-between mb-2">
+          <View className="flex-row items-center">
           <View className={`w-10 h-10 rounded-full ${bgColor} items-center justify-center mr-3`}>
             <Ionicons name={icon as any} size={22} color={color} />
           </View>
@@ -401,6 +522,37 @@ export default function BudgetPlanDetailScreen() {
               <Text className={`text-xs ${textColor}`}>{formatWithTwoDecimals(percentage)}% {t('budgetPlans.ofIncome')}</Text>
             )}
           </View>
+          </View>
+          {/* Add button in card header for each category */}
+          {Platform.OS === 'web' ? (
+            <button
+              onClick={() => handleOpenAddModal(type)}
+              className="bg-primary-100 p-3 rounded-full ml-2 hover:bg-primary-200 transition flex items-center justify-center"
+              aria-label={t('common.add')}
+              disabled={loading}
+              type="button"
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#0c6cf2" />
+              ) : (
+                <Ionicons name="add" size={20} color="#0c6cf2" />
+              )}
+            </button>
+          ) : (
+            <TouchableOpacity
+              onPress={() => handleOpenAddModal(type)}
+              className="bg-primary-100 p-3 rounded-full ml-2"
+              accessibilityRole="button"
+              accessibilityLabel={t('common.add')}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#0c6cf2" />
+              ) : (
+                <Ionicons name="add" size={20} color="#0c6cf2" />
+              )}
+            </TouchableOpacity>
+          )}
         </View>
         <Text className="text-text-secondary text-xs mb-2 text-center">{description}</Text>
         <View className="flex-row justify-between items-center mt-1">
@@ -498,6 +650,19 @@ export default function BudgetPlanDetailScreen() {
 
   // --- Duplicate modal state ---
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+  const [isDeletePlanModalOpen, setIsDeletePlanModalOpen] = useState(false);
+
+  // Handler to delete the budget plan
+  const handleDeleteBudgetPlan = async () => {
+    if (!selectedBudgetPlan?.budgetPlan?.uuid) return;
+    try {
+      await removeBudgetPlan(selectedBudgetPlan.budgetPlan.uuid);
+      setIsDeletePlanModalOpen(false);
+      router.push('/budget-plans');
+    } catch (err) {
+      // setError && setError(t('budgetPlans.failedToDeletePlan'));
+    }
+  };
 
   if (loading && !selectedBudgetPlan) {
     return (
@@ -742,20 +907,6 @@ export default function BudgetPlanDetailScreen() {
             sourceYear={sourceYear}
           />
         </AnimatedHeaderLayout>
-        {/* --- Floating Action Button (FAB) fixed to screen --- */}
-        <View className={`absolute bottom-6 right-6 z-30${fabLock ? ' opacity-50' : ''}`}>
-          <TouchableOpacity
-            onPress={() => handleOpenAddModal(type)}
-            disabled={fabLock}
-            className="bg-primary-600 w-14 h-14 rounded-full shadow-lg items-center justify-center active:opacity-80"
-            accessibilityRole="button"
-            accessibilityLabel={t('common.add')}
-            accessibilityHint={t('modals.addItemHint', { defaultValue: 'Add a new item' })}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="add" size={28} color="white" />
-          </TouchableOpacity>
-        </View>
       </View>
     </SwipeBackWrapper>
   );

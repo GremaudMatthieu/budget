@@ -33,6 +33,7 @@ interface BudgetContextType {
   adjustBudgetItem: (type: "need" | "want" | "saving" | "income", itemId: string, name: string, amount: string, category: string) => Promise<boolean>;
   removeBudgetItem: (type: "need" | "want" | "saving" | "income", itemId: string) => Promise<boolean>;
   refreshBudgetPlans: () => Promise<void>;
+  removeBudgetPlan: (budgetPlanId: string) => Promise<void>;
 }
 
 // Create context with default values
@@ -357,6 +358,22 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     await fetchBudgetPlansCalendar(year);
   }, [fetchBudgetPlansCalendar]);
 
+  // Add this method to delete a budget plan
+  const removeBudgetPlan = useCallback(async (budgetPlanId: string) => {
+    setLoading(true);
+    try {
+      await budgetService.deleteBudgetPlan(budgetPlanId);
+      await fetchBudgetPlansCalendar(new Date().getFullYear());
+      setSelectedBudgetPlan(null);
+    } catch (err) {
+      console.error('Failed to delete budget plan:', err);
+      setError('Failed to delete budget plan');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchBudgetPlansCalendar, setError]);
+
   const value = {
     budgetPlansCalendar,
     selectedBudgetPlan,
@@ -380,6 +397,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     adjustBudgetItem,
     removeBudgetItem,
     refreshBudgetPlans,
+    removeBudgetPlan,
   };
 
   return <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>;

@@ -22,6 +22,7 @@ import { useErrorContext } from '@/contexts/ErrorContext';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 import { useFocusEffect } from 'expo-router';
 import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
+import { validateEnvelopeAmountField } from '@/utils/validateEnvelopeAmount';
 
 // Content component for envelopes, which will be wrapped with the animated header
 function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }) {
@@ -78,16 +79,8 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
     setAmountTouched(prev => ({ ...prev, [id]: true }));
   };
 
-  // Validation for amount
-  const validateAmountField = (value: string) => {
-    const MAX_AMOUNT = 9999999999.99;
-    if (!value.trim()) return t('errors.amountRequired', { defaultValue: 'Amount is required' });
-    if (value.trim().length < 1) return t('errors.amountTooShort', { defaultValue: 'Amount must be at least 1 character' });
-    if (value.trim().length > 13) return t('errors.amountTooLong', { defaultValue: 'Amount must be at most 13 characters (e.g. 9999999999.99)' });
-    if (!validateAmount(value) || parseFloat(value) <= 0) return t('errors.amountInvalid', { defaultValue: 'Enter a valid positive amount' });
-    if (parseFloat(value) > MAX_AMOUNT) return t('errors.amountTooLarge', { defaultValue: 'Amount must be at most 9999999999.99' });
-    return null;
-  };
+  // Use shared validation
+  const validateAmountField = (value: string) => validateEnvelopeAmountField(value, t);
 
   // Validation for name
   const validateNameField = (value: string) => {

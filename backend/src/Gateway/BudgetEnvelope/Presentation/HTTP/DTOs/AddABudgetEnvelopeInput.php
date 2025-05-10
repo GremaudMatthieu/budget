@@ -36,7 +36,7 @@ final readonly class AddABudgetEnvelopeInput
             maxMessage: 'envelopes.targetedAmountMaxLength'
         )]
         #[Assert\Regex(
-            pattern: '/^\d+(\.\d{2})?$/',
+            pattern: '/^\d+(\.\d{1,2})?$/',
             message: 'envelopes.targetedAmountInvalid'
         )]
         private(set) string $targetedAmount,

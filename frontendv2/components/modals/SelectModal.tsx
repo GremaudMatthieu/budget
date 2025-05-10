@@ -92,7 +92,7 @@ const SelectModal: React.FC<SelectModalProps> = ({
                   className="p-4 flex-row items-center"
                 >
                   <Ionicons name="add-circle-outline" size={18} color="#0c6cf2" />
-                  <Text className="text-primary-600 ml-2">{t('modals.addNew', 'Add New Option')}</Text>
+                  <Text className="text-primary-600 ml-2">{t('modals.addNew')}</Text>
                 </TouchableOpacity>
               )}
             </ScrollView>

@@ -607,7 +607,7 @@ final class BudgetPlan implements AggregateRootInterface
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'rent',
-                'amount' => (string) ($needsAmount * 0.40),
+                'amount' => \sprintf("%.2f", $needsAmount * 0.40),
             ]),
             BudgetPlanNeed::fromArray([
                 'uuid' => $uuidGenerator->generate(),
@@ -617,7 +617,7 @@ final class BudgetPlan implements AggregateRootInterface
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'utilities',
-                'amount' => (string) ($needsAmount * 0.20),
+                'amount' => \sprintf("%.2f", $needsAmount * 0.20),
             ]),
             BudgetPlanNeed::fromArray([
                 'uuid' => $uuidGenerator->generate(),
@@ -627,7 +627,7 @@ final class BudgetPlan implements AggregateRootInterface
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'food',
-                'amount' => (string) ($needsAmount * 0.40),
+                'amount' => \sprintf("%.2f", $needsAmount * 0.40),
             ]),
         ];
     }
@@ -653,7 +653,7 @@ final class BudgetPlan implements AggregateRootInterface
                         locale: $userPreferredLanguage,
                     ),
                     'category' => 'entertainment',
-                    'amount' => (string) ($wantsAmount * 0.50),
+                    'amount' => \sprintf("%.2f", $wantsAmount * 0.50),
                 ]),
             BudgetPlanWant::fromArray([
                 'uuid' => $uuidGenerator->generate(),
@@ -663,7 +663,7 @@ final class BudgetPlan implements AggregateRootInterface
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'dining-out',
-                'amount' => (string) ($wantsAmount * 0.50),
+                'amount' => \sprintf("%.2f", $wantsAmount * 0.50),
             ]),
         ];
     }
@@ -689,7 +689,7 @@ final class BudgetPlan implements AggregateRootInterface
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'emergency-fund',
-                'amount' => (string) ($savingsAmount * 0.50),
+                'amount' => \sprintf("%.2f", $savingsAmount * 0.50),
             ]),
             BudgetPlanSaving::fromArray([
                 'uuid' => $uuidGenerator->generate(),
@@ -699,7 +699,7 @@ final class BudgetPlan implements AggregateRootInterface
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'retirement',
-                'amount' => (string) ($savingsAmount * 0.50),
+                'amount' => \sprintf("%.2f", $savingsAmount * 0.50),
             ]),
         ];
     }

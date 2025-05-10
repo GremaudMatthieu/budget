@@ -53,7 +53,6 @@ final class Version20250323223833 extends AbstractMigration
         $this->addSql('CREATE INDEX idx_budget_plan_view_user_uuid ON budget_plan_view (user_uuid)');
         $this->addSql('CREATE INDEX idx_budget_plan_view_uuid ON budget_plan_view (uuid)');
         $this->addSql('CREATE INDEX idx_budget_plan_view_date ON budget_plan_view (date)');
-        $this->addSql('CREATE UNIQUE INDEX unique_budget_plan_for_user ON budget_plan_view (user_uuid, date)');
         $this->addSql('COMMENT ON COLUMN budget_plan_view.date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN budget_plan_view.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE budget_plan_want_entry_view (id INT NOT NULL, uuid VARCHAR(36) NOT NULL, budget_plan_uuid VARCHAR(36) NOT NULL, want_name VARCHAR(35) NOT NULL, want_amount VARCHAR(13) NOT NULL, category VARCHAR(35) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');

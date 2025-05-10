@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useEnvelopes } from '@/contexts/EnvelopeContext';
 import { useErrorContext } from '@/contexts/ErrorContext';
 import { useTranslation } from '@/utils/useTranslation';
+import { validateEnvelopeAmountField } from '@/utils/validateEnvelopeAmount';
 
 /**
  * Custom hook for managing envelope detail data and UI state.
@@ -29,6 +30,7 @@ export function useEnvelopeData(uuid: string) {
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [currentAction, setCurrentAction] = useState<{ type: 'credit' | 'debit'; amount: string } | null>(null);
+  const [editingTargetError, setEditingTargetError] = useState<string | null>(null);
   const isMounted = useRef(true);
 
   const loadEnvelopeDetails = useCallback(async () => {
@@ -89,24 +91,42 @@ export function useEnvelopeData(uuid: string) {
     }
   }, [details, editingName, updateEnvelopeName, setError, t, loadEnvelopeDetails]);
 
+  // Validate target amount on change
+  useEffect(() => {
+    if (editingTarget !== null) {
+      setEditingTargetError(validateEnvelopeAmountField(editingTarget, t));
+    } else {
+      setEditingTargetError(null);
+    }
+  }, [editingTarget, t]);
+
   // Handler to update target budget
   const handleUpdateTarget = useCallback(async () => {
     if (!details || editingTarget === null) return;
     const newTarget = editingTarget.trim();
+    const validationError = validateEnvelopeAmountField(newTarget, t);
+    if (validationError) {
+      setEditingTargetError(validationError);
+      setError(validationError);
+      return;
+    }
     if (Number(newTarget) === Number(details.envelope.targetedAmount)) {
       setEditingTarget(null);
       return;
     }
     if (Number(newTarget) < Number(details.envelope.currentAmount)) {
       setError(t('envelopes.targetLessThanCurrent'));
+      setEditingTargetError(t('envelopes.targetLessThanCurrent'));
       return;
     }
     try {
       await updateTargetBudget(details.envelope.uuid, newTarget, details.envelope.currentAmount, setError);
       setEditingTarget(null);
+      setEditingTargetError(null);
       await loadEnvelopeDetails();
     } catch (err) {
       setError(t('envelopes.failedToUpdateTarget'));
+      setEditingTargetError(t('envelopes.failedToUpdateTarget'));
     }
   }, [details, editingTarget, updateTargetBudget, setError, t, loadEnvelopeDetails]);
 
@@ -117,9 +137,33 @@ export function useEnvelopeData(uuid: string) {
   };
 
   // Handler for quick credit
-  const handleQuickCredit = (amt: string) => openDescriptionModal('credit', amt);
+  const handleQuickCredit = (amt: string) => {
+    if (!details) return;
+    const entered = parseFloat(amt);
+    if (isNaN(entered) || entered <= 0) {
+      setError(t('errors.invalidAmount'));
+      return;
+    }
+    if (entered + Number(details.envelope.currentAmount) > Number(details.envelope.targetedAmount)) {
+      setError(t('envelopes.cannotCreditMoreThanTarget'));
+      return;
+    }
+    openDescriptionModal('credit', amt);
+  };
   // Handler for quick debit
-  const handleQuickDebit = (amt: string) => openDescriptionModal('debit', amt);
+  const handleQuickDebit = (amt: string) => {
+    if (!details) return;
+    const entered = parseFloat(amt);
+    if (isNaN(entered) || entered <= 0) {
+      setError(t('errors.invalidAmount'));
+      return;
+    }
+    if (entered > Number(details.envelope.currentAmount)) {
+      setError(t('envelopes.cannotDebitMoreThanBalance'));
+      return;
+    }
+    openDescriptionModal('debit', amt);
+  };
   // Handler for custom credit
   const handleCredit = () => openDescriptionModal('credit', amount);
   // Handler for custom debit
@@ -181,5 +225,8 @@ export function useEnvelopeData(uuid: string) {
     handleQuickDebit,
     handleDescriptionSubmit,
     setError,
+    editingTargetError,
+    setEditingTargetError,
+    deleteEnvelope,
   };
 } 

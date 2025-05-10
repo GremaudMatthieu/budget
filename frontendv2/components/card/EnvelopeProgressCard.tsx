@@ -16,6 +16,7 @@ export interface EnvelopeProgressCardProps {
   onUpdateName: () => void;
   onUpdateTarget: () => void;
   pending: boolean;
+  editingTargetError?: string;
 }
 
 /**
@@ -34,6 +35,7 @@ const EnvelopeProgressCard: React.FC<EnvelopeProgressCardProps> = ({
   onUpdateName,
   onUpdateTarget,
   pending,
+  editingTargetError,
 }) => {
   const { t } = useTranslation();
   return (
@@ -73,13 +75,22 @@ const EnvelopeProgressCard: React.FC<EnvelopeProgressCardProps> = ({
           <>
             <TextInput
               value={editingTarget}
-              onChangeText={setEditingTarget}
+              onChangeText={v => {
+                // Use shared normalization for consistency
+                let input = v.replace(/[^0-9.]/g, '');
+                const normalized = normalizeAmountInput(input);
+                setEditingTarget(normalized);
+              }}
               className="w-20 bg-gray-100 px-2 py-1 rounded-lg text-lg"
               keyboardType="numeric"
-              maxLength={10}
+              maxLength={13}
               autoFocus
               editable={!pending}
             />
+            {/* Show error if present */}
+            {typeof editingTargetError === 'string' && editingTargetError && (
+              <Text className="text-red-500 text-xs mt-1 ml-1">{editingTargetError}</Text>
+            )}
             <TouchableOpacity onPress={onUpdateTarget} className="ml-1 p-1 bg-gray-200 rounded-full">
               <Ionicons name="checkmark" size={16} color="#222" />
             </TouchableOpacity>

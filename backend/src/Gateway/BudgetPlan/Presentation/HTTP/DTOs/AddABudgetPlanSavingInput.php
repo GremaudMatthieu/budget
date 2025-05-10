@@ -33,7 +33,7 @@ final readonly class AddABudgetPlanSavingInput
             maxMessage: 'budgetPlan.amountMaxLength'
         )]
         #[Assert\Regex(
-            pattern: '/^\d+(\.\d{2})?$/',
+            pattern: '/^\d+(\.\d{1,2})?$/',
             message: 'budgetPlan.amountInvalid'
         )]
         private(set) string $amount,

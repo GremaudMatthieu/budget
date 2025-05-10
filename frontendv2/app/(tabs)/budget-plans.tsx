@@ -227,6 +227,41 @@ export default function BudgetPlansScreen() {
     );
   };
 
+  // --- Dynamic 50/30/20 advice based on annual summary ---
+  const getAnnualBudgetAdvice = () => {
+    if (!budgetSummary || !rule5030 || !yearlyTotals || yearlyTotals.income <= 0) {
+      return t('budgetPlans.advice.ideal');
+    }
+    const needs = rule5030.current.needs;
+    const wants = rule5030.current.wants;
+    const savings = rule5030.current.savings;
+    const diffNeeds = Math.abs(needs - rule5030.recommended.needs);
+    const diffWants = Math.abs(wants - rule5030.recommended.wants);
+    const diffSavings = Math.abs(savings - rule5030.recommended.savings);
+    if (diffNeeds < 5 && diffWants < 5 && diffSavings < 5) {
+      return t('budgetPlans.advice.ideal');
+    }
+    if (needs > rule5030.recommended.needs + 5) {
+      return t('budgetPlans.advice.needsHigh');
+    }
+    if (wants > rule5030.recommended.wants + 5) {
+      return t('budgetPlans.advice.wantsHigh');
+    }
+    if (savings < rule5030.recommended.savings - 5) {
+      return t('budgetPlans.advice.savingsLow');
+    }
+    return t('budgetPlans.advice.general');
+  };
+
+  // Helper: check if any budget plan exists for the current year
+  const hasAnyBudgetPlanForYear = (year: number): boolean => {
+    if (!budgetPlansCalendar || !budgetPlansCalendar[year]) return false;
+    // Check if any month in the year has a budget plan (uuid present)
+    return Object.values(budgetPlansCalendar[year]).some(
+      (monthData: any) => monthData && monthData.uuid
+    );
+  };
+
   if (loading && !budgetPlansCalendar && !refreshing) {
     return (
       <View className="flex-1 justify-center items-center bg-background-light">
@@ -381,6 +416,14 @@ export default function BudgetPlansScreen() {
         
         {/* Yearly Budget Summary - New section using the new API data */}
         {renderBudgetSummary()}
+        
+        {/* 50/30/20 Rule Advice Card */}
+        {hasAnyBudgetPlanForYear(currentYear) && (
+          <View className="bg-primary-50 rounded-lg p-4 mb-4">
+            <Text className="text-primary-700 font-semibold mb-1">{t('budgetPlans.advice.title')}</Text>
+            <Text className="text-primary-700 text-sm">{getAnnualBudgetAdvice()}</Text>
+          </View>
+        )}
         
         {/* All Months Grid */}
         <View className="mb-6">

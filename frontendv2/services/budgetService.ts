@@ -6,13 +6,11 @@ import {
   CreateBudgetPlanPayload,
   CreateFromExistingPayload,
   Category
-} from '../types/budgetTypes';
+} from '@/types/budgetTypes';
 
 export class BudgetService {
-  // Budget plan queries
   async getBudgetPlansCalendar(year: number): Promise<BudgetPlansCalendar> {
-    const response = await apiClient.get(`/budget-plans-yearly-calendar?year=${year}`);
-    return response;
+    return await apiClient.get(`/budget-plans-yearly-calendar?year=${year}`);
   }
 
   async getBudgetPlan(uuid: string): Promise<BudgetPlan> {
@@ -44,6 +42,12 @@ export class BudgetService {
   async createBudgetPlanFromExisting(payload: CreateFromExistingPayload, requestId: string): Promise<void> {
     const config = { headers: { 'Request-Id': requestId } };
     await apiClient.post('/budget-plans-generate-with-one-that-already-exists', payload, config);
+  }
+
+  async deleteBudgetPlan(budgetPlanId: string): Promise<void> {
+    const requestId = uuid.v4() as string;
+    const config = { headers: { 'Request-Id': requestId } };
+    await apiClient.delete(`/budget-plans/${budgetPlanId}`, config);
   }
 
   // Budget item management

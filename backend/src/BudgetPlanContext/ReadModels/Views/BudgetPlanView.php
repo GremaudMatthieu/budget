@@ -29,7 +29,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'budget_plan_view')]
-#[ORM\UniqueConstraint(name: 'unique_budget_plan_for_user', columns: ['user_uuid', 'date'])]
 #[ORM\Index(name: 'idx_budget_plan_view_user_uuid', columns: ['user_uuid'])]
 #[ORM\Index(name: 'idx_budget_plan_view_uuid', columns: ['uuid'])]
 #[ORM\Index(name: 'idx_budget_plan_view_date', columns: ['date'])]

@@ -241,6 +241,16 @@ export default {
     savingsDescription: 'Money set aside for future goals, emergencies, investments, and debt repayment.',
     incomesDescription: 'All sources of money coming in, including salary, side gigs, and passive income streams.',
     createThisMonthDisabled: 'You can only create a budget for the current year.',
+    advice: {
+      title: 'Budgeting Advice',
+      ideal: 'Great job! Your budget is well balanced according to the 50/30/20 rule.',
+      needsHigh: 'Your needs are taking up more than 50% of your income. Try to reduce essential expenses if possible.',
+      wantsHigh: 'Your wants are above 30% of your income. Consider cutting back on non-essential spending.',
+      savingsLow: 'Your savings are below 20% of your income. Try to increase your savings for better financial security.',
+      general: 'Aim for 50% needs, 30% wants, and 20% savings for a healthy budget.',
+      noIncome: 'Add income sources to get personalized advice based on your budget.',
+    },
+    deletePlan: 'Delete budget plan',
   },
   
   // Profile screens
@@ -343,6 +353,7 @@ export default {
     descriptionTooShort: 'Description must be at least 1 character',
     descriptionTooLong: 'Description must be at most 35 characters',
     nameRequired: 'Envelope name cannot be empty',
+    nameTooShort: 'Envelope name must be at least 2 characters',
   },
   
   // Validation and hints

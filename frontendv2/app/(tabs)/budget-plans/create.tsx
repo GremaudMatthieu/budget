@@ -13,16 +13,15 @@ import {
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { v4 as uuidv4 } from 'uuid';
 import { useBudget } from '@/contexts/BudgetContext';
 import { useErrorContext } from '@/contexts/ErrorContext';
 import { useTranslation } from '@/utils/useTranslation';
-import formatAmount from '@/utils/formatAmount';
 import validateAmount from '@/utils/validateAmount';
 import { currencyOptions } from '@/utils/currencyUtils';
 import SelectField from '@/components/inputs/SelectField';
-import { SelectOption } from '@/components/modals/SelectModal';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
+import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
+import { validateEnvelopeAmountField } from '@/utils/validateEnvelopeAmount';
 
 export default function CreateBudgetPlanScreen() {
   const params = useLocalSearchParams();
@@ -40,13 +39,16 @@ export default function CreateBudgetPlanScreen() {
   // Form state
   const [currency, setCurrency] = useState('USD');
   const [currencySelectVisible, setCurrencySelectVisible] = useState(false);
-  const [incomes, setIncomes] = useState([{ name: t('budgetPlans.defaultIncomeName'), amount: '', category: 'Employment' }]);
+  const [incomes, setIncomes] = useState([{ name: '', amount: '', category: 'Employment' }]);
   const [year, setYear] = useState<number>(0);
   const [month, setMonth] = useState<number>(0);
 
   // State for category selection modal
   const [categorySelectVisible, setCategorySelectVisible] = useState(false);
   const [currentEditingIncomeIndex, setCurrentEditingIncomeIndex] = useState<number | null>(null);
+
+  // Add per-income error state
+  const [incomeErrors, setIncomeErrors] = useState<{ name?: string; amount?: string; category?: string }[]>([]);
 
   // Get year and month from URL params
   useEffect(() => {
@@ -119,11 +121,20 @@ export default function CreateBudgetPlanScreen() {
 
   // Update income amount
   const handleIncomeAmountChange = (index: number, value: string) => {
-    // Make sure we only have valid numeric input with at most one decimal point
-    if (value && !validateAmount(value)) return;
-
+    // Allow ',' as decimal separator, convert to '.'
+    let input = value.replace(/,/g, '.');
+    // Remove anything that's not a digit or decimal point
+    input = input.replace(/[^0-9.]/g, '');
+    // Ensure only one decimal point
+    const parts = input.split('.');
+    let intPart = parts[0].slice(0, 10);
+    let formatted = intPart;
+    if (parts.length > 1) {
+      let decPart = parts[1].slice(0, 2);
+      formatted += '.' + decPart;
+    }
     const newIncomes = [...incomes];
-    newIncomes[index].amount = value;
+    newIncomes[index].amount = formatted;
     setIncomes(newIncomes);
   };
 
@@ -134,18 +145,30 @@ export default function CreateBudgetPlanScreen() {
     setIncomes(newIncomes);
   };
 
-  // Check if form is valid for submission
+  // Validate a single income entry (name, amount, category)
+  const validateIncome = (income: { name: string; amount: string; category: string }) => {
+    const errors: { name?: string; amount?: string; category?: string } = {};
+    if (!income.name.trim()) errors.name = t('errors.nameRequired');
+    else if (income.name.trim().length < 3) errors.name = t('errors.nameTooShort');
+    else if (income.name.trim().length > 35) errors.name = t('errors.nameTooLong', { count: 35 });
+    const amountError = validateEnvelopeAmountField(income.amount, t);
+    if (amountError) errors.amount = amountError;
+    if (!income.category.trim()) errors.category = t('errors.categoryRequired');
+    return errors;
+  };
+
+  // Validate all incomes and update error state
+  useEffect(() => {
+    setIncomeErrors(incomes.map(validateIncome));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [incomes]);
+
+  // Update isFormValid to use new validation
   const isFormValid = () => {
     return (
-      currency && 
+      currency &&
       incomes.length > 0 &&
-      incomes.every(income => 
-        income.name.trim() && 
-        income.amount.trim() && 
-        validateAmount(income.amount) &&
-        parseFloat(income.amount) > 0 &&
-        income.category.trim()
-      )
+      incomeErrors.every(err => Object.keys(err).length === 0)
     );
   };
 
@@ -188,6 +211,12 @@ export default function CreateBudgetPlanScreen() {
                   </View>
                 </View>
               </View>
+            </View>
+            
+            {/* 50/30/20 Rule Advice Card */}
+            <View className="bg-primary-50 rounded-lg p-4 mb-6">
+              <Text className="text-primary-700 font-semibold mb-1">{t('budgetPlans.advice.title')}</Text>
+              <Text className="text-primary-700 text-sm">{t('budgetPlans.advice.ideal')}</Text>
             </View>
             
             {/* Currency Selection */}
@@ -253,7 +282,11 @@ export default function CreateBudgetPlanScreen() {
                         onChangeText={(value) => handleIncomeNameChange(index, value)}
                         placeholder={t('budgetPlans.incomeNamePlaceholder')}
                         className="border border-surface-border rounded-lg p-3 bg-white"
+                        maxLength={35}
                       />
+                      {incomeErrors[index]?.name && (
+                        <Text className="text-red-500 text-xs mt-1">{incomeErrors[index].name}</Text>
+                      )}
                     </View>
                     
                     <View className="mb-3">
@@ -265,7 +298,7 @@ export default function CreateBudgetPlanScreen() {
                         <TextInput
                           value={income.amount}
                           onChangeText={(value) => handleIncomeAmountChange(index, value)}
-                          placeholder={t('modals.amountPlaceholder', '0.00')}
+                          placeholder={t('modals.amountPlaceholder')}
                           keyboardType="decimal-pad"
                           className="flex-1 p-3"
                         />

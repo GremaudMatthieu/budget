@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
 import { useTranslation } from '@/utils/useTranslation';
+import { validateEnvelopeAmountField } from '@/utils/validateEnvelopeAmount';
 
 export interface EnvelopeCustomAmountCardProps {
   amount: string;
@@ -33,17 +34,8 @@ const EnvelopeCustomAmountCard: React.FC<EnvelopeCustomAmountCardProps> = ({
   const [touched, setTouched] = useState(false);
   const [error, setLocalError] = useState<string | null>(null);
 
-  // Validation logic
-  const validateAmountField = (value: string) => {
-    const MAX_AMOUNT = 9999999999.99;
-    if (!value.trim()) return t('errors.amountRequired', { defaultValue: 'Amount is required' });
-    if (value.trim().length < 1) return t('errors.amountTooShort', { defaultValue: 'Amount must be at least 1 character' });
-    if (value.trim().length > 13) return t('errors.amountTooLong', { defaultValue: 'Amount must be at most 13 characters (e.g. 9999999999.99)' });
-    if (!/^(\d{1,10})(\.\d{0,2})?$/.test(value)) return t('errors.amountInvalid', { defaultValue: 'Enter a valid amount with up to 2 decimals' });
-    if (isNaN(Number(value)) || Number(value) <= 0) return t('errors.amountInvalid', { defaultValue: 'Enter a valid positive amount' });
-    if (Number(value) > MAX_AMOUNT) return t('errors.amountTooLarge', { defaultValue: 'Amount must be at most 9999999999.99' });
-    return null;
-  };
+  // Use shared validation
+  const validateAmountField = (value: string) => validateEnvelopeAmountField(value, t);
 
   useEffect(() => {
     if (!touched) return;
@@ -90,8 +82,10 @@ const EnvelopeCustomAmountCard: React.FC<EnvelopeCustomAmountCardProps> = ({
       <TextInput
         value={amount}
         onChangeText={v => {
+          // Filter out all non-numeric characters except '.'
           const normalized = normalizeAmountInput(v);
-          setAmount(normalized);
+          const filtered = normalized.replace(/[^0-9.]/g, '');
+          setAmount(filtered);
           setTouched(true);
         }}
         placeholder={t('envelopes.enterAmountPlaceholder', { currency })}

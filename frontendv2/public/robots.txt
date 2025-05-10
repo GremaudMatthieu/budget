@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+ 
+# Disallow sensitive or non-public paths
+Disallow: /private/
+Disallow: /api/ 

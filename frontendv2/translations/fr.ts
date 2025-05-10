@@ -251,6 +251,16 @@ export default {
     enterAmountHint: 'Entrez le montant pour cet élément',
     enterNameHint: 'Entrez le nom pour cet élément',
     selectCategoryHint: 'Sélectionnez une catégorie pour cet élément',
+    advice: {
+      title: 'Conseil budgétaire',
+      ideal: 'Bravo ! Votre budget est bien équilibré selon la règle 50/30/20.',
+      needsHigh: 'Vos besoins représentent plus de 50% de vos revenus. Essayez de réduire vos dépenses essentielles si possible.',
+      wantsHigh: 'Vos envies dépassent 30% de vos revenus. Pensez à limiter les dépenses non essentielles.',
+      savingsLow: 'Votre épargne est inférieure à 20% de vos revenus. Essayez d\'augmenter votre épargne pour plus de sécurité financière.',
+      general: 'Visez 50% pour les besoins, 30% pour les envies et 20% pour l\'épargne pour un budget sain.',
+      noIncome: 'Ajoutez des sources de revenus pour obtenir des conseils personnalisés selon votre budget.',
+    },
+    deletePlan: 'Supprimer le plan budgétaire',
   },
   
   // Profile screens
@@ -343,6 +353,8 @@ export default {
     failedToLoadBudgetPlanDetails: 'Échec du chargement des détails du plan budgétaire',
     descriptionRequired: 'La description est obligatoire',
     amountRequired: 'Le montant est obligatoire',
+    nameRequired: 'Le nom ne peut pas être vide',
+    nameTooShort: 'Le nom doit comporter au moins 3 caractères',
   },
   
   // Validation and hints
