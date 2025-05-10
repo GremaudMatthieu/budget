@@ -135,10 +135,8 @@ export default function BudgetPlansScreen() {
             <View className="flex-row justify-between items-center mb-2">
               <Text className="text-sm text-secondary-600">{t('budgetPlans.totalIncome')}</Text>
               <Text 
-                className="font-semibold text-text-primary" 
-                numberOfLines={1} 
-                ellipsizeMode="tail" 
-                style={{ maxWidth: '50%' }}
+                className="font-semibold text-text-primary break-all" 
+                style={{ fontSize: yearlyTotals.income > 9999999 ? 14 : 16 }}
               >
                 {formatCurrency(formatWithTwoDecimals(yearlyTotals.income))}
               </Text>
@@ -146,12 +144,10 @@ export default function BudgetPlansScreen() {
             
             <View className="flex-row justify-between items-center mb-4">
               <Text className="text-sm text-secondary-600">{t('budgetPlans.totalAllocated')}</Text>
-              <View className="flex-row items-center" style={{ maxWidth: '50%' }}>
+              <View className="flex-row items-center break-all">
                 <Text 
-                  className="font-semibold text-text-primary" 
-                  numberOfLines={1} 
-                  ellipsizeMode="tail" 
-                  style={{ maxWidth: '80%' }}
+                  className="font-semibold text-text-primary break-all" 
+                  style={{ fontSize: yearlyTotals.allocated > 9999999 ? 14 : 16 }}
                 >
                   {formatCurrency(formatWithTwoDecimals(yearlyTotals.allocated))}
                 </Text>
@@ -324,10 +320,8 @@ export default function BudgetPlansScreen() {
                   <View className="flex-row justify-between mb-2">
                     <Text className="text-text-secondary">{t('budgetPlans.totalIncome')}</Text>
                     <Text 
-                      className="font-semibold" 
-                      numberOfLines={1} 
-                      ellipsizeMode="tail" 
-                      style={{ maxWidth: 150 }}
+                      className="font-semibold break-all" 
+                      style={{ fontSize: (getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.totalIncome || 0) > 9999999 ? 14 : 16 }}
                     >
                       {formatCurrency(
                         formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.totalIncome || 0), 
@@ -339,10 +333,8 @@ export default function BudgetPlansScreen() {
                   <View className="flex-row justify-between mb-1">
                     <Text className="text-text-secondary">{t('budgetPlans.allocated')}</Text>
                     <Text 
-                      className="font-semibold" 
-                      numberOfLines={1} 
-                      ellipsizeMode="tail" 
-                      style={{ maxWidth: 150 }}
+                      className="font-semibold break-all" 
+                      style={{ fontSize: (getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.totalAllocated || 0) > 9999999 ? 14 : 16 }}
                     >
                       {formatCurrency(
                         formatWithTwoDecimals(getMonthData(new Date().getFullYear(), new Date().getMonth() + 1)?.totalAllocated || 0),
@@ -464,9 +456,8 @@ export default function BudgetPlansScreen() {
                       {hasData && monthData ? (
                         <View>
                           <Text 
-                            className="text-lg font-semibold text-text-primary"
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
+                            className="text-lg font-semibold text-text-primary break-all"
+                            style={{ fontSize: (monthData.totalIncome || 0) > 9999999 ? 14 : 16 }}
                           >
                             {formatCurrency(
                               formatWithTwoDecimals(monthData.totalIncome || 0), 
@@ -478,16 +469,14 @@ export default function BudgetPlansScreen() {
                           <View className="flex-row justify-between items-center mt-1">
                             <Text className="text-xs text-secondary-600">{t('budgetPlans.allocated')}:</Text>
                             <Text 
-                              className={`text-xs font-medium ${
+                              className={`text-xs font-medium break-all ${
                                 (monthData.allocatedPercentage ?? 0) > 100 
                                   ? 'text-danger-600' 
                                   : (monthData.allocatedPercentage ?? 0) < 80 
                                     ? 'text-amber-600' 
                                     : 'text-success-600'
                               }`}
-                              numberOfLines={1}
-                              ellipsizeMode="tail"
-                              style={{ maxWidth: '60%' }}
+                              style={{ fontSize: (monthData.totalAllocated || 0) > 9999999 ? 13 : 14 }}
                             >
                               {formatCurrency(
                                 formatWithTwoDecimals(monthData.totalAllocated || 0), 

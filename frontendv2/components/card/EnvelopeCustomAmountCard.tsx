@@ -78,7 +78,7 @@ const EnvelopeCustomAmountCard: React.FC<EnvelopeCustomAmountCardProps> = ({
 
   return (
     <View className="bg-white rounded-xl shadow-md p-4 mb-4">
-      <Text className="text-lg font-semibold text-text-primary mb-2">{t('envelopes.customAmount')}</Text>
+      <Text className="text-lg font-semibold text-text-primary mb-2 min-w-0 break-all" numberOfLines={2} ellipsizeMode="tail">{t('envelopes.customAmount')}</Text>
       <TextInput
         value={amount}
         onChangeText={v => {
@@ -90,10 +90,11 @@ const EnvelopeCustomAmountCard: React.FC<EnvelopeCustomAmountCardProps> = ({
         }}
         placeholder={t('envelopes.enterAmountPlaceholder', { currency })}
         keyboardType="decimal-pad"
-        className="border border-gray-300 rounded-lg p-3 mb-1 bg-white"
+        className="border border-gray-300 rounded-lg p-3 mb-1 bg-white min-w-0 break-all"
         maxLength={13}
         onBlur={() => setTouched(true)}
         onFocus={() => setTouched(true)}
+        style={{ fontSize: Number(amount) > 9999999 ? 14 : 16 }}
       />
       {touched && error && (
         <Text className="text-red-500 text-xs mb-2">{error}</Text>

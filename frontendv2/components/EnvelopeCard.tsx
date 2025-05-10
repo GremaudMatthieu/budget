@@ -41,11 +41,16 @@ const EnvelopeCard: React.FC<EnvelopeCardProps> = ({ envelope }) => {
       </View>
       
       <View className="flex-row justify-between items-center">
-        <View>
-          <Text className="text-lg font-semibold text-text-primary mb-1">
+        <View style={{ minWidth: 0, flex: 1 }}>
+          <Text
+            className="text-lg font-semibold text-text-primary mb-1 min-w-0 break-all"
+            numberOfLines={2}
+            ellipsizeMode="tail"
+            style={{ fontSize: Number(envelope.currentAmount) > 9999999 ? 14 : 16 }}
+          >
             {formatCurrency(envelope.currentAmount, envelope.currency)}
           </Text>
-          <Text className="text-sm text-text-secondary">
+          <Text className="text-sm text-text-secondary min-w-0 break-all">
             {t('envelopes.of')} {formatCurrency(envelope.targetedAmount, envelope.currency)}
           </Text>
         </View>

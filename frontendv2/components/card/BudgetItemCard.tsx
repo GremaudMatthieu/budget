@@ -34,23 +34,32 @@ const BudgetItemCard: React.FC<BudgetItemCardProps> = ({
 }) => {
   return (
     <View className="bg-white rounded-xl shadow-md p-4 mb-4">
-      <View className="flex-row justify-between items-center">
-        <View className="flex-row items-center flex-1">
+      <View className="flex-row flex-wrap justify-between items-center">
+        <View className="flex-row items-center flex-1 min-w-0">
           <View className={`w-8 h-8 rounded-full ${bgColor} items-center justify-center mr-2`}>
             <Ionicons name={icon as any} size={18} color={color} />
           </View>
-          <View style={{ flex: 1 }}>
-            <Text className="text-lg font-semibold text-text-primary mb-2" numberOfLines={1} ellipsizeMode="tail">
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text className="text-lg font-semibold text-text-primary mb-1" numberOfLines={2} ellipsizeMode="tail">
               {name}
             </Text>
-            <Text className="text-xs text-text-secondary" numberOfLines={1} ellipsizeMode="tail">
+            <Text className="text-xs text-text-secondary mb-1" numberOfLines={1} ellipsizeMode="tail">
               {category}
             </Text>
+            {/* On small screens, show amount below name/category */}
+            <View className="md:hidden">
+              <Text className="font-semibold text-primary-600 text-base break-all">
+                {amount} {currency}
+              </Text>
+            </View>
           </View>
         </View>
-        <Text className="font-semibold mr-4 text-primary-600" numberOfLines={1} ellipsizeMode="tail" style={{ maxWidth: 100 }}>
-          {amount} {currency}
-        </Text>
+        {/* On medium+ screens, show amount to the right */}
+        <View className="hidden md:flex md:items-center md:ml-4">
+          <Text className="font-semibold text-primary-600 text-base break-all">
+            {amount} {currency}
+          </Text>
+        </View>
         {onEdit && (
           <TouchableOpacity onPress={onEdit} className="p-2 bg-gray-100 rounded-full mr-1" disabled={loading}>
             <Ionicons name="create-outline" size={16} color="#64748b" />

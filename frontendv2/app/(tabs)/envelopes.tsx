@@ -685,15 +685,15 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
           {(envelopesData?.envelopes ?? []).length > 0 && (
             <View className="bg-secondary-900 rounded-xl p-6 mb-8">
               <View className="bg-secondary-800 rounded-lg p-4 mb-4">
-                <Text className="text-xl font-bold text-white">{t('envelopes.budgetOverview')}</Text>
-                <Text className="text-secondary-300">
+                <Text className="text-xl font-bold text-white min-w-0 break-all" numberOfLines={2} ellipsizeMode="tail">{t('envelopes.budgetOverview')}</Text>
+                <Text className="text-secondary-300 min-w-0 break-all">
                   {(envelopesData?.envelopes ?? []).filter(e => Number(e.currentAmount) / Number(e.targetedAmount) >= 1).length} {t('envelopes.completedOf')} {(envelopesData?.envelopes?.length ?? 0)} {t('envelopes.title').toLowerCase()}
                 </Text>
               </View>
-              <View className="flex-row items-center">
-                <View className="h-1 flex-1 bg-success-500 rounded-full" />
-                <View className="h-1 flex-1 bg-primary-500 rounded-full mx-1" />
-                <View className="h-1 flex-1 bg-secondary-500 rounded-full" />
+              <View className="flex-row items-center min-w-0">
+                <View className="h-1 flex-1 bg-success-500 rounded-full min-w-0" />
+                <View className="h-1 flex-1 bg-primary-500 rounded-full mx-1 min-w-0" />
+                <View className="h-1 flex-1 bg-secondary-500 rounded-full min-w-0" />
               </View>
 
             </View>

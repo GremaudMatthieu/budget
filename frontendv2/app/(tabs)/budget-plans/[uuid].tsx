@@ -338,35 +338,45 @@ export default function BudgetPlanDetailScreen() {
           <Text className="text-lg font-bold text-text-primary mb-2 text-center">{t('budgetPlans.budgetSummary')}</Text>
           <View className="flex-row gap-x-2 mb-2">
             {/* Needs */}
-            <View className="flex-1 items-center justify-center py-2 px-1">
+            <View className="flex-1 items-center justify-center py-2 px-1 min-w-0">
               <Ionicons name="cash-outline" size={18} color="#16a34a" className="mb-1" />
               <Text className="text-green-600 font-semibold text-xs mb-1">{t('budgetPlans.needs')}</Text>
-              <Text className="text-base font-bold text-text-primary text-center min-w-0 max-w-full overflow-hidden" numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: totalNeeds > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(totalNeeds), planDetails?.currency)}</Text>
+              <Text className="text-base font-bold text-text-primary text-center min-w-0 break-all" style={{ fontSize: totalNeeds > 9999999 ? 14 : 16 }}>
+                {formatCurrency(formatWithTwoDecimals(totalNeeds), planDetails?.currency)}
+              </Text>
               <Text className="text-xs text-text-secondary text-center mt-1">{formatWithTwoDecimals(needsPercentage)}%</Text>
             </View>
             {/* Wants */}
-            <View className="flex-1 items-center justify-center py-2 px-1">
+            <View className="flex-1 items-center justify-center py-2 px-1 min-w-0">
               <Ionicons name="cart-outline" size={18} color="#0284c7" className="mb-1" />
               <Text className="text-blue-600 font-semibold text-xs mb-1">{t('budgetPlans.wants')}</Text>
-              <Text className="text-base font-bold text-text-primary text-center min-w-0 max-w-full overflow-hidden" numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: totalWants > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(totalWants), planDetails?.currency)}</Text>
+              <Text className="text-base font-bold text-text-primary text-center min-w-0 break-all" style={{ fontSize: totalWants > 9999999 ? 14 : 16 }}>
+                {formatCurrency(formatWithTwoDecimals(totalWants), planDetails?.currency)}
+              </Text>
               <Text className="text-xs text-text-secondary text-center mt-1">{formatWithTwoDecimals(wantsPercentage)}%</Text>
             </View>
             {/* Savings */}
-            <View className="flex-1 items-center justify-center py-2 px-1">
+            <View className="flex-1 items-center justify-center py-2 px-1 min-w-0">
               <Ionicons name="save-outline" size={18} color="#ca8a04" className="mb-1" />
               <Text className="text-amber-600 font-semibold text-xs mb-1">{t('budgetPlans.savings')}</Text>
-              <Text className="text-base font-bold text-text-primary text-center min-w-0 max-w-full overflow-hidden" numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: totalSavings > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(totalSavings), planDetails?.currency)}</Text>
+              <Text className="text-base font-bold text-text-primary text-center min-w-0 break-all" style={{ fontSize: totalSavings > 9999999 ? 14 : 16 }}>
+                {formatCurrency(formatWithTwoDecimals(totalSavings), planDetails?.currency)}
+              </Text>
               <Text className="text-xs text-text-secondary text-center mt-1">{formatWithTwoDecimals(savingsPercentage)}%</Text>
             </View>
           </View>
           {/* --- Total/Remaining Row --- */}
           <View className="flex-row justify-between items-center border-t border-gray-200 pt-2 mt-2">
             <Text className="text-primary-700 font-semibold text-xs">{t('budgetPlans.totalAllocated')}</Text>
-            <Text className="font-bold text-primary-700 text-base text-right min-w-0 max-w-[120px] overflow-hidden" numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: totalAllocated > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(totalAllocated), planDetails?.currency)}</Text>
+            <Text className="font-bold text-primary-700 text-base text-right min-w-0 break-all" style={{ fontSize: totalAllocated > 9999999 ? 14 : 16 }}>
+              {formatCurrency(formatWithTwoDecimals(totalAllocated), planDetails?.currency)}
+            </Text>
           </View>
           <View className="flex-row justify-between items-center mt-1">
             <Text className={`font-semibold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'} text-xs`}>{t('budgetPlans.remainingToAllocate')}</Text>
-            <Text className={`font-bold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'} text-base text-right min-w-0 max-w-[120px] overflow-hidden`} numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: Math.abs(remaining) > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}</Text>
+            <Text className={`font-bold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'} text-base text-right min-w-0 break-all`} style={{ fontSize: Math.abs(remaining) > 9999999 ? 14 : 16 }}>
+              {formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}
+            </Text>
           </View>
         </View>
         {/* --- Pie Chart & Legend (not boxed) --- */}
@@ -557,7 +567,9 @@ export default function BudgetPlanDetailScreen() {
         <Text className="text-text-secondary text-xs mb-2 text-center">{description}</Text>
         <View className="flex-row justify-between items-center mt-1">
           <Text className="font-semibold text-text-primary text-xs">{t('common.total')}</Text>
-          <Text className={`font-bold ${textColor} text-base text-right min-w-0 max-w-[120px] overflow-hidden`} numberOfLines={1} ellipsizeMode="middle" style={{ fontSize: total > 9999999 ? 14 : 16 }}>{formatCurrency(formatWithTwoDecimals(total), planDetails?.currency)}</Text>
+          <Text className={`font-bold ${textColor} text-base text-right min-w-0 break-all`} style={{ fontSize: total > 9999999 ? 14 : 16 }}>
+            {formatCurrency(formatWithTwoDecimals(total), planDetails?.currency)}
+          </Text>
         </View>
         {type !== 'income' && (
           <View className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
