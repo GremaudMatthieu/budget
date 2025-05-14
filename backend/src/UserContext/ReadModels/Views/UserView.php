@@ -69,6 +69,12 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
     #[ORM\Column(name: 'provider_user_id', type: 'string', length: 255)]
     private(set) string $providerUserId;
 
+    #[ORM\Column(name: 'context_uuid', type: 'string', length: 36)]
+    private(set) string $contextId;
+
+    #[ORM\Column(name: 'context', type: 'string', length: 36)]
+    private(set) string $context;
+
     public function __construct(
         UserId $userId,
         UserEmail $email,
@@ -82,6 +88,8 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
         array $roles,
         UserRegistrationContext $registrationContext,
         string $providerUserId,
+        string $contextId,
+        string $context,
     ) {
         $this->uuid = (string) $userId;
         $this->email = (string) $email;
@@ -95,6 +103,8 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
         $this->roles = $roles;
         $this->registrationContext = (string) $registrationContext;
         $this->providerUserId = $providerUserId;
+        $this->contextId = $contextId;
+        $this->context = $context;
     }
 
     public static function fromRepository(array $user): self
@@ -112,6 +122,8 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
             json_decode($user['roles'], true),
             UserRegistrationContext::fromString($user['registration_context']),
             $user['provider_user_id'],
+            $user['context_uuid'],
+            $user['context'],
         );
     }
 
@@ -130,6 +142,8 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
             $event->roles,
             UserRegistrationContext::fromString($event->registrationContext),
             $event->providerUserId,
+            $event->contextId,
+            $event->context,
         );
     }
 
@@ -142,6 +156,8 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
         UserConsent $consentGiven,
         UserRegistrationContext $registrationContext,
         string $providerUserId,
+        string $contextId,
+        string $context,
     ): self
     {
         return new self(
@@ -157,6 +173,8 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
             ['ROLE_USER'],
             $registrationContext,
             $providerUserId,
+            $contextId,
+            $context,
         );
     }
 
@@ -235,6 +253,8 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
         $this->roles = ['ROLE_USER'];
         $this->registrationContext = $event->registrationContext;
         $this->providerUserId = $event->providerUserId;
+        $this->contextId = $event->contextId;
+        $this->context = $event->context;
     }
 
     private function applyUserFirstnameChangedDomainEvent(UserFirstnameChangedDomainEvent $event): void

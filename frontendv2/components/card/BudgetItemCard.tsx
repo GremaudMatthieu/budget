@@ -57,8 +57,8 @@ const BudgetItemCard: React.FC<BudgetItemCardProps> = ({
         {/* On medium+ screens, show amount to the right */}
         <View className="hidden md:flex md:items-center md:ml-4">
           <Text className="font-semibold text-primary-600 text-base break-all">
-            {amount} {currency}
-          </Text>
+          {amount} {currency}
+        </Text>
         </View>
         {onEdit && (
           <TouchableOpacity onPress={onEdit} className="p-2 bg-gray-100 rounded-full mr-1" disabled={loading}>

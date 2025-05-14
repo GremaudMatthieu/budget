@@ -13,7 +13,7 @@ final readonly class BudgetEnvelopeName
         Assert::that($budgetEnvelopeName)
             ->notBlank('Name should not be blank.')
             ->minLength(1, 'The name must be at least 1 character long.')
-            ->maxLength(50, 'The name must be at most 50 characters long.')
+            ->maxLength(25, 'The name must be at most 25 characters long.')
             ->regex('/^[\p{L}\p{N} ]+$/u', 'The name can only contain letters (including letters with accents), numbers (0-9), and spaces. No special characters are allowed.')
         ;
     }

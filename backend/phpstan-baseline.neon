@@ -1,6 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Property App\\BudgetEnvelopeContext\\Domain\\Aggregates\\BudgetEnvelope\:\:\$context is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/BudgetEnvelopeContext/Domain/Aggregates/BudgetEnvelope.php
+
+		-
 			message: '#^Cannot access offset 1\|2\|3\|4\|5\|6\|7\|8\|9\|10\|11\|12 on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
@@ -495,6 +501,12 @@ parameters:
 		-
 			message: '#^Method App\\UserContext\\Domain\\Aggregates\\User\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
 			identifier: return.type
+			count: 1
+			path: src/UserContext/Domain/Aggregates/User.php
+
+		-
+			message: '#^Property App\\UserContext\\Domain\\Aggregates\\User\:\:\$context is never read, only written\.$#'
+			identifier: property.onlyWritten
 			count: 1
 			path: src/UserContext/Domain/Aggregates/User.php
 

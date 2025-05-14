@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\UserContext\Domain\Events;
 
+use App\SharedContext\Domain\Enums\ContextEnum;
 use App\UserContext\Domain\Events\UserSignedUpDomainEvent;
 use PHPUnit\Framework\TestCase;
 
@@ -22,7 +23,8 @@ class UserSignedUpEventTest extends TestCase
             'b7e685be-db83-4866-9f85-102fac30a50b',
             'google',
             '1234567890',
-
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
         $array = $event->toArray();
 
@@ -53,6 +55,8 @@ class UserSignedUpEventTest extends TestCase
             'providerUserId' => '1234567890',
             'userId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
             'requestId' => '8f636cef-6a4d-40f1-a9cf-4e64f67ce7c0',
+            'context' => ContextEnum::USER->value,
+            'contextId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
         ];
 
         $event = UserSignedUpDomainEvent::fromArray($data);

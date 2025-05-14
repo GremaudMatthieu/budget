@@ -6,6 +6,7 @@ use App\Libraries\FluxCapacitor\Anonymizer\Traits\UserDomainEventsCapabilityTrai
 use App\Libraries\FluxCapacitor\Anonymizer\Traits\EncryptedKeyCacheTrait;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\UserAggregateInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 use App\UserContext\Domain\Events\UserDeletedDomainEvent;
@@ -41,6 +42,7 @@ final class User implements AggregateRootInterface, UserAggregateInterface
     private int $aggregateVersion = 0;
     private UserRegistrationContext $userRegistrationContext;
     private string $providerUserId;
+    private Context $context;
 
     private function __construct()
     {
@@ -55,6 +57,7 @@ final class User implements AggregateRootInterface, UserAggregateInterface
         UserConsent $isConsentGiven,
         UserRegistrationContext $registrationContext,
         string $providerUserId,
+        Context $context,
     ): self {
         $aggregate = new self();
         $aggregate->raiseDomainEvent(
@@ -69,6 +72,8 @@ final class User implements AggregateRootInterface, UserAggregateInterface
                 (string) $userId,
                 (string) $registrationContext,
                 $providerUserId,
+                $context->getContextId(),
+                $context->getContext(),
             ),
         );
 
@@ -203,6 +208,7 @@ final class User implements AggregateRootInterface, UserAggregateInterface
         $this->roles = ['ROLE_USER'];
         $this->userRegistrationContext = UserRegistrationContext::fromString($event->registrationContext);
         $this->providerUserId = $event->providerUserId;
+        $this->context = Context::from($event->contextId, $event->context);
     }
 
     public function applyUserFirstnameChangedDomainEvent(UserFirstnameChangedDomainEvent $event): void

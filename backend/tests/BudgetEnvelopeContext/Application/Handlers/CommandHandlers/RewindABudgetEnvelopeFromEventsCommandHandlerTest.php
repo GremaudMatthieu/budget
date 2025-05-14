@@ -15,6 +15,8 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
+use App\SharedContext\Domain\Enums\ContextEnum;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Infrastructure\Adapters\UuidGeneratorAdapter;
 use App\SharedContext\Infrastructure\Repositories\EventSourcedRepository;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -56,7 +58,8 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
             BudgetEnvelopeUserId::fromString($userId),
             BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
             BudgetEnvelopeName::fromString($oldName),
-            BudgetEnvelopeCurrency::fromString('EUR')
+            BudgetEnvelopeCurrency::fromString('EUR'),
+            Context::from('3e6a6763-4c4d-4648-bc3f-e9447dbed12c', ContextEnum::BUDGET_ENVELOPE->value),
         );
 
         $newEnvelope = BudgetEnvelope::create(
@@ -64,7 +67,8 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
             BudgetEnvelopeUserId::fromString($userId),
             BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
             BudgetEnvelopeName::fromString($newName),
-            BudgetEnvelopeCurrency::fromString('EUR')
+            BudgetEnvelopeCurrency::fromString('EUR'),
+            Context::from('3e6a6763-4c4d-4648-bc3f-e9447dbed12c', ContextEnum::BUDGET_ENVELOPE->value),
         );
 
         $oldNameRegistryId = BudgetEnvelopeNameRegistryId::fromUserIdAndBudgetEnvelopeName(
@@ -115,7 +119,8 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
             BudgetEnvelopeUserId::fromString($userId),
             BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
             BudgetEnvelopeName::fromString($envelopeName),
-            BudgetEnvelopeCurrency::fromString('EUR')
+            BudgetEnvelopeCurrency::fromString('EUR'),
+            Context::from('3e6a6763-4c4d-4648-bc3f-e9447dbed12c', ContextEnum::BUDGET_ENVELOPE->value),
         );
 
         $nameRegistryId = BudgetEnvelopeNameRegistryId::fromUserIdAndBudgetEnvelopeName(

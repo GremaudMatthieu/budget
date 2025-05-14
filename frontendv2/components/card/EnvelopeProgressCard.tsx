@@ -61,12 +61,14 @@ const EnvelopeProgressCard: React.FC<EnvelopeProgressCardProps> = ({
             </TouchableOpacity>
           </>
         ) : (
-          <>
-            <Text className="text-lg font-semibold text-text-primary mb-2 min-w-0 break-all" numberOfLines={2} ellipsizeMode="tail">{name}</Text>
+          <View className="flex-row items-center flex-1 min-w-0">
+            <Text className="text-lg font-semibold text-text-primary mb-2 min-w-0 flex-shrink" numberOfLines={2} ellipsizeMode="tail" style={{ flex: 1 }}>
+              {name}
+            </Text>
             <TouchableOpacity onPress={() => setEditingName(name)} disabled={pending} className="ml-2">
               <Ionicons name="create-outline" size={20} color="#222" />
             </TouchableOpacity>
-          </>
+          </View>
         )}
       </View>
       {/* Progress bar and target editing */}

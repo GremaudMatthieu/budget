@@ -39,6 +39,10 @@ const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
     { useNativeDriver: true }
   );
 
+  // Determine if subtitle is long (multi-line or long string)
+  const subtitleIsLong = typeof subtitle === 'string' && (subtitle.includes('\n') || subtitle.length > 40);
+  const dynamicPaddingTop = headerHeight + (subtitleIsLong ? 48 : 24);
+
   return (
     <View style={styles.container}>
       <AnimatedHeader
@@ -56,7 +60,7 @@ const AnimatedHeaderLayout: React.FC<AnimatedHeaderLayoutProps> = ({
       <Animated.ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: headerHeight + 24 }
+          { paddingTop: dynamicPaddingTop }
         ]}
         scrollEventThrottle={16}
         onScroll={handleScroll}

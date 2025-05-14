@@ -30,8 +30,8 @@ final readonly class ListBudgetPlansCalendarQueryHandler
     {
         return array_reduce($budgetPlans, function (array $calendarStructure, array $plan) {
             $date = new \DateTimeImmutable($plan['date']);
-            $year = (int)$date->format('Y');
-            $month = (int)$date->format('n');
+            $year = (int) $date->format('Y');
+            $month = (int) $date->format('n');
 
             if (!isset($calendarStructure[$year])) {
                 $calendarStructure[$year] = [];

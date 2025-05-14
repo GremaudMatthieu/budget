@@ -26,8 +26,8 @@ final readonly class UserViewRepository implements UserViewRepositoryInterface
     public function save(UserViewInterface $user): void
     {
         $this->connection->executeStatement('
-        INSERT INTO user_view (uuid, created_at, updated_at, email, firstname, lastname, language_preference, consent_given, consent_date, roles, registration_context, provider_user_id)
-        VALUES (:uuid, :created_at, :updated_at, :email, :firstname, :lastname, :language_preference, :consent_given, :consent_date, :roles, :registration_context, :provider_user_id)
+        INSERT INTO user_view (uuid, created_at, updated_at, email, firstname, lastname, language_preference, consent_given, consent_date, roles, registration_context, provider_user_id, context, context_uuid)
+        VALUES (:uuid, :created_at, :updated_at, :email, :firstname, :lastname, :language_preference, :consent_given, :consent_date, :roles, :registration_context, :provider_user_id, :context, :context_uuid)
         ON CONFLICT (uuid) DO UPDATE SET
             updated_at = EXCLUDED.updated_at,
             email = EXCLUDED.email,
@@ -38,7 +38,9 @@ final readonly class UserViewRepository implements UserViewRepositoryInterface
             consent_date = EXCLUDED.consent_date,
             roles = EXCLUDED.roles,
             registration_context = EXCLUDED.registration_context,
-            provider_user_id = EXCLUDED.provider_user_id
+            provider_user_id = EXCLUDED.provider_user_id,
+            context = EXCLUDED.context,
+            context_uuid = EXCLUDED.context_uuid
     ', [
             'uuid' => $user->uuid,
             'created_at' => $user->createdAt->format(\DateTimeImmutable::ATOM),
@@ -52,6 +54,8 @@ final readonly class UserViewRepository implements UserViewRepositoryInterface
             'roles' => json_encode($user->roles),
             'registration_context' => $user->registrationContext,
             'provider_user_id' => $user->providerUserId,
+            'context' => $user->context,
+            'context_uuid' => $user->contextId,
         ]);
     }
 
@@ -68,7 +72,7 @@ final readonly class UserViewRepository implements UserViewRepositoryInterface
      * @throws Exception
      */
     #[\Override]
-    public function findOneBy(array $criteria, ?array $orderBy = null): ?UserViewInterface
+    public function findOneBy(array $criteria): ?UserViewInterface
     {
         $sql = sprintf('SELECT * FROM user_view WHERE %s LIMIT 1', $this->buildWhereClause($criteria));
         $stmt = $this->connection->prepare($sql);

@@ -32,14 +32,16 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
     public function save(BudgetPlanViewInterface $budgetPlanView): void
     {
         $this->connection->executeStatement('
-        INSERT INTO budget_plan_view (uuid, user_uuid, date, currency, created_at, updated_at, is_deleted)
-        VALUES (:uuid, :user_uuid, :date, :currency, :created_at, :updated_at, :is_deleted)
+        INSERT INTO budget_plan_view (uuid, user_uuid, date, currency, created_at, updated_at, is_deleted, context_uuid, context)
+        VALUES (:uuid, :user_uuid, :date, :currency, :created_at, :updated_at, :is_deleted, :context_uuid, :context)
         ON CONFLICT (uuid) DO UPDATE SET
             user_uuid = EXCLUDED.user_uuid,
             date = EXCLUDED.date,
             currency = EXCLUDED.currency,
             updated_at = EXCLUDED.updated_at,
-            is_deleted = EXCLUDED.is_deleted
+            is_deleted = EXCLUDED.is_deleted,
+            context_uuid = EXCLUDED.context_uuid,
+            context = EXCLUDED.context
         ', [
             'uuid' => $budgetPlanView->uuid,
             'user_uuid' => $budgetPlanView->userId,
@@ -48,6 +50,8 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
             'created_at' => $budgetPlanView->createdAt->format(\DateTimeImmutable::ATOM),
             'updated_at' => $budgetPlanView->updatedAt->format(\DateTime::ATOM),
             'is_deleted' => $budgetPlanView->isDeleted ? '1' : '0',
+            'context_uuid' => $budgetPlanView->contextUuid,
+            'context' => $budgetPlanView->context,
         ]);
     }
 

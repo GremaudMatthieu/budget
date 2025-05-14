@@ -35,10 +35,10 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
         $this->connection->executeStatement(
             'INSERT INTO ' . self::TABLE_NAME . ' (
                 uuid, created_at, updated_at, current_amount, targeted_amount, 
-                name, user_uuid, currency, is_deleted
+                name, user_uuid, currency, is_deleted, context_uuid, context
             ) VALUES (
                 :uuid, :created_at, :updated_at, :current_amount, :targeted_amount,
-                :name, :user_uuid, :currency, :is_deleted
+                :name, :user_uuid, :currency, :is_deleted, :context_uuid, :context
             ) ON CONFLICT (uuid) DO UPDATE SET
                 updated_at = EXCLUDED.updated_at,
                 current_amount = EXCLUDED.current_amount,
@@ -46,7 +46,9 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
                 name = EXCLUDED.name,
                 user_uuid = EXCLUDED.user_uuid,
                 currency = EXCLUDED.currency,
-                is_deleted = EXCLUDED.is_deleted',
+                is_deleted = EXCLUDED.is_deleted,
+                context_uuid = EXCLUDED.context_uuid,
+                context = EXCLUDED.context',
             $this->prepareDataForSave($budgetEnvelope)
         );
     }
@@ -89,6 +91,7 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
         $qb->select(
                 'ev.uuid', 'ev.created_at', 'ev.updated_at', 'ev.current_amount',
                 'ev.targeted_amount', 'ev.name', 'ev.user_uuid', 'ev.is_deleted', 'ev.currency',
+                'ev.context_uuid', 'ev.context',
                 'ehv.budget_envelope_uuid', 'ehv.created_at AS ledger_created_at',
                 'ehv.monetary_amount', 'ehv.entry_type', 'ehv.description'
             )
@@ -174,6 +177,8 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
             'user_uuid' => $budgetEnvelope->userUuid,
             'currency' => $budgetEnvelope->currency,
             'is_deleted' => $budgetEnvelope->isDeleted ? '1' : '0',
+            'context' => $budgetEnvelope->context,
+            'context_uuid' => $budgetEnvelope->contextUuid,
         ];
     }
 

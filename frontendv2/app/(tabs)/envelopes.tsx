@@ -296,7 +296,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                       value={editingName.name}
                                       onChangeText={handleNameChange}
                                       className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                      maxLength={50}
+                                      maxLength={25}
                                       autoFocus
                                       onBlur={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
                                       onFocus={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
@@ -438,7 +438,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                       value={editingName.name}
                                       onChangeText={handleNameChange}
                                       className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                      maxLength={50}
+                                      maxLength={25}
                                       autoFocus
                                       onBlur={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
                                       onFocus={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
@@ -573,7 +573,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                       value={editingName.name}
                                       onChangeText={handleNameChange}
                                       className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
-                                      maxLength={50}
+                                      maxLength={25}
                                       autoFocus
                                       onBlur={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
                                       onFocus={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}

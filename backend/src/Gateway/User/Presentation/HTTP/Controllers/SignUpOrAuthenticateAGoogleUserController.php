@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Gateway\User\Presentation\HTTP\Controllers;
 
+use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
 use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Application\Commands\SignUpOrAuthenticateWithOAuth2Command;
 use App\UserContext\Domain\Ports\Inbound\AuthenticationServiceInterface;
@@ -86,9 +88,11 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
             $redirectUri = $mobileRedirectUri;
         }
 
+        $uuid = $this->uuidGenerator->generate();
+
         $this->commandBus->execute(
             new SignUpOrAuthenticateWithOAuth2Command(
-                UserId::fromString($this->uuidGenerator->generate()),
+                UserId::fromString($uuid),
                 UserEmail::fromString($googleUser->getEmail()),
                 UserFirstname::fromString($googleUser->getFirstName() ?? 'N/A'),
                 UserLastname::fromString($googleUser->getLastName() ?? 'N/A'),
@@ -96,6 +100,7 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
                 UserConsent::fromBool(true),
                 UserRegistrationContext::fromString('google'),
                 $googleUser->getId(),
+                Context::from($uuid, ContextEnum::USER->value),
             )
         );
         $authResult = $this->authenticationService->authenticateByEmail($email);

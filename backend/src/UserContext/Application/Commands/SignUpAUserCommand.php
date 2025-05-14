@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\UserContext\Application\Commands;
 
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Domain\ValueObjects\UserConsent;
 use App\UserContext\Domain\ValueObjects\UserEmail;
@@ -23,6 +24,8 @@ final readonly class SignUpAUserCommand implements CommandInterface
     private bool $userConsentGiven;
     private string $userRegistrationContext;
     private string $providerUserId;
+    private string $context;
+    private string $contextId;
 
     public function __construct(
         UserId $userId,
@@ -33,6 +36,7 @@ final readonly class SignUpAUserCommand implements CommandInterface
         UserConsent $userConsentGiven,
         UserRegistrationContext $userRegistrationContext,
         string $providerUserId,
+        Context $context,
     ) {
         $this->userId = (string) $userId;
         $this->userEmail = (string) $userEmail;
@@ -42,6 +46,8 @@ final readonly class SignUpAUserCommand implements CommandInterface
         $this->userConsentGiven = $userConsentGiven->toBool();
         $this->userRegistrationContext = (string) $userRegistrationContext;
         $this->providerUserId = $providerUserId;
+        $this->context = $context->getContext();
+        $this->contextId = $context->getContextId();
     }
 
     public function getUserId(): UserId
@@ -82,5 +88,10 @@ final readonly class SignUpAUserCommand implements CommandInterface
     public function getProviderUserId(): string
     {
         return $this->providerUserId;
+    }
+
+    public function getContext(): Context
+    {
+        return Context::from($this->contextId, $this->context);
     }
 }

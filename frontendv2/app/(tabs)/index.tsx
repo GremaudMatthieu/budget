@@ -13,7 +13,7 @@ function DashboardContent() {
   const { t } = useTranslation();
   const router = useRouter();
   const { budgetPlansCalendar, loading: budgetLoading, fetchBudgetPlansCalendar } = useBudget();
-  const { envelopesData, loading: envelopesLoading } = useEnvelopes();
+  const { envelopesData, loading: envelopesLoading, refreshEnvelopes } = useEnvelopes();
 
   // Get current month/year
   const now = new Date();
@@ -23,13 +23,15 @@ function DashboardContent() {
   // Fetch budget plans on mount and when app comes to foreground
   useEffect(() => {
     fetchBudgetPlansCalendar(currentYear);
+    refreshEnvelopes(true, 3); // Limit to 5 envelopes for dashboard
     const subscription = AppState.addEventListener('change', (state) => {
       if (state === 'active') {
         fetchBudgetPlansCalendar(currentYear);
+        refreshEnvelopes(true, 3);
       }
     });
     return () => subscription.remove();
-  }, [currentYear, fetchBudgetPlansCalendar]);
+  }, [currentYear, fetchBudgetPlansCalendar, refreshEnvelopes]);
 
   // Get the current month's budget plan from the year/month map
   const currentBudget = budgetPlansCalendar && budgetPlansCalendar[currentYear]?.[currentMonth];

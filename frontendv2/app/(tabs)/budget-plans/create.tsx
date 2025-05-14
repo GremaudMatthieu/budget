@@ -166,7 +166,7 @@ export default function CreateBudgetPlanScreen() {
   // Update isFormValid to use new validation
   const isFormValid = () => {
     return (
-      currency &&
+      currency && 
       incomes.length > 0 &&
       incomeErrors.every(err => Object.keys(err).length === 0)
     );
@@ -211,12 +211,6 @@ export default function CreateBudgetPlanScreen() {
                   </View>
                 </View>
               </View>
-            </View>
-            
-            {/* 50/30/20 Rule Advice Card */}
-            <View className="bg-primary-50 rounded-lg p-4 mb-6">
-              <Text className="text-primary-700 font-semibold mb-1">{t('budgetPlans.advice.title')}</Text>
-              <Text className="text-primary-700 text-sm">{t('budgetPlans.advice.ideal')}</Text>
             </View>
             
             {/* Currency Selection */}

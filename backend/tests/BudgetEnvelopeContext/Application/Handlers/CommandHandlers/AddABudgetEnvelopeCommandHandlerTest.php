@@ -18,7 +18,9 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs\AddABudgetEnvelopeInput;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Infrastructure\Adapters\UuidGeneratorAdapter;
 use App\SharedContext\Infrastructure\Repositories\EventSourcedRepository;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -61,6 +63,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
                 '0.00',
             ),
             BudgetEnvelopeCurrency::fromString($addABudgetEnvelopeInput->currency),
+            Context::from($addABudgetEnvelopeInput->uuid, $addABudgetEnvelopeInput->context),
         );
 
         $this->eventStore->expects($this->any())
@@ -90,6 +93,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
                 '0.00',
             ),
             BudgetEnvelopeCurrency::fromString($addABudgetEnvelopeInput->currency),
+            Context::from($addABudgetEnvelopeInput->uuid, $addABudgetEnvelopeInput->context),
         );
 
         $nameRegistryId = 'name-registry-' . md5('test name' . 'd26cc02e-99e7-428c-9d61-572dff3f84a7');
@@ -112,6 +116,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
                     BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
                     BudgetEnvelopeName::fromString('test name'),
                     BudgetEnvelopeCurrency::fromString('USD'),
+                    Context::from($addABudgetEnvelopeInput->uuid, $addABudgetEnvelopeInput->context),
                 );
             }));
 
@@ -138,6 +143,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
                 '0.00',
             ),
             BudgetEnvelopeCurrency::fromString($addABudgetEnvelopeInput->currency),
+            Context::from($addABudgetEnvelopeInput->uuid, $addABudgetEnvelopeInput->context),
         );
 
         $this->eventStore->expects($this->once())
@@ -150,6 +156,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
                     BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
                     BudgetEnvelopeName::fromString('test name'),
                     BudgetEnvelopeCurrency::fromString('USD'),
+                    Context::from($addABudgetEnvelopeInput->uuid, $addABudgetEnvelopeInput->context),
                 )
             );
 

@@ -10,5 +10,5 @@ interface UserViewRepositoryInterface
 
     public function delete(UserViewInterface $user): void;
 
-    public function findOneBy(array $criteria, ?array $orderBy = null): ?UserViewInterface;
+    public function findOneBy(array $criteria): ?UserViewInterface;
 }

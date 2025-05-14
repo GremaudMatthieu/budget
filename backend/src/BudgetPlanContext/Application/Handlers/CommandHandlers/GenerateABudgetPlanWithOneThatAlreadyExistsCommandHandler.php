@@ -58,6 +58,7 @@ final readonly class GenerateABudgetPlanWithOneThatAlreadyExistsCommandHandler
                 $command->getDate(),
                 $command->getUserId(),
                 $aggregateToCopy,
+                $command->getContext(),
                 $this->uuidGenerator,
             );
             $this->eventSourcedRepository->trackAggregates($aggregatesToSave);

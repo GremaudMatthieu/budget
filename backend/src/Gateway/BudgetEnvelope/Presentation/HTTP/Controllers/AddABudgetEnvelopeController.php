@@ -11,7 +11,9 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs\AddABudgetEnvelopeInput;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,6 +45,9 @@ final readonly class AddABudgetEnvelopeController
                     '0.00',
                 ),
                 BudgetEnvelopeCurrency::fromString($addABudgetEnvelopeInput->currency),
+                null === $addABudgetEnvelopeInput->contextId ?
+                    Context::from($addABudgetEnvelopeInput->uuid, ContextEnum::BUDGET_ENVELOPE->value)
+                    : Context::from($addABudgetEnvelopeInput->contextId, $addABudgetEnvelopeInput->context),
             ),
         );
 

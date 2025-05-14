@@ -17,7 +17,9 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs\RenameABudgetEnvelopeInput;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Infrastructure\Adapters\UuidGeneratorAdapter;
 use App\SharedContext\Infrastructure\Repositories\EventSourcedRepository;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -58,6 +60,7 @@ class RenameABudgetEnvelopeCommandHandlerTest extends TestCase
             BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
             BudgetEnvelopeName::fromString('test name'),
             BudgetEnvelopeCurrency::fromString('EUR'),
+            Context::from('10a33b8c-853a-4df8-8fc9-e8bb00b78da4', ContextEnum::BUDGET_ENVELOPE->value),
         );
 
         $this->eventStore->expects($this->any())
@@ -133,6 +136,7 @@ class RenameABudgetEnvelopeCommandHandlerTest extends TestCase
             BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
             BudgetEnvelopeName::fromString('test name'),
             BudgetEnvelopeCurrency::fromString('EUR'),
+            Context::from('10a33b8c-853a-4df8-8fc9-e8bb00b78da4', ContextEnum::BUDGET_ENVELOPE->value),
         );
 
         $this->eventStore->expects($this->once())
@@ -156,6 +160,7 @@ class RenameABudgetEnvelopeCommandHandlerTest extends TestCase
             BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
             BudgetEnvelopeName::fromString('test name'),
             BudgetEnvelopeCurrency::fromString('EUR'),
+            Context::from('10a33b8c-853a-4df8-8fc9-e8bb00b78da4', ContextEnum::BUDGET_ENVELOPE->value),
         );
 
         $envelope->delete(BudgetEnvelopeUserId::fromString('a871e446-ddcd-4e7a-9bf9-525bab84e566'));

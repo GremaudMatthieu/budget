@@ -9,6 +9,7 @@ use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedWithOneThatAlreadyExi
 use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAddedDomainEvent;
 use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAdjustedDomainEvent;
 use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeRemovedDomainEvent;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanRemovedDomainEvent;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanIncomeEntryViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanIncomeEntryViewRepositoryInterface;
 use App\BudgetPlanContext\ReadModels\Views\BudgetPlanIncomeEntryView;
@@ -31,6 +32,7 @@ final readonly class BudgetPlanIncomeEntryProjection
             BudgetPlanIncomeAddedDomainEvent::class => $this->handleBudgetPlanIncomeAddedDomainEvent($event),
             BudgetPlanIncomeAdjustedDomainEvent::class => $this->handleBudgetPlanIncomeAdjustedDomainEvent($event),
             BudgetPlanIncomeRemovedDomainEvent::class => $this->handleBudgetPlanIncomeRemovedDomainEvent($event),
+            BudgetPlanRemovedDomainEvent::class => $this->handleBudgetPlanRemovedDomainEvent($event),
             default => null,
         };
     }
@@ -85,5 +87,10 @@ final readonly class BudgetPlanIncomeEntryProjection
     private function handleBudgetPlanIncomeRemovedDomainEvent(BudgetPlanIncomeRemovedDomainEvent $event): void
     {
         $this->budgetPlanIncomeEntryViewRepository->delete($event->uuid);
+    }
+
+    private function handleBudgetPlanRemovedDomainEvent(BudgetPlanRemovedDomainEvent $event): void
+    {
+        $this->budgetPlanIncomeEntryViewRepository->deleteByBudgetPlanId($event->aggregateId);
     }
 }

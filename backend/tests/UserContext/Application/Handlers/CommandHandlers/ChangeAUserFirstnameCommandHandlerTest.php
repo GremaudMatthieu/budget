@@ -6,6 +6,8 @@ namespace App\Tests\UserContext\Application\Handlers\CommandHandlers;
 
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
+use App\SharedContext\Domain\Enums\ContextEnum;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\SharedContext\Infrastructure\Repositories\EventSourcedRepository;
 use App\UserContext\Application\Commands\ChangeAUserFirstnameCommand;
@@ -56,6 +58,7 @@ class ChangeAUserFirstnameCommandHandlerTest extends TestCase
             UserConsent::fromBool(true),
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            Context::from($userId, ContextEnum::USER->value),
         );
 
         $this->eventStore->expects($this->once())

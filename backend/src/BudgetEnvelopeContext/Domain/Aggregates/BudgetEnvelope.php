@@ -26,6 +26,7 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\Libraries\FluxCapacitor\EventStore\Traits\DomainEventsCapabilityTrait;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 
 final class BudgetEnvelope implements AggregateRootInterface
@@ -38,6 +39,7 @@ final class BudgetEnvelope implements AggregateRootInterface
     private BudgetEnvelopeTargetedAmount $budgetEnvelopeTargetedAmount;
     private BudgetEnvelopeName $budgetEnvelopeName;
     private BudgetEnvelopeCurrency $budgetEnvelopeCurrency;
+    private Context $context;
     private \DateTime $updatedAt;
     private int $aggregateVersion = 0;
     private bool $isDeleted = false;
@@ -52,6 +54,7 @@ final class BudgetEnvelope implements AggregateRootInterface
         BudgetEnvelopeTargetedAmount $budgetEnvelopeTargetedAmount,
         BudgetEnvelopeName $budgetEnvelopeName,
         BudgetEnvelopeCurrency $budgetEnvelopeCurrency,
+        Context $context,
     ): self {
         $aggregate = new self();
         $aggregate->raiseDomainEvent(
@@ -61,6 +64,8 @@ final class BudgetEnvelope implements AggregateRootInterface
                 (string) $budgetEnvelopeName,
                 (string) $budgetEnvelopeTargetedAmount,
                 (string) $budgetEnvelopeCurrency,
+                $context->getContextId(),
+                $context->getContext(),
             ),
         );
 
@@ -231,6 +236,7 @@ final class BudgetEnvelope implements AggregateRootInterface
             $event->targetedAmount,
         );
         $this->budgetEnvelopeCurrency = BudgetEnvelopeCurrency::fromString($event->currency);
+        $this->context = Context::from($event->contextId, $event->context);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
         $this->isDeleted = false;
     }

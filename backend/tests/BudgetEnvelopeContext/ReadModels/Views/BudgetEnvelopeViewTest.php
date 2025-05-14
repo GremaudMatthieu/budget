@@ -7,6 +7,7 @@ namespace App\Tests\BudgetEnvelopeContext\ReadModels\Views;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use PHPUnit\Framework\TestCase;
 
 class BudgetEnvelopeViewTest extends TestCase
@@ -20,6 +21,8 @@ class BudgetEnvelopeViewTest extends TestCase
                 'Test Envelope',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 
@@ -52,6 +55,8 @@ class BudgetEnvelopeViewTest extends TestCase
                 'Test Envelope',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 
@@ -62,6 +67,8 @@ class BudgetEnvelopeViewTest extends TestCase
                 'Test Envelope',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 

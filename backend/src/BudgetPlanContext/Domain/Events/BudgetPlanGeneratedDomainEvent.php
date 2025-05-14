@@ -17,6 +17,8 @@ final class BudgetPlanGeneratedDomainEvent implements DomainEventInterface
     public array $needs;
     public array $wants;
     public array $savings;
+    public string $context;
+    public string $contextId;
     public string $requestId;
     public \DateTimeImmutable $occurredOn;
 
@@ -29,6 +31,8 @@ final class BudgetPlanGeneratedDomainEvent implements DomainEventInterface
         array $wants,
         array $savings,
         string $userId,
+        string $contextId,
+        string $context,
         string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
     ) {
         $this->aggregateId = $aggregateId;
@@ -39,6 +43,8 @@ final class BudgetPlanGeneratedDomainEvent implements DomainEventInterface
         $this->needs = $needs;
         $this->wants = $wants;
         $this->savings = $savings;
+        $this->contextId = $contextId;
+        $this->context = $context;
         $this->requestId = $requestId;
         $this->occurredOn = UtcClock::immutableNow();
     }
@@ -54,6 +60,8 @@ final class BudgetPlanGeneratedDomainEvent implements DomainEventInterface
             'needs' => $this->needs,
             'wants' => $this->wants,
             'savings' => $this->savings,
+            'contextId' => $this->contextId,
+            'context' => $this->context,
             'requestId' => $this->requestId,
             'occurredOn' => $this->occurredOn->format(\DateTimeInterface::ATOM),
         ];
@@ -70,6 +78,8 @@ final class BudgetPlanGeneratedDomainEvent implements DomainEventInterface
             $data['wants'],
             $data['savings'],
             $data['userId'],
+            $data['contextId'],
+            $data['context'],
             $data['requestId'],
         );
         $event->occurredOn = new \DateTimeImmutable($data['occurredOn']);

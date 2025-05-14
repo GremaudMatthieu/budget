@@ -40,6 +40,7 @@ use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\Libraries\FluxCapacitor\EventStore\Traits\DomainEventsCapabilityTrait;
 use App\SharedContext\Domain\Ports\Outbound\TranslatorInterface;
 use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 
@@ -70,6 +71,7 @@ final class BudgetPlan implements AggregateRootInterface
         BudgetPlanUserId $userId,
         UserLanguagePreference $userLanguagePreference,
         BudgetPlanCurrency $currency,
+        Context $context,
         UuidGeneratorInterface $uuidGenerator,
         TranslatorInterface $translator,
     ): self {
@@ -84,6 +86,8 @@ final class BudgetPlan implements AggregateRootInterface
                 array_map(fn(BudgetPlanWant $want) => $want->toArray(), self::generateFakeWants($incomes, (string) $userLanguagePreference, $uuidGenerator, $translator)),
                 array_map(fn(BudgetPlanSaving $saving) => $saving->toArray(), self::generateFakeSavings($incomes, (string) $userLanguagePreference, $uuidGenerator, $translator)),
                 (string) $userId,
+                $context->getContextId(),
+                $context->getContext(),
             ),
         );
 
@@ -95,6 +99,7 @@ final class BudgetPlan implements AggregateRootInterface
         \DateTimeImmutable $date,
         BudgetPlanUserId $userId,
         BudgetPlan $budgetPlanToCopy,
+        Context $context,
         UuidGeneratorInterface $uuidGenerator,
     ): self {
         $aggregate = new self();
@@ -133,6 +138,8 @@ final class BudgetPlan implements AggregateRootInterface
                     ),
                 ),
                 (string) $userId,
+                $context->getContextId(),
+                $context->getContext(),
             ),
         );
 

@@ -8,6 +8,7 @@ use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanCurrency;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 
 final readonly class GenerateABudgetPlanCommand implements CommandInterface
@@ -18,6 +19,8 @@ final readonly class GenerateABudgetPlanCommand implements CommandInterface
     private string $userId;
     private string $userLanguagePreference;
     private string $currency;
+    private string $context;
+    private string $contextId;
 
     public function __construct(
         BudgetPlanId $budgetPlanId,
@@ -26,6 +29,7 @@ final readonly class GenerateABudgetPlanCommand implements CommandInterface
         BudgetPlanUserId $userId,
         UserLanguagePreference $userLanguagePreference,
         BudgetPlanCurrency $currency,
+        Context $context,
     ) {
         $this->budgetPlanId = (string) $budgetPlanId;
         $this->date = $date;
@@ -33,6 +37,8 @@ final readonly class GenerateABudgetPlanCommand implements CommandInterface
         $this->userId = (string) $userId;
         $this->userLanguagePreference = (string) $userLanguagePreference;
         $this->currency = (string) $currency;
+        $this->context = $context->getContext();
+        $this->contextId = $context->getContextId();
     }
 
     public function getBudgetPlanId(): BudgetPlanId
@@ -63,5 +69,10 @@ final readonly class GenerateABudgetPlanCommand implements CommandInterface
     public function getCurrency(): BudgetPlanCurrency
     {
         return BudgetPlanCurrency::fromString($this->currency);
+    }
+
+    public function getContext(): Context
+    {
+        return Context::from($this->contextId, $this->context);
     }
 }

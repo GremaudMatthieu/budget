@@ -6,6 +6,7 @@ namespace App\Tests\UserContext\ReadModels\Projections;
 
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Domain\Events\UserDeletedDomainEvent;
 use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent;
@@ -68,6 +69,8 @@ class UserProjectionTest extends TestCase
             'b7e685be-db83-4866-9f85-102fac30a50b',
             'google',
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $this->keyManagementRepository->expects($this->once())
@@ -90,6 +93,8 @@ class UserProjectionTest extends TestCase
             'b7e685be-db83-4866-9f85-102fac30a50b',
             'google',
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -132,6 +137,8 @@ class UserProjectionTest extends TestCase
             ['ROLE_USER'],
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -167,6 +174,8 @@ class UserProjectionTest extends TestCase
             ['ROLE_USER'],
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -202,6 +211,8 @@ class UserProjectionTest extends TestCase
             ['ROLE_USER'],
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -236,6 +247,8 @@ class UserProjectionTest extends TestCase
             ['ROLE_USER'],
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -351,6 +364,8 @@ class UserProjectionTest extends TestCase
             ['ROLE_USER'],
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $this->keyManagementRepository->method('getKey')
@@ -421,6 +436,8 @@ class UserProjectionTest extends TestCase
             ['ROLE_USER'],
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $this->keyManagementRepository->method('getKey')

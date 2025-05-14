@@ -8,7 +8,7 @@ interface EnvelopeContextType {
   currentEnvelopeDetails: EnvelopeDetails | null;
   loading: boolean;
   error: string | null;
-  refreshEnvelopes: (force?: boolean) => Promise<void>;
+  refreshEnvelopes: (force?: boolean, limit?: number) => Promise<void>;
   fetchEnvelopeDetails: (envelopeId: string) => Promise<EnvelopeDetails | null>;
   createEnvelope: (name: string, targetBudget: string, currency: string) => Promise<void>;
   deleteEnvelope: (envelopeId: string, setError: (error: string | null) => void) => Promise<void>;
@@ -60,11 +60,11 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     });
   }, []);
 
-  const refreshEnvelopes = useCallback(async () => {
+  const refreshEnvelopes = useCallback(async (force?: boolean, limit?: number) => {
     setLoading(true);
     setError(null);
     try {
-      const updatedEnvelopes = await envelopeService.listEnvelopes();
+      const updatedEnvelopes = await envelopeService.listEnvelopes(limit);
       setEnvelopesData(updatedEnvelopes);
     } catch (err) {
       setError("Failed to refresh envelopes");

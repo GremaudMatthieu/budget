@@ -12,7 +12,7 @@ final readonly class RenameABudgetEnvelopeInput
         #[Assert\NotBlank]
         #[Assert\Length(
             min: 1,
-            max: 50,
+            max: 25,
             minMessage: 'envelopes.nameMinLength',
             maxMessage: 'envelopes.nameMaxLength'
         )]

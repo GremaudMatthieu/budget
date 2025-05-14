@@ -43,6 +43,7 @@ final readonly class SignUpAUserCommandHandler
                 $signUpAUserCommand->isUserConsentGiven(),
                 $signUpAUserCommand->getUserRegistrationContext(),
                 $signUpAUserCommand->getProviderUserId(),
+                $signUpAUserCommand->getContext(),
             );
             $this->eventSourcedRepository->trackAggregates($aggregatesToSave);
         }

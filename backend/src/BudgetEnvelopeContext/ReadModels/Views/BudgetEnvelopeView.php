@@ -21,6 +21,7 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -50,7 +51,7 @@ final class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSeri
     #[ORM\Column(name: 'targeted_amount', type: 'string', length: 13)]
     private(set) string $targetedAmount;
 
-    #[ORM\Column(name: 'name', type: 'string', length: 50)]
+    #[ORM\Column(name: 'name', type: 'string', length: 25)]
     private(set) string $name;
 
     #[ORM\Column(name: 'currency', type: 'string', length: 3)]
@@ -58,6 +59,12 @@ final class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSeri
 
     #[ORM\Column(name: 'user_uuid', type: 'string', length: 36)]
     private(set) string $userUuid;
+
+    #[ORM\Column(name: 'context_uuid', type: 'string', length: 36)]
+    private(set) string $contextUuid;
+
+    #[ORM\Column(name: 'context', type: 'string', length: 36)]
+    private(set) string $context;
 
     #[ORM\Column(name: 'is_deleted', type: 'boolean', options: ['default' => false])]
     private(set) bool $isDeleted;
@@ -69,6 +76,7 @@ final class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSeri
         BudgetEnvelopeUserId $userId,
         BudgetEnvelopeCurrentAmount $currentAmount,
         BudgetEnvelopeCurrency $currency,
+        Context $context,
         \DateTimeImmutable $createdAt,
         \DateTime $updatedAt,
         bool $isDeleted,
@@ -80,6 +88,8 @@ final class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSeri
         $this->userUuid = (string) $userId;
         $this->currency = (string) $currency;
         $this->isDeleted = $isDeleted;
+        $this->context = $context->getContext();
+        $this->contextUuid = $context->getContextId();
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
     }
@@ -100,6 +110,7 @@ final class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSeri
                 $budgetEnvelope['targeted_amount'],
             ),
             BudgetEnvelopeCurrency::fromString($budgetEnvelope['currency']),
+            Context::from($budgetEnvelope['context_uuid'], $budgetEnvelope['context']),
             new \DateTimeImmutable($budgetEnvelope['created_at']),
             new \DateTime($budgetEnvelope['updated_at']),
             (bool) $budgetEnvelope['is_deleted'],
@@ -122,6 +133,7 @@ final class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSeri
                 $event->targetedAmount,
             ),
             BudgetEnvelopeCurrency::fromString($event->currency),
+            Context::from($event->contextId, $event->context),
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
             false,
@@ -159,6 +171,8 @@ final class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSeri
         $this->currency = $event->currency;
         $this->createdAt = $event->occurredOn;
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
+        $this->context = $event->context;
+        $this->contextUuid = $event->contextId;
         $this->isDeleted = false;
     }
 

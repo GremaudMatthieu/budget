@@ -12,6 +12,7 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeEntryType;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -42,6 +43,8 @@ class GetABudgetEnvelopeWithItsLedgerQueryHandlerTest extends TestCase
                 'user_uuid' => 'd26cc02e-99e7-428c-9d61-572dff3f84a7',
                 'created_at' => new \DateTime()->format('Y-m-d H:i:s'),
                 'updated_at' => new \DateTime()->format('Y-m-d H:i:s'),
+                'context_uuid' => 'be0c3a86-c3c9-467f-b675-3f519fd96111',
+                'context' => ContextEnum::BUDGET_ENVELOPE->value,
                 'is_deleted' => false,
             ],
         );
@@ -117,6 +120,8 @@ class GetABudgetEnvelopeWithItsLedgerQueryHandlerTest extends TestCase
                 'created_at' => new \DateTime()->format('Y-m-d H:i:s'),
                 'updated_at' => new \DateTime()->format('Y-m-d H:i:s'),
                 'is_deleted' => false,
+                'context_uuid' => 'be0c3a86-c3c9-467f-b675-3f519fd96111',
+                'context' => ContextEnum::BUDGET_ENVELOPE->value,
             ],
         );
         $getABudgetEnvelopeWithItsHistoryQuery = new GetABudgetEnvelopeWithItsLedgerQuery(

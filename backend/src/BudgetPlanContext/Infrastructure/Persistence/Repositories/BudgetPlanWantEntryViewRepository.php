@@ -60,4 +60,10 @@ final class BudgetPlanWantEntryViewRepository implements BudgetPlanWantEntryView
     {
         $this->connection->delete('budget_plan_want_entry_view', ['uuid' => $uuid]);
     }
+
+    #[\Override]
+    public function deleteByBudgetPlanId(string $uuid): void
+    {
+        $this->connection->delete('budget_plan_want_entry_view', ['budget_plan_uuid' => $uuid]);
+    }
 }

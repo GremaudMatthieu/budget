@@ -10,6 +10,7 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 
 final readonly class AddABudgetEnvelopeCommand implements CommandInterface
 {
@@ -18,6 +19,8 @@ final readonly class AddABudgetEnvelopeCommand implements CommandInterface
     private string $budgetEnvelopeName;
     private string $budgetEnvelopeTargetedAmount;
     private string $budgetEnvelopeCurrency;
+    private string $context;
+    private string $contextId;
 
     public function __construct(
         BudgetEnvelopeId $budgetEnvelopeId,
@@ -25,12 +28,15 @@ final readonly class AddABudgetEnvelopeCommand implements CommandInterface
         BudgetEnvelopeName $budgetEnvelopeName,
         BudgetEnvelopeTargetedAmount $budgetEnvelopeTargetedAmount,
         BudgetEnvelopeCurrency $budgetEnvelopeCurrency,
+        Context $context,
     ) {
         $this->budgetEnvelopeId = (string) $budgetEnvelopeId;
         $this->budgetEnvelopeUserId = (string) $budgetEnvelopeUserId;
         $this->budgetEnvelopeName = (string) $budgetEnvelopeName;
         $this->budgetEnvelopeTargetedAmount = (string) $budgetEnvelopeTargetedAmount;
         $this->budgetEnvelopeCurrency = (string) $budgetEnvelopeCurrency;
+        $this->context = $context->getContext();
+        $this->contextId = $context->getContextId();
     }
 
     public function getBudgetEnvelopeUserId(): BudgetEnvelopeUserId
@@ -56,5 +62,10 @@ final readonly class AddABudgetEnvelopeCommand implements CommandInterface
     public function getBudgetEnvelopeCurrency(): BudgetEnvelopeCurrency
     {
         return BudgetEnvelopeCurrency::fromString($this->budgetEnvelopeCurrency);
+    }
+
+    public function getContext(): Context
+    {
+        return Context::from($this->contextId, $this->context);
     }
 }

@@ -34,7 +34,7 @@ final readonly class SignUpOrAuthenticateWithOAuth2CommandHandler
         ) {
             return;
         }
-        
+
         $existingUserByEmail = $this->userViewRepository->findOneBy(['email' => (string) $command->getUserEmail()]);
 
         if ($existingUserByEmail) {
@@ -43,7 +43,7 @@ final readonly class SignUpOrAuthenticateWithOAuth2CommandHandler
                 (string) $command->getUserRegistrationContext(),
                 $command->getProviderUserId()
             );
-            
+
             return;
         }
 
@@ -53,6 +53,7 @@ final readonly class SignUpOrAuthenticateWithOAuth2CommandHandler
             (string) $command->getUserRegistrationContext(),
             $command->getProviderUserId(),
         );
+        $context = $command->getContext();
         $this->userViewRepository->save(
             UserView::fromOAuth(
                 UserId::fromString($userId),
@@ -63,6 +64,8 @@ final readonly class SignUpOrAuthenticateWithOAuth2CommandHandler
                 UserConsent::fromBool(true),
                 $command->getUserRegistrationContext(),
                 $command->getProviderUserId(),
+                $context->getContextId(),
+                $context->getContext(),
             ),
         );
         $this->commandBus->execute(
@@ -75,6 +78,7 @@ final readonly class SignUpOrAuthenticateWithOAuth2CommandHandler
                 UserConsent::fromBool(true),
                 $command->getUserRegistrationContext(),
                 $command->getProviderUserId(),
+                $context,
             ),
         );
     }

@@ -25,6 +25,8 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
     public string $requestId;
     public string $registrationContext;
     public string $providerUserId;
+    public string $contextId;
+    public string $context;
     public \DateTimeImmutable $occurredOn;
 
     public function __construct(
@@ -38,6 +40,8 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
         string $userId,
         string $registrationContext,
         string $providerUserId,
+        string $contextId,
+        string $context,
         string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID
     ) {
         $this->aggregateId = $aggregateId;
@@ -51,6 +55,8 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
         $this->requestId = $requestId;
         $this->registrationContext = $registrationContext;
         $this->providerUserId = $providerUserId;
+        $this->contextId = $contextId;
+        $this->context = $context;
         $this->occurredOn = UtcClock::immutableNow();
     }
 
@@ -69,6 +75,8 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
             'roles' => $this->roles,
             'registrationContext' => $this->registrationContext,
             'providerUserId' => $this->providerUserId,
+            'contextId' => $this->contextId,
+            'context' => $this->context,
             'occurredOn' => $this->occurredOn->format(\DateTimeInterface::ATOM),
         ];
     }
@@ -87,6 +95,8 @@ final class UserSignedUpDomainEvent implements UserDomainEventInterface, Abstrac
             $data['userId'],
             $data['registrationContext'],
             $data['providerUserId'],
+            $data['contextId'],
+            $data['context'],
             $data['requestId']
         );
         $event->occurredOn = new \DateTimeImmutable($data['occurredOn']);

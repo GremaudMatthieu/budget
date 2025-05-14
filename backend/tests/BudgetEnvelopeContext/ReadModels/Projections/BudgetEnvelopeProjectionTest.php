@@ -14,6 +14,7 @@ use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedD
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
 use App\BudgetEnvelopeContext\ReadModels\Projections\BudgetEnvelopeProjection;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -36,6 +37,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
             'Test',
             '1000.00',
             'USD',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::BUDGET_ENVELOPE->value,
         );
 
         $this->envelopeViewRepository->expects($this->once())
@@ -70,6 +73,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
                 'Test',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 
@@ -113,6 +118,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
                 'Test',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 
@@ -155,6 +162,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
                 'Test',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 
@@ -196,6 +205,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
                 'Test',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 
@@ -237,6 +248,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
                 'Test',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 
@@ -262,6 +275,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
                 'Test',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 
@@ -326,6 +341,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
                 'Test',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 
@@ -378,6 +395,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
                 'Test',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 

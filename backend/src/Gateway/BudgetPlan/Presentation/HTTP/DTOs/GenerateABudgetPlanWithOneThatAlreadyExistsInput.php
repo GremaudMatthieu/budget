@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Gateway\BudgetPlan\Presentation\HTTP\DTOs;
 
+use App\SharedContext\Domain\Enums\ContextEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class GenerateABudgetPlanWithOneThatAlreadyExistsInput
@@ -26,6 +27,10 @@ final readonly class GenerateABudgetPlanWithOneThatAlreadyExistsInput
         #[Assert\NotBlank]
         #[Assert\Type(\DateTimeImmutable::class)]
         private(set) \DateTimeImmutable $date,
+
+        private(set) ?string $context = ContextEnum::BUDGET_PLAN->value,
+
+        private(set) ?string $contextId = null,
     ) {
     }
 }

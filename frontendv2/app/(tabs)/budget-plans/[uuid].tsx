@@ -131,6 +131,17 @@ export default function BudgetPlanDetailScreen() {
     return t('budgetPlans.advice.general');
   };
 
+  // Helper to format subtitle for header with responsive line breaks if needed
+  const getHeaderSubtitle = () => {
+    const incomeStr = formatCurrency(formatWithTwoDecimals(totalIncome), planDetails?.currency);
+    const remainingStr = formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency);
+    // If either is very long, add a line break
+    if (incomeStr.length > 12 || remainingStr.length > 12) {
+      return `${incomeStr}\n${t('budgetPlans.remaining')}: ${remainingStr}`;
+    }
+    return `${incomeStr} • ${t('budgetPlans.remaining')}: ${remainingStr}`;
+  };
+
   // Render a list of budget items using BudgetItemCard
   const renderItemList = (type: 'need' | 'want' | 'saving' | 'income', items: any[]) => {
     if (!items) return null;
@@ -335,46 +346,46 @@ export default function BudgetPlanDetailScreen() {
       <View className="w-full">
         {/* --- Compact Summary & Allocation Grid --- */}
         <View className="bg-white rounded-xl shadow-md px-2 py-2 mb-2">
-          <Text className="text-lg font-bold text-text-primary mb-2 text-center">{t('budgetPlans.budgetSummary')}</Text>
+          <Text className="text-base font-bold text-text-primary mb-2 text-center min-w-0 break-all" numberOfLines={2} ellipsizeMode="tail">{t('budgetPlans.budgetSummary')}</Text>
           <View className="flex-row gap-x-2 mb-2">
             {/* Needs */}
-            <View className="flex-1 items-center justify-center py-2 px-1 min-w-0">
-              <Ionicons name="cash-outline" size={18} color="#16a34a" className="mb-1" />
-              <Text className="text-green-600 font-semibold text-xs mb-1">{t('budgetPlans.needs')}</Text>
-              <Text className="text-base font-bold text-text-primary text-center min-w-0 break-all" style={{ fontSize: totalNeeds > 9999999 ? 14 : 16 }}>
+            <View className="flex-1 items-center justify-center py-1 px-0.5 min-w-0">
+              <Ionicons name="cash-outline" size={15} color="#16a34a" className="mb-1" />
+              <Text className="text-green-600 font-semibold text-[11px] mb-0.5">{t('budgetPlans.needs')}</Text>
+              <Text className="text-sm font-bold text-text-primary text-center min-w-0 break-all" style={{ fontSize: totalNeeds > 9999999 ? 13 : 15 }}>
                 {formatCurrency(formatWithTwoDecimals(totalNeeds), planDetails?.currency)}
               </Text>
-              <Text className="text-xs text-text-secondary text-center mt-1">{formatWithTwoDecimals(needsPercentage)}%</Text>
+              <Text className="text-[10px] text-text-secondary text-center mt-0.5">{formatWithTwoDecimals(needsPercentage)}%</Text>
             </View>
             {/* Wants */}
-            <View className="flex-1 items-center justify-center py-2 px-1 min-w-0">
-              <Ionicons name="cart-outline" size={18} color="#0284c7" className="mb-1" />
-              <Text className="text-blue-600 font-semibold text-xs mb-1">{t('budgetPlans.wants')}</Text>
-              <Text className="text-base font-bold text-text-primary text-center min-w-0 break-all" style={{ fontSize: totalWants > 9999999 ? 14 : 16 }}>
+            <View className="flex-1 items-center justify-center py-1 px-0.5 min-w-0">
+              <Ionicons name="cart-outline" size={15} color="#0284c7" className="mb-1" />
+              <Text className="text-blue-600 font-semibold text-[11px] mb-0.5">{t('budgetPlans.wants')}</Text>
+              <Text className="text-sm font-bold text-text-primary text-center min-w-0 break-all" style={{ fontSize: totalWants > 9999999 ? 13 : 15 }}>
                 {formatCurrency(formatWithTwoDecimals(totalWants), planDetails?.currency)}
               </Text>
-              <Text className="text-xs text-text-secondary text-center mt-1">{formatWithTwoDecimals(wantsPercentage)}%</Text>
+              <Text className="text-[10px] text-text-secondary text-center mt-0.5">{formatWithTwoDecimals(wantsPercentage)}%</Text>
             </View>
             {/* Savings */}
-            <View className="flex-1 items-center justify-center py-2 px-1 min-w-0">
-              <Ionicons name="save-outline" size={18} color="#ca8a04" className="mb-1" />
-              <Text className="text-amber-600 font-semibold text-xs mb-1">{t('budgetPlans.savings')}</Text>
-              <Text className="text-base font-bold text-text-primary text-center min-w-0 break-all" style={{ fontSize: totalSavings > 9999999 ? 14 : 16 }}>
+            <View className="flex-1 items-center justify-center py-1 px-0.5 min-w-0">
+              <Ionicons name="save-outline" size={15} color="#ca8a04" className="mb-1" />
+              <Text className="text-amber-600 font-semibold text-[11px] mb-0.5">{t('budgetPlans.savings')}</Text>
+              <Text className="text-sm font-bold text-text-primary text-center min-w-0 break-all" style={{ fontSize: totalSavings > 9999999 ? 13 : 15 }}>
                 {formatCurrency(formatWithTwoDecimals(totalSavings), planDetails?.currency)}
               </Text>
-              <Text className="text-xs text-text-secondary text-center mt-1">{formatWithTwoDecimals(savingsPercentage)}%</Text>
+              <Text className="text-[10px] text-text-secondary text-center mt-0.5">{formatWithTwoDecimals(savingsPercentage)}%</Text>
             </View>
           </View>
           {/* --- Total/Remaining Row --- */}
-          <View className="flex-row justify-between items-center border-t border-gray-200 pt-2 mt-2">
-            <Text className="text-primary-700 font-semibold text-xs">{t('budgetPlans.totalAllocated')}</Text>
-            <Text className="font-bold text-primary-700 text-base text-right min-w-0 break-all" style={{ fontSize: totalAllocated > 9999999 ? 14 : 16 }}>
+          <View className="flex-row justify-between items-center border-t border-gray-200 pt-1 mt-1">
+            <Text className="text-primary-700 font-semibold text-[11px]">{t('budgetPlans.totalAllocated')}</Text>
+            <Text className="font-bold text-primary-700 text-sm text-right min-w-0 break-all" style={{ fontSize: totalAllocated > 9999999 ? 13 : 15 }}>
               {formatCurrency(formatWithTwoDecimals(totalAllocated), planDetails?.currency)}
             </Text>
           </View>
-          <View className="flex-row justify-between items-center mt-1">
-            <Text className={`font-semibold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'} text-xs`}>{t('budgetPlans.remainingToAllocate')}</Text>
-            <Text className={`font-bold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'} text-base text-right min-w-0 break-all`} style={{ fontSize: Math.abs(remaining) > 9999999 ? 14 : 16 }}>
+          <View className="flex-row justify-between items-center mt-0.5">
+            <Text className={`font-semibold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'} text-[11px]`}>{t('budgetPlans.remainingToAllocate')}</Text>
+            <Text className={`font-bold ${remaining >= 0 ? 'text-primary-700' : 'text-red-600'} text-sm text-right min-w-0 break-all`} style={{ fontSize: Math.abs(remaining) > 9999999 ? 13 : 15 }}>
               {formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}
             </Text>
           </View>
@@ -807,7 +818,7 @@ export default function BudgetPlanDetailScreen() {
         <Stack.Screen options={{ headerShown: false }} />
         <AnimatedHeaderLayout
           title={planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}
-          subtitle={`${formatCurrency(formatWithTwoDecimals(totalIncome), planDetails?.currency)} • ${t('budgetPlans.remaining')}: ${formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}`}
+          subtitle={getHeaderSubtitle()}
           showBackButton={true}
           rightComponent={
             <TouchableOpacity

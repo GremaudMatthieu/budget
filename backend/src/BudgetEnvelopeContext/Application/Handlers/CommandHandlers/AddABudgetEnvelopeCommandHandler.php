@@ -54,6 +54,7 @@ final readonly class AddABudgetEnvelopeCommandHandler
                 $command->getBudgetEnvelopeTargetedAmount(),
                 $command->getBudgetEnvelopeName(),
                 $command->getBudgetEnvelopeCurrency(),
+                $command->getContext(),
             );
             $this->eventSourcedRepository->trackAggregates($aggregatesToSave);
         }

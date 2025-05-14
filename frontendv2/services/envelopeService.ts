@@ -72,7 +72,10 @@ export const envelopeService = {
     ),
 
   // Queries
-  listEnvelopes: () => apiClient.get<EnvelopesData>('/envelopes'),
+  listEnvelopes: (limit?: number) => {
+    const url = limit ? `/envelopes?limit=${limit}` : '/envelopes';
+    return apiClient.get<EnvelopesData>(url);
+  },
   
   getEnvelopeDetails: (uuid: string) => apiClient.get<EnvelopeDetails>(`/envelopes/${uuid}`),
-};
+}

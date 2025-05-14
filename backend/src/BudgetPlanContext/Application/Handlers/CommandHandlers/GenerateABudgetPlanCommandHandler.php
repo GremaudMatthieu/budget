@@ -58,6 +58,7 @@ final readonly class GenerateABudgetPlanCommandHandler
                 $command->getUserId(),
                 $command->getUserLanguagePreference(),
                 $command->getCurrency(),
+                $command->getContext(),
                 $this->uuidGenerator,
                 $this->translator,
             );

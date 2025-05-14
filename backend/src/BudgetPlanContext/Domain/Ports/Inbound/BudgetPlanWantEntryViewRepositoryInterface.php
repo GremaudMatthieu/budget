@@ -11,4 +11,6 @@ interface BudgetPlanWantEntryViewRepositoryInterface
     public function save(BudgetPlanWantEntryViewInterface $budgetPlanWantEntryView): void;
 
     public function delete(string $uuid): void;
+
+    public function deleteByBudgetPlanId(string $uuid): void;
 }

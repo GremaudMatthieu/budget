@@ -25,6 +25,7 @@ use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanCurrency;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -58,6 +59,12 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
     #[ORM\Column(name: 'currency', type: 'string', length: 3)]
     private(set) string $currency;
 
+    #[ORM\Column(name: 'context_uuid', type: 'string', length: 36)]
+    private(set) string $contextUuid;
+
+    #[ORM\Column(name: 'context', type: 'string', length: 36)]
+    private(set) string $context;
+
     #[ORM\Column(name: 'is_deleted', type: 'boolean', options: ['default' => false])]
     private(set) bool $isDeleted;
 
@@ -66,6 +73,7 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
         BudgetPlanUserId $budgetPlanUserId,
         BudgetPlanCurrency $budgetPlanCurrency,
         \DateTimeImmutable $date,
+        Context $context,
         \DateTimeImmutable $createdAt,
         \DateTime $updatedAt,
         bool $isDeleted,
@@ -74,6 +82,8 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
         $this->userId = (string) $budgetPlanUserId;
         $this->currency = (string) $budgetPlanCurrency;
         $this->date = $date;
+        $this->context = $context->getContext();
+        $this->contextUuid = $context->getContextId();
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->isDeleted = $isDeleted;
@@ -86,6 +96,7 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
             BudgetPlanUserId::fromString($event->userId),
             BudgetPlanCurrency::fromString($event->currency),
             new \DateTimeImmutable($event->date),
+            Context::from($event->contextId, $event->context),
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
             false,
@@ -100,6 +111,7 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
             BudgetPlanUserId::fromString($event->userId),
             BudgetPlanCurrency::fromString($event->currency),
             new \DateTimeImmutable($event->date),
+            Context::from($event->contextId, $event->context),
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
             false,
@@ -113,6 +125,7 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
             BudgetPlanUserId::fromString($budgetPlan['user_uuid']),
             BudgetPlanCurrency::fromString($budgetPlan['currency']),
             new \DateTimeImmutable($budgetPlan['date']),
+            Context::from($budgetPlan['context_uuid'], $budgetPlan['context']),
             new \DateTimeImmutable($budgetPlan['created_at']),
             \DateTime::createFromImmutable(new \DateTimeImmutable($budgetPlan['updated_at'])),
             (bool) $budgetPlan['is_deleted'],

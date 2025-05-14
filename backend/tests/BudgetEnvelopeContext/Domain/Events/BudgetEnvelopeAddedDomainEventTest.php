@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\BudgetEnvelopeContext\Domain\Events;
 
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use PHPUnit\Framework\TestCase;
 
 class BudgetEnvelopeAddedDomainEventTest extends TestCase
@@ -16,7 +17,9 @@ class BudgetEnvelopeAddedDomainEventTest extends TestCase
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'Test',
             '1000.00',
-            'USD'
+            'USD',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::BUDGET_ENVELOPE->value,
         );
         $array = $event->toArray();
 
@@ -38,6 +41,8 @@ class BudgetEnvelopeAddedDomainEventTest extends TestCase
             'targetedAmount' => '1000.00',
             'currency' => 'USD',
             'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'context' => ContextEnum::BUDGET_ENVELOPE->value,
+            'contextId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
         ];
 
         $event = BudgetEnvelopeAddedDomainEvent::fromArray($data);

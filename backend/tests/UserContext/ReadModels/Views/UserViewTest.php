@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\UserContext\ReadModels\Views;
 
+use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Domain\Events\UserSignedUpDomainEvent;
 use App\UserContext\Domain\ValueObjects\UserConsent;
@@ -32,6 +33,8 @@ class UserViewTest extends TestCase
             ['ROLE_USER'],
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $this->assertEquals('b7e685be-db83-4866-9f85-102fac30a50b', $userView->uuid);
@@ -64,6 +67,8 @@ class UserViewTest extends TestCase
             ['ROLE_USER'],
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $expected = [
@@ -93,6 +98,8 @@ class UserViewTest extends TestCase
             'roles' => json_encode(['ROLE_USER']),
             'registration_context' => 'google',
             'provider_user_id' => '1234567890',
+            'context_uuid' => 'b7e685be-db83-4866-9f85-102fac30a50b',
+            'context' => ContextEnum::USER->value,
         ];
 
         $userView = UserView::fromRepository($userData);
@@ -126,6 +133,8 @@ class UserViewTest extends TestCase
             ['ROLE_USER'],
             UserRegistrationContext::fromString('google'),
             '1234567890',
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            ContextEnum::USER->value,
         );
 
         $userView->fromEvents(
@@ -145,6 +154,8 @@ class UserViewTest extends TestCase
                         'roles' => ['ROLE_USER'],
                         'registrationContext' => 'google',
                         'providerUserId' => '1234567890',
+                        'contextId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
+                        'context' => ContextEnum::USER->value,
                     ]),
                 ];
             })());

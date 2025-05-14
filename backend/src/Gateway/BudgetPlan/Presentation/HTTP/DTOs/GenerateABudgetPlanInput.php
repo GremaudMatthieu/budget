@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Gateway\BudgetPlan\Presentation\HTTP\DTOs;
 
+use App\SharedContext\Domain\Enums\ContextEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class GenerateABudgetPlanInput
@@ -63,6 +64,10 @@ final readonly class GenerateABudgetPlanInput
             message: 'budgetPlan.currencyInvalid'
         )]
         private(set) string $currency,
+
+        private(set) ?string $context = ContextEnum::BUDGET_PLAN->value,
+
+        private(set) ?string $contextId = null,
     ) {
     }
 }

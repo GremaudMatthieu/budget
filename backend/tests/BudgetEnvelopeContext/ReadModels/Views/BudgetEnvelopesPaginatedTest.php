@@ -7,6 +7,7 @@ namespace App\Tests\BudgetEnvelopeContext\ReadModels\Views;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopesPaginated;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use PHPUnit\Framework\TestCase;
 
 class BudgetEnvelopesPaginatedTest extends TestCase
@@ -20,6 +21,8 @@ class BudgetEnvelopesPaginatedTest extends TestCase
                 'Test Envelope 1',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
         $envelope2 = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
@@ -29,6 +32,8 @@ class BudgetEnvelopesPaginatedTest extends TestCase
                 'Test Envelope 2',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
 

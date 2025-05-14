@@ -10,7 +10,9 @@ use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanIncome;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\Gateway\BudgetPlan\Presentation\HTTP\DTOs\GenerateABudgetPlanInput;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,20 +32,23 @@ final readonly class GenerateABudgetPlanController
     }
 
     public function __invoke(
-        #[MapRequestPayload] GenerateABudgetPlanInput $generateABudgetPlanInput,
+        #[MapRequestPayload] GenerateABudgetPlanInput $input,
         #[CurrentUser] UserViewInterface $user,
     ): JsonResponse {
         $this->commandBus->execute(
             new GenerateABudgetPlanCommand(
-                BudgetPlanId::fromString($generateABudgetPlanInput->uuid),
-                $generateABudgetPlanInput->date,
+                BudgetPlanId::fromString($input->uuid),
+                $input->date,
                 array_map(
                     fn($income) => BudgetPlanIncome::fromArray($income),
-                    $generateABudgetPlanInput->incomes
+                    $input->incomes
                 ),
                 BudgetPlanUserId::fromString($user->getUuid()),
                 UserLanguagePreference::fromString($user->languagePreference),
-                BudgetPlanCurrency::fromString($generateABudgetPlanInput->currency)
+                BudgetPlanCurrency::fromString($input->currency),
+                null === $input->contextId ?
+                    Context::from($input->uuid, ContextEnum::BUDGET_PLAN->value)
+                    : Context::from($input->contextId, $input->context),
             ),
         );
 

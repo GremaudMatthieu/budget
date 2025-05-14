@@ -9,6 +9,7 @@ use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedWithOneThatAlreadyExi
 use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedAddedDomainEvent;
 use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedAdjustedDomainEvent;
 use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedRemovedDomainEvent;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanRemovedDomainEvent;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanNeedEntryViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanNeedEntryViewRepositoryInterface;
 use App\BudgetPlanContext\ReadModels\Views\BudgetPlanNeedEntryView;
@@ -30,6 +31,7 @@ final readonly class BudgetPlanNeedEntryProjection
             BudgetPlanNeedAddedDomainEvent::class => $this->handleBudgetPlanNeedAddedDomainEvent($event),
             BudgetPlanNeedAdjustedDomainEvent::class => $this->handleBudgetPlanNeedAdjustedDomainEvent($event),
             BudgetPlanNeedRemovedDomainEvent::class => $this->handleBudgetPlanNeedRemovedDomainEvent($event),
+            BudgetPlanRemovedDomainEvent::class => $this->handleBudgetPlanRemovedDomainEvent($event),
             default => null,
         };
     }
@@ -83,5 +85,10 @@ final readonly class BudgetPlanNeedEntryProjection
     private function handleBudgetPlanNeedRemovedDomainEvent(BudgetPlanNeedRemovedDomainEvent $event): void
     {
         $this->budgetPlanNeedEntryViewRepository->delete($event->uuid);
+    }
+
+    private function handleBudgetPlanRemovedDomainEvent(BudgetPlanRemovedDomainEvent $event): void
+    {
+        $this->budgetPlanNeedEntryViewRepository->deleteByBudgetPlanId($event->aggregateId);
     }
 }

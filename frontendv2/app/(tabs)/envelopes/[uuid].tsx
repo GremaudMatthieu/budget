@@ -88,6 +88,12 @@ export default function EnvelopeDetailScreen() {
 
   const progress = Number(details.envelope.currentAmount) / Number(details.envelope.targetedAmount);
 
+  // Helper to determine if the envelope name is long
+  const getHeaderHeight = () => {
+    if (!details?.envelope?.name) return 130;
+    return details.envelope.name.length > 40 || details.envelope.name.includes('\n') ? 180 : 130;
+  };
+
   // Web-specific delete confirmation dialog
   const renderWebDeleteDialog = () => {
     if (!deleteModalOpen) return null;
@@ -205,6 +211,7 @@ export default function EnvelopeDetailScreen() {
         <AnimatedHeaderLayout
           title={details.envelope.name}
           showBackButton
+          headerHeight={getHeaderHeight()}
         >
           <StatusBar style="dark" />
           <ScrollView

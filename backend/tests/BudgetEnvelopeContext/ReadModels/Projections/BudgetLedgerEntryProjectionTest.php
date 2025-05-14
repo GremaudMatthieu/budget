@@ -10,6 +10,7 @@ use App\BudgetEnvelopeContext\ReadModels\Projections\BudgetEnvelopeLedgerEntryPr
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeLedgerEntryView;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface;
+use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Inbound\EventSourcedRepositoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -65,6 +66,8 @@ class BudgetLedgerEntryProjectionTest extends TestCase
                 'Test',
                 '1000.00',
                 'USD',
+                'b7e685be-db83-4866-9f85-102fac30a50b',
+                ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
         $envelopeView->fromEvent(new BudgetEnvelopeCreditedDomainEvent(

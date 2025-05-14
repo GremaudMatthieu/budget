@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs;
 
+use App\SharedContext\Domain\Enums\ContextEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class AddABudgetEnvelopeInput
@@ -18,7 +19,7 @@ final readonly class AddABudgetEnvelopeInput
         #[Assert\NotBlank]
         #[Assert\Length(
             min: 1,
-            max: 50,
+            max: 25,
             minMessage: 'envelopes.nameMinLength',
             maxMessage: 'envelopes.nameMaxLength'
         )]
@@ -54,6 +55,10 @@ final readonly class AddABudgetEnvelopeInput
             message: 'envelopes.currencyInvalid'
         )]
         private(set) string $currency,
+
+        private(set) ?string $context = ContextEnum::BUDGET_ENVELOPE->value,
+
+        private(set) ?string $contextId = null,
     ) {
     }
 }
