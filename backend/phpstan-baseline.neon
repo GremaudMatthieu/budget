@@ -1,8 +1,20 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Property App\\BudgetEnvelopeContext\\Domain\\Aggregates\\BudgetEnvelope\:\:\$context is never read, only written\.$#'
-			identifier: property.onlyWritten
+			message: '#^Cannot access offset ''context'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/BudgetEnvelopeContext/Domain/Aggregates/BudgetEnvelope.php
+
+		-
+			message: '#^Cannot access offset ''contextId'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/BudgetEnvelopeContext/Domain/Aggregates/BudgetEnvelope.php
+
+		-
+			message: '#^Property App\\BudgetEnvelopeContext\\Domain\\Aggregates\\BudgetEnvelope\:\:\$isDeleted \(bool\) does not accept mixed\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: src/BudgetEnvelopeContext/Domain/Aggregates/BudgetEnvelope.php
 
@@ -25,8 +37,20 @@ parameters:
 			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
 
 		-
-			message: '#^Property App\\BudgetPlanContext\\Domain\\Aggregates\\BudgetPlan\:\:\$updatedAt is never read, only written\.$#'
-			identifier: property.onlyWritten
+			message: '#^Cannot access offset ''context'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
+
+		-
+			message: '#^Cannot access offset ''contextId'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\Domain\\Aggregates\\BudgetPlan\:\:\$isDeleted \(bool\) does not accept mixed\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
 
@@ -107,6 +131,102 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: src/BudgetPlanContext/ReadModels/Projections/BudgetPlanWantEntryProjection.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanIncomeEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanIncomeEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanNeedEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanNeedEntryView\:\:\$needAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanNeedEntryView\:\:\$needName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanNeedEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanSavingEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanSavingEntryView\:\:\$savingAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanSavingEntryView\:\:\$savingName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanSavingEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanWantEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanWantEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanWantEntryView\:\:\$wantAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanWantEntryView\:\:\$wantName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanWantEntryView.php
 
 		-
 			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
@@ -361,6 +481,12 @@ parameters:
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
+			message: '#^Call to an undefined static method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface\:\:fromSnapshot\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
+
+		-
 			message: '#^Cannot access constant class on mixed\.$#'
 			identifier: classConstant.nonObject
 			count: 3
@@ -375,7 +501,7 @@ parameters:
 		-
 			message: '#^Cannot access offset ''stream_version'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
+			count: 3
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
@@ -405,7 +531,7 @@ parameters:
 		-
 			message: '#^Cannot cast mixed to int\.$#'
 			identifier: cast.int
-			count: 3
+			count: 4
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
@@ -424,6 +550,30 @@ parameters:
 			message: '#^Method App\\Libraries\\FluxCapacitor\\EventStore\\EventStore\:\:getEventPayload\(\) should return array but returns mixed\.$#'
 			identifier: return.type
 			count: 2
+			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
+
+		-
+			message: '#^Method App\\Libraries\\FluxCapacitor\\EventStore\\EventStore\:\:guessAggregateType\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
+
+		-
+			message: '#^Method App\\Libraries\\FluxCapacitor\\EventStore\\EventStore\:\:load\(\) should return App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
+
+		-
+			message: '#^PHPDoc tag @var with type App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface is not subtype of native type string\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
+
+		-
+			message: '#^PHPDoc tag @var with type App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\DomainEventInterface is not subtype of native type string\.$#'
+			identifier: varTag.nativeType
+			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
@@ -487,10 +637,46 @@ parameters:
 			path: src/Libraries/FluxCapacitor/EventStore/Services/EventClassMap.php
 
 		-
+			message: '#^Binary operation "%%" between mixed and int results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/Services/SnapshotService.php
+
+		-
+			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface\:\:aggregateVersion\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/Services/SnapshotService.php
+
+		-
+			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\SnapshotableAggregateInterface\:\:aggregateVersion\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/Services/SnapshotService.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/Services/SnapshotService.php
+
+		-
 			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Services\\RequestIdProvider\:\:\$requestId \(string\) does not accept string\|null\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: src/SharedContext/Infrastructure/EventListener/RequestIdListener.php
+
+		-
+			message: '#^Cannot access offset ''phoneNumber'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/SharedContext/Infrastructure/Services/BudgetAppEventUpcastingService.php
+
+		-
+			message: '#^Method App\\SharedContext\\Infrastructure\\Services\\BudgetAppEventUpcastingService\:\:upcastUserSignedUpV1ToV2\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/SharedContext/Infrastructure/Services/BudgetAppEventUpcastingService.php
 
 		-
 			message: '#^Cannot access an offset on mixed\.$#'
@@ -499,20 +685,32 @@ parameters:
 			path: src/UserContext/Application/Handlers/CommandHandlers/SignUpAUserCommandHandler.php
 
 		-
+			message: '#^Cannot access offset ''context'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/UserContext/Domain/Aggregates/User.php
+
+		-
+			message: '#^Cannot access offset ''contextId'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/UserContext/Domain/Aggregates/User.php
+
+		-
 			message: '#^Method App\\UserContext\\Domain\\Aggregates\\User\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
 			path: src/UserContext/Domain/Aggregates/User.php
 
 		-
-			message: '#^Property App\\UserContext\\Domain\\Aggregates\\User\:\:\$context is never read, only written\.$#'
-			identifier: property.onlyWritten
+			message: '#^Property App\\UserContext\\Domain\\Aggregates\\User\:\:\$providerUserId \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: src/UserContext/Domain/Aggregates/User.php
 
 		-
-			message: '#^Property App\\UserContext\\Domain\\Aggregates\\User\:\:\$createdAt is never read, only written\.$#'
-			identifier: property.onlyWritten
+			message: '#^Property App\\UserContext\\Domain\\Aggregates\\User\:\:\$roles \(array\) does not accept mixed\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: src/UserContext/Domain/Aggregates/User.php
 

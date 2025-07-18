@@ -8,8 +8,8 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeCurrency;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\Context;
 
 final readonly class AddABudgetEnvelopeCommand implements CommandInterface
@@ -24,7 +24,7 @@ final readonly class AddABudgetEnvelopeCommand implements CommandInterface
 
     public function __construct(
         BudgetEnvelopeId $budgetEnvelopeId,
-        BudgetEnvelopeUserId $budgetEnvelopeUserId,
+        UserId $budgetEnvelopeUserId,
         BudgetEnvelopeName $budgetEnvelopeName,
         BudgetEnvelopeTargetedAmount $budgetEnvelopeTargetedAmount,
         BudgetEnvelopeCurrency $budgetEnvelopeCurrency,
@@ -39,9 +39,9 @@ final readonly class AddABudgetEnvelopeCommand implements CommandInterface
         $this->contextId = $context->getContextId();
     }
 
-    public function getBudgetEnvelopeUserId(): BudgetEnvelopeUserId
+    public function getBudgetEnvelopeUserId(): UserId
     {
-        return BudgetEnvelopeUserId::fromString($this->budgetEnvelopeUserId);
+        return UserId::fromString($this->budgetEnvelopeUserId);
     }
 
     public function getBudgetEnvelopeId(): BudgetEnvelopeId

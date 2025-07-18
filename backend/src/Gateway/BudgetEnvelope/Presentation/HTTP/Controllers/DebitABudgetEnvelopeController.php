@@ -8,9 +8,9 @@ use App\BudgetEnvelopeContext\Application\Commands\DebitABudgetEnvelopeCommand;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeDebitMoney;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeEntryDescription;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs\DebitABudgetEnvelopeInput;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +38,7 @@ final readonly class DebitABudgetEnvelopeController
                 BudgetEnvelopeDebitMoney::fromString($debitABudgetEnvelopeInput->debitMoney),
                 BudgetEnvelopeEntryDescription::fromString($debitABudgetEnvelopeInput->description),
                 BudgetEnvelopeId::fromString($uuid),
-                BudgetEnvelopeUserId::fromString($user->getUuid()),
+                UserId::fromString($user->getUuid()),
             ),
         );
 

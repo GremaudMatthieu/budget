@@ -6,10 +6,10 @@ namespace App\Gateway\BudgetPlan\Presentation\HTTP\Controllers;
 
 use App\BudgetPlanContext\Application\Commands\GenerateABudgetPlanWithOneThatAlreadyExistsCommand;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\Gateway\BudgetPlan\Presentation\HTTP\DTOs\GenerateABudgetPlanWithOneThatAlreadyExistsInput;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\Context;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +39,7 @@ final readonly class GenerateABudgetPlanWithOneThatAlreadyExistsController
                     $input->budgetPlanUuidThatAlreadyExists,
                 ),
                 $input->date,
-                BudgetPlanUserId::fromString($user->getUuid()),
+                UserId::fromString($user->getUuid()),
                 null === $input->contextId ?
                     Context::from($input->uuid, ContextEnum::BUDGET_PLAN->value)
                     : Context::from($input->contextId, $input->context),

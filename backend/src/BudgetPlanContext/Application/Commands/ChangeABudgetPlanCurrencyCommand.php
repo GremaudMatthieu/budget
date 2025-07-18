@@ -6,8 +6,8 @@ namespace App\BudgetPlanContext\Application\Commands;
 
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanCurrency;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class ChangeABudgetPlanCurrencyCommand implements CommandInterface
 {
@@ -18,7 +18,7 @@ final readonly class ChangeABudgetPlanCurrencyCommand implements CommandInterfac
     public function __construct(
         BudgetPlanCurrency $budgetPlanCurrency,
         BudgetPlanId $budgetPlanId,
-        BudgetPlanUserId $budgetPlanUserId,
+        UserId $budgetPlanUserId,
     ) {
         $this->budgetPlanCurrency = (string) $budgetPlanCurrency;
         $this->budgetPlanId = (string) $budgetPlanId;
@@ -30,9 +30,9 @@ final readonly class ChangeABudgetPlanCurrencyCommand implements CommandInterfac
         return BudgetPlanCurrency::fromString($this->budgetPlanCurrency);
     }
 
-    public function getBudgetPlanUserId(): BudgetPlanUserId
+    public function getBudgetPlanUserId(): UserId
     {
-        return BudgetPlanUserId::fromString($this->budgetPlanUserId);
+        return UserId::fromString($this->budgetPlanUserId);
     }
 
     public function getBudgetPlanId(): BudgetPlanId

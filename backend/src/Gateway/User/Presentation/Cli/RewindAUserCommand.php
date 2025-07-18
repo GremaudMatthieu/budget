@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Gateway\User\Presentation\Cli;
 
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Application\Commands\RewindAUserFromEventsCommand;
-use App\UserContext\Domain\ValueObjects\UserId;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

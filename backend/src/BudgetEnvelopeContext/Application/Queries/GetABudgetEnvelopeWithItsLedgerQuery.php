@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\BudgetEnvelopeContext\Application\Queries;
 
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Inbound\QueryInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class GetABudgetEnvelopeWithItsLedgerQuery implements QueryInterface
 {
@@ -15,7 +15,7 @@ final readonly class GetABudgetEnvelopeWithItsLedgerQuery implements QueryInterf
 
     public function __construct(
         BudgetEnvelopeId $budgetEnvelopeId,
-        BudgetEnvelopeUserId $budgetEnvelopeUserId,
+        UserId $budgetEnvelopeUserId,
     ) {
         $this->budgetEnvelopeId = (string) $budgetEnvelopeId;
         $this->budgetEnvelopeUserId = (string) $budgetEnvelopeUserId;
@@ -26,8 +26,8 @@ final readonly class GetABudgetEnvelopeWithItsLedgerQuery implements QueryInterf
         return BudgetEnvelopeId::fromString($this->budgetEnvelopeId);
     }
 
-    public function getBudgetEnvelopeUserId(): BudgetEnvelopeUserId
+    public function getBudgetEnvelopeUserId(): UserId
     {
-        return BudgetEnvelopeUserId::fromString($this->budgetEnvelopeUserId);
+        return UserId::fromString($this->budgetEnvelopeUserId);
     }
 }

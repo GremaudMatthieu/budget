@@ -2,15 +2,15 @@
 
 namespace App\Tests\BudgetEnvelopeContext\ReadModels\Projections;
 
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCurrencyChangedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDeletedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRenamedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeReplayedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRewoundDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedDomainEvent;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCurrencyChangedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDeletedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRenamedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeReplayedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRewoundDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
 use App\BudgetEnvelopeContext\ReadModels\Projections\BudgetEnvelopeProjection;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
@@ -31,7 +31,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeAddedEvent(): void
     {
-        $event = new BudgetEnvelopeAddedDomainEvent(
+        $event = new BudgetEnvelopeAddedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'Test',
@@ -60,14 +60,14 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeCreditedEvent(): void
     {
-        $event = new BudgetEnvelopeCreditedDomainEvent(
+        $event = new BudgetEnvelopeCreditedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             '500.00',
             'test',
         );
-        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test',
@@ -88,7 +88,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeCreditedWithEnvelopeThatDoesNotExist(): void
     {
-        $event = new BudgetEnvelopeCreditedDomainEvent(
+        $event = new BudgetEnvelopeCreditedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             '500.00',
@@ -105,14 +105,14 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeDebitedEvent(): void
     {
-        $event = new BudgetEnvelopeDebitedDomainEvent(
+        $event = new BudgetEnvelopeDebitedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             '500.00',
             'test',
         );
-        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test',
@@ -133,7 +133,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeDebitedWithEnvelopeThatDoesNotExist(): void
     {
-        $event = new BudgetEnvelopeDebitedDomainEvent(
+        $event = new BudgetEnvelopeDebitedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             '500.00',
@@ -150,13 +150,13 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeNamedEvent(): void
     {
-        $event = new BudgetEnvelopeRenamedDomainEvent(
+        $event = new BudgetEnvelopeRenamedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'Test',
         );
-        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test',
@@ -177,7 +177,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeNamedWithEnvelopeThatDoesNotExist(): void
     {
-        $event = new BudgetEnvelopeRenamedDomainEvent(
+        $event = new BudgetEnvelopeRenamedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'Test',
@@ -193,13 +193,13 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeDeletedEvent(): void
     {
-        $event = new BudgetEnvelopeDeletedDomainEvent(
+        $event = new BudgetEnvelopeDeletedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             true,
         );
-        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test',
@@ -220,7 +220,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeDeletedWithEnvelopeThatDoesNotExist(): void
     {
-        $event = new BudgetEnvelopeDeletedDomainEvent(
+        $event = new BudgetEnvelopeDeletedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             true,
@@ -236,13 +236,13 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeTargetedAmountUpdatedEvent(): void
     {
-        $event = new BudgetEnvelopeTargetedAmountChangedDomainEvent(
+        $event = new BudgetEnvelopeTargetedAmountChangedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             '1000.00',
         );
-        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test',
@@ -263,13 +263,13 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeCurrencyChangedEvent(): void
     {
-        $event = new BudgetEnvelopeCurrencyChangedDomainEvent(
+        $event = new BudgetEnvelopeCurrencyChangedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'USD',
         );
-        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test',
@@ -290,7 +290,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeCurrencyChangedWithEnvelopeThatDoesNotExist(): void
     {
-        $event = new BudgetEnvelopeCurrencyChangedDomainEvent(
+        $event = new BudgetEnvelopeCurrencyChangedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'USD',
@@ -307,7 +307,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleEnvelopeTargetedAmountUpdatedWithEnvelopeThatDoesNotExist(): void
     {
-        $event = new BudgetEnvelopeTargetedAmountChangedDomainEvent(
+        $event = new BudgetEnvelopeTargetedAmountChangedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             '1000.00',
@@ -323,7 +323,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleBudgetEnvelopeRewoundEvent(): void
     {
-        $event = new BudgetEnvelopeRewoundDomainEvent(
+        $event = new BudgetEnvelopeRewoundDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'Test',
@@ -334,8 +334,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
             '2024-01-01 00:00:00',
             false,
         );
-        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test',
@@ -356,7 +356,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleBudgetEnvelopeRewoundWithEnvelopeThatDoesNotExist(): void
     {
-        $event = new BudgetEnvelopeRewoundDomainEvent(
+        $event = new BudgetEnvelopeRewoundDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'Test',
@@ -378,7 +378,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleBudgetEnvelopeReplayedEvent(): void
     {
-        $event = new BudgetEnvelopeReplayedDomainEvent(
+        $event = new BudgetEnvelopeReplayedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'Test',
@@ -388,8 +388,8 @@ class BudgetEnvelopeProjectionTest extends TestCase
             '2024-01-01 00:00:00',
             false,
         );
-        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test',
@@ -410,7 +410,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
     public function testHandleBudgetEnvelopeReplayedWithEnvelopeThatDoesNotExist(): void
     {
-        $event = new BudgetEnvelopeReplayedDomainEvent(
+        $event = new BudgetEnvelopeReplayedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'Test',

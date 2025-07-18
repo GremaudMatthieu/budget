@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Gateway\User\Presentation\HTTP\Controllers;
 
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Application\Commands\DeleteAUserCommand;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
-use App\UserContext\Domain\ValueObjects\UserId;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

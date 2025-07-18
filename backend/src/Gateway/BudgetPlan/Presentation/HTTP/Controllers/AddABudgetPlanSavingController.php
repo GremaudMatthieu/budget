@@ -10,9 +10,9 @@ use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanEntryId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanEntryName;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanSavingCategory;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\Gateway\BudgetPlan\Presentation\HTTP\DTOs\AddABudgetPlanSavingInput;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,7 +42,7 @@ final readonly class AddABudgetPlanSavingController
                 BudgetPlanEntryName::fromString($addABudgetPlanSavingInput->name),
                 BudgetPlanEntryAmount::fromString($addABudgetPlanSavingInput->amount),
                 BudgetPlanSavingCategory::fromString($addABudgetPlanSavingInput->category),
-                BudgetPlanUserId::fromString($user->getUuid()),
+                UserId::fromString($user->getUuid()),
             ),
         );
 

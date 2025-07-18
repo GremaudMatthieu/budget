@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\BudgetPlanContext\Domain\ValueObjects;
 
 use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 use Assert\Assert;
 
@@ -19,7 +20,7 @@ final readonly class BudgetPlanDateRegistryId
     }
 
     public static function fromUserIdAndBudgetPlanDate(
-        BudgetPlanUserId $userId,
+        UserId $userId,
         \DateTimeImmutable $date,
         UuidGeneratorInterface $uuidGenerator,
     ): self {

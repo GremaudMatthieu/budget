@@ -6,8 +6,8 @@ namespace App\BudgetPlanContext\Application\Commands;
 
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanCurrency;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 
@@ -26,7 +26,7 @@ final readonly class GenerateABudgetPlanCommand implements CommandInterface
         BudgetPlanId $budgetPlanId,
         \DateTimeImmutable $date,
         array $incomes,
-        BudgetPlanUserId $userId,
+        UserId $userId,
         UserLanguagePreference $userLanguagePreference,
         BudgetPlanCurrency $currency,
         Context $context,
@@ -61,9 +61,9 @@ final readonly class GenerateABudgetPlanCommand implements CommandInterface
         return UserLanguagePreference::fromString($this->userLanguagePreference);
     }
 
-    public function getUserId(): BudgetPlanUserId
+    public function getUserId(): UserId
     {
-        return BudgetPlanUserId::fromString($this->userId);
+        return UserId::fromString($this->userId);
     }
 
     public function getCurrency(): BudgetPlanCurrency

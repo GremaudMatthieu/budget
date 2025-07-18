@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\BudgetPlanContext\Domain\Builders;
 
 use App\BudgetPlanContext\Domain\Aggregates\BudgetPlanDateRegistry;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanDateRegisteredDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanDateReleasedDomainEvent;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanDateRegisteredDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanDateReleasedDomainEvent_v1;
 use App\BudgetPlanContext\Domain\Exceptions\BudgetPlanDateAlreadyExistsForUserException;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanDateRegistryId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\SharedContext\Domain\Ports\Inbound\EventSourcedRepositoryInterface;
 use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 
 final class BudgetPlanDateRegistryBuilder
@@ -52,7 +52,7 @@ final class BudgetPlanDateRegistryBuilder
 
     public function ensureDateIsAvailable(
         \DateTimeImmutable $date,
-        BudgetPlanUserId $userId,
+        UserId $userId,
         ?BudgetPlanId $currentPlanId = null
     ): self {
         if ($this->currentRegistry === null) {
@@ -71,14 +71,14 @@ final class BudgetPlanDateRegistryBuilder
         $currentOwner = null;
 
         foreach ($this->currentRegistry->raisedDomainEvents() as $event) {
-            if ($event instanceof BudgetPlanDateRegisteredDomainEvent &&
+            if ($event instanceof BudgetPlanDateRegisteredDomainEvent_v1 &&
                 $event->date === UtcClock::fromImmutableToString($date) &&
                 $event->userId === (string) $userId) {
                 $isInUse = true;
                 $currentOwner = $event->budgetPlanId;
             }
 
-            if ($event instanceof BudgetPlanDateReleasedDomainEvent &&
+            if ($event instanceof BudgetPlanDateReleasedDomainEvent_v1 &&
                 $event->date === UtcClock::fromImmutableToString($date) &&
                 $event->userId === (string) $userId) {
                 $isInUse = false;
@@ -95,7 +95,7 @@ final class BudgetPlanDateRegistryBuilder
 
     public function registerDate(
         \DateTimeImmutable $date,
-        BudgetPlanUserId $userId,
+        UserId $userId,
         BudgetPlanId $budgetPlanId,
     ): self {
         if ($this->currentRegistry === null) {
@@ -137,7 +137,7 @@ final class BudgetPlanDateRegistryBuilder
 
     public function releaseDate(
         \DateTimeImmutable $date,
-        BudgetPlanUserId $userId,
+        UserId $userId,
         BudgetPlanId $budgetPlanId,
     ): self {
         if ($this->oldRegistry === null) {

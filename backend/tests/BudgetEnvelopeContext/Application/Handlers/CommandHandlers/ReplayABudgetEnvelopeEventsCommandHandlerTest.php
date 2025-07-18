@@ -11,9 +11,9 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeCurrency;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
 use App\SharedContext\Domain\Enums\ContextEnum;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Infrastructure\Repositories\EventSourcedRepository;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -40,13 +40,13 @@ class ReplayABudgetEnvelopeEventsCommandHandlerTest extends TestCase
     {
         $replayABudgetEnvelopeEventsCommand = new ReplayABudgetEnvelopeEventsCommand(
             BudgetEnvelopeId::fromString('3e6a6763-4c4d-4648-bc3f-e9447dbed12c'),
-            BudgetEnvelopeUserId::fromString('18e04f53-0ea6-478c-a02b-81b7f3d6e8c1')
+            UserId::fromString('18e04f53-0ea6-478c-a02b-81b7f3d6e8c1')
         );
 
         $this->eventStore->expects($this->once())->method('load')->willReturn(
             BudgetEnvelope::create(
                 BudgetEnvelopeId::fromString('3e6a6763-4c4d-4648-bc3f-e9447dbed12c'),
-                BudgetEnvelopeUserId::fromString('18e04f53-0ea6-478c-a02b-81b7f3d6e8c1'),
+                UserId::fromString('18e04f53-0ea6-478c-a02b-81b7f3d6e8c1'),
                 BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
                 BudgetEnvelopeName::fromString('test name'),
                 BudgetEnvelopeCurrency::fromString('EUR'),
@@ -61,7 +61,7 @@ class ReplayABudgetEnvelopeEventsCommandHandlerTest extends TestCase
     {
         $replayABudgetEnvelopeEventsCommand = new ReplayABudgetEnvelopeEventsCommand(
             BudgetEnvelopeId::fromString('3e6a6763-4c4d-4648-bc3f-e9447dbed12c'),
-            BudgetEnvelopeUserId::fromString('18e04f53-0ea6-478c-a02b-81b7f3d6e8c1'),
+            UserId::fromString('18e04f53-0ea6-478c-a02b-81b7f3d6e8c1'),
         );
 
         $this->eventStore->expects($this->once())->method('load')->willThrowException(new \Exception('Error loading events'));

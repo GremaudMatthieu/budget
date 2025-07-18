@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\BudgetEnvelopeContext\ReadModels\Projections;
 
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCurrencyChangedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDeletedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRenamedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeReplayedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRewoundDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedDomainEvent;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCurrencyChangedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDeletedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRenamedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeReplayedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRewoundDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewInterface;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
@@ -29,39 +29,25 @@ final readonly class BudgetEnvelopeProjection
     public function __invoke(DomainEventInterface $event): void
     {
         match($event::class) {
-            BudgetEnvelopeAddedDomainEvent::class => $this->handleBudgetEnvelopeAddedDomainEvent($event),
-            BudgetEnvelopeCreditedDomainEvent::class => $this->handleBudgetEnvelopeCreditedDomainEvent($event),
-            BudgetEnvelopeDebitedDomainEvent::class => $this->handleBudgetEnvelopeDebitedDomainEvent($event),
-            BudgetEnvelopeRenamedDomainEvent::class => $this->handleBudgetEnvelopeNamedDomainEvent($event),
-            BudgetEnvelopeDeletedDomainEvent::class => $this->handleBudgetEnvelopeDeletedDomainEvent($event),
-            BudgetEnvelopeRewoundDomainEvent::class => $this->handleBudgetEnvelopeRewoundDomainEvent($event),
-            BudgetEnvelopeReplayedDomainEvent::class => $this->handleBudgetEnvelopeReplayedDomainEvent($event),
-            BudgetEnvelopeTargetedAmountChangedDomainEvent::class => $this->handleBudgetEnvelopeTargetedAmountChangedDomainEvent($event),
-            BudgetEnvelopeCurrencyChangedDomainEvent::class => $this->handleBudgetEnvelopeCurrencyChangedDomainEvent($event),
+            BudgetEnvelopeAddedDomainEvent_v1::class => $this->handleBudgetEnvelopeAddedDomainEvent_v1($event),
+            BudgetEnvelopeCreditedDomainEvent_v1::class => $this->handleBudgetEnvelopeCreditedDomainEvent_v1($event),
+            BudgetEnvelopeDebitedDomainEvent_v1::class => $this->handleBudgetEnvelopeDebitedDomainEvent_v1($event),
+            BudgetEnvelopeRenamedDomainEvent_v1::class => $this->handleBudgetEnvelopeNamedDomainEvent($event),
+            BudgetEnvelopeDeletedDomainEvent_v1::class => $this->handleBudgetEnvelopeDeletedDomainEvent_v1($event),
+            BudgetEnvelopeRewoundDomainEvent_v1::class => $this->handleBudgetEnvelopeRewoundDomainEvent_v1($event),
+            BudgetEnvelopeReplayedDomainEvent_v1::class => $this->handleBudgetEnvelopeReplayedDomainEvent_v1($event),
+            BudgetEnvelopeTargetedAmountChangedDomainEvent_v1::class => $this->handleBudgetEnvelopeTargetedAmountChangedDomainEvent_v1($event),
+            BudgetEnvelopeCurrencyChangedDomainEvent_v1::class => $this->handleBudgetEnvelopeCurrencyChangedDomainEvent_v1($event),
             default => null,
         };
     }
 
-    private function handleBudgetEnvelopeAddedDomainEvent(BudgetEnvelopeAddedDomainEvent $event): void
+    private function handleBudgetEnvelopeAddedDomainEvent_v1(BudgetEnvelopeAddedDomainEvent_v1 $event): void
     {
-        $this->budgetEnvelopeViewRepository->save(BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent($event));
+        $this->budgetEnvelopeViewRepository->save(BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1($event));
     }
 
-    private function handleBudgetEnvelopeCreditedDomainEvent(BudgetEnvelopeCreditedDomainEvent $event): void
-    {
-        $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $event->aggregateId, 'is_deleted' => false],
-        );
-
-        if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
-            return;
-        }
-
-        $budgetEnvelopeView->fromEvent($event);
-        $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-    }
-
-    private function handleBudgetEnvelopeDebitedDomainEvent(BudgetEnvelopeDebitedDomainEvent $event): void
+    private function handleBudgetEnvelopeCreditedDomainEvent_v1(BudgetEnvelopeCreditedDomainEvent_v1 $event): void
     {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
             ['uuid' => $event->aggregateId, 'is_deleted' => false],
@@ -75,7 +61,7 @@ final readonly class BudgetEnvelopeProjection
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
     }
 
-    private function handleBudgetEnvelopeNamedDomainEvent(BudgetEnvelopeRenamedDomainEvent $event): void
+    private function handleBudgetEnvelopeDebitedDomainEvent_v1(BudgetEnvelopeDebitedDomainEvent_v1 $event): void
     {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
             ['uuid' => $event->aggregateId, 'is_deleted' => false],
@@ -89,20 +75,7 @@ final readonly class BudgetEnvelopeProjection
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
     }
 
-    private function handleBudgetEnvelopeDeletedDomainEvent(BudgetEnvelopeDeletedDomainEvent $event): void {
-        $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
-            ['uuid' => $event->aggregateId, 'is_deleted' => false],
-        );
-
-        if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
-            return;
-        }
-
-        $budgetEnvelopeView->fromEvent($event);
-        $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
-    }
-
-    private function handleBudgetEnvelopeRewoundDomainEvent(BudgetEnvelopeRewoundDomainEvent $event): void
+    private function handleBudgetEnvelopeNamedDomainEvent(BudgetEnvelopeRenamedDomainEvent_v1 $event): void
     {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
             ['uuid' => $event->aggregateId, 'is_deleted' => false],
@@ -116,7 +89,20 @@ final readonly class BudgetEnvelopeProjection
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
     }
 
-    private function handleBudgetEnvelopeReplayedDomainEvent(BudgetEnvelopeReplayedDomainEvent $event): void
+    private function handleBudgetEnvelopeDeletedDomainEvent_v1(BudgetEnvelopeDeletedDomainEvent_v1 $event): void {
+        $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
+        );
+
+        if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
+            return;
+        }
+
+        $budgetEnvelopeView->fromEvent($event);
+        $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
+    }
+
+    private function handleBudgetEnvelopeRewoundDomainEvent_v1(BudgetEnvelopeRewoundDomainEvent_v1 $event): void
     {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
             ['uuid' => $event->aggregateId, 'is_deleted' => false],
@@ -130,8 +116,22 @@ final readonly class BudgetEnvelopeProjection
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
     }
 
-    private function handleBudgetEnvelopeTargetedAmountChangedDomainEvent(
-        BudgetEnvelopeTargetedAmountChangedDomainEvent $event,
+    private function handleBudgetEnvelopeReplayedDomainEvent_v1(BudgetEnvelopeReplayedDomainEvent_v1 $event): void
+    {
+        $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
+            ['uuid' => $event->aggregateId, 'is_deleted' => false],
+        );
+
+        if (!$budgetEnvelopeView instanceof BudgetEnvelopeViewInterface) {
+            return;
+        }
+
+        $budgetEnvelopeView->fromEvent($event);
+        $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
+    }
+
+    private function handleBudgetEnvelopeTargetedAmountChangedDomainEvent_v1(
+        BudgetEnvelopeTargetedAmountChangedDomainEvent_v1 $event,
     ): void {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
             ['uuid' => $event->aggregateId, 'is_deleted' => false],
@@ -145,8 +145,8 @@ final readonly class BudgetEnvelopeProjection
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
     }
 
-    private function handleBudgetEnvelopeCurrencyChangedDomainEvent(
-        BudgetEnvelopeCurrencyChangedDomainEvent $event,
+    private function handleBudgetEnvelopeCurrencyChangedDomainEvent_v1(
+        BudgetEnvelopeCurrencyChangedDomainEvent_v1 $event,
     ): void {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
             ['uuid' => $event->aggregateId, 'is_deleted' => false],

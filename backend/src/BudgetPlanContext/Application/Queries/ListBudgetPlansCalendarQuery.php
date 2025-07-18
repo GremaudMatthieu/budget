@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\BudgetPlanContext\Application\Queries;
 
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\SharedContext\Domain\Ports\Inbound\QueryInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class ListBudgetPlansCalendarQuery implements QueryInterface
 {
     private string $budgetPlanUserId;
 
     public function __construct(
-        BudgetPlanUserId $budgetPlanUserId,
+        UserId $budgetPlanUserId,
     ) {
         $this->budgetPlanUserId = (string) $budgetPlanUserId;
     }
 
-    public function getBudgetPlanUserId(): BudgetPlanUserId
+    public function getBudgetPlanUserId(): UserId
     {
-        return BudgetPlanUserId::fromString($this->budgetPlanUserId);
+        return UserId::fromString($this->budgetPlanUserId);
     }
 }

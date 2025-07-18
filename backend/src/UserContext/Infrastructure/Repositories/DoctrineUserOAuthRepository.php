@@ -36,11 +36,10 @@ final readonly class DoctrineUserOAuthRepository implements UserOAuthRepositoryI
         $this->entityManager->flush();
     }
     
-    public function removeOAuthLink(string $userId, string $provider): void
+    public function removeOAuthUser(string $userId): void
     {
         $oauthLink = $this->findOneBy([
             'userId' => $userId,
-            'provider' => $provider
         ]);
         
         if ($oauthLink) {

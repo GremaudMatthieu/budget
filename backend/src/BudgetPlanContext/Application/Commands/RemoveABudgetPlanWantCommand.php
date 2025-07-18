@@ -6,8 +6,8 @@ namespace App\BudgetPlanContext\Application\Commands;
 
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanEntryId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class RemoveABudgetPlanWantCommand implements CommandInterface
 {
@@ -18,7 +18,7 @@ final readonly class RemoveABudgetPlanWantCommand implements CommandInterface
     public function __construct(
         BudgetPlanId $budgetPlanId,
         BudgetPlanEntryId $entryId,
-        BudgetPlanUserId $budgetPlanUserId,
+        UserId $budgetPlanUserId,
     ) {
         $this->budgetPlanId = (string) $budgetPlanId;
         $this->entryId = (string) $entryId;
@@ -35,8 +35,8 @@ final readonly class RemoveABudgetPlanWantCommand implements CommandInterface
         return BudgetPlanEntryId::fromString($this->entryId);
     }
 
-    public function getBudgetPlanUserId(): BudgetPlanUserId
+    public function getBudgetPlanUserId(): UserId
     {
-        return BudgetPlanUserId::fromString($this->budgetPlanUserId);
+        return UserId::fromString($this->budgetPlanUserId);
     }
 }

@@ -7,8 +7,8 @@ namespace App\BudgetEnvelopeContext\Application\Commands;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeCreditMoney;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeEntryDescription;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class CreditABudgetEnvelopeCommand implements CommandInterface
 {
@@ -21,7 +21,7 @@ final readonly class CreditABudgetEnvelopeCommand implements CommandInterface
         BudgetEnvelopeCreditMoney $budgetEnvelopeCreditMoney,
         BudgetEnvelopeEntryDescription $budgetEnvelopeEntryDescription,
         BudgetEnvelopeId $budgetEnvelopeId,
-        BudgetEnvelopeUserId $budgetEnvelopeUserId,
+        UserId $budgetEnvelopeUserId,
     ) {
         $this->budgetEnvelopeCreditMoney = (string) $budgetEnvelopeCreditMoney;
         $this->budgetEnvelopeEntryDescription = (string) $budgetEnvelopeEntryDescription;
@@ -39,9 +39,9 @@ final readonly class CreditABudgetEnvelopeCommand implements CommandInterface
         return BudgetEnvelopeEntryDescription::fromString($this->budgetEnvelopeEntryDescription);
     }
 
-    public function getBudgetEnvelopeUserId(): BudgetEnvelopeUserId
+    public function getBudgetEnvelopeUserId(): UserId
     {
-        return BudgetEnvelopeUserId::fromString($this->budgetEnvelopeUserId);
+        return UserId::fromString($this->budgetEnvelopeUserId);
     }
 
     public function getBudgetEnvelopeId(): BudgetEnvelopeId

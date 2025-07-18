@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\UserContext\Domain\Aggregates;
 
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
-use App\UserContext\Domain\Events\UserEmailRegisteredDomainEvent;
-use App\UserContext\Domain\Events\UserEmailReleasedDomainEvent;
+use App\SharedContext\Domain\ValueObjects\UserId;
+use App\UserContext\Domain\Events\UserEmailRegisteredDomainEvent_v1;
+use App\UserContext\Domain\Events\UserEmailReleasedDomainEvent_v1;
 use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserEmailRegistryId;
-use App\UserContext\Domain\ValueObjects\UserId;
 
 final class UserEmailRegistry implements AggregateRootInterface
 {
@@ -40,7 +40,7 @@ final class UserEmailRegistry implements AggregateRootInterface
     {
         $emailHash = $this->hashEmail((string) $email);
         $this->raiseDomainEvent(
-            new UserEmailRegisteredDomainEvent(
+            new UserEmailRegisteredDomainEvent_v1(
                 $this->userEmailRegistryId,
                 (string)$userId,
                 $emailHash,
@@ -52,7 +52,7 @@ final class UserEmailRegistry implements AggregateRootInterface
     {
         $emailHash = $this->hashEmail((string) $email);
         $this->raiseDomainEvent(
-            new UserEmailReleasedDomainEvent(
+            new UserEmailReleasedDomainEvent_v1(
                 $this->userEmailRegistryId,
                 (string)$userId,
                 $emailHash,
@@ -97,7 +97,7 @@ final class UserEmailRegistry implements AggregateRootInterface
         return $this->userEmailRegistryId;
     }
 
-    public function applyUserEmailRegisteredDomainEvent(UserEmailRegisteredDomainEvent $event): void
+    public function applyUserEmailRegisteredDomainEvent_v1(UserEmailRegisteredDomainEvent_v1 $event): void
     {
         $this->userEmailRegistryId = $event->aggregateId;
         $this->emailHashes[$event->email] = [
@@ -106,7 +106,7 @@ final class UserEmailRegistry implements AggregateRootInterface
         ];
     }
 
-    public function applyUserEmailReleasedDomainEvent(UserEmailReleasedDomainEvent $event): void
+    public function applyUserEmailReleasedDomainEvent_v1(UserEmailReleasedDomainEvent_v1 $event): void
     {
         $this->userEmailRegistryId = $event->aggregateId;
         if (isset($this->emailHashes[$event->email])) {

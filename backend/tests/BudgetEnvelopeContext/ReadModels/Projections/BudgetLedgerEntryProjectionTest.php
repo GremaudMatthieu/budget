@@ -2,9 +2,9 @@
 
 namespace App\Tests\BudgetEnvelopeContext\ReadModels\Projections;
 
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeLedgerEntryViewRepositoryInterface;
 use App\BudgetEnvelopeContext\ReadModels\Projections\BudgetEnvelopeLedgerEntryProjection;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeLedgerEntryView;
@@ -36,13 +36,13 @@ class BudgetLedgerEntryProjectionTest extends TestCase
 
     public function testHandleEnvelopeCreditedEvent(): void
     {
-        $event = new BudgetEnvelopeCreditedDomainEvent(
+        $event = new BudgetEnvelopeCreditedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             '500.00',
             'test',
         );
-        $envelopeHistory = BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeCreditedDomainEvent($event);
+        $envelopeHistory = BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeCreditedDomainEvent_v1($event);
 
         $this->budgetEnvelopeLedgerEntryViewRepository->expects($this->once())
             ->method('save')
@@ -53,14 +53,14 @@ class BudgetLedgerEntryProjectionTest extends TestCase
 
     public function testHandleEnvelopeDebitedEvent(): void
     {
-        $event = new BudgetEnvelopeDebitedDomainEvent(
+        $event = new BudgetEnvelopeDebitedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             '500.00',
             'test',
         );
-        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelopeView = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test',
@@ -70,14 +70,14 @@ class BudgetLedgerEntryProjectionTest extends TestCase
                 ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
-        $envelopeView->fromEvent(new BudgetEnvelopeCreditedDomainEvent(
+        $envelopeView->fromEvent(new BudgetEnvelopeCreditedDomainEvent_v1(
             'b7e685be-db83-4866-9f85-102fac30a50b',
             '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             '500.00',
             'test',
         ));
 
-        $envelopeHistory = BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeDebitedDomainEvent($event);
+        $envelopeHistory = BudgetEnvelopeLedgerEntryView::fromBudgetEnvelopeDebitedDomainEvent_v1($event);
 
         $this->budgetEnvelopeLedgerEntryViewRepository->expects($this->once())
             ->method('save')

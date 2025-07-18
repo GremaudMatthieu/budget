@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\BudgetPlanContext\ReadModels\Projections;
 
-use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAddedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAdjustedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeRemovedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanRemovedDomainEvent;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAddedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAdjustedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeRemovedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanRemovedDomainEvent_v1;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanIncomeEntryViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanIncomeEntryViewRepositoryInterface;
 use App\BudgetPlanContext\ReadModels\Views\BudgetPlanIncomeEntryView;
@@ -27,20 +27,20 @@ final readonly class BudgetPlanIncomeEntryProjection
     public function __invoke(DomainEventInterface $event): void
     {
         match($event::class) {
-            BudgetPlanGeneratedDomainEvent::class => $this->handleBudgetPlanGeneratedDomainEvent($event),
-            BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent::class => $this->handleBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent($event),
-            BudgetPlanIncomeAddedDomainEvent::class => $this->handleBudgetPlanIncomeAddedDomainEvent($event),
-            BudgetPlanIncomeAdjustedDomainEvent::class => $this->handleBudgetPlanIncomeAdjustedDomainEvent($event),
-            BudgetPlanIncomeRemovedDomainEvent::class => $this->handleBudgetPlanIncomeRemovedDomainEvent($event),
-            BudgetPlanRemovedDomainEvent::class => $this->handleBudgetPlanRemovedDomainEvent($event),
+            BudgetPlanGeneratedDomainEvent_v1::class => $this->handleBudgetPlanGeneratedDomainEvent_v1($event),
+            BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1::class => $this->handleBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1($event),
+            BudgetPlanIncomeAddedDomainEvent_v1::class => $this->handleBudgetPlanIncomeAddedDomainEvent_v1($event),
+            BudgetPlanIncomeAdjustedDomainEvent_v1::class => $this->handleBudgetPlanIncomeAdjustedDomainEvent_v1($event),
+            BudgetPlanIncomeRemovedDomainEvent_v1::class => $this->handleBudgetPlanIncomeRemovedDomainEvent_v1($event),
+            BudgetPlanRemovedDomainEvent_v1::class => $this->handleBudgetPlanRemovedDomainEvent_v1($event),
             default => null,
         };
     }
 
-    private function handleBudgetPlanGeneratedDomainEvent(BudgetPlanGeneratedDomainEvent $event): void {
+    private function handleBudgetPlanGeneratedDomainEvent_v1(BudgetPlanGeneratedDomainEvent_v1 $event): void {
         foreach ($event->incomes as $income) {
             $this->budgetPlanIncomeEntryViewRepository->save(
-                BudgetPlanIncomeEntryView::fromArrayOnBudgetPlanGeneratedDomainEvent(
+                BudgetPlanIncomeEntryView::fromArrayOnBudgetPlanGeneratedDomainEvent_v1(
                     $income,
                     $event->aggregateId,
                     $event->occurredOn,
@@ -49,12 +49,12 @@ final readonly class BudgetPlanIncomeEntryProjection
         }
     }
 
-    private function handleBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent $event,
+    private function handleBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1(
+        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1 $event,
     ): void {
         foreach ($event->incomes as $income) {
             $this->budgetPlanIncomeEntryViewRepository->save(
-                BudgetPlanIncomeEntryView::fromArrayOnBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
+                BudgetPlanIncomeEntryView::fromArrayOnBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1(
                     $income,
                     $event->aggregateId,
                     $event->occurredOn,
@@ -63,14 +63,14 @@ final readonly class BudgetPlanIncomeEntryProjection
         }
     }
 
-    private function handleBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): void
+    private function handleBudgetPlanIncomeAddedDomainEvent_v1(BudgetPlanIncomeAddedDomainEvent_v1 $event): void
     {
         $this->budgetPlanIncomeEntryViewRepository->save(
-            BudgetPlanIncomeEntryView::fromBudgetPlanIncomeAddedDomainEvent($event),
+            BudgetPlanIncomeEntryView::fromBudgetPlanIncomeAddedDomainEvent_v1($event),
         );
     }
 
-    private function handleBudgetPlanIncomeAdjustedDomainEvent(BudgetPlanIncomeAdjustedDomainEvent $event): void
+    private function handleBudgetPlanIncomeAdjustedDomainEvent_v1(BudgetPlanIncomeAdjustedDomainEvent_v1 $event): void
     {
         $budgetPlanIncomeView = $this->budgetPlanIncomeEntryViewRepository->findOneByUuid(
             $event->uuid,
@@ -84,12 +84,12 @@ final readonly class BudgetPlanIncomeEntryProjection
         $this->budgetPlanIncomeEntryViewRepository->save($budgetPlanIncomeView);
     }
 
-    private function handleBudgetPlanIncomeRemovedDomainEvent(BudgetPlanIncomeRemovedDomainEvent $event): void
+    private function handleBudgetPlanIncomeRemovedDomainEvent_v1(BudgetPlanIncomeRemovedDomainEvent_v1 $event): void
     {
         $this->budgetPlanIncomeEntryViewRepository->delete($event->uuid);
     }
 
-    private function handleBudgetPlanRemovedDomainEvent(BudgetPlanRemovedDomainEvent $event): void
+    private function handleBudgetPlanRemovedDomainEvent_v1(BudgetPlanRemovedDomainEvent_v1 $event): void
     {
         $this->budgetPlanIncomeEntryViewRepository->deleteByBudgetPlanId($event->aggregateId);
     }

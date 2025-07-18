@@ -6,10 +6,10 @@ namespace App\Gateway\User\Presentation\HTTP\Controllers;
 
 use App\Gateway\User\Presentation\HTTP\DTOs\ChangeAUserFirstnameInput;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Application\Commands\ChangeAUserFirstnameCommand;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
-use App\UserContext\Domain\ValueObjects\UserId;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;

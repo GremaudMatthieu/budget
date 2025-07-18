@@ -8,9 +8,9 @@ use App\BudgetEnvelopeContext\Application\Commands\CreditABudgetEnvelopeCommand;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeCreditMoney;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeEntryDescription;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs\CreditABudgetEnvelopeInput;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +38,7 @@ final readonly class CreditABudgetEnvelopeController
                 BudgetEnvelopeCreditMoney::fromString($creditABudgetEnvelopeInput->creditMoney),
                 BudgetEnvelopeEntryDescription::fromString($creditABudgetEnvelopeInput->description),
                 BudgetEnvelopeId::fromString($uuid),
-                BudgetEnvelopeUserId::fromString($user->getUuid()),
+                UserId::fromString($user->getUuid()),
             ),
         );
 

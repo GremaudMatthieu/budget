@@ -8,10 +8,10 @@ use App\BudgetPlanContext\Application\Commands\GenerateABudgetPlanCommand;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanCurrency;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanIncome;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\Gateway\BudgetPlan\Presentation\HTTP\DTOs\GenerateABudgetPlanInput;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
@@ -43,7 +43,7 @@ final readonly class GenerateABudgetPlanController
                     fn($income) => BudgetPlanIncome::fromArray($income),
                     $input->incomes
                 ),
-                BudgetPlanUserId::fromString($user->getUuid()),
+                UserId::fromString($user->getUuid()),
                 UserLanguagePreference::fromString($user->languagePreference),
                 BudgetPlanCurrency::fromString($input->currency),
                 null === $input->contextId ?

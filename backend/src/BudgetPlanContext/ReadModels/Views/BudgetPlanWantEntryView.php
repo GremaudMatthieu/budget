@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\BudgetPlanContext\ReadModels\Views;
 
-use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAddedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAdjustedDomainEvent;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAddedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAdjustedDomainEvent_v1;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanWantEntryViewInterface;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanWant;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -46,58 +44,56 @@ final class BudgetPlanWantEntryView implements \JsonSerializable, BudgetPlanWant
     private(set) \DateTime $updatedAt;
 
     private function __construct(
-        BudgetPlanId $budgetPlanUuid,
-        BudgetPlanWant $budgetPlanWant,
+        string $budgetPlanUuid,
+        array $budgetPlanWant,
         \DateTimeImmutable $createdAt,
         \DateTime $updatedAt,
     ) {
-        $this->budgetPlanUuid = (string) $budgetPlanUuid;
-        $this->uuid = $budgetPlanWant->getUuid();
-        $this->wantName = $budgetPlanWant->getWantName();
-        $this->wantAmount = $budgetPlanWant->getAmount();
-        $this->category = $budgetPlanWant->getCategory();
+        $this->budgetPlanUuid = $budgetPlanUuid;
+        $this->uuid = $budgetPlanWant['uuid'];
+        $this->wantName = $budgetPlanWant['wantName'];
+        $this->wantAmount = $budgetPlanWant['amount'];
+        $this->category = $budgetPlanWant['category'];
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
     }
 
-    public static function fromArrayOnBudgetPlanGeneratedDomainEvent(
+    public static function fromArrayOnBudgetPlanGeneratedDomainEvent_v1(
         array $want,
         string $budgetPlanUuid,
         \DateTimeImmutable $occurredOn,
     ): self {
         return new self(
-            BudgetPlanId::fromString($budgetPlanUuid),
-            BudgetPlanWant::fromArray($want),
+            $budgetPlanUuid,
+            $want,
             $occurredOn,
             \DateTime::createFromImmutable($occurredOn),
         );
     }
 
-    public static function fromBudgetPlanWantAddedDomainEvent(BudgetPlanWantAddedDomainEvent $event): self
+    public static function fromBudgetPlanWantAddedDomainEvent_v1(BudgetPlanWantAddedDomainEvent_v1 $event): self
     {
         return new self(
-            BudgetPlanId::fromString($event->aggregateId),
-            BudgetPlanWant::fromArray(
-                [
-                    'uuid' => $event->uuid,
-                    'wantName' => $event->name,
-                    'category' => $event->category,
-                    'amount' => $event->amount,
-                ]
-            ),
+            $event->aggregateId,
+            [
+                'uuid' => $event->uuid,
+                'wantName' => $event->name,
+                'category' => $event->category,
+                'amount' => $event->amount,
+            ],
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
         );
     }
 
-    public static function fromArrayOnBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
+    public static function fromArrayOnBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1(
         array $want,
         string $budgetPlanUuid,
         \DateTimeImmutable $occurredOn,
     ): self {
         return new self(
-            BudgetPlanId::fromString($budgetPlanUuid),
-            BudgetPlanWant::fromArray($want),
+            $budgetPlanUuid,
+            $want,
             $occurredOn,
             \DateTime::createFromImmutable($occurredOn),
         );
@@ -106,15 +102,13 @@ final class BudgetPlanWantEntryView implements \JsonSerializable, BudgetPlanWant
     public static function fromRepository(array $budgetPlanWantEntry): self
     {
         return new self(
-            BudgetPlanId::fromString($budgetPlanWantEntry['budget_plan_uuid']),
-            BudgetPlanWant::fromArray(
-                [
-                    'uuid' => $budgetPlanWantEntry['uuid'],
-                    'wantName' => $budgetPlanWantEntry['want_name'],
-                    'category' => $budgetPlanWantEntry['category'],
-                    'amount' => $budgetPlanWantEntry['want_amount'],
-                ],
-            ),
+            $budgetPlanWantEntry['budget_plan_uuid'],
+            [
+                'uuid' => $budgetPlanWantEntry['uuid'],
+                'wantName' => $budgetPlanWantEntry['want_name'],
+                'category' => $budgetPlanWantEntry['category'],
+                'amount' => $budgetPlanWantEntry['want_amount'],
+            ],
             new \DateTimeImmutable($budgetPlanWantEntry['created_at']),
             \DateTime::createFromImmutable(new \DateTimeImmutable($budgetPlanWantEntry['updated_at']))
         );
@@ -128,12 +122,12 @@ final class BudgetPlanWantEntryView implements \JsonSerializable, BudgetPlanWant
     private function apply(DomainEventInterface $event): void
     {
         match ($event::class) {
-            BudgetPlanWantAdjustedDomainEvent::class => $this->applyBudgetPlanWantAdjustedDomainEvent($event),
+            BudgetPlanWantAdjustedDomainEvent_v1::class => $this->applyBudgetPlanWantAdjustedDomainEvent_v1($event),
             default => throw new \RuntimeException('budgetPlan.unknownEvent'),
         };
     }
 
-    private function applyBudgetPlanWantAdjustedDomainEvent(BudgetPlanWantAdjustedDomainEvent $event): void
+    private function applyBudgetPlanWantAdjustedDomainEvent_v1(BudgetPlanWantAdjustedDomainEvent_v1 $event): void
     {
         $this->wantName = $event->name;
         $this->wantAmount = $event->amount;

@@ -6,7 +6,7 @@ namespace App\Tests\UserContext\Domain\Services;
 
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\EncryptionServiceInterface;
 use App\Libraries\FluxCapacitor\Anonymizer\Services\EventEncryptor;
-use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent;
+use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent_v1;
 use PHPUnit\Framework\TestCase;
 
 final class EventEncryptorTest extends TestCase
@@ -23,7 +23,7 @@ final class EventEncryptorTest extends TestCase
     public function testEncrypt(): void
     {
         $userId = 'user123';
-        $event = new UserFirstnameChangedDomainEvent('aggregateId', 'sensitive data', 'aggregateId');
+        $event = new UserFirstnameChangedDomainEvent_v1('aggregateId', 'sensitive data', 'aggregateId');
 
         $this->encryptionService
             ->method('encrypt')
@@ -45,7 +45,7 @@ final class EventEncryptorTest extends TestCase
     public function testDecrypt(): void
     {
         $userId = 'user123';
-        $event = new UserFirstnameChangedDomainEvent('aggregateId', json_encode([
+        $event = new UserFirstnameChangedDomainEvent_v1('aggregateId', json_encode([
             'ciphertext' => 'encryptedData',
             'iv' => 'iv',
             'tag' => 'tag',

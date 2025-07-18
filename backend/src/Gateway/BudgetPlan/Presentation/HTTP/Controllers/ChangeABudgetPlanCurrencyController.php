@@ -7,9 +7,9 @@ namespace App\Gateway\BudgetPlan\Presentation\HTTP\Controllers;
 use App\BudgetPlanContext\Application\Commands\ChangeABudgetPlanCurrencyCommand;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanCurrency;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\Gateway\BudgetPlan\Presentation\HTTP\DTOs\ChangeABudgetPlanCurrencyInput;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +38,7 @@ final readonly class ChangeABudgetPlanCurrencyController
                     $changeABudgetPlanCurrencyInput->currency,
                 ),
                 BudgetPlanId::fromString($uuid),
-                BudgetPlanUserId::fromString($user->getUuid()),
+                UserId::fromString($user->getUuid()),
             ),
         );
 

@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\BudgetEnvelopeContext\Domain\Builders;
 
 use App\BudgetEnvelopeContext\Domain\Aggregates\BudgetEnvelopeNameRegistry;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeNameRegisteredDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeNameReleasedDomainEvent;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeNameRegisteredDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeNameReleasedDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Exceptions\BudgetEnvelopeNameAlreadyExistsForUserException;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeNameRegistryId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\SharedContext\Domain\Ports\Inbound\EventSourcedRepositoryInterface;
 use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final class BudgetEnvelopeNameRegistryBuilder
 {
@@ -52,8 +52,8 @@ final class BudgetEnvelopeNameRegistryBuilder
 
     public function ensureNameIsAvailable(
         BudgetEnvelopeName $name,
-        BudgetEnvelopeUserId $userId,
-        ?BudgetEnvelopeId $currentEnvelopeId = null
+        UserId             $userId,
+        ?BudgetEnvelopeId  $currentEnvelopeId = null
     ): self {
         if ($this->currentRegistry === null) {
             $this->loadOrCreateRegistry(
@@ -71,14 +71,14 @@ final class BudgetEnvelopeNameRegistryBuilder
         $currentOwner = null;
 
         foreach ($this->currentRegistry->raisedDomainEvents() as $event) {
-            if ($event instanceof BudgetEnvelopeNameRegisteredDomainEvent &&
+            if ($event instanceof BudgetEnvelopeNameRegisteredDomainEvent_v1 &&
                 $event->name === (string) $name &&
                 $event->userId === (string) $userId) {
                 $isInUse = true;
                 $currentOwner = $event->budgetEnvelopeId;
             }
 
-            if ($event instanceof BudgetEnvelopeNameReleasedDomainEvent &&
+            if ($event instanceof BudgetEnvelopeNameReleasedDomainEvent_v1 &&
                 $event->name === (string) $name &&
                 $event->userId === (string) $userId) {
                 $isInUse = false;
@@ -95,8 +95,8 @@ final class BudgetEnvelopeNameRegistryBuilder
 
     public function registerName(
         BudgetEnvelopeName $name,
-        BudgetEnvelopeUserId $userId,
-        BudgetEnvelopeId $envelopeId,
+        UserId             $userId,
+        BudgetEnvelopeId   $envelopeId,
     ): self {
         if ($this->currentRegistry === null) {
             $this->loadOrCreateRegistry(
@@ -137,8 +137,8 @@ final class BudgetEnvelopeNameRegistryBuilder
 
     public function releaseName(
         BudgetEnvelopeName $name,
-        BudgetEnvelopeUserId $userId,
-        BudgetEnvelopeId $budgetEnvelopeId,
+        UserId             $userId,
+        BudgetEnvelopeId   $budgetEnvelopeId,
     ): self {
         if ($this->oldRegistry === null) {
             $this->loadOldRegistry(

@@ -12,10 +12,10 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeNameRegistryId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
 use App\SharedContext\Domain\Enums\ContextEnum;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Infrastructure\Adapters\UuidGeneratorAdapter;
 use App\SharedContext\Infrastructure\Repositories\EventSourcedRepository;
@@ -49,13 +49,13 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
 
         $rewindCommand = new RewindABudgetEnvelopeFromEventsCommand(
             BudgetEnvelopeId::fromString($envelopeId),
-            BudgetEnvelopeUserId::fromString($userId),
+            UserId::fromString($userId),
             $desiredDateTime,
         );
 
         $oldEnvelope = BudgetEnvelope::create(
             BudgetEnvelopeId::fromString($envelopeId),
-            BudgetEnvelopeUserId::fromString($userId),
+            UserId::fromString($userId),
             BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
             BudgetEnvelopeName::fromString($oldName),
             BudgetEnvelopeCurrency::fromString('EUR'),
@@ -64,7 +64,7 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
 
         $newEnvelope = BudgetEnvelope::create(
             BudgetEnvelopeId::fromString($envelopeId),
-            BudgetEnvelopeUserId::fromString($userId),
+            UserId::fromString($userId),
             BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
             BudgetEnvelopeName::fromString($newName),
             BudgetEnvelopeCurrency::fromString('EUR'),
@@ -72,13 +72,13 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
         );
 
         $oldNameRegistryId = BudgetEnvelopeNameRegistryId::fromUserIdAndBudgetEnvelopeName(
-            BudgetEnvelopeUserId::fromString($userId),
+            UserId::fromString($userId),
             BudgetEnvelopeName::fromString($oldName),
             $this->uuidGenerator
         );
 
         $newNameRegistryId = BudgetEnvelopeNameRegistryId::fromUserIdAndBudgetEnvelopeName(
-            BudgetEnvelopeUserId::fromString($userId),
+            UserId::fromString($userId),
             BudgetEnvelopeName::fromString($newName),
             $this->uuidGenerator
         );
@@ -110,13 +110,13 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
 
         $rewindCommand = new RewindABudgetEnvelopeFromEventsCommand(
             BudgetEnvelopeId::fromString($envelopeId),
-            BudgetEnvelopeUserId::fromString($userId),
+            UserId::fromString($userId),
             $desiredDateTime,
         );
 
         $envelope = BudgetEnvelope::create(
             BudgetEnvelopeId::fromString($envelopeId),
-            BudgetEnvelopeUserId::fromString($userId),
+            UserId::fromString($userId),
             BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
             BudgetEnvelopeName::fromString($envelopeName),
             BudgetEnvelopeCurrency::fromString('EUR'),
@@ -124,7 +124,7 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
         );
 
         $nameRegistryId = BudgetEnvelopeNameRegistryId::fromUserIdAndBudgetEnvelopeName(
-            BudgetEnvelopeUserId::fromString($userId),
+            UserId::fromString($userId),
             BudgetEnvelopeName::fromString($envelopeName),
             $this->uuidGenerator
         );
@@ -148,7 +148,7 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
     {
         $rewindABudgetEnvelopeFromEventsCommand = new RewindABudgetEnvelopeFromEventsCommand(
             BudgetEnvelopeId::fromString('3e6a6763-4c4d-4648-bc3f-e9447dbed12c'),
-            BudgetEnvelopeUserId::fromString('18e04f53-0ea6-478c-a02b-81b7f3d6e8c1'),
+            UserId::fromString('18e04f53-0ea6-478c-a02b-81b7f3d6e8c1'),
             new \DateTimeImmutable('2024-12-07T22:03:35+00:00')
         );
 

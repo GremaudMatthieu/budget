@@ -7,11 +7,11 @@ namespace App\Tests\BudgetEnvelopeContext\Application\Handlers\QueryHandlers;
 use App\BudgetEnvelopeContext\Application\Handlers\QueryHandlers\ListBudgetEnvelopesQueryHandler;
 use App\BudgetEnvelopeContext\Application\Queries\ListBudgetEnvelopesQuery;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopesPaginated;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
 use App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs\ListBudgetEnvelopesInput;
 use App\SharedContext\Domain\Enums\ContextEnum;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +50,7 @@ class ListBudgetEnvelopesQueryHandlerTest extends TestCase
         $envelopePaginated = new BudgetEnvelopesPaginated([$envelopeView], 1);
         $listBudgetEnvelopesInput = new ListBudgetEnvelopesInput([], 10, 0);
         $listBudgetEnvelopesQuery = new ListBudgetEnvelopesQuery(
-            BudgetEnvelopeUserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
+            UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
             $listBudgetEnvelopesInput->orderBy,
             $listBudgetEnvelopesInput->limit,
             $listBudgetEnvelopesInput->offset,

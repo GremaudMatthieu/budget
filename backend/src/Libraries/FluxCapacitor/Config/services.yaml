@@ -12,3 +12,8 @@ services:
     arguments:
       $connection: '@doctrine.dbal.default_connection'
       $passphrase: '%env(KEY_MANAGEMENT_SECRET)%'
+
+  App\Libraries\FluxCapacitor\EventStore\Services\SnapshotService:
+    arguments:
+      $connection: '@doctrine.dbal.default_connection'
+      $snapshotFrequency: 50

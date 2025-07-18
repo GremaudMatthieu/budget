@@ -6,8 +6,8 @@ namespace App\Gateway\BudgetEnvelope\Presentation\Cli;
 
 use App\BudgetEnvelopeContext\Application\Commands\ReplayABudgetEnvelopeEventsCommand;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -74,7 +74,7 @@ final class ReplayABudgetEnvelopeCommand extends Command
         $this->commandBus->execute(
             new ReplayABudgetEnvelopeEventsCommand(
                 BudgetEnvelopeId::fromString($budgetEnvelopeId),
-                BudgetEnvelopeUserId::fromString($budgetEnvelopeUserId),
+                UserId::fromString($budgetEnvelopeUserId),
             ),
         );
 

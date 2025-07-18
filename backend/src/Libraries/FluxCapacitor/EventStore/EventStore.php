@@ -9,11 +9,15 @@ use App\Libraries\FluxCapacitor\Anonymizer\Ports\UserDomainEventInterface;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\PublishDomainEventsException;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventBusInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventUpcastingServiceInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\SnapshotableAggregateInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\UserAggregateInterface;
 use App\Libraries\FluxCapacitor\EventStore\Services\RequestIdProvider;
+use App\Libraries\FluxCapacitor\EventStore\Services\SnapshotService;
 use App\Libraries\FluxCapacitor\EventStore\Traits\AggregateTrackerTrait;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
@@ -25,11 +29,13 @@ final class EventStore implements EventStoreInterface
     use AggregateTrackerTrait;
 
     public function __construct(
-        private Connection $connection,
-        private EventBusInterface $eventBus,
-        private RequestIdProvider $requestIdProvider,
-        private EventClassMapInterface $eventClassMap,
-        private EventEncryptorInterface $eventEncryptor,
+        private readonly Connection $connection,
+        private readonly EventBusInterface $eventBus,
+        private readonly RequestIdProvider $requestIdProvider,
+        private readonly EventClassMapInterface $eventClassMap,
+        private readonly EventEncryptorInterface $eventEncryptor,
+        private readonly EventUpcastingServiceInterface $upcastingService,
+        private readonly SnapshotService $snapshotService,
     ) {
     }
 
@@ -39,6 +45,22 @@ final class EventStore implements EventStoreInterface
     #[\Override]
     public function load(string $uuid, ?\DateTimeImmutable $desiredDateTime = null): AggregateRootInterface
     {
+        if (!$desiredDateTime) {
+            $aggregateType = $this->guessAggregateType($uuid);
+            $snapshot = $this->snapshotService->loadSnapshot($uuid, $aggregateType);
+            
+            if ($snapshot) {
+                /** @var AggregateRootInterface $aggregateClass */
+                $aggregateClass = $this->eventClassMap->getAggregatePathByByStreamName($aggregateType);
+                $aggregate = $aggregateClass::fromSnapshot($snapshot['data'], $snapshot['version']);
+                $eventsAfterSnapshot = $this->getEventsAfterVersion($uuid, $snapshot['version']);
+                $this->applyEventsToAggregate($aggregate, $eventsAfterSnapshot);
+                $this->trackAggregate($aggregate);
+
+                return $aggregate;
+            }
+        }
+        
         $queryBuilder = $this->createBaseQueryBuilder($uuid, $desiredDateTime);
         $eventsIterator = $queryBuilder->executeQuery()->iterateAssociative();
         $aggregate = $this->createAggregateFromEvents($eventsIterator, $uuid);
@@ -124,6 +146,7 @@ final class EventStore implements EventStoreInterface
                     'request_id' => $event->requestId,
                     'user_id' => $event->userId,
                     'meta_data' => json_encode([], JSON_THROW_ON_ERROR),
+                    'event_version' => $event->getVersion(),
                 ]);
             }
 
@@ -133,6 +156,11 @@ final class EventStore implements EventStoreInterface
 
             if ($aggregate instanceof UserAggregateInterface) {
                 $aggregate->clearKeys();
+            }
+
+            if ($aggregate instanceof SnapshotableAggregateInterface
+                && $this->snapshotService->shouldCreateSnapshot($aggregate)) {
+                $this->snapshotService->saveSnapshot($aggregate);
             }
 
         } catch (Exception $e) {
@@ -193,8 +221,10 @@ final class EventStore implements EventStoreInterface
 
     private function processEventForAggregate(array $eventData, AggregateRootInterface $aggregate): void
     {
+        $eventData = $this->upcastingService->upcastEvent($eventData);
         $eventPath = $this->eventClassMap->getEventPathByClassName($eventData['event_name']);
         $payload = $this->getEventPayload($eventData, $eventPath);
+        /** @var DomainEventInterface $eventPath */
         $domainEvent = $eventPath::fromArray($payload);
         $methodName = sprintf('apply%s', new \ReflectionClass($domainEvent)->getShortName());
         $aggregate->$methodName($domainEvent);
@@ -215,5 +245,37 @@ final class EventStore implements EventStoreInterface
         }
 
         return json_decode($eventData['payload'], true, 512, JSON_THROW_ON_ERROR);
+    }
+
+    private function guessAggregateType(string $uuid): string
+    {
+        $streamName = $this->connection->fetchOne(
+            'SELECT stream_name FROM event_store WHERE stream_id = ? LIMIT 1',
+            [$uuid]
+        );
+        
+        return $streamName ?: 'Unknown';
+    }
+
+    private function getEventsAfterVersion(string $uuid, int $version): \Traversable
+    {
+        $queryBuilder = $this->connection->createQueryBuilder()
+            ->select('stream_id', 'event_name', 'payload', 'occurred_on', 'request_id', 'user_id', 'stream_version', 'stream_name')
+            ->from('event_store')
+            ->where('stream_id = :id')
+            ->andWhere('stream_version > :version')
+            ->setParameter('id', $uuid)
+            ->setParameter('version', $version)
+            ->orderBy('stream_version', 'ASC');
+
+        return $queryBuilder->executeQuery()->iterateAssociative();
+    }
+
+    private function applyEventsToAggregate(AggregateRootInterface $aggregate, \Traversable $events): void
+    {
+        foreach ($events as $eventData) {
+            $this->processEventForAggregate($eventData, $aggregate);
+            $aggregate->setAggregateVersion((int) $eventData['stream_version']);
+        }
     }
 }

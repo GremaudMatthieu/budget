@@ -6,8 +6,8 @@ namespace App\Gateway\BudgetPlan\Presentation\HTTP\Controllers;
 
 use App\BudgetPlanContext\Application\Queries\GetABudgetPlanWithItsEntriesQuery;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\SharedContext\Domain\Ports\Outbound\QueryBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,7 +34,7 @@ final readonly class GetABudgetPlanWithItsEntriesController
                 new GetABudgetPlanWithItsEntriesQuery(
                     BudgetPlanId::fromString($uuid),
                     UserLanguagePreference::fromString($user->languagePreference),
-                    BudgetPlanUserId::fromString($user->getUuid()),
+                    UserId::fromString($user->getUuid()),
                 ),
             ),
             Response::HTTP_OK,

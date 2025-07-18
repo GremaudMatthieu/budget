@@ -9,10 +9,10 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeCurrency;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs\AddABudgetEnvelopeInput;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\Context;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,7 +38,7 @@ final readonly class AddABudgetEnvelopeController
         $this->commandBus->execute(
             new AddABudgetEnvelopeCommand(
                 BudgetEnvelopeId::fromString($addABudgetEnvelopeInput->uuid),
-                BudgetEnvelopeUserId::fromString($user->getUuid()),
+                UserId::fromString($user->getUuid()),
                 BudgetEnvelopeName::fromString($addABudgetEnvelopeInput->name),
                 BudgetEnvelopeTargetedAmount::fromString(
                     $addABudgetEnvelopeInput->targetedAmount,

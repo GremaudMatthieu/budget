@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\BudgetPlanContext\Application\Commands;
 
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\Context;
 
 final readonly class GenerateABudgetPlanWithOneThatAlreadyExistsCommand implements CommandInterface
@@ -22,7 +22,7 @@ final readonly class GenerateABudgetPlanWithOneThatAlreadyExistsCommand implemen
         BudgetPlanId $budgetPlanId,
         BudgetPlanId $budgetPlanIdThatAlreadyExists,
         \DateTimeImmutable $date,
-        BudgetPlanUserId $userId,
+        UserId $userId,
         Context $context,
     ) {
         $this->budgetPlanId = (string) $budgetPlanId;
@@ -48,9 +48,9 @@ final readonly class GenerateABudgetPlanWithOneThatAlreadyExistsCommand implemen
         return $this->date;
     }
 
-    public function getUserId(): BudgetPlanUserId
+    public function getUserId(): UserId
     {
-        return BudgetPlanUserId::fromString($this->userId);
+        return UserId::fromString($this->userId);
     }
 
     public function getContext(): Context

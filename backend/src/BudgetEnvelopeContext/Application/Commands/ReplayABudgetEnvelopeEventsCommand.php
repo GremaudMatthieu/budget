@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\BudgetEnvelopeContext\Application\Commands;
 
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class ReplayABudgetEnvelopeEventsCommand implements CommandInterface
 {
@@ -15,15 +15,15 @@ final readonly class ReplayABudgetEnvelopeEventsCommand implements CommandInterf
 
     public function __construct(
         BudgetEnvelopeId $budgetEnvelopeId,
-        BudgetEnvelopeUserId $budgetEnvelopeUserId,
+        UserId $budgetEnvelopeUserId,
     ) {
         $this->budgetEnvelopeId = (string) $budgetEnvelopeId;
         $this->budgetEnvelopeUserId = (string) $budgetEnvelopeUserId;
     }
 
-    public function getBudgetEnvelopeUserId(): BudgetEnvelopeUserId
+    public function getBudgetEnvelopeUserId(): UserId
     {
-        return BudgetEnvelopeUserId::fromString($this->budgetEnvelopeUserId);
+        return UserId::fromString($this->budgetEnvelopeUserId);
     }
 
     public function getBudgetEnvelopeId(): BudgetEnvelopeId

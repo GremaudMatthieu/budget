@@ -6,10 +6,10 @@ namespace App\Gateway\User\Presentation\HTTP\Controllers;
 
 use App\Gateway\User\Presentation\HTTP\DTOs\ChangeAUserLanguagePreferenceInput;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Application\Commands\ChangeAUserLanguagePreferenceCommand;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
-use App\UserContext\Domain\ValueObjects\UserId;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;

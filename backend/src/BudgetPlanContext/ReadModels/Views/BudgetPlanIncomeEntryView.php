@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\BudgetPlanContext\ReadModels\Views;
 
-use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAddedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAdjustedDomainEvent;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAddedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAdjustedDomainEvent_v1;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanIncomeEntryViewInterface;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanIncome;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -46,58 +44,56 @@ final class BudgetPlanIncomeEntryView implements \JsonSerializable, BudgetPlanIn
     private(set) \DateTime $updatedAt;
 
     private function __construct(
-        BudgetPlanId $budgetPlanUuid,
-        BudgetPlanIncome $budgetPlanIncome,
+        string $budgetPlanUuid,
+        array $budgetPlanIncome,
         \DateTimeImmutable $createdAt,
         \DateTime $updatedAt,
     ) {
-        $this->budgetPlanUuid = (string) $budgetPlanUuid;
-        $this->uuid = $budgetPlanIncome->getUuid();
-        $this->incomeName = $budgetPlanIncome->getIncomeName();
-        $this->incomeAmount = $budgetPlanIncome->getAmount();
-        $this->category = $budgetPlanIncome->getCategory();
+        $this->budgetPlanUuid = $budgetPlanUuid;
+        $this->uuid = $budgetPlanIncome['uuid'];
+        $this->incomeName = $budgetPlanIncome['incomeName'];
+        $this->incomeAmount = $budgetPlanIncome['amount'];
+        $this->category = $budgetPlanIncome['category'];
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
     }
 
-    public static function fromArrayOnBudgetPlanGeneratedDomainEvent(
+    public static function fromArrayOnBudgetPlanGeneratedDomainEvent_v1(
         array $income,
         string $budgetPlanUuid,
         \DateTimeImmutable $occurredOn,
     ): self {
         return new self(
-            BudgetPlanId::fromString($budgetPlanUuid),
-            BudgetPlanIncome::fromArray($income),
+            $budgetPlanUuid,
+            $income,
             $occurredOn,
             \DateTime::createFromImmutable($occurredOn),
         );
     }
 
-    public static function fromBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): self
+    public static function fromBudgetPlanIncomeAddedDomainEvent_v1(BudgetPlanIncomeAddedDomainEvent_v1 $event): self
     {
         return new self(
-            BudgetPlanId::fromString($event->aggregateId),
-            BudgetPlanIncome::fromArray(
-                [
-                    'uuid' => $event->uuid,
-                    'incomeName' => $event->name,
-                    'category' => $event->category,
-                    'amount' => $event->amount,
-                ]
-            ),
+            $event->aggregateId,
+            [
+                'uuid' => $event->uuid,
+                'incomeName' => $event->name,
+                'category' => $event->category,
+                'amount' => $event->amount,
+            ],
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
         );
     }
 
-    public static function fromArrayOnBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
+    public static function fromArrayOnBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1(
         array $income,
         string $budgetPlanUuid,
         \DateTimeImmutable $occurredOn,
     ): self {
         return new self(
-            BudgetPlanId::fromString($budgetPlanUuid),
-            BudgetPlanIncome::fromArray($income),
+            $budgetPlanUuid,
+            $income,
             $occurredOn,
             \DateTime::createFromImmutable($occurredOn),
         );
@@ -106,15 +102,13 @@ final class BudgetPlanIncomeEntryView implements \JsonSerializable, BudgetPlanIn
     public static function fromRepository(array $budgetPlanIncomeEntry): self
     {
         return new self(
-            BudgetPlanId::fromString($budgetPlanIncomeEntry['budget_plan_uuid']),
-            BudgetPlanIncome::fromArray(
-                [
-                    'uuid' => $budgetPlanIncomeEntry['uuid'],
-                    'incomeName' => $budgetPlanIncomeEntry['income_name'],
-                    'category' => $budgetPlanIncomeEntry['category'],
-                    'amount' => $budgetPlanIncomeEntry['income_amount'],
-                ],
-            ),
+            $budgetPlanIncomeEntry['budget_plan_uuid'],
+            [
+                'uuid' => $budgetPlanIncomeEntry['uuid'],
+                'incomeName' => $budgetPlanIncomeEntry['income_name'],
+                'category' => $budgetPlanIncomeEntry['category'],
+                'amount' => $budgetPlanIncomeEntry['income_amount'],
+            ],
             new \DateTimeImmutable($budgetPlanIncomeEntry['created_at']),
             \DateTime::createFromImmutable(new \DateTimeImmutable($budgetPlanIncomeEntry['updated_at']))
         );
@@ -128,12 +122,12 @@ final class BudgetPlanIncomeEntryView implements \JsonSerializable, BudgetPlanIn
     private function apply(DomainEventInterface $event): void
     {
         match ($event::class) {
-            BudgetPlanIncomeAdjustedDomainEvent::class => $this->applyBudgetPlanIncomeAdjustedDomainEvent($event),
+            BudgetPlanIncomeAdjustedDomainEvent_v1::class => $this->applyBudgetPlanIncomeAdjustedDomainEvent_v1($event),
             default => throw new \RuntimeException('budgetPlan.unknownEvent'),
         };
     }
 
-    private function applyBudgetPlanIncomeAdjustedDomainEvent(BudgetPlanIncomeAdjustedDomainEvent $event): void
+    private function applyBudgetPlanIncomeAdjustedDomainEvent_v1(BudgetPlanIncomeAdjustedDomainEvent_v1 $event): void
     {
         $this->incomeName = $event->name;
         $this->incomeAmount = $event->amount;

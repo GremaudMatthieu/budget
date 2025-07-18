@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\BudgetEnvelopeContext\ReadModels\Views;
 
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent_v1;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopesPaginated;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
 use App\SharedContext\Domain\Enums\ContextEnum;
@@ -14,8 +14,8 @@ class BudgetEnvelopesPaginatedTest extends TestCase
 {
     public function testJsonSerialize(): void
     {
-        $envelope1 = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelope1 = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test Envelope 1',
@@ -25,8 +25,8 @@ class BudgetEnvelopesPaginatedTest extends TestCase
                 ContextEnum::BUDGET_ENVELOPE->value,
             ),
         );
-        $envelope2 = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent(
-            new BudgetEnvelopeAddedDomainEvent(
+        $envelope2 = BudgetEnvelopeView::fromBudgetEnvelopeAddedDomainEvent_v1(
+            new BudgetEnvelopeAddedDomainEvent_v1(
                 'b7e685be-db83-4866-9f85-102fac30a50b',
                 '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
                 'Test Envelope 2',

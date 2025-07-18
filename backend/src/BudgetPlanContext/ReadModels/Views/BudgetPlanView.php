@@ -4,28 +4,24 @@ declare(strict_types=1);
 
 namespace App\BudgetPlanContext\ReadModels\Views;
 
-use App\BudgetPlanContext\Domain\Events\BudgetPlanCurrencyChangedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAddedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAdjustedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeRemovedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedAddedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedAdjustedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedRemovedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanRemovedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanSavingAddedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanSavingAdjustedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanSavingRemovedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAddedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAdjustedDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanWantRemovedDomainEvent;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanCurrencyChangedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAddedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeAdjustedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanIncomeRemovedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedAddedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedAdjustedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanNeedRemovedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanRemovedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanSavingAddedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanSavingAdjustedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanSavingRemovedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAddedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanWantAdjustedDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanWantRemovedDomainEvent_v1;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanViewInterface;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanCurrency;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\SharedContext\Domain\ValueObjects\Context;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -69,49 +65,52 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
     private(set) bool $isDeleted;
 
     private function __construct(
-        BudgetPlanId $budgetPlanId,
-        BudgetPlanUserId $budgetPlanUserId,
-        BudgetPlanCurrency $budgetPlanCurrency,
+        string $budgetPlanId,
+        string $budgetPlanUserId,
+        string $budgetPlanCurrency,
         \DateTimeImmutable $date,
-        Context $context,
+        string $context,
+        string $contextId,
         \DateTimeImmutable $createdAt,
         \DateTime $updatedAt,
         bool $isDeleted,
     ) {
-        $this->uuid = (string) $budgetPlanId;
-        $this->userId = (string) $budgetPlanUserId;
-        $this->currency = (string) $budgetPlanCurrency;
+        $this->uuid = $budgetPlanId;
+        $this->userId = $budgetPlanUserId;
+        $this->currency = $budgetPlanCurrency;
         $this->date = $date;
-        $this->context = $context->getContext();
-        $this->contextUuid = $context->getContextId();
+        $this->context = $context;
+        $this->contextUuid = $contextId;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->isDeleted = $isDeleted;
     }
 
-    public static function fromBudgetPlanGeneratedDomainEvent(BudgetPlanGeneratedDomainEvent $event): self
+    public static function fromBudgetPlanGeneratedDomainEvent_v1(BudgetPlanGeneratedDomainEvent_v1 $event): self
     {
         return new self(
-            BudgetPlanId::fromString($event->aggregateId),
-            BudgetPlanUserId::fromString($event->userId),
-            BudgetPlanCurrency::fromString($event->currency),
+            $event->aggregateId,
+            $event->userId,
+            $event->currency,
             new \DateTimeImmutable($event->date),
-            Context::from($event->contextId, $event->context),
+            $event->context,
+            $event->contextId,
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
             false,
         );
     }
 
-    public static function fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent $event,
+    public static function fromBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1(
+        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1 $event,
     ): self {
         return new self(
-            BudgetPlanId::fromString($event->aggregateId),
-            BudgetPlanUserId::fromString($event->userId),
-            BudgetPlanCurrency::fromString($event->currency),
+            $event->aggregateId,
+            $event->userId,
+            $event->currency,
             new \DateTimeImmutable($event->date),
-            Context::from($event->contextId, $event->context),
+            $event->context,
+            $event->contextId,
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
             false,
@@ -121,11 +120,12 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
     public static function fromRepository(array $budgetPlan): BudgetPlanViewInterface
     {
         return new self(
-            BudgetPlanId::fromString($budgetPlan['uuid']),
-            BudgetPlanUserId::fromString($budgetPlan['user_uuid']),
-            BudgetPlanCurrency::fromString($budgetPlan['currency']),
+            $budgetPlan['uuid'],
+            $budgetPlan['user_uuid'],
+            $budgetPlan['currency'],
             new \DateTimeImmutable($budgetPlan['date']),
-            Context::from($budgetPlan['context_uuid'], $budgetPlan['context']),
+            $budgetPlan['context'],
+            $budgetPlan['context_uuid'],
             new \DateTimeImmutable($budgetPlan['created_at']),
             \DateTime::createFromImmutable(new \DateTimeImmutable($budgetPlan['updated_at'])),
             (bool) $budgetPlan['is_deleted'],
@@ -164,27 +164,27 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
     private function apply(DomainEventInterface $event): void
     {
         match ($event::class) {
-            BudgetPlanGeneratedDomainEvent::class => $this->applyBudgetPlanGeneratedDomainEvent($event),
-            BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent::class => $this->applyBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent($event),
-            BudgetPlanRemovedDomainEvent::class => $this->applyBudgetPlanRemovedDomainEvent($event),
-            BudgetPlanCurrencyChangedDomainEvent::class => $this->applyBudgetPlanCurrencyChangedDomainEvent($event),
-            BudgetPlanIncomeAddedDomainEvent::class => $this->applyBudgetPlanIncomeAddedDomainEvent($event),
-            BudgetPlanNeedAddedDomainEvent::class => $this->applyBudgetPlanNeedAddedDomainEvent($event),
-            BudgetPlanSavingAddedDomainEvent::class => $this->applyBudgetPlanSavingAddedDomainEvent($event),
-            BudgetPlanWantAddedDomainEvent::class => $this->applyBudgetPlanWantAddedDomainEvent($event),
-            BudgetPlanIncomeAdjustedDomainEvent::class => $this->applyBudgetPlanIncomeAdjustedDomainEvent($event),
-            BudgetPlanSavingAdjustedDomainEvent::class => $this->applyBudgetPlanSavingAdjustedDomainEvent($event),
-            BudgetPlanWantAdjustedDomainEvent::class => $this->applyBudgetPlanWantAdjustedDomainEvent($event),
-            BudgetPlanNeedAdjustedDomainEvent::class => $this->applyBudgetPlanNeedAdjustedDomainEvent($event),
-            BudgetPlanIncomeRemovedDomainEvent::class => $this->handleBudgetPlanIncomeRemovedDomainEvent($event),
-            BudgetPlanWantRemovedDomainEvent::class => $this->handleBudgetPlanWantRemovedDomainEvent($event),
-            BudgetPlanNeedRemovedDomainEvent::class => $this->handleBudgetPlanNeedRemovedDomainEvent($event),
-            BudgetPlanSavingRemovedDomainEvent::class => $this->handleBudgetPlanSavingRemovedDomainEvent($event),
+            BudgetPlanGeneratedDomainEvent_v1::class => $this->applyBudgetPlanGeneratedDomainEvent_v1($event),
+            BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1::class => $this->applyBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1($event),
+            BudgetPlanRemovedDomainEvent_v1::class => $this->applyBudgetPlanRemovedDomainEvent_v1($event),
+            BudgetPlanCurrencyChangedDomainEvent_v1::class => $this->applyBudgetPlanCurrencyChangedDomainEvent_v1($event),
+            BudgetPlanIncomeAddedDomainEvent_v1::class => $this->applyBudgetPlanIncomeAddedDomainEvent_v1($event),
+            BudgetPlanNeedAddedDomainEvent_v1::class => $this->applyBudgetPlanNeedAddedDomainEvent_v1($event),
+            BudgetPlanSavingAddedDomainEvent_v1::class => $this->applyBudgetPlanSavingAddedDomainEvent_v1($event),
+            BudgetPlanWantAddedDomainEvent_v1::class => $this->applyBudgetPlanWantAddedDomainEvent_v1($event),
+            BudgetPlanIncomeAdjustedDomainEvent_v1::class => $this->applyBudgetPlanIncomeAdjustedDomainEvent_v1($event),
+            BudgetPlanSavingAdjustedDomainEvent_v1::class => $this->applyBudgetPlanSavingAdjustedDomainEvent_v1($event),
+            BudgetPlanWantAdjustedDomainEvent_v1::class => $this->applyBudgetPlanWantAdjustedDomainEvent_v1($event),
+            BudgetPlanNeedAdjustedDomainEvent_v1::class => $this->applyBudgetPlanNeedAdjustedDomainEvent_v1($event),
+            BudgetPlanIncomeRemovedDomainEvent_v1::class => $this->handleBudgetPlanIncomeRemovedDomainEvent_v1($event),
+            BudgetPlanWantRemovedDomainEvent_v1::class => $this->handleBudgetPlanWantRemovedDomainEvent_v1($event),
+            BudgetPlanNeedRemovedDomainEvent_v1::class => $this->handleBudgetPlanNeedRemovedDomainEvent_v1($event),
+            BudgetPlanSavingRemovedDomainEvent_v1::class => $this->handleBudgetPlanSavingRemovedDomainEvent_v1($event),
             default => throw new \RuntimeException('Unknown event type'),
         };
     }
 
-    private function applyBudgetPlanGeneratedDomainEvent(BudgetPlanGeneratedDomainEvent $event): void
+    private function applyBudgetPlanGeneratedDomainEvent_v1(BudgetPlanGeneratedDomainEvent_v1 $event): void
     {
         $this->uuid = $event->aggregateId;
         $this->userId = $event->userId;
@@ -192,11 +192,13 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
         $this->date = new \DateTimeImmutable($event->date);
         $this->createdAt = $event->occurredOn;
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
+        $this->context = $event->context;
+        $this->contextUuid = $event->contextId;
         $this->isDeleted = false;
     }
 
-    private function applyBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent(
-        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent $event,
+    private function applyBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1(
+        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1 $event,
     ): void {
         $this->uuid = $event->aggregateId;
         $this->userId = $event->userId;
@@ -204,76 +206,78 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
         $this->date = new \DateTimeImmutable($event->date);
         $this->createdAt = $event->occurredOn;
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
+        $this->context = $event->context;
+        $this->contextUuid = $event->contextId;
         $this->isDeleted = false;
     }
 
-    private function applyBudgetPlanCurrencyChangedDomainEvent(BudgetPlanCurrencyChangedDomainEvent $event): void
+    private function applyBudgetPlanCurrencyChangedDomainEvent_v1(BudgetPlanCurrencyChangedDomainEvent_v1 $event): void
     {
         $this->currency = $event->currency;
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanIncomeAddedDomainEvent(BudgetPlanIncomeAddedDomainEvent $event): void
+    private function applyBudgetPlanIncomeAddedDomainEvent_v1(BudgetPlanIncomeAddedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanNeedAddedDomainEvent(BudgetPlanNeedAddedDomainEvent $event): void
+    private function applyBudgetPlanNeedAddedDomainEvent_v1(BudgetPlanNeedAddedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanSavingAddedDomainEvent(BudgetPlanSavingAddedDomainEvent $event): void
+    private function applyBudgetPlanSavingAddedDomainEvent_v1(BudgetPlanSavingAddedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanWantAddedDomainEvent(BudgetPlanWantAddedDomainEvent $event): void
+    private function applyBudgetPlanWantAddedDomainEvent_v1(BudgetPlanWantAddedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanIncomeAdjustedDomainEvent(BudgetPlanIncomeAdjustedDomainEvent $event): void
+     private function applyBudgetPlanIncomeAdjustedDomainEvent_v1(BudgetPlanIncomeAdjustedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanNeedAdjustedDomainEvent(BudgetPlanNeedAdjustedDomainEvent $event): void
+    private function applyBudgetPlanNeedAdjustedDomainEvent_v1(BudgetPlanNeedAdjustedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanSavingAdjustedDomainEvent(BudgetPlanSavingAdjustedDomainEvent $event): void
+    private function applyBudgetPlanSavingAdjustedDomainEvent_v1(BudgetPlanSavingAdjustedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanWantAdjustedDomainEvent(BudgetPlanWantAdjustedDomainEvent $event): void
+    private function applyBudgetPlanWantAdjustedDomainEvent_v1(BudgetPlanWantAdjustedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function handleBudgetPlanIncomeRemovedDomainEvent(BudgetPlanIncomeRemovedDomainEvent $event): void
+    private function handleBudgetPlanIncomeRemovedDomainEvent_v1(BudgetPlanIncomeRemovedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function handleBudgetPlanWantRemovedDomainEvent(BudgetPlanWantRemovedDomainEvent $event): void
+    private function handleBudgetPlanWantRemovedDomainEvent_v1(BudgetPlanWantRemovedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function handleBudgetPlanNeedRemovedDomainEvent(BudgetPlanNeedRemovedDomainEvent $event): void
+    private function handleBudgetPlanNeedRemovedDomainEvent_v1(BudgetPlanNeedRemovedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function handleBudgetPlanSavingRemovedDomainEvent(BudgetPlanSavingRemovedDomainEvent $event): void
+    private function handleBudgetPlanSavingRemovedDomainEvent_v1(BudgetPlanSavingRemovedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyBudgetPlanRemovedDomainEvent(BudgetPlanRemovedDomainEvent $event): void
+    private function applyBudgetPlanRemovedDomainEvent_v1(BudgetPlanRemovedDomainEvent_v1 $event): void
     {
         $this->isDeleted = $event->isDeleted;
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);

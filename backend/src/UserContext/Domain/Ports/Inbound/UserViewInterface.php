@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\UserContext\Domain\Ports\Inbound;
 
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\UserContext\Domain\Events\UserSignedUpDomainEvent;
+use App\UserContext\Domain\Events\UserSignedUpDomainEvent_v1;
 
 interface UserViewInterface
 {
     public static function fromRepository(array $user): self;
 
-    public static function fromUserSignedUpDomainEvent(UserSignedUpDomainEvent $event): self;
+    public static function fromUserSignedUpDomainEvent_v1(UserSignedUpDomainEvent_v1 $event): self;
 
     public function fromEvents(\Generator $events): void;
 

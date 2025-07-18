@@ -10,9 +10,9 @@ use App\BudgetEnvelopeContext\Domain\Exceptions\BudgetEnvelopeNotFoundException;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeEntryType;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
 use App\SharedContext\Domain\Enums\ContextEnum;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +50,7 @@ class GetABudgetEnvelopeWithItsLedgerQueryHandlerTest extends TestCase
         );
         $getABudgetEnvelopeWithItsHistoryQuery = new GetABudgetEnvelopeWithItsLedgerQuery(
             BudgetEnvelopeId::fromString($envelopeView->uuid),
-            BudgetEnvelopeUserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
+            UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
         );
         $envelopeHistoryCreatedAt = new \DateTimeImmutable();
         $envelopeCreatedAt = new \DateTime()->format('Y-m-d H:i:s');
@@ -126,7 +126,7 @@ class GetABudgetEnvelopeWithItsLedgerQueryHandlerTest extends TestCase
         );
         $getABudgetEnvelopeWithItsHistoryQuery = new GetABudgetEnvelopeWithItsLedgerQuery(
             BudgetEnvelopeId::fromString($envelopeView->uuid),
-            BudgetEnvelopeUserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
+            UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
         );
 
         $this->envelopeViewRepository->expects($this->once())->method('findOneEnvelopeWithItsLedgerBy')->willReturn([]);

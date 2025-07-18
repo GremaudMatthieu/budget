@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Gateway\BudgetEnvelope\Presentation\HTTP\Controllers;
 
 use App\BudgetEnvelopeContext\Application\Queries\ListBudgetEnvelopesQuery;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs\ListBudgetEnvelopesInput;
 use App\SharedContext\Domain\Ports\Outbound\QueryBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +32,7 @@ final readonly class ListBudgetEnvelopesController
         return new JsonResponse(
             $this->queryBus->query(
                 new ListBudgetEnvelopesQuery(
-                    BudgetEnvelopeUserId::fromString($user->getUuid()),
+                    UserId::fromString($user->getUuid()),
                     $listBudgetEnvelopesInput->orderBy,
                     $listBudgetEnvelopesInput->limit,
                     $listBudgetEnvelopesInput->offset,

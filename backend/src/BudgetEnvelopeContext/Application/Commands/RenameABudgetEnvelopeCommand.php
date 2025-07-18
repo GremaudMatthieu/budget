@@ -6,8 +6,8 @@ namespace App\BudgetEnvelopeContext\Application\Commands;
 
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class RenameABudgetEnvelopeCommand implements CommandInterface
 {
@@ -18,7 +18,7 @@ final readonly class RenameABudgetEnvelopeCommand implements CommandInterface
     public function __construct(
         BudgetEnvelopeName $budgetEnvelopeName,
         BudgetEnvelopeId $budgetEnvelopeId,
-        BudgetEnvelopeUserId $budgetEnvelopeUserId,
+        UserId $budgetEnvelopeUserId,
     ) {
         $this->budgetEnvelopeName = (string) $budgetEnvelopeName;
         $this->budgetEnvelopeId = (string) $budgetEnvelopeId;
@@ -30,9 +30,9 @@ final readonly class RenameABudgetEnvelopeCommand implements CommandInterface
         return BudgetEnvelopeName::fromString($this->budgetEnvelopeName);
     }
 
-    public function getBudgetEnvelopeUserId(): BudgetEnvelopeUserId
+    public function getBudgetEnvelopeUserId(): UserId
     {
-        return BudgetEnvelopeUserId::fromString($this->budgetEnvelopeUserId);
+        return UserId::fromString($this->budgetEnvelopeUserId);
     }
 
     public function getBudgetEnvelopeId(): BudgetEnvelopeId

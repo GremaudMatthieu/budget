@@ -8,6 +8,7 @@ use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregate
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\ValueObjects\Context;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\SharedContext\Infrastructure\Repositories\EventSourcedRepository;
 use App\UserContext\Application\Commands\DeleteAUserCommand;
@@ -19,7 +20,6 @@ use App\UserContext\Domain\ValueObjects\UserConsent;
 use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserEmailRegistryId;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
-use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
 use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use PHPUnit\Framework\MockObject\MockObject;

@@ -9,8 +9,8 @@ use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanEntryId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanEntryName;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanIncomeCategory;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class AdjustABudgetPlanIncomeCommand implements CommandInterface
 {
@@ -27,7 +27,7 @@ final readonly class AdjustABudgetPlanIncomeCommand implements CommandInterface
         BudgetPlanEntryName $name,
         BudgetPlanEntryAmount $amount,
         BudgetPlanIncomeCategory $category,
-        BudgetPlanUserId $userId,
+        UserId $userId,
     ) {
         $this->budgetPlanId = (string) $budgetPlanId;
         $this->entryId = (string) $entryId;
@@ -62,8 +62,8 @@ final readonly class AdjustABudgetPlanIncomeCommand implements CommandInterface
         return BudgetPlanIncomeCategory::fromString($this->category);
     }
 
-    public function getUserId(): BudgetPlanUserId
+    public function getUserId(): UserId
     {
-        return BudgetPlanUserId::fromString($this->userId);
+        return UserId::fromString($this->userId);
     }
 }

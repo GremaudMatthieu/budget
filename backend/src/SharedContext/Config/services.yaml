@@ -11,3 +11,8 @@ services:
   App\SharedContext\Infrastructure\EventListener\ExceptionListener:
     tags:
       - { name: 'kernel.event_listener', event: 'kernel.exception' }
+
+  App\SharedContext\Infrastructure\Services\BudgetAppEventUpcastingService: ~
+  
+  App\Libraries\FluxCapacitor\EventStore\Ports\EventUpcastingServiceInterface:
+    alias: App\SharedContext\Infrastructure\Services\BudgetAppEventUpcastingService

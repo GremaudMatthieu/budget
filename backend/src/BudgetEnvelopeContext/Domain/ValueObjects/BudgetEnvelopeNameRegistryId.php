@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\BudgetEnvelopeContext\Domain\ValueObjects;
 
 use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use Assert\Assert;
 
 final readonly class BudgetEnvelopeNameRegistryId
@@ -18,7 +19,7 @@ final readonly class BudgetEnvelopeNameRegistryId
     }
 
     public static function fromUserIdAndBudgetEnvelopeName(
-        BudgetEnvelopeUserId $userId,
+        UserId $userId,
         BudgetEnvelopeName $budgetEnvelopeName,
         UuidGeneratorInterface $uuidGenerator,
     ): self {

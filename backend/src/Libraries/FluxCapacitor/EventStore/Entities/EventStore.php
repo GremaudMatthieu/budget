@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_event_name', columns: ['event_name'])]
 #[ORM\Index(name: 'idx_event_user_id', columns: ['user_id'])]
 #[ORM\Index(name: 'idx_occurred_on', columns: ['occurred_on'])]
+#[ORM\Index(name: 'idx_event_version', columns: ['event_version'])]
 final class EventStore
 {
     #[ORM\Id]
@@ -116,6 +117,16 @@ final class EventStore
         }
         set {
             $this->occurredOn = $value;
+        }
+    }
+
+    #[ORM\Column(name: 'event_version', type: 'integer', options: ['default' => 1])]
+    public int $eventVersion = 1 {
+        get {
+            return $this->eventVersion;
+        }
+        set {
+            $this->eventVersion = $value;
         }
     }
 }

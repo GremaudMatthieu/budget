@@ -6,8 +6,8 @@ namespace App\Gateway\BudgetEnvelope\Presentation\HTTP\Controllers;
 
 use App\BudgetEnvelopeContext\Application\Queries\GetABudgetEnvelopeWithItsLedgerQuery;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Outbound\QueryBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +32,7 @@ final readonly class GetABudgetEnvelopeWithItsLedgerController
             $this->queryBus->query(
                 new GetABudgetEnvelopeWithItsLedgerQuery(
                     BudgetEnvelopeId::fromString($uuid),
-                    BudgetEnvelopeUserId::fromString($user->getUuid()),
+                    UserId::fromString($user->getUuid()),
                 ),
             ),
             Response::HTTP_OK,

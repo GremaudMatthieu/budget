@@ -2,14 +2,14 @@
 
 namespace App\BudgetPlanContext\Domain\Aggregates;
 
-use App\BudgetPlanContext\Domain\Events\BudgetPlanDateRegisteredDomainEvent;
-use App\BudgetPlanContext\Domain\Events\BudgetPlanDateReleasedDomainEvent;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanDateRegisteredDomainEvent_v1;
+use App\BudgetPlanContext\Domain\Events\BudgetPlanDateReleasedDomainEvent_v1;
 use App\BudgetPlanContext\Domain\Exceptions\BudgetPlanDateAlreadyExistsForUserException;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanDateRegistryId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\Libraries\FluxCapacitor\EventStore\Traits\DomainEventsCapabilityTrait;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 
 final class BudgetPlanDateRegistry implements AggregateRootInterface
@@ -39,7 +39,7 @@ final class BudgetPlanDateRegistry implements AggregateRootInterface
 
     public function registerDate(
         \DateTimeImmutable $date,
-        BudgetPlanUserId $userId,
+        UserId $userId,
         BudgetPlanId $budgetPlanId,
     ): void {
         $dateKey = $this->generateDateKey(UtcClock::fromImmutableToString($date), (string) $userId);
@@ -49,7 +49,7 @@ final class BudgetPlanDateRegistry implements AggregateRootInterface
         }
 
         $this->raiseDomainEvent(
-            new BudgetPlanDateRegisteredDomainEvent(
+            new BudgetPlanDateRegisteredDomainEvent_v1(
                 $this->budgetPlanDateRegistryId,
                 (string) $userId,
                 UtcClock::fromImmutableToString($date),
@@ -60,11 +60,11 @@ final class BudgetPlanDateRegistry implements AggregateRootInterface
 
     public function releaseDate(
         \DateTimeImmutable $date,
-        BudgetPlanUserId $userId,
+        UserId $userId,
         BudgetPlanId $budgetPlanId,
     ): void {
         $this->raiseDomainEvent(
-            new BudgetPlanDateReleasedDomainEvent(
+            new BudgetPlanDateReleasedDomainEvent_v1(
                 $this->budgetPlanDateRegistryId,
                 (string) $userId,
                 UtcClock::fromImmutableToString($date),
@@ -90,14 +90,14 @@ final class BudgetPlanDateRegistry implements AggregateRootInterface
         return $this->budgetPlanDateRegistryId;
     }
 
-    public function applyBudgetPlanDateRegisteredDomainEvent(BudgetPlanDateRegisteredDomainEvent $event): void
+    public function applyBudgetPlanDateRegisteredDomainEvent_v1(BudgetPlanDateRegisteredDomainEvent_v1 $event): void
     {
         $dateKey = $this->generateDateKey($event->date, $event->userId);
         $this->budgetPlanDateRegistryId = $event->aggregateId;
         $this->registeredDates[$dateKey] = $event->budgetPlanId;
     }
 
-    public function applyBudgetPlanDateReleasedDomainEvent(BudgetPlanDateReleasedDomainEvent $event): void
+    public function applyBudgetPlanDateReleasedDomainEvent_v1(BudgetPlanDateReleasedDomainEvent_v1 $event): void
     {
         $dateKey = $this->generateDateKey($event->date, $event->userId);
         $this->budgetPlanDateRegistryId = $event->aggregateId;

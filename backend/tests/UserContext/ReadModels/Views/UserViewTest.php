@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\UserContext\ReadModels\Views;
 
 use App\SharedContext\Domain\Enums\ContextEnum;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
-use App\UserContext\Domain\Events\UserSignedUpDomainEvent;
+use App\UserContext\Domain\Events\UserSignedUpDomainEvent_v1;
 use App\UserContext\Domain\ValueObjects\UserConsent;
 use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
-use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
 use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use App\UserContext\ReadModels\Views\UserView;
@@ -21,17 +21,17 @@ class UserViewTest extends TestCase
     public function testUserView(): void
     {
         $userView = new UserView(
-            UserId::fromString('b7e685be-db83-4866-9f85-102fac30a50b'),
-            UserEmail::fromString('john.doe@example.com'),
-            UserFirstname::fromString('John'),
-            UserLastname::fromString('Doe'),
-            UserLanguagePreference::fromString('fr'),
-            UserConsent::fromBool(true),
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            'john.doe@example.com',
+            'John',
+            'Doe',
+            'fr',
+            true,
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             new \DateTime('2023-01-01T00:00:00+00:00'),
             ['ROLE_USER'],
-            UserRegistrationContext::fromString('google'),
+            'google',
             '1234567890',
             'b7e685be-db83-4866-9f85-102fac30a50b',
             ContextEnum::USER->value,
@@ -55,17 +55,17 @@ class UserViewTest extends TestCase
     public function testJsonSerialize(): void
     {
         $userView = new UserView(
-            UserId::fromString('b7e685be-db83-4866-9f85-102fac30a50b'),
-            UserEmail::fromString('john.doe@example.com'),
-            UserFirstname::fromString('John'),
-            UserLastname::fromString('Doe'),
-            UserLanguagePreference::fromString('fr'),
-            UserConsent::fromBool(true),
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            'john.doe@example.com',
+            'John',
+            'Doe',
+            'fr',
+            true,
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             new \DateTime('2023-01-01T00:00:00+00:00'),
             ['ROLE_USER'],
-            UserRegistrationContext::fromString('google'),
+            'google',
             '1234567890',
             'b7e685be-db83-4866-9f85-102fac30a50b',
             ContextEnum::USER->value,
@@ -121,17 +121,17 @@ class UserViewTest extends TestCase
     public function testFromEvents(): void
     {
         $userView = new UserView(
-            UserId::fromString('b7e685be-db83-4866-9f85-102fac30a50b'),
-            UserEmail::fromString('john.doe@example.com'),
-            UserFirstname::fromString('John'),
-            UserLastname::fromString('Doe'),
-            UserLanguagePreference::fromString('fr'),
-            UserConsent::fromBool(true),
+            'b7e685be-db83-4866-9f85-102fac30a50b',
+            'john.doe@example.com',
+            'John',
+            'Doe',
+            'fr',
+            true,
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             new \DateTimeImmutable('2023-01-01T00:00:00+00:00'),
             new \DateTime('2023-01-01T00:00:00+00:00'),
             ['ROLE_USER'],
-            UserRegistrationContext::fromString('google'),
+            'google',
             '1234567890',
             'b7e685be-db83-4866-9f85-102fac30a50b',
             ContextEnum::USER->value,
@@ -140,7 +140,7 @@ class UserViewTest extends TestCase
         $userView->fromEvents(
             (function () {
                 yield [
-                    'type' => UserSignedUpDomainEvent::class,
+                    'type' => UserSignedUpDomainEvent_v1::class,
                     'payload' => json_encode([
                         'aggregateId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
                         'userId' => 'b7e685be-db83-4866-9f85-102fac30a50b',

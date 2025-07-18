@@ -2,15 +2,15 @@
 
 namespace App\BudgetEnvelopeContext\Domain\Aggregates;
 
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeNameRegisteredDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeNameReleasedDomainEvent;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeNameRegisteredDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeNameReleasedDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Exceptions\BudgetEnvelopeNameAlreadyExistsForUserException;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeNameRegistryId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\Libraries\FluxCapacitor\EventStore\Traits\DomainEventsCapabilityTrait;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
 {
@@ -41,7 +41,7 @@ final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
 
     public function registerName(
         BudgetEnvelopeName $name,
-        BudgetEnvelopeUserId $userId,
+        UserId $userId,
         BudgetEnvelopeId $envelopeId
     ): void {
         $nameKey = $this->generateNameKey((string) $name, (string) $userId);
@@ -51,7 +51,7 @@ final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
         }
 
         $this->raiseDomainEvent(
-            new BudgetEnvelopeNameRegisteredDomainEvent(
+            new BudgetEnvelopeNameRegisteredDomainEvent_v1(
                 $this->budgetEnvelopeNameRegistryId,
                 (string) $userId,
                 (string) $name,
@@ -62,11 +62,11 @@ final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
 
     public function releaseName(
         BudgetEnvelopeName $name,
-        BudgetEnvelopeUserId $userId,
+        UserId $userId,
         BudgetEnvelopeId $envelopeId,
     ): void {
         $this->raiseDomainEvent(
-            new BudgetEnvelopeNameReleasedDomainEvent(
+            new BudgetEnvelopeNameReleasedDomainEvent_v1(
                 $this->budgetEnvelopeNameRegistryId,
                 (string) $userId,
                 (string) $name,
@@ -92,14 +92,14 @@ final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
         return $this->budgetEnvelopeNameRegistryId;
     }
 
-    public function applyBudgetEnvelopeNameRegisteredDomainEvent(BudgetEnvelopeNameRegisteredDomainEvent $event): void
+    public function applyBudgetEnvelopeNameRegisteredDomainEvent_v1(BudgetEnvelopeNameRegisteredDomainEvent_v1 $event): void
     {
         $nameKey = $this->generateNameKey($event->name, $event->userId);
         $this->budgetEnvelopeNameRegistryId = $event->aggregateId;
         $this->registeredNames[$nameKey] = $event->budgetEnvelopeId;
     }
 
-    public function applyBudgetEnvelopeNameReleasedDomainEvent(BudgetEnvelopeNameReleasedDomainEvent $event): void
+    public function applyBudgetEnvelopeNameReleasedDomainEvent_v1(BudgetEnvelopeNameReleasedDomainEvent_v1 $event): void
     {
         $nameKey = $this->generateNameKey($event->name, $event->userId);
         $this->budgetEnvelopeNameRegistryId = $event->aggregateId;

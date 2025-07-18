@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\UserContext\Application\Commands;
 
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
-use App\UserContext\Domain\ValueObjects\UserId;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class DeleteAUserCommand implements CommandInterface
 {

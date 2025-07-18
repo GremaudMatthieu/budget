@@ -6,8 +6,8 @@ namespace App\Gateway\BudgetEnvelope\Presentation\Cli;
 
 use App\BudgetEnvelopeContext\Application\Commands\RewindABudgetEnvelopeFromEventsCommand;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -93,7 +93,7 @@ final class RewindABudgetEnvelopeCommand extends Command
         $this->commandBus->execute(
             new RewindABudgetEnvelopeFromEventsCommand(
                 BudgetEnvelopeId::fromString($budgetEnvelopeId),
-                BudgetEnvelopeUserId::fromString($budgetEnvelopeUserId),
+                UserId::fromString($budgetEnvelopeUserId),
                 $desiredDateTime,
             ),
         );

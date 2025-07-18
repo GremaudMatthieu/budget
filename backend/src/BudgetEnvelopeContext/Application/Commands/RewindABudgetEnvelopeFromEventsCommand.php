@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\BudgetEnvelopeContext\Application\Commands;
 
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\SharedContext\Domain\Ports\Inbound\CommandInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 
 final readonly class RewindABudgetEnvelopeFromEventsCommand implements CommandInterface
 {
@@ -16,7 +16,7 @@ final readonly class RewindABudgetEnvelopeFromEventsCommand implements CommandIn
 
     public function __construct(
         BudgetEnvelopeId $budgetEnvelopeId,
-        BudgetEnvelopeUserId $budgetEnvelopeUserId,
+        UserId $budgetEnvelopeUserId,
         \DateTimeImmutable $desiredDateTime,
     ) {
         $this->budgetEnvelopeId = (string) $budgetEnvelopeId;
@@ -24,9 +24,9 @@ final readonly class RewindABudgetEnvelopeFromEventsCommand implements CommandIn
         $this->desiredDateTime = $desiredDateTime->format(\DateTimeInterface::ATOM);
     }
 
-    public function getBudgetEnvelopeUserId(): BudgetEnvelopeUserId
+    public function getBudgetEnvelopeUserId(): UserId
     {
-        return BudgetEnvelopeUserId::fromString($this->budgetEnvelopeUserId);
+        return UserId::fromString($this->budgetEnvelopeUserId);
     }
 
     public function getBudgetEnvelopeId(): BudgetEnvelopeId

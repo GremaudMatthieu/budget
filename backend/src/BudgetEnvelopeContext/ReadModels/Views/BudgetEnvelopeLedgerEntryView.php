@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace App\BudgetEnvelopeContext\ReadModels\Views;
 
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent;
-use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent_v1;
+use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeDebitedDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeLedgerEntryViewInterface;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeEntryType;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeEntryDescription;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -43,17 +40,17 @@ final class BudgetEnvelopeLedgerEntryView implements BudgetEnvelopeLedgerEntryVi
     private(set) string $userUuid;
 
     private function __construct(
-        BudgetEnvelopeId $budgetEnvelopeId,
-        BudgetEnvelopeEntryType $entryType,
-        BudgetEnvelopeEntryDescription $budgetEnvelopeEntryDescription,
-        BudgetEnvelopeUserId $budgetEnvelopeUserId,
+        string $budgetEnvelopeId,
+        string $entryType,
+        string $budgetEnvelopeEntryDescription,
+        string $budgetEnvelopeUserId,
         \DateTimeImmutable $createdAt,
         string $monetaryAmount,
     ) {
-        $this->budgetEnvelopeUuid = (string) $budgetEnvelopeId;
-        $this->entryType = (string) $entryType;
-        $this->description = (string) $budgetEnvelopeEntryDescription;
-        $this->userUuid = (string) $budgetEnvelopeUserId;
+        $this->budgetEnvelopeUuid = $budgetEnvelopeId;
+        $this->entryType = $entryType;
+        $this->description = $budgetEnvelopeEntryDescription;
+        $this->userUuid = $budgetEnvelopeUserId;
         $this->createdAt = $createdAt;
         $this->monetaryAmount = $monetaryAmount;
     }
@@ -62,35 +59,35 @@ final class BudgetEnvelopeLedgerEntryView implements BudgetEnvelopeLedgerEntryVi
     public static function fromRepository(array $budgetEnvelopeLedgerEntry): self
     {
         return new self(
-            BudgetEnvelopeId::fromString($budgetEnvelopeLedgerEntry['aggregate_id']),
-            BudgetEnvelopeEntryType::fromString($budgetEnvelopeLedgerEntry['entry_type']),
-            BudgetEnvelopeEntryDescription::fromString($budgetEnvelopeLedgerEntry['description']),
-            BudgetEnvelopeUserId::fromString($budgetEnvelopeLedgerEntry['user_uuid']),
+            $budgetEnvelopeLedgerEntry['aggregate_id'],
+            $budgetEnvelopeLedgerEntry['entry_type'],
+            $budgetEnvelopeLedgerEntry['description'],
+            $budgetEnvelopeLedgerEntry['user_uuid'],
             new \DateTimeImmutable($budgetEnvelopeLedgerEntry['created_at']),
             $budgetEnvelopeLedgerEntry['monetary_amount'],
         );
     }
 
     #[\Override]
-    public static function fromBudgetEnvelopeCreditedDomainEvent(BudgetEnvelopeCreditedDomainEvent $event): self
+    public static function fromBudgetEnvelopeCreditedDomainEvent_v1(BudgetEnvelopeCreditedDomainEvent_v1 $event): self
     {
         return new self(
-            BudgetEnvelopeId::fromString($event->aggregateId),
-            BudgetEnvelopeEntryType::fromString(BudgetEnvelopeEntryType::CREDIT),
-            BudgetEnvelopeEntryDescription::fromString($event->description),
-            BudgetEnvelopeUserId::fromString($event->userId),
+            $event->aggregateId,
+            BudgetEnvelopeEntryType::CREDIT,
+            $event->description,
+            $event->userId,
             $event->occurredOn,
             $event->creditMoney,
         );
     }
 
     #[\Override]
-    public static function fromBudgetEnvelopeDebitedDomainEvent(BudgetEnvelopeDebitedDomainEvent $event): self {
+    public static function fromBudgetEnvelopeDebitedDomainEvent_v1(BudgetEnvelopeDebitedDomainEvent_v1 $event): self {
         return new self(
-            BudgetEnvelopeId::fromString($event->aggregateId),
-            BudgetEnvelopeEntryType::fromString(BudgetEnvelopeEntryType::DEBIT),
-            BudgetEnvelopeEntryDescription::fromString($event->description),
-            BudgetEnvelopeUserId::fromString($event->userId),
+            $event->aggregateId,
+            BudgetEnvelopeEntryType::DEBIT,
+            $event->description,
+            $event->userId,
             $event->occurredOn,
             $event->debitMoney,
         );

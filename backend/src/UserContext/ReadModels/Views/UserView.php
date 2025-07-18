@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App\UserContext\ReadModels\Views;
 
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
-use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent;
-use App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent;
-use App\UserContext\Domain\Events\UserLastnameChangedDomainEvent;
-use App\UserContext\Domain\Events\UserReplayedDomainEvent;
-use App\UserContext\Domain\Events\UserRewoundDomainEvent;
-use App\UserContext\Domain\Events\UserSignedUpDomainEvent;
+use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent_v1;
+use App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent_v1;
+use App\UserContext\Domain\Events\UserLastnameChangedDomainEvent_v1;
+use App\UserContext\Domain\Events\UserReplayedDomainEvent_v1;
+use App\UserContext\Domain\Events\UserRewoundDomainEvent_v1;
+use App\UserContext\Domain\Events\UserSignedUpDomainEvent_v1;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use App\UserContext\Domain\ValueObjects\UserConsent;
 use App\UserContext\Domain\ValueObjects\UserEmail;
 use App\UserContext\Domain\ValueObjects\UserFirstname;
-use App\UserContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\ValueObjects\UserLastname;
 use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use Doctrine\ORM\Mapping as ORM;
@@ -76,32 +76,32 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
     private(set) string $context;
 
     public function __construct(
-        UserId $userId,
-        UserEmail $email,
-        UserFirstname $firstname,
-        UserLastname $lastname,
-        UserLanguagePreference $languagePreference,
-        UserConsent $consentGiven,
+        string $userId,
+        string $email,
+        string $firstname,
+        string $lastname,
+        string $languagePreference,
+        bool $consentGiven,
         \DateTimeImmutable $consentDate,
         \DateTimeImmutable $createdAt,
         \DateTime $updatedAt,
         array $roles,
-        UserRegistrationContext $registrationContext,
+        string $registrationContext,
         string $providerUserId,
         string $contextId,
         string $context,
     ) {
-        $this->uuid = (string) $userId;
-        $this->email = (string) $email;
-        $this->firstname = (string) $firstname;
-        $this->lastname = (string) $lastname;
-        $this->languagePreference = (string) $languagePreference;
-        $this->consentGiven = $consentGiven->toBool();
+        $this->uuid = $userId;
+        $this->email = $email;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+        $this->languagePreference = $languagePreference;
+        $this->consentGiven = $consentGiven;
         $this->consentDate = $consentDate;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->roles = $roles;
-        $this->registrationContext = (string) $registrationContext;
+        $this->registrationContext = $registrationContext;
         $this->providerUserId = $providerUserId;
         $this->contextId = $contextId;
         $this->context = $context;
@@ -110,37 +110,37 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
     public static function fromRepository(array $user): self
     {
         return new self(
-            UserId::fromString($user['uuid']),
-            UserEmail::fromString($user['email']),
-            UserFirstname::fromString($user['firstname']),
-            UserLastname::fromString($user['lastname']),
-            UserLanguagePreference::fromString($user['language_preference']),
-            UserConsent::fromBool((bool) $user['consent_given']),
+            $user['uuid'],
+            $user['email'],
+            $user['firstname'],
+            $user['lastname'],
+            $user['language_preference'],
+            (bool) $user['consent_given'],
             new \DateTimeImmutable($user['consent_date']),
             new \DateTimeImmutable($user['created_at']),
             new \DateTime($user['updated_at']),
             json_decode($user['roles'], true),
-            UserRegistrationContext::fromString($user['registration_context']),
+            $user['registration_context'],
             $user['provider_user_id'],
             $user['context_uuid'],
             $user['context'],
         );
     }
 
-    public static function fromUserSignedUpDomainEvent(UserSignedUpDomainEvent $event): self
+    public static function fromUserSignedUpDomainEvent_v1(UserSignedUpDomainEvent_v1 $event): self
     {
         return new self(
-            UserId::fromString($event->aggregateId),
-            UserEmail::fromString($event->email),
-            UserFirstname::fromString($event->firstname),
-            UserLastname::fromString($event->lastname),
-            UserLanguagePreference::fromString($event->languagePreference),
-            UserConsent::fromBool($event->isConsentGiven),
+            $event->aggregateId,
+            $event->email,
+            $event->firstname,
+            $event->lastname,
+            $event->languagePreference,
+            $event->isConsentGiven,
             $event->occurredOn,
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
             $event->roles,
-            UserRegistrationContext::fromString($event->registrationContext),
+            $event->registrationContext,
             $event->providerUserId,
             $event->contextId,
             $event->context,
@@ -161,17 +161,17 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
     ): self
     {
         return new self(
-            $userId,
-            $email,
-            $firstname,
-            $lastname,
-            $languagePreference,
-            $consentGiven,
+            (string) $userId,
+            (string) $email,
+            (string) $firstname,
+            (string) $lastname,
+            (string) $languagePreference,
+            $consentGiven->toBool(),
             UtcClock::immutableNow(),
             UtcClock::immutableNow(),
             UtcClock::now(),
             ['ROLE_USER'],
-            $registrationContext,
+            (string) $registrationContext,
             $providerUserId,
             $contextId,
             $context,
@@ -229,17 +229,17 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
     private function apply(DomainEventInterface $event): void
     {
         match (get_class($event)) {
-            UserSignedUpDomainEvent::class => $this->applyUserSignedUpDomainEvent($event),
-            UserFirstnameChangedDomainEvent::class => $this->applyUserFirstnameChangedDomainEvent($event),
-            UserLastnameChangedDomainEvent::class => $this->applyUserLastnameChangedDomainEvent($event),
-            UserLanguagePreferenceChangedDomainEvent::class => $this->applyUserLanguagePreferenceChangedDomainEvent($event),
-            UserReplayedDomainEvent::class => $this->applyUserReplayedDomainEvent($event),
-            UserRewoundDomainEvent::class => $this->applyUserRewoundDomainEvent($event),
+            UserSignedUpDomainEvent_v1::class => $this->applyUserSignedUpDomainEvent_v1($event),
+            UserFirstnameChangedDomainEvent_v1::class => $this->applyUserFirstnameChangedDomainEvent_v1($event),
+            UserLastnameChangedDomainEvent_v1::class => $this->applyUserLastnameChangedDomainEvent_v1($event),
+            UserLanguagePreferenceChangedDomainEvent_v1::class => $this->applyUserLanguagePreferenceChangedDomainEvent_v1($event),
+            UserReplayedDomainEvent_v1::class => $this->applyUserReplayedDomainEvent_v1($event),
+            UserRewoundDomainEvent_v1::class => $this->applyUserRewoundDomainEvent_v1($event),
             default => throw new \RuntimeException('users.unknownEvent'),
         };
     }
 
-    private function applyUserSignedUpDomainEvent(UserSignedUpDomainEvent $event): void
+    private function applyUserSignedUpDomainEvent_v1(UserSignedUpDomainEvent_v1 $event): void
     {
         $this->uuid = $event->aggregateId;
         $this->email = $event->email;
@@ -257,26 +257,26 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
         $this->context = $event->context;
     }
 
-    private function applyUserFirstnameChangedDomainEvent(UserFirstnameChangedDomainEvent $event): void
+    private function applyUserFirstnameChangedDomainEvent_v1(UserFirstnameChangedDomainEvent_v1 $event): void
     {
         $this->firstname = $event->firstname;
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyUserLastnameChangedDomainEvent(UserLastnameChangedDomainEvent $event): void
+    private function applyUserLastnameChangedDomainEvent_v1(UserLastnameChangedDomainEvent_v1 $event): void
     {
         $this->lastname = $event->lastname;
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyUserLanguagePreferenceChangedDomainEvent(
-        UserLanguagePreferenceChangedDomainEvent $event,
+    private function applyUserLanguagePreferenceChangedDomainEvent_v1(
+        UserLanguagePreferenceChangedDomainEvent_v1 $event,
     ): void {
         $this->languagePreference = $event->languagePreference;
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-    private function applyUserReplayedDomainEvent(UserReplayedDomainEvent $event): void
+    private function applyUserReplayedDomainEvent_v1(UserReplayedDomainEvent_v1 $event): void
     {
         $this->firstname = $event->firstname;
         $this->lastname = $event->lastname;
@@ -289,7 +289,7 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
         $this->providerUserId = $event->providerUserId;
     }
 
-    private function applyUserRewoundDomainEvent(UserRewoundDomainEvent $event): void
+    private function applyUserRewoundDomainEvent_v1(UserRewoundDomainEvent_v1 $event): void
     {
         $this->firstname = $event->firstname;
         $this->lastname = $event->lastname;

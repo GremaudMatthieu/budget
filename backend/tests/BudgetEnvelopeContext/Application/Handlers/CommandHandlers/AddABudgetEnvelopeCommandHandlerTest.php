@@ -14,12 +14,11 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeNameRegistryId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
-use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeUserId;
 use App\Gateway\BudgetEnvelope\Presentation\HTTP\DTOs\AddABudgetEnvelopeInput;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
-use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\Context;
 use App\SharedContext\Infrastructure\Adapters\UuidGeneratorAdapter;
 use App\SharedContext\Infrastructure\Repositories\EventSourcedRepository;
@@ -56,7 +55,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
         );
         $addABudgetEnvelopeCommand = new AddABudgetEnvelopeCommand(
             BudgetEnvelopeId::fromString($addABudgetEnvelopeInput->uuid),
-            BudgetEnvelopeUserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
+            UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
             BudgetEnvelopeName::fromString($addABudgetEnvelopeInput->name),
             BudgetEnvelopeTargetedAmount::fromString(
                 $addABudgetEnvelopeInput->targetedAmount,
@@ -86,7 +85,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
         );
         $addABudgetEnvelopeCommand = new AddABudgetEnvelopeCommand(
             BudgetEnvelopeId::fromString($addABudgetEnvelopeInput->uuid),
-            BudgetEnvelopeUserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
+            UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
             BudgetEnvelopeName::fromString($addABudgetEnvelopeInput->name),
             BudgetEnvelopeTargetedAmount::fromString(
                 $addABudgetEnvelopeInput->targetedAmount,
@@ -104,7 +103,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
                 if ($id === $nameRegistryId) {
                     return BudgetEnvelopeNameRegistry::create(
                         BudgetEnvelopeNameRegistryId::fromUserIdAndBudgetEnvelopeName(
-                            BudgetEnvelopeUserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
+                            UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
                             BudgetEnvelopeName::fromString($addABudgetEnvelopeInput->name),
                             $this->uuidGenerator,
                         ),
@@ -112,7 +111,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
                 }
                 return BudgetEnvelope::create(
                     BudgetEnvelopeId::fromString($addABudgetEnvelopeInput->uuid),
-                    BudgetEnvelopeUserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
+                    UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
                     BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
                     BudgetEnvelopeName::fromString('test name'),
                     BudgetEnvelopeCurrency::fromString('USD'),
@@ -136,7 +135,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
         );
         $addABudgetEnvelopeCommand = new AddABudgetEnvelopeCommand(
             BudgetEnvelopeId::fromString($addABudgetEnvelopeInput->uuid),
-            BudgetEnvelopeUserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
+            UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
             BudgetEnvelopeName::fromString($addABudgetEnvelopeInput->name),
             BudgetEnvelopeTargetedAmount::fromString(
                 $addABudgetEnvelopeInput->targetedAmount,
@@ -152,7 +151,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
             ->willReturn(
                 BudgetEnvelope::create(
                     BudgetEnvelopeId::fromString($addABudgetEnvelopeInput->uuid),
-                    BudgetEnvelopeUserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
+                    UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),
                     BudgetEnvelopeTargetedAmount::fromString('20.00', '0.00'),
                     BudgetEnvelopeName::fromString('test name'),
                     BudgetEnvelopeCurrency::fromString('USD'),

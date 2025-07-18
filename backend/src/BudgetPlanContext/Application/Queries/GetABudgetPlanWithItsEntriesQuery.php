@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\BudgetPlanContext\Application\Queries;
 
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
-use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanUserId;
 use App\SharedContext\Domain\Ports\Inbound\QueryInterface;
+use App\SharedContext\Domain\ValueObjects\UserId;
 use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 
 final readonly class GetABudgetPlanWithItsEntriesQuery implements QueryInterface
@@ -18,7 +18,7 @@ final readonly class GetABudgetPlanWithItsEntriesQuery implements QueryInterface
     public function __construct(
         BudgetPlanId $budgetPlanId,
         UserLanguagePreference $userLanguagePreference,
-        BudgetPlanUserId $budgetPlanUserId,
+        UserId $budgetPlanUserId,
     ) {
         $this->budgetPlanId = (string) $budgetPlanId;
         $this->userLanguagePreference = (string) $userLanguagePreference;
@@ -35,8 +35,8 @@ final readonly class GetABudgetPlanWithItsEntriesQuery implements QueryInterface
         return $this->userLanguagePreference;
     }
 
-    public function getBudgetPlanUserId(): BudgetPlanUserId
+    public function getBudgetPlanUserId(): UserId
     {
-        return BudgetPlanUserId::fromString($this->budgetPlanUserId);
+        return UserId::fromString($this->budgetPlanUserId);
     }
 }
