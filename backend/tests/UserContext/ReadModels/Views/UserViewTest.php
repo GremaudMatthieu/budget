@@ -5,14 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\UserContext\ReadModels\Views;
 
 use App\SharedContext\Domain\Enums\ContextEnum;
-use App\SharedContext\Domain\ValueObjects\UserId;
-use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Domain\Events\UserSignedUpDomainEvent_v1;
-use App\UserContext\Domain\ValueObjects\UserConsent;
-use App\UserContext\Domain\ValueObjects\UserEmail;
-use App\UserContext\Domain\ValueObjects\UserFirstname;
-use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use App\UserContext\ReadModels\Views\UserView;
 use PHPUnit\Framework\TestCase;
 
@@ -158,7 +151,8 @@ class UserViewTest extends TestCase
                         'context' => ContextEnum::USER->value,
                     ]),
                 ];
-            })());
+            })()
+        );
 
         $expected = [
             'uuid' => 'b7e685be-db83-4866-9f85-102fac30a50b',

@@ -11,10 +11,10 @@ use App\SharedContext\Domain\ValueObjects\UtcClock;
 final class UserDeletedDomainEvent_v1 implements UserDomainEventInterface, VersionedDomainEventInterface
 {
     use VersionedEventTrait;
-    
+
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'UserDeleted';
-    
+
     public string $aggregateId;
     public string $userId;
     public string $requestId;
@@ -23,7 +23,7 @@ final class UserDeletedDomainEvent_v1 implements UserDomainEventInterface, Versi
     public function __construct(
         string $aggregateId,
         string $userId,
-        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID
+        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
     ) {
         $this->aggregateId = $aggregateId;
         $this->userId = $userId;

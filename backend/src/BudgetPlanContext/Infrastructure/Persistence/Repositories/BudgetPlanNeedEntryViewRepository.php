@@ -26,7 +26,7 @@ final class BudgetPlanNeedEntryViewRepository implements BudgetPlanNeedEntryView
 
         $result = $this->connection->fetchAssociative($sql, ['uuid' => $uuid]);
 
-        if ($result === false) {
+        if (false === $result) {
             return null;
         }
 

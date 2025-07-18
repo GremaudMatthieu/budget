@@ -46,13 +46,13 @@ final class UserEmailRegistryBuilder
 
     public function ensureEmailIsAvailable(UserEmail $email, ?UserId $currentUserId = null): self
     {
-        if ($this->registry === null) {
+        if (null === $this->registry) {
             $this->loadOrCreateRegistry();
         }
 
         if ($this->registry->isEmailRegistered($email)) {
             $owner = $this->registry->getEmailOwner($email);
-            if ($currentUserId === null || $owner !== (string) $currentUserId) {
+            if (null === $currentUserId || $owner !== (string) $currentUserId) {
                 throw new UserAlreadyExistsException();
             }
         }
@@ -62,7 +62,7 @@ final class UserEmailRegistryBuilder
 
     public function registerEmail(UserEmail $email, UserId $userId): self
     {
-        if ($this->registry === null) {
+        if (null === $this->registry) {
             $this->loadOrCreateRegistry();
         }
 
@@ -73,7 +73,7 @@ final class UserEmailRegistryBuilder
 
     public function releaseEmail(UserEmail $email, UserId $userId): self
     {
-        if ($this->registry === null) {
+        if (null === $this->registry) {
             $this->loadOrCreateRegistry();
         }
 
@@ -84,7 +84,7 @@ final class UserEmailRegistryBuilder
 
     public function getRegistryAggregate(): ?UserEmailRegistry
     {
-        if ($this->registry !== null && count($this->registry->raisedDomainEvents()) > 0) {
+        if (null !== $this->registry && count($this->registry->raisedDomainEvents()) > 0) {
             return $this->registry;
         }
 

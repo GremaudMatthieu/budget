@@ -10,7 +10,7 @@ trait VersionedEventTrait
     {
         return static::VERSION;
     }
-    
+
     public function getEventType(): string
     {
         return static::EVENT_TYPE;

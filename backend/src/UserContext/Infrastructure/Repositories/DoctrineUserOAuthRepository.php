@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 final readonly class DoctrineUserOAuthRepository implements UserOAuthRepositoryInterface
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -19,29 +19,29 @@ final readonly class DoctrineUserOAuthRepository implements UserOAuthRepositoryI
     {
         return $this->entityManager->getRepository(UserOAuth::class)->findOneBy($criteria);
     }
-    
+
     public function createOAuthLink(string $userId, string $provider, string $providerUserId): void
     {
         $existingLink = $this->findOneBy([
             'userId' => $userId,
-            'provider' => $provider
+            'provider' => $provider,
         ]);
-        
+
         if ($existingLink) {
             return;
         }
-        
+
         $oauthLink = new UserOAuth($userId, $provider, $providerUserId);
         $this->entityManager->persist($oauthLink);
         $this->entityManager->flush();
     }
-    
+
     public function removeOAuthUser(string $userId): void
     {
         $oauthLink = $this->findOneBy([
             'userId' => $userId,
         ]);
-        
+
         if ($oauthLink) {
             $this->entityManager->remove($oauthLink);
             $this->entityManager->flush();

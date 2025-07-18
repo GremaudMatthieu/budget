@@ -15,7 +15,7 @@ final class BudgetEnvelopeReplayedDomainEvent_v1 implements VersionedDomainEvent
 
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'BudgetEnvelopeReplayed';
-    
+
     public string $aggregateId;
     public string $userId;
     public string $name;

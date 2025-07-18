@@ -45,7 +45,7 @@ class BudgetEnvelopeReplayedDomainEvent_v1Test extends TestCase
             'currentAmount' => '500.00',
             'currency' => 'USD',
             'updatedAt' => '2024-12-07T22:03:35+00:00',
-            'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'occurredOn' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
             'isDeleted' => false,
         ];
 

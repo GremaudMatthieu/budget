@@ -76,7 +76,7 @@ final readonly class UserProjection
         UserLanguagePreferenceChangedDomainEvent_v1 $event,
     ): void {
         $userView = $this->userViewRepository->findOneBy([
-            'uuid' => $event->aggregateId
+            'uuid' => $event->aggregateId,
         ]);
 
         if (!$userView instanceof UserViewInterface) {

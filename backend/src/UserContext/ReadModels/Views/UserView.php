@@ -31,49 +31,49 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'user_view_id_seq', allocationSize: 1, initialValue: 1)]
-    private(set) int $id;
+    public private(set) int $id;
 
     #[ORM\Column(name: 'uuid', type: 'string', length: 36, unique: true)]
-    private(set) string $uuid;
+    public private(set) string $uuid;
 
     #[ORM\Column(name: 'email', type: 'string', length: 320)]
-    private(set) string $email;
+    public private(set) string $email;
 
     #[ORM\Column(name: 'firstname', type: 'string', length: 50)]
-    private(set) string $firstname;
+    public private(set) string $firstname;
 
     #[ORM\Column(name: 'lastname', type: 'string', length: 50)]
-    private(set) string $lastname;
+    public private(set) string $lastname;
 
     #[ORM\Column(name: 'language_preference', type: 'string', length: 35)]
-    private(set) string $languagePreference;
+    public private(set) string $languagePreference;
 
     #[ORM\Column(name: 'consent_given', type: 'boolean')]
-    private(set) bool $consentGiven;
+    public private(set) bool $consentGiven;
 
     #[ORM\Column(name: 'consent_date', type: 'datetime_immutable')]
-    private(set) \DateTimeImmutable $consentDate;
+    public private(set) \DateTimeImmutable $consentDate;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    private(set) \DateTimeImmutable $createdAt;
+    public private(set) \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    private(set) \DateTime $updatedAt;
+    public private(set) \DateTime $updatedAt;
 
     #[ORM\Column(name: 'roles', type: 'json')]
-    private(set) array $roles = ['ROLE_USER'];
+    public private(set) array $roles = ['ROLE_USER'];
 
     #[ORM\Column(name: 'registration_context', type: 'string', length: 32)]
-    private(set) string $registrationContext;
+    public private(set) string $registrationContext;
 
     #[ORM\Column(name: 'provider_user_id', type: 'string', length: 255)]
-    private(set) string $providerUserId;
+    public private(set) string $providerUserId;
 
     #[ORM\Column(name: 'context_uuid', type: 'string', length: 36)]
-    private(set) string $contextId;
+    public private(set) string $contextId;
 
     #[ORM\Column(name: 'context', type: 'string', length: 36)]
-    private(set) string $context;
+    public private(set) string $context;
 
     public function __construct(
         string $userId,
@@ -158,8 +158,7 @@ final class UserView implements UserViewInterface, UserInterface, \JsonSerializa
         string $providerUserId,
         string $contextId,
         string $context,
-    ): self
-    {
+    ): self {
         return new self(
             (string) $userId,
             (string) $email,

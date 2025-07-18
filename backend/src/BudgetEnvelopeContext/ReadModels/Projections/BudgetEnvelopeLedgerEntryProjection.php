@@ -65,12 +65,12 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
             match ($this->eventClassMap->getEventPathByClassName($budgetEnvelopeEvent['event_name'])) {
                 BudgetEnvelopeCreditedDomainEvent_v1::class => $this->handleBudgetEnvelopeCreditedDomainEvent_v1(
                     BudgetEnvelopeCreditedDomainEvent_v1::fromArray(
-                        (json_decode($budgetEnvelopeEvent['payload'], true)),
+                        json_decode($budgetEnvelopeEvent['payload'], true),
                     ),
                 ),
                 BudgetEnvelopeDebitedDomainEvent_v1::class => $this->handleBudgetEnvelopeDebitedDomainEvent_v1(
                     BudgetEnvelopeDebitedDomainEvent_v1::fromArray(
-                        (json_decode($budgetEnvelopeEvent['payload'], true)),
+                        json_decode($budgetEnvelopeEvent['payload'], true),
                     ),
                 ),
                 default => null,
@@ -84,7 +84,7 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
         $budgetEnvelopeEvents = $this->eventSourcedRepository->getByDomainEvents(
             $event->aggregateId,
             [BudgetEnvelopeCreditedDomainEvent_v1::class, BudgetEnvelopeDebitedDomainEvent_v1::class],
-            UtcClock::fromStringToImmutable(($event->updatedAt)->format(\DateTimeInterface::ATOM)),
+            UtcClock::fromStringToImmutable($event->updatedAt->format(\DateTimeInterface::ATOM)),
         );
 
         /** @var array{event_name: string, payload: string} $budgetEnvelopeEvent */

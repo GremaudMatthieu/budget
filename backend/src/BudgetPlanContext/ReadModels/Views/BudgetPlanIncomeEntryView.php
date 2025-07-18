@@ -20,28 +20,28 @@ final class BudgetPlanIncomeEntryView implements \JsonSerializable, BudgetPlanIn
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'budget_plan_income_entry_view_id_seq', allocationSize: 1, initialValue: 1)]
-    private(set) int $id;
+    public private(set) int $id;
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
-    private(set) string $uuid;
+    public private(set) string $uuid;
 
     #[ORM\Column(name: 'budget_plan_uuid', type: 'string', length: 36)]
-    private(set) string $budgetPlanUuid;
+    public private(set) string $budgetPlanUuid;
 
     #[ORM\Column(name: 'income_name', type: 'string', length: 35)]
-    private(set) string $incomeName;
+    public private(set) string $incomeName;
 
     #[ORM\Column(name: 'income_amount', type: 'string', length: 13)]
-    private(set) string $incomeAmount;
+    public private(set) string $incomeAmount;
 
     #[ORM\Column(name: 'category', type: 'string', length: 35)]
-    private(set) string $category;
+    public private(set) string $category;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    private(set) \DateTimeImmutable $createdAt;
+    public private(set) \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    private(set) \DateTime $updatedAt;
+    public private(set) \DateTime $updatedAt;
 
     private function __construct(
         string $budgetPlanUuid,

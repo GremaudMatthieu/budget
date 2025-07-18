@@ -41,7 +41,6 @@ final readonly class AddABudgetEnvelopeInput
             message: 'envelopes.targetedAmountInvalid'
         )]
         private(set) string $targetedAmount,
-
         #[Assert\NotBlank]
         #[Assert\Type(type: 'string')]
         #[Assert\Length(
@@ -55,9 +54,7 @@ final readonly class AddABudgetEnvelopeInput
             message: 'envelopes.currencyInvalid'
         )]
         private(set) string $currency,
-
         private(set) ?string $context = ContextEnum::BUDGET_ENVELOPE->value,
-
         private(set) ?string $contextId = null,
     ) {
     }

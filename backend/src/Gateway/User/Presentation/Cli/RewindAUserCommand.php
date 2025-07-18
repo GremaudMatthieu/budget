@@ -68,6 +68,7 @@ final class RewindAUserCommand extends Command
         $desiredDateTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $desiredDateTime);
         if (!$desiredDateTime) {
             $output->writeln('<error>Invalid date format. Use Y-m-d H:i:s.</error>');
+
             return Command::FAILURE;
         }
 

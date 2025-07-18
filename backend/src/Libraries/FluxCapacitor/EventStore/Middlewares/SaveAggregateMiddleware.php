@@ -25,7 +25,7 @@ final readonly class SaveAggregateMiddleware implements MiddlewareInterface
 
         $trackedAggregates = $this->eventStore->getTrackedAggregates();
 
-        if (count($trackedAggregates) === 1) {
+        if (1 === count($trackedAggregates)) {
             $this->eventStore->save($trackedAggregates[0]);
         } elseif (count($trackedAggregates) > 1) {
             $this->eventStore->saveMultiAggregate($trackedAggregates);

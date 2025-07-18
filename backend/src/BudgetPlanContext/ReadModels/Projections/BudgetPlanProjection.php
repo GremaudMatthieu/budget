@@ -98,7 +98,8 @@ final readonly class BudgetPlanProjection
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanIncomeAddedDomainEvent_v1(BudgetPlanIncomeAddedDomainEvent_v1 $event): void {
+    private function handleBudgetPlanIncomeAddedDomainEvent_v1(BudgetPlanIncomeAddedDomainEvent_v1 $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
             ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );
@@ -237,7 +238,8 @@ final readonly class BudgetPlanProjection
         $this->budgetPlanViewRepository->save($budgetPlanView);
     }
 
-    private function handleBudgetPlanNeedRemovedDomainEvent_v1(BudgetPlanNeedRemovedDomainEvent_v1 $event): void {
+    private function handleBudgetPlanNeedRemovedDomainEvent_v1(BudgetPlanNeedRemovedDomainEvent_v1 $event): void
+    {
         $budgetPlanView = $this->budgetPlanViewRepository->findOneBy(
             ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );

@@ -15,7 +15,7 @@ final class BudgetPlanNeedRemovedDomainEvent_v1 implements VersionedDomainEventI
 
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'BudgetPlanNeedRemoved';
-    
+
     public string $aggregateId;
     public string $uuid;
     public string $userId;

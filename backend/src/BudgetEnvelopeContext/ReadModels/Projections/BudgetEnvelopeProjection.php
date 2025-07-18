@@ -89,7 +89,8 @@ final readonly class BudgetEnvelopeProjection
         $this->budgetEnvelopeViewRepository->save($budgetEnvelopeView);
     }
 
-    private function handleBudgetEnvelopeDeletedDomainEvent_v1(BudgetEnvelopeDeletedDomainEvent_v1 $event): void {
+    private function handleBudgetEnvelopeDeletedDomainEvent_v1(BudgetEnvelopeDeletedDomainEvent_v1 $event): void
+    {
         $budgetEnvelopeView = $this->budgetEnvelopeViewRepository->findOneBy(
             ['uuid' => $event->aggregateId, 'is_deleted' => false],
         );

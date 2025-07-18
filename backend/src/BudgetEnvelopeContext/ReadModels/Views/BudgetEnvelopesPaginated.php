@@ -9,8 +9,8 @@ use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopesPaginatedInter
 final class BudgetEnvelopesPaginated implements BudgetEnvelopesPaginatedInterface, \jsonSerializable
 {
     /* @var array<object> */
-    private(set) iterable $budgetEnvelopes;
-    private(set) int $totalItems;
+    public private(set) iterable $budgetEnvelopes;
+    public private(set) int $totalItems;
 
     /**
      * @param array<object> $budgetEnvelopes

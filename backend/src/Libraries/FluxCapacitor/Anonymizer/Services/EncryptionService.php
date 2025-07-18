@@ -38,7 +38,7 @@ final class EncryptionService implements EncryptionServiceInterface
         );
 
 
-        if ($ciphertext === false) {
+        if (false === $ciphertext) {
             throw UserEncryptionException::fromEncryptFailure();
         }
 
@@ -52,15 +52,15 @@ final class EncryptionService implements EncryptionServiceInterface
     public function decrypt(string $ciphertext, string $iv, string $tag, string $userId): string
     {
         $plaintext = openssl_decrypt(
-            base64_decode($ciphertext),
+            base64_decode($ciphertext, true),
             self::CIPHER,
             $this->getKeyForUser($userId),
             OPENSSL_RAW_DATA,
-            base64_decode($iv),
-            base64_decode($tag),
+            base64_decode($iv, true),
+            base64_decode($tag, true),
         );
 
-        if ($plaintext === false) {
+        if (false === $plaintext) {
             throw UserEncryptionException::fromDecryptFailure();
         }
 

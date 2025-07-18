@@ -25,18 +25,19 @@ final class BudgetPlanDateRegistryBuilder
 
     private function __construct(
         private readonly EventSourcedRepositoryInterface $eventSourcedRepository,
-        private readonly UuidGeneratorInterface $uuidGenerator
+        private readonly UuidGeneratorInterface $uuidGenerator,
     ) {
     }
 
     public static function build(
         EventSourcedRepositoryInterface $eventSourcedRepository,
-        UuidGeneratorInterface $uuidGenerator
+        UuidGeneratorInterface $uuidGenerator,
     ): self {
         return new self($eventSourcedRepository, $uuidGenerator);
     }
 
-    public function loadOrCreateRegistry(BudgetPlanDateRegistryId $registryId): self {
+    public function loadOrCreateRegistry(BudgetPlanDateRegistryId $registryId): self
+    {
         try {
             /** @var BudgetPlanDateRegistry $registry */
             $registry = $this->eventSourcedRepository->get((string) $registryId);
@@ -53,9 +54,9 @@ final class BudgetPlanDateRegistryBuilder
     public function ensureDateIsAvailable(
         \DateTimeImmutable $date,
         UserId $userId,
-        ?BudgetPlanId $currentPlanId = null
+        ?BudgetPlanId $currentPlanId = null,
     ): self {
-        if ($this->currentRegistry === null) {
+        if (null === $this->currentRegistry) {
             $this->loadOrCreateRegistry(
                 BudgetPlanDateRegistryId::fromUserIdAndBudgetPlanDate(
                     $userId,
@@ -71,22 +72,22 @@ final class BudgetPlanDateRegistryBuilder
         $currentOwner = null;
 
         foreach ($this->currentRegistry->raisedDomainEvents() as $event) {
-            if ($event instanceof BudgetPlanDateRegisteredDomainEvent_v1 &&
-                $event->date === UtcClock::fromImmutableToString($date) &&
-                $event->userId === (string) $userId) {
+            if ($event instanceof BudgetPlanDateRegisteredDomainEvent_v1
+                && $event->date === UtcClock::fromImmutableToString($date)
+                && $event->userId === (string) $userId) {
                 $isInUse = true;
                 $currentOwner = $event->budgetPlanId;
             }
 
-            if ($event instanceof BudgetPlanDateReleasedDomainEvent_v1 &&
-                $event->date === UtcClock::fromImmutableToString($date) &&
-                $event->userId === (string) $userId) {
+            if ($event instanceof BudgetPlanDateReleasedDomainEvent_v1
+                && $event->date === UtcClock::fromImmutableToString($date)
+                && $event->userId === (string) $userId) {
                 $isInUse = false;
                 $currentOwner = null;
             }
         }
 
-        if ($isInUse && ($currentPlanId === null || $currentOwner !== (string) $currentPlanId)) {
+        if ($isInUse && (null === $currentPlanId || $currentOwner !== (string) $currentPlanId)) {
             throw new BudgetPlanDateAlreadyExistsForUserException();
         }
 
@@ -98,7 +99,7 @@ final class BudgetPlanDateRegistryBuilder
         UserId $userId,
         BudgetPlanId $budgetPlanId,
     ): self {
-        if ($this->currentRegistry === null) {
+        if (null === $this->currentRegistry) {
             $this->loadOrCreateRegistry(
                 BudgetPlanDateRegistryId::fromUserIdAndBudgetPlanDate(
                     $userId,
@@ -114,15 +115,13 @@ final class BudgetPlanDateRegistryBuilder
     }
 
     public function loadOldRegistry(
-        BudgetPlanDateRegistryId $oldRegistryId
+        BudgetPlanDateRegistryId $oldRegistryId,
     ): self {
         try {
             $oldRegistry = $this->eventSourcedRepository->get((string) $oldRegistryId);
 
             if (!$oldRegistry instanceof BudgetPlanDateRegistry) {
-                throw new \RuntimeException(
-                    'Expected BudgetPlanDateRegistry but got ' . get_class($oldRegistry),
-                );
+                throw new \RuntimeException('Expected BudgetPlanDateRegistry but got '.get_class($oldRegistry));
             }
 
             $this->oldRegistry = $oldRegistry;
@@ -140,7 +139,7 @@ final class BudgetPlanDateRegistryBuilder
         UserId $userId,
         BudgetPlanId $budgetPlanId,
     ): self {
-        if ($this->oldRegistry === null) {
+        if (null === $this->oldRegistry) {
             $this->loadOldRegistry(
                 BudgetPlanDateRegistryId::fromUserIdAndBudgetPlanDate(
                     $userId,
@@ -162,11 +161,11 @@ final class BudgetPlanDateRegistryBuilder
     {
         $registries = [];
 
-        if ($this->currentRegistry !== null && count($this->currentRegistry->raisedDomainEvents()) > 0) {
+        if (null !== $this->currentRegistry && count($this->currentRegistry->raisedDomainEvents()) > 0) {
             $registries[] = $this->currentRegistry;
         }
 
-        if ($this->oldRegistry !== null && count($this->oldRegistry->raisedDomainEvents()) > 0) {
+        if (null !== $this->oldRegistry && count($this->oldRegistry->raisedDomainEvents()) > 0) {
             $registries[] = $this->oldRegistry;
         }
 

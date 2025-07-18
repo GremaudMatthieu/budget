@@ -37,7 +37,8 @@ final readonly class BudgetPlanIncomeEntryProjection
         };
     }
 
-    private function handleBudgetPlanGeneratedDomainEvent_v1(BudgetPlanGeneratedDomainEvent_v1 $event): void {
+    private function handleBudgetPlanGeneratedDomainEvent_v1(BudgetPlanGeneratedDomainEvent_v1 $event): void
+    {
         foreach ($event->incomes as $income) {
             $this->budgetPlanIncomeEntryViewRepository->save(
                 BudgetPlanIncomeEntryView::fromArrayOnBudgetPlanGeneratedDomainEvent_v1(

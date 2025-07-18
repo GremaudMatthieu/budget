@@ -34,7 +34,7 @@ class BudgetEnvelopeCreditedDomainEvent_v1Test extends TestCase
             'requestId' => '9faff004-117b-4b51-8e4d-ed6648f745c2',
             'creditMoney' => '500.00',
             'description' => 'test',
-            'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'occurredOn' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
         ];
 
         $event = BudgetEnvelopeCreditedDomainEvent_v1::fromArray($data);

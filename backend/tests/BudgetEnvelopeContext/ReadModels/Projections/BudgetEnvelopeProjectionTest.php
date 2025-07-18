@@ -43,8 +43,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
         $this->envelopeViewRepository->expects($this->once())
             ->method('save')
-            ->with($this->callback(function (BudgetEnvelopeView $view) use ($event) {
-                return $view->uuid === $event->aggregateId
+            ->with($this->callback(fn (BudgetEnvelopeView $view) => $view->uuid === $event->aggregateId
                     && $view->createdAt == $event->occurredOn
                     && $view->updatedAt == \DateTime::createFromImmutable($event->occurredOn)
                     && false === $view->isDeleted
@@ -52,8 +51,7 @@ class BudgetEnvelopeProjectionTest extends TestCase
                     && '0.00' === $view->currentAmount
                     && $view->name === $event->name
                     && $view->userUuid === $event->userId
-                    && $view->currency === $event->currency;
-            }));
+                    && $view->currency === $event->currency));
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
@@ -303,7 +301,6 @@ class BudgetEnvelopeProjectionTest extends TestCase
 
         $this->budgetEnvelopeProjection->__invoke($event);
     }
-
 
     public function testHandleEnvelopeTargetedAmountUpdatedWithEnvelopeThatDoesNotExist(): void
     {

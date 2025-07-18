@@ -106,6 +106,6 @@ final class BudgetPlanDateRegistry implements AggregateRootInterface
 
     private function generateDateKey(string $date, string $userId): string
     {
-        return $userId . ':' . mb_strtolower($date);
+        return $userId.':'.mb_strtolower($date);
     }
 }

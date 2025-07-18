@@ -15,7 +15,7 @@ final class BudgetEnvelopeTargetedAmountChangedDomainEvent_v1 implements Version
 
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'BudgetEnvelopeTargetedAmountChanged';
-    
+
     public string $aggregateId;
     public string $userId;
     public string $targetedAmount;

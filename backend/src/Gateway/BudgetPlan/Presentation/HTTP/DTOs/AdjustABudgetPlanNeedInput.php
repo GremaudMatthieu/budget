@@ -16,7 +16,6 @@ final readonly class AdjustABudgetPlanNeedInput
             max: 35,
         )]
         private(set) string $name,
-
         #[Assert\NotBlank]
         #[Assert\Type(type: 'string')]
         #[Assert\Length(
@@ -30,7 +29,6 @@ final readonly class AdjustABudgetPlanNeedInput
             message: 'budgetPlan.amountInvalid'
         )]
         private(set) string $amount,
-
         #[Assert\NotBlank]
         #[Assert\Type('string')]
         #[Assert\Length(

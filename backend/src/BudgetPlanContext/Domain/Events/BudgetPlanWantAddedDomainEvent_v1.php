@@ -15,7 +15,7 @@ final class BudgetPlanWantAddedDomainEvent_v1 implements VersionedDomainEventInt
 
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'BudgetPlanWantAdded';
-    
+
     public string $aggregateId;
     public string $uuid;
     public string $userId;

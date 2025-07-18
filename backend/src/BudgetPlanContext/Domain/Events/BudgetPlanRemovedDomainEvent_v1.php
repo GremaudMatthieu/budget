@@ -15,7 +15,7 @@ final class BudgetPlanRemovedDomainEvent_v1 implements VersionedDomainEventInter
 
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'BudgetPlanRemoved';
-    
+
     public string $aggregateId;
     public string $userId;
     public bool $isDeleted;

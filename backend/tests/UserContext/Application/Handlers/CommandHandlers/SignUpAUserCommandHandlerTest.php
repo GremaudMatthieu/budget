@@ -67,11 +67,11 @@ class SignUpAUserCommandHandlerTest extends TestCase
 
         $this->eventStore->expects($this->exactly(2))
             ->method('load')
-            ->willReturnCallback(function($id) use ($userId, $registry) {
+            ->willReturnCallback(function ($id) use ($userId, $registry) {
                 if ($id === $userId) {
                     throw new EventsNotFoundForAggregateException();
                 }
-                if ($id === UserEmailRegistry::DEFAULT_ID) {
+                if (UserEmailRegistry::DEFAULT_ID === $id) {
                     return $registry;
                 }
                 throw new \RuntimeException("Unexpected ID: $id");
@@ -79,11 +79,9 @@ class SignUpAUserCommandHandlerTest extends TestCase
 
         $this->eventStore->expects($this->once())
             ->method('trackAggregates')
-            ->with($this->callback(function($aggregates) {
-                return count($aggregates) === 2 &&
-                    $aggregates[0] instanceof UserEmailRegistry &&
-                    $aggregates[1] instanceof User;
-            }));
+            ->with($this->callback(fn ($aggregates) => 2 === count($aggregates)
+                    && $aggregates[0] instanceof UserEmailRegistry
+                    && $aggregates[1] instanceof User));
 
         $this->handler->__invoke($command);
     }
@@ -165,17 +163,17 @@ class SignUpAUserCommandHandlerTest extends TestCase
         $emailHashesProperty->setValue($registry, [
             $emailHash => [
                 'isRegistered' => true,
-                'userId' => $existingUserId
-            ]
+                'userId' => $existingUserId,
+            ],
         ]);
 
         $this->eventStore->expects($this->exactly(2))
             ->method('load')
-            ->willReturnCallback(function($id) use ($userId, $registry) {
+            ->willReturnCallback(function ($id) use ($userId, $registry) {
                 if ($id === $userId) {
                     throw new EventsNotFoundForAggregateException();
                 }
-                if ($id === UserEmailRegistry::DEFAULT_ID) {
+                if (UserEmailRegistry::DEFAULT_ID === $id) {
                     return $registry;
                 }
                 throw new \RuntimeException("Unexpected ID: $id");

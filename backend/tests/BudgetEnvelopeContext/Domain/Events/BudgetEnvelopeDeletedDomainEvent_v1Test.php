@@ -31,7 +31,7 @@ class BudgetEnvelopeDeletedDomainEvent_v1Test extends TestCase
             'userId' => '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'requestId' => '9faff004-117b-4b51-8e4d-ed6648f745c2',
             'isDeleted' => true,
-            'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'occurredOn' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
         ];
 
         $event = BudgetEnvelopeDeletedDomainEvent_v1::fromArray($data);

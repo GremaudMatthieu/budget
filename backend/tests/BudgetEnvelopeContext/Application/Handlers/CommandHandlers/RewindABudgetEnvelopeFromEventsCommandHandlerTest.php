@@ -85,18 +85,16 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
 
         $this->eventStore->expects($this->atLeastOnce())
             ->method('load')
-            ->willReturnCallback(function ($id, $datetime = null) use ($oldEnvelope, $newEnvelope, $envelopeId, $oldNameRegistryId, $newNameRegistryId, $desiredDateTime) {
+            ->willReturnCallback(function ($id, $datetime = null) use ($oldEnvelope, $newEnvelope, $envelopeId) {
                 if ($id === $envelopeId) {
-                    return $datetime !== null ? $newEnvelope : $oldEnvelope;
+                    return null !== $datetime ? $newEnvelope : $oldEnvelope;
                 }
                 throw new EventsNotFoundForAggregateException();
             });
 
         $this->eventStore->expects($this->once())
             ->method('trackAggregates')
-            ->with($this->callback(function ($aggregates) {
-                return is_array($aggregates) && count($aggregates) >= 1;
-            }));
+            ->with($this->callback(fn ($aggregates) => is_array($aggregates) && count($aggregates) >= 1));
 
         $this->rewindABudgetEnvelopeFromEventsCommandHandler->__invoke($rewindCommand);
     }
@@ -131,7 +129,7 @@ class RewindABudgetEnvelopeFromEventsCommandHandlerTest extends TestCase
 
         $this->eventStore->expects($this->atLeastOnce())
             ->method('load')
-            ->willReturnCallback(function ($id) use ($envelope, $envelopeId, $nameRegistryId) {
+            ->willReturnCallback(function ($id) use ($envelope, $envelopeId) {
                 if ($id === $envelopeId) {
                     return $envelope;
                 }

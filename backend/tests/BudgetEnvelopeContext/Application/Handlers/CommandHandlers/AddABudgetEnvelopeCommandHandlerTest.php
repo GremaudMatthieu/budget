@@ -95,7 +95,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
             Context::from($addABudgetEnvelopeInput->uuid, $addABudgetEnvelopeInput->context),
         );
 
-        $nameRegistryId = 'name-registry-' . md5('test name' . 'd26cc02e-99e7-428c-9d61-572dff3f84a7');
+        $nameRegistryId = 'name-registry-'.md5('test named26cc02e-99e7-428c-9d61-572dff3f84a7');
 
         $this->eventStore->expects($this->any())
             ->method('load')
@@ -109,6 +109,7 @@ class AddABudgetEnvelopeCommandHandlerTest extends TestCase
                         ),
                     );
                 }
+
                 return BudgetEnvelope::create(
                     BudgetEnvelopeId::fromString($addABudgetEnvelopeInput->uuid),
                     UserId::fromString('d26cc02e-99e7-428c-9d61-572dff3f84a7'),

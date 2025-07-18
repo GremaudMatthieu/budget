@@ -19,25 +19,25 @@ final class BudgetEnvelopeLedgerEntryView implements BudgetEnvelopeLedgerEntryVi
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'budget_envelope_ledger_view_id_seq', allocationSize: 1, initialValue: 1)]
-    private(set) int $id;
+    public private(set) int $id;
 
     #[ORM\Column(name: 'budget_envelope_uuid', type: 'string', length: 36, unique: false)]
-    private(set) string $budgetEnvelopeUuid;
+    public private(set) string $budgetEnvelopeUuid;
 
     #[ORM\Column(name: 'created_at', type: 'datetime')]
-    private(set) \DateTimeImmutable $createdAt;
+    public private(set) \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'monetary_amount', type: 'string', length: 13)]
-    private(set) string $monetaryAmount;
+    public private(set) string $monetaryAmount;
 
     #[ORM\Column(name: 'entry_type', type: 'string', length: 6)]
-    private(set) string $entryType;
+    public private(set) string $entryType;
 
     #[ORM\Column(name: 'description', type: 'string', length: 13, options: ['default' => ''])]
-    private(set) string $description;
+    public private(set) string $description;
 
     #[ORM\Column(name: 'user_uuid', type: 'string', length: 36)]
-    private(set) string $userUuid;
+    public private(set) string $userUuid;
 
     private function __construct(
         string $budgetEnvelopeId,
@@ -82,7 +82,8 @@ final class BudgetEnvelopeLedgerEntryView implements BudgetEnvelopeLedgerEntryVi
     }
 
     #[\Override]
-    public static function fromBudgetEnvelopeDebitedDomainEvent_v1(BudgetEnvelopeDebitedDomainEvent_v1 $event): self {
+    public static function fromBudgetEnvelopeDebitedDomainEvent_v1(BudgetEnvelopeDebitedDomainEvent_v1 $event): self
+    {
         return new self(
             $event->aggregateId,
             BudgetEnvelopeEntryType::DEBIT,

@@ -33,7 +33,7 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
     public function save(BudgetEnvelopeViewInterface $budgetEnvelope): void
     {
         $this->connection->executeStatement(
-            'INSERT INTO ' . self::TABLE_NAME . ' (
+            'INSERT INTO '.self::TABLE_NAME.' (
                 uuid, created_at, updated_at, current_amount, targeted_amount, 
                 name, user_uuid, currency, is_deleted, context_uuid, context
             ) VALUES (
@@ -89,12 +89,23 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select(
-                'ev.uuid', 'ev.created_at', 'ev.updated_at', 'ev.current_amount',
-                'ev.targeted_amount', 'ev.name', 'ev.user_uuid', 'ev.is_deleted', 'ev.currency',
-                'ev.context_uuid', 'ev.context',
-                'ehv.budget_envelope_uuid', 'ehv.created_at AS ledger_created_at',
-                'ehv.monetary_amount', 'ehv.entry_type', 'ehv.description'
-            )
+            'ev.uuid',
+            'ev.created_at',
+            'ev.updated_at',
+            'ev.current_amount',
+            'ev.targeted_amount',
+            'ev.name',
+            'ev.user_uuid',
+            'ev.is_deleted',
+            'ev.currency',
+            'ev.context_uuid',
+            'ev.context',
+            'ehv.budget_envelope_uuid',
+            'ehv.created_at AS ledger_created_at',
+            'ehv.monetary_amount',
+            'ehv.entry_type',
+            'ehv.description'
+        )
             ->from(self::TABLE_NAME, 'ev')
             ->leftJoin('ev', 'budget_envelope_ledger_entry_view', 'ehv', 'ev.uuid = ehv.budget_envelope_uuid')
             ->orderBy('ehv.created_at', 'DESC');
@@ -119,7 +130,7 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
         return [
             'envelope' => BudgetEnvelopeView::fromRepository($budgetEnvelopeData),
             'ledger' => null !== $result[0]['ledger_created_at'] ? array_map(
-                fn($row) => $this->mapToBudgetEnvelopeLedgerView([
+                fn ($row) => $this->mapToBudgetEnvelopeLedgerView([
                     'aggregate_id' => $row['budget_envelope_uuid'],
                     'user_uuid' => $row['user_uuid'],
                     'created_at' => $row['ledger_created_at'],
@@ -187,7 +198,7 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
         $processedCriteria = $this->processCriteria($criteria);
 
         foreach ($processedCriteria as $field => $value) {
-            if ($value === null) {
+            if (null === $value) {
                 $qb->andWhere($qb->expr()->isNull($field));
             } else {
                 $qb->andWhere($qb->expr()->eq($field, ":$field"));
@@ -201,7 +212,7 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
         $processedCriteria = $this->processCriteria($criteria);
 
         foreach ($processedCriteria as $field => $value) {
-            if ($value === null) {
+            if (null === $value) {
                 $qb->andWhere($qb->expr()->isNull("$alias.$field"));
             } else {
                 $qb->andWhere($qb->expr()->eq("$alias.$field", ":$field"));
@@ -226,7 +237,7 @@ final readonly class BudgetEnvelopeViewRepository implements BudgetEnvelopeViewR
         $processed = [];
 
         foreach ($criteria as $field => $value) {
-            if ($value === null) {
+            if (null === $value) {
                 continue;
             }
 

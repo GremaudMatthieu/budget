@@ -30,7 +30,7 @@ class UserLastnameChangedEvent_v1Test extends TestCase
             'userId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
             'requestId' => '8f636cef-6a4d-40f1-a9cf-4e64f67ce7c0',
             'lastname' => 'Doe',
-            'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'occurredOn' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
         ];
 
         $event = UserLastnameChangedDomainEvent_v1::fromArray($data);

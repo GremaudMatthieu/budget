@@ -40,7 +40,7 @@ class UserRewoundEvent_v1Test extends TestCase
                 'updatedAt' => '2021-09-01T00:00:00+00:00',
                 'registrationContext' => 'google',
                 'providerUserId' => '1234567890',
-                'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+                'occurredOn' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
             ],
             $event->toArray()
         );
@@ -61,7 +61,7 @@ class UserRewoundEvent_v1Test extends TestCase
             'updatedAt' => '2021-09-01T00:00:00+00:00',
             'registrationContext' => 'google',
             'providerUserId' => '1234567890',
-            'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'occurredOn' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
         ]);
 
         $this->assertEquals('aggregateId', $event->aggregateId);

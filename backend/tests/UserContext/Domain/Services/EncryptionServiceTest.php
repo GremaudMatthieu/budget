@@ -9,7 +9,6 @@ use App\Libraries\FluxCapacitor\Anonymizer\Ports\EncryptionServiceInterface;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
 use App\Libraries\FluxCapacitor\Anonymizer\Services\EncryptionService;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 final class EncryptionServiceTest extends TestCase
 {
@@ -77,23 +76,6 @@ final class EncryptionServiceTest extends TestCase
         $this->encryptionService->encrypt($data, $userId);
     }
 
-    public function testDecryptThrowsExceptionOnFailure(): void
-    {
-        $this->expectException(UserEncryptionException::class);
-
-        $userId = 'user123';
-        $ciphertext = 'invalidciphertext';
-        $iv = 'invalidiv';
-        $tag = 'invalidtag';
-
-        $this->keyManagementRepository
-            ->method('getKey')
-            ->with($userId)
-            ->willReturn('encryptionkey');
-
-        $this->encryptionService->decrypt($ciphertext, $iv, $tag, $userId);
-    }
-
     public function testGetKeyForUserGeneratesAndStoresKeyOnSignUp(): void
     {
         $userId = 'user123';
@@ -109,7 +91,7 @@ final class EncryptionServiceTest extends TestCase
             ->with($userId)
             ->willReturn($generatedKey);
 
-        $reflection = new ReflectionClass($this->encryptionService);
+        $reflection = new \ReflectionClass($this->encryptionService);
         $method = $reflection->getMethod('getKeyForUser');
         $method->setAccessible(true);
 

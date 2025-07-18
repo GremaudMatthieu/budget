@@ -147,7 +147,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
             foreach ($orderBy as $field => $direction) {
                 $orderByClauses[] = "{$field} {$direction}";
             }
-            $sql .= ' ORDER BY ' . implode(', ', $orderByClauses);
+            $sql .= ' ORDER BY '.implode(', ', $orderByClauses);
         }
 
         $stmt = $this->connection->prepare($sql);
@@ -191,7 +191,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
 
         foreach ($entries as $entry) {
             $category = $entry['category'] ?? 'Uncategorized';
-            $amount = (float)$entry[$amountField];
+            $amount = (float) $entry[$amountField];
 
             if (!isset($totals[$category])) {
                 $totals[$category] = 0;
@@ -209,13 +209,13 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
 
         return [
             'totals' => $totals,
-            'ratios' => $ratios
+            'ratios' => $ratios,
         ];
     }
 
     private function formatPercentage(float $value): string
     {
-        return round($value * 100) . ' %';
+        return round($value * 100).' %';
     }
 
     /**
@@ -226,7 +226,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
         array $criteria,
         ?array $orderBy = null,
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
     ): array {
         $sql = '
     WITH budget_plans AS (
@@ -248,7 +248,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
              FROM budget_plan_saving_entry_view 
              WHERE budget_plan_uuid = pv.uuid) AS total_savings
         FROM budget_plan_view pv
-        WHERE ' . $this->buildWhereClauseWithAlias($criteria, 'pv') . '
+        WHERE '.$this->buildWhereClauseWithAlias($criteria, 'pv').'
         AND pv.user_uuid = :user_uuid
     )
     SELECT 
@@ -277,7 +277,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
             foreach ($orderBy as $field => $direction) {
                 $orderByClauses[] = "{$field} {$direction}";
             }
-            $sql .= ' ORDER BY ' . implode(', ', $orderByClauses);
+            $sql .= ' ORDER BY '.implode(', ', $orderByClauses);
         } else {
             $sql .= ' ORDER BY year DESC, month ASC';
         }
@@ -288,7 +288,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
             'income' => 0,
             'needs' => 0,
             'wants' => 0,
-            'savings' => 0
+            'savings' => 0,
         ];
         $year = $criteria['year'] ?? date('Y');
         $formattedResults[$year] = array_fill(1, 12, ['uuid' => null]);
@@ -335,21 +335,21 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
                 'recommended' => [
                     'needs' => 50,
                     'wants' => 30,
-                    'savings' => 20
+                    'savings' => 20,
                 ],
                 'current' => [
                     'needs' => $actualNeedsPercentage,
                     'wants' => $actualWantsPercentage,
-                    'savings' => $actualSavingsPercentage
-                ]
+                    'savings' => $actualSavingsPercentage,
+                ],
             ],
             'yearlyTotals' => [
                 'income' => round($yearlyTotals['income'], 2),
                 'allocated' => round($yearlyTotals['needs'] + $yearlyTotals['wants'] + $yearlyTotals['savings'], 2),
                 'needs' => round($yearlyTotals['needs'], 2),
                 'wants' => round($yearlyTotals['wants'], 2),
-                'savings' => round($yearlyTotals['savings'], 2)
-            ]
+                'savings' => round($yearlyTotals['savings'], 2),
+            ],
         ];
 
         return $formattedResults;
@@ -363,7 +363,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
         array $criteria,
         ?array $orderBy = null,
         ?int $limit = null,
-        ?int $offset = null
+        ?int $offset = null,
     ): array {
         $qb = $this->connection->createQueryBuilder()
             ->select('uuid', 'date')
@@ -388,9 +388,9 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
         $processedCriteria = $this->processCriteria($criteria);
 
         foreach ($processedCriteria as $field => $value) {
-            if ($value === null) {
+            if (null === $value) {
                 $qb->andWhere($qb->expr()->isNull($field));
-            } else if ($field === 'year') {
+            } elseif ('year' === $field) {
                 $qb->andWhere('EXTRACT(YEAR FROM date) = :year');
                 $qb->setParameter('year', $value);
             } else {
@@ -417,9 +417,9 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
         $clauses = [];
 
         foreach ($processed as $field => $value) {
-            if ($value === null) {
+            if (null === $value) {
                 $clauses[] = "{$alias}.{$field} IS NULL";
-            } else if ($field === 'year') {
+            } elseif ('year' === $field) {
                 $clauses[] = "EXTRACT(YEAR FROM {$alias}.date) = :{$field}";
             } else {
                 $clauses[] = "{$alias}.{$field} = :{$field}";
@@ -434,7 +434,7 @@ final readonly class BudgetPlanViewRepository implements BudgetPlanViewRepositor
         $processed = [];
 
         foreach ($criteria as $field => $value) {
-            if ($value === null) {
+            if (null === $value) {
                 continue;
             }
 

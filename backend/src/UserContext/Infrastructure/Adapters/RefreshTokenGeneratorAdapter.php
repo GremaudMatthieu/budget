@@ -6,7 +6,7 @@ namespace App\UserContext\Infrastructure\Adapters;
 
 use App\UserContext\Domain\Ports\Outbound\RefreshTokenGeneratorInterface;
 use App\UserContext\ReadModels\Views\UserView;
-use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface AS GesdinetRefreshTokenGeneratorInterface;
+use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface as GesdinetRefreshTokenGeneratorInterface;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenInterface;
 
 final readonly class RefreshTokenGeneratorAdapter implements RefreshTokenGeneratorInterface

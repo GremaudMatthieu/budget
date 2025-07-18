@@ -15,7 +15,7 @@ final class BudgetEnvelopeAddedDomainEvent_v1 implements VersionedDomainEventInt
 
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'BudgetEnvelopeAdded';
-    
+
     public string $aggregateId;
     public string $userId;
     public string $name;
@@ -35,7 +35,7 @@ final class BudgetEnvelopeAddedDomainEvent_v1 implements VersionedDomainEventInt
         string $contextId,
         string $context,
         string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
-    ){
+    ) {
         $this->aggregateId = $aggregateId;
         $this->userId = $userId;
         $this->name = $name;

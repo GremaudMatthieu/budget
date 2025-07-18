@@ -25,18 +25,19 @@ final class BudgetEnvelopeNameRegistryBuilder
 
     private function __construct(
         private readonly EventSourcedRepositoryInterface $eventSourcedRepository,
-        private readonly UuidGeneratorInterface $uuidGenerator
+        private readonly UuidGeneratorInterface $uuidGenerator,
     ) {
     }
 
     public static function build(
         EventSourcedRepositoryInterface $eventSourcedRepository,
-        UuidGeneratorInterface $uuidGenerator
+        UuidGeneratorInterface $uuidGenerator,
     ): self {
         return new self($eventSourcedRepository, $uuidGenerator);
     }
 
-    public function loadOrCreateRegistry(BudgetEnvelopeNameRegistryId $registryId): self {
+    public function loadOrCreateRegistry(BudgetEnvelopeNameRegistryId $registryId): self
+    {
         try {
             /** @var BudgetEnvelopeNameRegistry $registry */
             $registry = $this->eventSourcedRepository->get((string) $registryId);
@@ -52,10 +53,10 @@ final class BudgetEnvelopeNameRegistryBuilder
 
     public function ensureNameIsAvailable(
         BudgetEnvelopeName $name,
-        UserId             $userId,
-        ?BudgetEnvelopeId  $currentEnvelopeId = null
+        UserId $userId,
+        ?BudgetEnvelopeId $currentEnvelopeId = null,
     ): self {
-        if ($this->currentRegistry === null) {
+        if (null === $this->currentRegistry) {
             $this->loadOrCreateRegistry(
                 BudgetEnvelopeNameRegistryId::fromUserIdAndBudgetEnvelopeName(
                     $userId,
@@ -71,22 +72,22 @@ final class BudgetEnvelopeNameRegistryBuilder
         $currentOwner = null;
 
         foreach ($this->currentRegistry->raisedDomainEvents() as $event) {
-            if ($event instanceof BudgetEnvelopeNameRegisteredDomainEvent_v1 &&
-                $event->name === (string) $name &&
-                $event->userId === (string) $userId) {
+            if ($event instanceof BudgetEnvelopeNameRegisteredDomainEvent_v1
+                && $event->name === (string) $name
+                && $event->userId === (string) $userId) {
                 $isInUse = true;
                 $currentOwner = $event->budgetEnvelopeId;
             }
 
-            if ($event instanceof BudgetEnvelopeNameReleasedDomainEvent_v1 &&
-                $event->name === (string) $name &&
-                $event->userId === (string) $userId) {
+            if ($event instanceof BudgetEnvelopeNameReleasedDomainEvent_v1
+                && $event->name === (string) $name
+                && $event->userId === (string) $userId) {
                 $isInUse = false;
                 $currentOwner = null;
             }
         }
 
-        if ($isInUse && ($currentEnvelopeId === null || $currentOwner !== (string) $currentEnvelopeId)) {
+        if ($isInUse && (null === $currentEnvelopeId || $currentOwner !== (string) $currentEnvelopeId)) {
             throw new BudgetEnvelopeNameAlreadyExistsForUserException();
         }
 
@@ -95,10 +96,10 @@ final class BudgetEnvelopeNameRegistryBuilder
 
     public function registerName(
         BudgetEnvelopeName $name,
-        UserId             $userId,
-        BudgetEnvelopeId   $envelopeId,
+        UserId $userId,
+        BudgetEnvelopeId $envelopeId,
     ): self {
-        if ($this->currentRegistry === null) {
+        if (null === $this->currentRegistry) {
             $this->loadOrCreateRegistry(
                 BudgetEnvelopeNameRegistryId::fromUserIdAndBudgetEnvelopeName(
                     $userId,
@@ -114,15 +115,13 @@ final class BudgetEnvelopeNameRegistryBuilder
     }
 
     public function loadOldRegistry(
-        BudgetEnvelopeNameRegistryId $oldRegistryId
+        BudgetEnvelopeNameRegistryId $oldRegistryId,
     ): self {
         try {
             $oldRegistry = $this->eventSourcedRepository->get((string) $oldRegistryId);
 
             if (!$oldRegistry instanceof BudgetEnvelopeNameRegistry) {
-                throw new \RuntimeException(
-                    'Expected BudgetEnvelopeNameRegistry but got ' . get_class($oldRegistry),
-                );
+                throw new \RuntimeException('Expected BudgetEnvelopeNameRegistry but got '.get_class($oldRegistry));
             }
 
             $this->oldRegistry = $oldRegistry;
@@ -137,10 +136,10 @@ final class BudgetEnvelopeNameRegistryBuilder
 
     public function releaseName(
         BudgetEnvelopeName $name,
-        UserId             $userId,
-        BudgetEnvelopeId   $budgetEnvelopeId,
+        UserId $userId,
+        BudgetEnvelopeId $budgetEnvelopeId,
     ): self {
-        if ($this->oldRegistry === null) {
+        if (null === $this->oldRegistry) {
             $this->loadOldRegistry(
                 BudgetEnvelopeNameRegistryId::fromUserIdAndBudgetEnvelopeName(
                     $userId,
@@ -162,11 +161,11 @@ final class BudgetEnvelopeNameRegistryBuilder
     {
         $registries = [];
 
-        if ($this->currentRegistry !== null && count($this->currentRegistry->raisedDomainEvents()) > 0) {
+        if (null !== $this->currentRegistry && count($this->currentRegistry->raisedDomainEvents()) > 0) {
             $registries[] = $this->currentRegistry;
         }
 
-        if ($this->oldRegistry !== null && count($this->oldRegistry->raisedDomainEvents()) > 0) {
+        if (null !== $this->oldRegistry && count($this->oldRegistry->raisedDomainEvents()) > 0) {
             $registries[] = $this->oldRegistry;
         }
 

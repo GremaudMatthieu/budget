@@ -31,7 +31,7 @@ class BudgetEnvelopeCurrencyChangedDomainEvent_v1Test extends TestCase
             'userId' => '1ced5c7e-fd3a-4a36-808e-75ddc478f67b',
             'currency' => 'USD',
             'requestId' => '9faff004-117b-4b51-8e4d-ed6648f745c2',
-            'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'occurredOn' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
         ];
 
         $event = BudgetEnvelopeCurrencyChangedDomainEvent_v1::fromArray($data);

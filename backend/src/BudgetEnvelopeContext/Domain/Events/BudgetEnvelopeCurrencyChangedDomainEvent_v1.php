@@ -15,7 +15,7 @@ final class BudgetEnvelopeCurrencyChangedDomainEvent_v1 implements VersionedDoma
 
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'BudgetEnvelopeCurrencyChanged';
-    
+
     public string $aggregateId;
     public string $userId;
     public string $currency;

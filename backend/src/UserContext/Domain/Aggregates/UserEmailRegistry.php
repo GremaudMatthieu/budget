@@ -28,6 +28,7 @@ final class UserEmailRegistry implements AggregateRootInterface
     {
         $registry = new self();
         $registry->userEmailRegistryId = (string) $registryId;
+
         return $registry;
     }
 
@@ -42,7 +43,7 @@ final class UserEmailRegistry implements AggregateRootInterface
         $this->raiseDomainEvent(
             new UserEmailRegisteredDomainEvent_v1(
                 $this->userEmailRegistryId,
-                (string)$userId,
+                (string) $userId,
                 $emailHash,
             ),
         );
@@ -54,7 +55,7 @@ final class UserEmailRegistry implements AggregateRootInterface
         $this->raiseDomainEvent(
             new UserEmailReleasedDomainEvent_v1(
                 $this->userEmailRegistryId,
-                (string)$userId,
+                (string) $userId,
                 $emailHash,
             ),
         );
@@ -84,6 +85,7 @@ final class UserEmailRegistry implements AggregateRootInterface
     public function setAggregateVersion(int $aggregateVersion): self
     {
         $this->aggregateVersion = $aggregateVersion;
+
         return $this;
     }
 
@@ -102,7 +104,7 @@ final class UserEmailRegistry implements AggregateRootInterface
         $this->userEmailRegistryId = $event->aggregateId;
         $this->emailHashes[$event->email] = [
             'isRegistered' => true,
-            'userId' => $event->userId
+            'userId' => $event->userId,
         ];
     }
 

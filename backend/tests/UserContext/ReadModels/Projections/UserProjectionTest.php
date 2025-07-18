@@ -7,8 +7,6 @@ namespace App\Tests\UserContext\ReadModels\Projections;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
 use App\SharedContext\Domain\Enums\ContextEnum;
-use App\SharedContext\Domain\ValueObjects\UserId;
-use App\SharedContext\Domain\ValueObjects\UserLanguagePreference;
 use App\UserContext\Domain\Events\UserDeletedDomainEvent_v1;
 use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent_v1;
 use App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent_v1;
@@ -19,11 +17,6 @@ use App\UserContext\Domain\Events\UserSignedUpDomainEvent_v1;
 use App\UserContext\Domain\Ports\Inbound\UserOAuthRepositoryInterface;
 use App\UserContext\Domain\Ports\Inbound\UserViewRepositoryInterface;
 use App\UserContext\Domain\Ports\Outbound\RefreshTokenManagerInterface;
-use App\UserContext\Domain\ValueObjects\UserConsent;
-use App\UserContext\Domain\ValueObjects\UserEmail;
-use App\UserContext\Domain\ValueObjects\UserFirstname;
-use App\UserContext\Domain\ValueObjects\UserLastname;
-use App\UserContext\Domain\ValueObjects\UserRegistrationContext;
 use App\UserContext\ReadModels\Projections\UserProjection;
 use App\UserContext\ReadModels\Views\UserView;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -54,9 +47,7 @@ class UserProjectionTest extends TestCase
         );
 
         $this->eventEncryptor->method('decrypt')->willReturnCallback(
-            function ($event) {
-                return $event;
-            }
+            fn ($event) => $event
         );
     }
 
@@ -105,8 +96,7 @@ class UserProjectionTest extends TestCase
             ->willReturn('encryption-key');
         $this->userViewRepository->expects($this->once())
             ->method('save')
-            ->with($this->callback(function (UserView $view) use ($event) {
-                return $view->uuid === $event->aggregateId
+            ->with($this->callback(fn (UserView $view) => $view->uuid === $event->aggregateId
                     && $view->createdAt == $event->occurredOn
                     && $view->updatedAt == \DateTime::createFromImmutable($event->occurredOn)
                     && $view->email === $event->email
@@ -115,8 +105,7 @@ class UserProjectionTest extends TestCase
                     && $view->registrationContext === $event->registrationContext
                     && $view->providerUserId === $event->providerUserId
                     && $view->consentGiven === $event->isConsentGiven
-                    && $view->roles === $event->roles;
-            }));
+                    && $view->roles === $event->roles));
 
         $this->userProjection->__invoke($event);
     }

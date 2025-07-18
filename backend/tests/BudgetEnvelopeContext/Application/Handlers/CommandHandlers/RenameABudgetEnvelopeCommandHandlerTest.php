@@ -65,8 +65,8 @@ class RenameABudgetEnvelopeCommandHandlerTest extends TestCase
 
         $this->eventStore->expects($this->any())
             ->method('load')
-            ->willReturnCallback(function($id) use ($envelope) {
-                if ($id === '10a33b8c-853a-4df8-8fc9-e8bb00b78da4') {
+            ->willReturnCallback(function ($id) use ($envelope) {
+                if ('10a33b8c-853a-4df8-8fc9-e8bb00b78da4' === $id) {
                     return $envelope;
                 }
                 throw new EventsNotFoundForAggregateException();

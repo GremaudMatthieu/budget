@@ -40,7 +40,7 @@ final readonly class GenerateABudgetPlanController
                 BudgetPlanId::fromString($input->uuid),
                 $input->date,
                 array_map(
-                    fn($income) => BudgetPlanIncome::fromArray($income),
+                    fn ($income) => BudgetPlanIncome::fromArray($income),
                     $input->incomes
                 ),
                 UserId::fromString($user->getUuid()),

@@ -15,7 +15,7 @@ final class BudgetEnvelopeCreditedDomainEvent_v1 implements VersionedDomainEvent
 
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'BudgetEnvelopeCredited';
-    
+
     public string $aggregateId;
     public string $userId;
     public string $creditMoney;

@@ -27,40 +27,40 @@ final class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSeri
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'budget_envelope_view_id_seq', allocationSize: 1, initialValue: 1)]
-    private(set) int $id;
+    public private(set) int $id;
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
-    private(set) string $uuid;
+    public private(set) string $uuid;
 
     #[ORM\Column(name: 'created_at', type: 'datetime')]
-    private(set) \DateTimeImmutable $createdAt;
+    public private(set) \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    private(set) \DateTime $updatedAt;
+    public private(set) \DateTime $updatedAt;
 
     #[ORM\Column(name: 'current_amount', type: 'string', length: 13)]
-    private(set) string $currentAmount;
+    public private(set) string $currentAmount;
 
     #[ORM\Column(name: 'targeted_amount', type: 'string', length: 13)]
-    private(set) string $targetedAmount;
+    public private(set) string $targetedAmount;
 
     #[ORM\Column(name: 'name', type: 'string', length: 25)]
-    private(set) string $name;
+    public private(set) string $name;
 
     #[ORM\Column(name: 'currency', type: 'string', length: 3)]
-    private(set) string $currency;
+    public private(set) string $currency;
 
     #[ORM\Column(name: 'user_uuid', type: 'string', length: 36)]
-    private(set) string $userUuid;
+    public private(set) string $userUuid;
 
     #[ORM\Column(name: 'context_uuid', type: 'string', length: 36)]
-    private(set) string $contextUuid;
+    public private(set) string $contextUuid;
 
     #[ORM\Column(name: 'context', type: 'string', length: 36)]
-    private(set) string $context;
+    public private(set) string $context;
 
     #[ORM\Column(name: 'is_deleted', type: 'boolean', options: ['default' => false])]
-    private(set) bool $isDeleted;
+    public private(set) bool $isDeleted;
 
     private function __construct(
         string $budgetEnvelopeId,

@@ -40,7 +40,7 @@ class BudgetEnvelopeAddedDomainEvent_v1Test extends TestCase
             'requestId' => '9faff004-117b-4b51-8e4d-ed6648f745c2',
             'targetedAmount' => '1000.00',
             'currency' => 'USD',
-            'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'occurredOn' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
             'context' => ContextEnum::BUDGET_ENVELOPE->value,
             'contextId' => 'b7e685be-db83-4866-9f85-102fac30a50b',
         ];

@@ -47,7 +47,7 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
         }
 
         $params = ['state' => $state ?: json_encode(['platform' => $platform])];
-        if ($redirectUri && $platform === 'mobile') {
+        if ($redirectUri && 'mobile' === $platform) {
             $params['redirect_uri'] = $redirectUri;
         }
 
@@ -84,7 +84,7 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
         $redirectUri = $request->getSession()->get('oauth_redirect_uri');
         $mobileRedirectUri = $request->getSession()->get('oauth_mobile_redirect');
 
-        if ($platform === 'mobile' && $mobileRedirectUri) {
+        if ('mobile' === $platform && $mobileRedirectUri) {
             $redirectUri = $mobileRedirectUri;
         }
 
@@ -110,21 +110,21 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
 
     private function buildRedirectUrl(string $email, string $token, string $platform = 'web', ?string $customRedirectUri = null, ?string $refreshToken = null): string
     {
-        if ($platform === 'mobile') {
+        if ('mobile' === $platform) {
             // Use the app scheme for mobile deep linking
             $baseUrl = $customRedirectUri ?? $this->getParameter('MOBILE_APP_SCHEME');
             $separator = (str_contains($baseUrl, '?')) ? '&' : '?';
-            $url = $baseUrl . $separator . "email=" . urlencode($email) . "&token=" . urlencode($token);
+            $url = $baseUrl.$separator.'email='.urlencode($email).'&token='.urlencode($token);
         } else {
             $frontendUrl = $this->getParameter('FRONTEND_URL');
-            $url = "{$frontendUrl}/oauth/google/callback?email=" . urlencode($email) .
-                "&token=" . urlencode($token);
+            $url = "{$frontendUrl}/oauth/google/callback?email=".urlencode($email).
+                '&token='.urlencode($token);
         }
-        
+
         if ($refreshToken) {
-            $url .= "&refresh_token=" . urlencode($refreshToken);
+            $url .= '&refresh_token='.urlencode($refreshToken);
         }
-        
+
         return $url;
     }
 }

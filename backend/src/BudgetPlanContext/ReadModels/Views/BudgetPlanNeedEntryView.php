@@ -20,28 +20,28 @@ final class BudgetPlanNeedEntryView implements \JsonSerializable, BudgetPlanNeed
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'budget_plan_need_entry_view_id_seq', allocationSize: 1, initialValue: 1)]
-    private(set) int $id;
+    public private(set) int $id;
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
-    private(set) string $uuid;
+    public private(set) string $uuid;
 
     #[ORM\Column(name: 'budget_plan_uuid', type: 'string', length: 36)]
-    private(set) string $budgetPlanUuid;
+    public private(set) string $budgetPlanUuid;
 
     #[ORM\Column(name: 'need_name', type: 'string', length: 35)]
-    private(set) string $needName;
+    public private(set) string $needName;
 
     #[ORM\Column(name: 'need_amount', type: 'string', length: 13)]
-    private(set) string $needAmount;
+    public private(set) string $needAmount;
 
     #[ORM\Column(name: 'category', type: 'string', length: 35)]
-    private(set) string $category;
+    public private(set) string $category;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    private(set) \DateTimeImmutable $createdAt;
+    public private(set) \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    private(set) \DateTime $updatedAt;
+    public private(set) \DateTime $updatedAt;
 
     private function __construct(
         string $budgetPlanUuid,
@@ -75,12 +75,12 @@ final class BudgetPlanNeedEntryView implements \JsonSerializable, BudgetPlanNeed
     {
         return new self(
             $event->aggregateId,
-                [
-                    'uuid' => $event->uuid,
-                    'needName' => $event->name,
-                    'category' => $event->category,
-                    'amount' => $event->amount,
-                ],
+            [
+                'uuid' => $event->uuid,
+                'needName' => $event->name,
+                'category' => $event->category,
+                'amount' => $event->amount,
+            ],
             $event->occurredOn,
             \DateTime::createFromImmutable($event->occurredOn),
         );

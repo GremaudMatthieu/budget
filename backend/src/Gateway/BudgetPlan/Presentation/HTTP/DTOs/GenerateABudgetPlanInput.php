@@ -16,11 +16,9 @@ final readonly class GenerateABudgetPlanInput
             pattern: '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
         )]
         private(set) string $uuid,
-
         #[Assert\NotBlank]
         #[Assert\Type(\DateTimeImmutable::class)]
         private(set) \DateTimeImmutable $date,
-
         #[Assert\NotBlank]
         #[Assert\Type('array')]
         #[Assert\All([
@@ -64,9 +62,7 @@ final readonly class GenerateABudgetPlanInput
             message: 'budgetPlan.currencyInvalid'
         )]
         private(set) string $currency,
-
         private(set) ?string $context = ContextEnum::BUDGET_PLAN->value,
-
         private(set) ?string $contextId = null,
     ) {
     }

@@ -289,11 +289,11 @@ final class User implements AggregateRootInterface, UserAggregateInterface, Snap
             ],
         ];
     }
-    
+
     public static function fromSnapshot(array $data, int $version): self
     {
         $user = new self();
-        
+
         $user->userId = UserId::fromString($data['userId']);
         $user->email = UserEmail::fromString($data['email']);
         $user->firstname = UserFirstname::fromString($data['firstname']);
@@ -308,7 +308,7 @@ final class User implements AggregateRootInterface, UserAggregateInterface, Snap
         $user->providerUserId = $data['providerUserId'];
         $user->context = Context::from($data['context']['contextId'], $data['context']['context']);
         $user->aggregateVersion = $version;
-        
+
         return $user;
     }
 }

@@ -17,7 +17,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-
 #[AsCommand(
     name: 'app:rewind-a-budget-envelope',
     description: 'Rewinds events for a budget envelope.',
@@ -87,6 +86,7 @@ final class RewindABudgetEnvelopeCommand extends Command
         $desiredDateTime = UtcClock::fromStringToImmutable($desiredDateTime);
         if (!$desiredDateTime) {
             $output->writeln('<error>Invalid date format.</error>');
+
             return Command::FAILURE;
         }
 

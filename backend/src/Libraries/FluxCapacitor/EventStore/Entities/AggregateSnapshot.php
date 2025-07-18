@@ -36,7 +36,7 @@ class AggregateSnapshot
         string $aggregateId,
         string $aggregateType,
         int $version,
-        string $data
+        string $data,
     ) {
         $this->aggregateId = $aggregateId;
         $this->aggregateType = $aggregateType;

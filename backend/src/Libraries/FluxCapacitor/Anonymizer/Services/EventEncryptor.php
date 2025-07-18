@@ -9,8 +9,6 @@ use App\Libraries\FluxCapacitor\Anonymizer\Ports\AbstractUserDomainEventInterfac
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\AbstractUserSignedUpDomainEventInterface;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\EncryptionServiceInterface;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
-use ReflectionClass;
-use ReflectionProperty;
 
 final readonly class EventEncryptor implements EventEncryptorInterface
 {
@@ -20,7 +18,7 @@ final readonly class EventEncryptor implements EventEncryptorInterface
 
     public function encrypt(AbstractUserDomainEventInterface $event, string $userId): AbstractUserDomainEventInterface
     {
-        $reflection = new ReflectionClass($event);
+        $reflection = new \ReflectionClass($event);
 
         foreach ($reflection->getProperties() as $property) {
             if ($this->hasPersonalDataAttribute($property)) {
@@ -43,7 +41,7 @@ final readonly class EventEncryptor implements EventEncryptorInterface
 
     public function decrypt(AbstractUserDomainEventInterface $event, string $userId): AbstractUserDomainEventInterface
     {
-        $reflection = new ReflectionClass($event);
+        $reflection = new \ReflectionClass($event);
 
         foreach ($reflection->getProperties() as $property) {
             if ($this->hasPersonalDataAttribute($property)) {
@@ -66,7 +64,7 @@ final readonly class EventEncryptor implements EventEncryptorInterface
         return $event;
     }
 
-    private function hasPersonalDataAttribute(ReflectionProperty $property): bool
+    private function hasPersonalDataAttribute(\ReflectionProperty $property): bool
     {
         return count($property->getAttributes(PersonalData::class)) > 0;
     }

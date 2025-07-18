@@ -13,10 +13,10 @@ use App\SharedContext\Domain\ValueObjects\UtcClock;
 final class UserSignedUpDomainEvent_v1 implements UserDomainEventInterface, AbstractUserSignedUpDomainEventInterface, VersionedDomainEventInterface
 {
     use VersionedEventTrait;
-    
+
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'UserSignedUp';
-    
+
     public string $aggregateId;
     #[PersonalData]
     public string $email;
@@ -49,7 +49,7 @@ final class UserSignedUpDomainEvent_v1 implements UserDomainEventInterface, Abst
         string $providerUserId,
         string $contextId,
         string $context,
-        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID
+        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
     ) {
         $this->aggregateId = $aggregateId;
         $this->email = $email;

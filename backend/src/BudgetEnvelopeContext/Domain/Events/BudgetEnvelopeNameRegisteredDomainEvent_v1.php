@@ -15,7 +15,7 @@ final class BudgetEnvelopeNameRegisteredDomainEvent_v1 implements VersionedDomai
 
     public const int VERSION = 1;
     public const string EVENT_TYPE = 'BudgetEnvelopeNameRegistered';
-    
+
     public string $aggregateId;
     public string $userId;
     public string $name;

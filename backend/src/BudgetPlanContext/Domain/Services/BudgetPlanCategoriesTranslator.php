@@ -9,7 +9,7 @@ use App\SharedContext\Domain\Ports\Outbound\TranslatorInterface;
 
 final readonly class BudgetPlanCategoriesTranslator implements BudgetPlanCategoriesTranslatorInterface
 {
-    const array CATEGORIES = [
+    public const array CATEGORIES = [
         'incomeCategoriesRatio' => 'incomes',
         'incomeCategoriesTotal' => 'incomes',
         'needCategoriesRatio' => 'needs',
@@ -22,7 +22,8 @@ final readonly class BudgetPlanCategoriesTranslator implements BudgetPlanCategor
 
     public function __construct(
         private TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     public function translate(array $budgetPlans, string $locale): array
     {
@@ -40,8 +41,11 @@ final readonly class BudgetPlanCategoriesTranslator implements BudgetPlanCategor
                         $locale,
                     );
                 }
+
                 return $translatedBudgetPlans;
-            }, $budgetPlans);
+            },
+            $budgetPlans
+        );
     }
 
     private function translateCategories(array $categories, string $domain, string $locale): array
@@ -49,8 +53,9 @@ final readonly class BudgetPlanCategoriesTranslator implements BudgetPlanCategor
         return array_reduce(
             array_keys($categories),
             function ($translatedCategories, $key) use ($categories, $domain, $locale) {
-                $translatedKey = $this->translator->trans($domain . '.' . $key, [], 'messages', $locale);
+                $translatedKey = $this->translator->trans($domain.'.'.$key, [], 'messages', $locale);
                 $translatedCategories[$translatedKey] = $categories[$key];
+
                 return $translatedCategories;
             },
             []

@@ -26,8 +26,8 @@ jobs:
             ${{ runner.os }}-php-
       - name: Install dependencies
         run: cd backend && composer install --prefer-dist --no-progress
-      #- name: Coding style
-      #  run: cd backend && vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+      - name: Coding style
+        run: cd backend && vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
       - name: Static analysis
         run: cd backend && vendor/bin/phpstan analyse --level=max
       - name: Unit tests

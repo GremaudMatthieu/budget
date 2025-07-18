@@ -45,7 +45,7 @@ final readonly class AuthenticationService implements AuthenticationServiceInter
                 'firstname' => $user->firstname ?? '',
                 'lastname' => $user->lastname ?? '',
                 'languagePreference' => $user->languagePreference ?? 'en',
-            ]
+            ],
         ];
     }
 
@@ -54,7 +54,7 @@ final readonly class AuthenticationService implements AuthenticationServiceInter
         $user = $this->userViewRepository->findOneBy(['email' => $email]);
 
         if (!$user) {
-            throw new UserNotFoundException('User not found with email: ' . $email);
+            throw new UserNotFoundException('User not found with email: '.$email);
         }
 
         return $this->generateTokensForUser($user);

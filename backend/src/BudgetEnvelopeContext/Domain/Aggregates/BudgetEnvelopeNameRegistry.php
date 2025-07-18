@@ -26,8 +26,7 @@ final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
 
     public static function create(
         BudgetEnvelopeNameRegistryId $budgetEnvelopeNameRegistryId,
-    ): self
-    {
+    ): self {
         $registry = new self();
         $registry->budgetEnvelopeNameRegistryId = (string) $budgetEnvelopeNameRegistryId;
 
@@ -42,7 +41,7 @@ final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
     public function registerName(
         BudgetEnvelopeName $name,
         UserId $userId,
-        BudgetEnvelopeId $envelopeId
+        BudgetEnvelopeId $envelopeId,
     ): void {
         $nameKey = $this->generateNameKey((string) $name, (string) $userId);
 
@@ -108,6 +107,6 @@ final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
 
     private function generateNameKey(string $name, string $userId): string
     {
-        return $userId . ':' . mb_strtolower($name);
+        return $userId.':'.mb_strtolower($name);
     }
 }

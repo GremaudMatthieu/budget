@@ -65,11 +65,11 @@ class DeleteAUserCommandHandlerTest extends TestCase
 
         $this->eventStore->expects($this->exactly(2))
             ->method('load')
-            ->willReturnCallback(function($id) use ($userId, $user, $registry) {
+            ->willReturnCallback(function ($id) use ($userId, $user, $registry) {
                 if ($id === $userId) {
                     return $user;
                 }
-                if ($id === UserEmailRegistry::DEFAULT_ID) {
+                if (UserEmailRegistry::DEFAULT_ID === $id) {
                     return $registry;
                 }
                 throw new \RuntimeException("Unexpected ID: $id");
@@ -119,11 +119,11 @@ class DeleteAUserCommandHandlerTest extends TestCase
 
         $this->eventStore->expects($this->exactly(2))
             ->method('load')
-            ->willReturnCallback(function($id) use ($userId, $user, $registry) {
+            ->willReturnCallback(function ($id) use ($userId, $user, $registry) {
                 if ($id === $userId) {
                     return $user;
                 }
-                if ($id === UserEmailRegistry::DEFAULT_ID) {
+                if (UserEmailRegistry::DEFAULT_ID === $id) {
                     return $registry;
                 }
                 throw new \RuntimeException("Unexpected ID: $id");

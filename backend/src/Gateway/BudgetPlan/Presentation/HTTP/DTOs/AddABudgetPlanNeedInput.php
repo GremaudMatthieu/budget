@@ -15,7 +15,6 @@ final readonly class AddABudgetPlanNeedInput
             pattern: '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
         )]
         private(set) string $uuid,
-
         #[Assert\NotBlank]
         #[Assert\Type('string')]
         #[Assert\Length(
@@ -23,7 +22,6 @@ final readonly class AddABudgetPlanNeedInput
             max: 35,
         )]
         private(set) string $name,
-
         #[Assert\NotBlank]
         #[Assert\Type(type: 'string')]
         #[Assert\Length(
@@ -37,7 +35,6 @@ final readonly class AddABudgetPlanNeedInput
             message: 'budgetPlan.amountInvalid'
         )]
         private(set) string $amount,
-
         #[Assert\NotBlank]
         #[Assert\Type('string')]
         #[Assert\Length(

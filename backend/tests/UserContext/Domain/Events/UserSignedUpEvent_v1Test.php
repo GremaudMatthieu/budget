@@ -50,7 +50,7 @@ class UserSignedUpEvent_v1Test extends TestCase
             'languagePreference' => 'fr',
             'isConsentGiven' => true,
             'roles' => ['ROLE_USER'],
-            'occurredOn' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'occurredOn' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
             'registrationContext' => 'google',
             'providerUserId' => '1234567890',
             'userId' => 'b7e685be-db83-4866-9f85-102fac30a50b',

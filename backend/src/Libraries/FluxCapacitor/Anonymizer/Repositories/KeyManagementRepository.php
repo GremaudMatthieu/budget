@@ -63,12 +63,12 @@ final readonly class KeyManagementRepository implements KeyManagementRepositoryI
             $tag
         );
 
-        return base64_encode($iv . $tag . $encryptedKey);
+        return base64_encode($iv.$tag.$encryptedKey);
     }
 
     public function decryptKey(string $encryptedKey): string
     {
-        $decoded = base64_decode($encryptedKey);
+        $decoded = base64_decode($encryptedKey, true);
 
         $iv = substr($decoded, 0, 16);
         $tag = substr($decoded, 16, 16);

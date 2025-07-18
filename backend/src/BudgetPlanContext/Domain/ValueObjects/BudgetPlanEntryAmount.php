@@ -9,12 +9,13 @@ use Assert\Assert;
 final readonly class BudgetPlanEntryAmount
 {
     private function __construct(
-        protected string $entryAmount
+        protected string $entryAmount,
     ) {
         Assert::that($entryAmount)
             ->notBlank('Amount should not be blank.')
             ->string('Amount must be a string.')
-            ->regex('/^\d+(\.\d{1,2})?$/',
+            ->regex(
+                '/^\d+(\.\d{1,2})?$/',
                 'The amount must be a string representing a number with up to two decimal places (e.g., "0.00").',
             );
     }

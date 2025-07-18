@@ -15,7 +15,7 @@ class UserEmailTest extends TestCase
         $email = 'test@example.com';
         $userEmail = UserEmail::fromString($email);
 
-        $this->assertEquals($email, (string)$userEmail);
+        $this->assertEquals($email, (string) $userEmail);
     }
 
     public function testEmptyEmail(): void

@@ -48,7 +48,7 @@ final class EventStore implements EventStoreInterface
         if (!$desiredDateTime) {
             $aggregateType = $this->guessAggregateType($uuid);
             $snapshot = $this->snapshotService->loadSnapshot($uuid, $aggregateType);
-            
+
             if ($snapshot) {
                 /** @var AggregateRootInterface $aggregateClass */
                 $aggregateClass = $this->eventClassMap->getAggregatePathByByStreamName($aggregateType);
@@ -60,7 +60,7 @@ final class EventStore implements EventStoreInterface
                 return $aggregate;
             }
         }
-        
+
         $queryBuilder = $this->createBaseQueryBuilder($uuid, $desiredDateTime);
         $eventsIterator = $queryBuilder->executeQuery()->iterateAssociative();
         $aggregate = $this->createAggregateFromEvents($eventsIterator, $uuid);
@@ -82,7 +82,7 @@ final class EventStore implements EventStoreInterface
     public function loadByDomainEvents(
         string $uuid,
         array $domainEventClasses,
-        ?\DateTimeImmutable $desiredDateTime = null
+        ?\DateTimeImmutable $desiredDateTime = null,
     ): \Generator {
         $queryBuilder = $this->connection->createQueryBuilder()
             ->select('stream_id', 'event_name', 'payload', 'occurred_on', 'request_id', 'user_id', 'stream_version')
@@ -200,7 +200,7 @@ final class EventStore implements EventStoreInterface
 
         $firstEvent = $eventsIterator->current();
         $streamName = $firstEvent['stream_name'];
-        /**@var AggregateRootInterface $aggregatePath **/
+        /** @var AggregateRootInterface $aggregatePath * */
         $aggregatePath = $this->eventClassMap->getAggregatePathByByStreamName($streamName);
         $aggregate = $aggregatePath::empty();
         $version = (int) $firstEvent['stream_version'];
@@ -253,7 +253,7 @@ final class EventStore implements EventStoreInterface
             'SELECT stream_name FROM event_store WHERE stream_id = ? LIMIT 1',
             [$uuid]
         );
-        
+
         return $streamName ?: 'Unknown';
     }
 

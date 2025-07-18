@@ -12,14 +12,14 @@ final class BudgetAppEventUpcastingService implements EventUpcastingServiceInter
     {
         $eventName = $eventData['event_name'];
         $version = $eventData['event_version'] ?? 1;
-        
+
         // Pattern : EventName_v1 → EventName_v2
         return match([$eventName, $version]) {
             // Règles à ajouter au fur et à mesure
             default => $eventData,
         };
     }
-    
+
     private function upcastUserSignedUpV1ToV2(array $eventData): array
     {
         // Exemple pour plus tard

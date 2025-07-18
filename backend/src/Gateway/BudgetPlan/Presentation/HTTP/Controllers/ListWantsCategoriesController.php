@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class ListWantsCategoriesController
 {
     public function __construct(
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -27,9 +27,9 @@ final readonly class ListWantsCategoriesController
     ): JsonResponse {
         $locale = $user->languagePreference;
 
-        $categories = array_map(fn(WantsCategoriesEnum $category) => [
+        $categories = array_map(fn (WantsCategoriesEnum $category) => [
             'id' => $category->value,
-            'name' => $this->translator->trans('wants.' . $category->value, [], 'messages', $locale)
+            'name' => $this->translator->trans('wants.'.$category->value, [], 'messages', $locale),
         ], WantsCategoriesEnum::cases());
 
         return new JsonResponse($categories, Response::HTTP_OK);

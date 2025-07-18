@@ -62,7 +62,8 @@ class DebitABudgetEnvelopeCommandHandlerTest extends TestCase
             BudgetEnvelopeCurrency::fromString('USD'),
             Context::from('10a33b8c-853a-4df8-8fc9-e8bb00b78da4', ContextEnum::BUDGET_ENVELOPE->value),
         );
-        $envelope->credit(BudgetEnvelopeCreditMoney::fromString('100.00'),
+        $envelope->credit(
+            BudgetEnvelopeCreditMoney::fromString('100.00'),
             BudgetEnvelopeEntryDescription::fromString('test'),
             UserId::fromString('a871e446-ddcd-4e7a-9bf9-525bab84e566'),
         );

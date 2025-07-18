@@ -35,34 +35,34 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'budget_plan_view_id_seq', allocationSize: 1, initialValue: 1)]
-    private(set) int $id;
+    public private(set) int $id;
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
-    private(set) string $uuid;
+    public private(set) string $uuid;
 
     #[ORM\Column(name: 'user_uuid', type: 'string', length: 36)]
-    private(set) string $userId;
+    public private(set) string $userId;
 
     #[ORM\Column(name: 'date', type: 'datetime_immutable')]
-    private(set) \DateTimeImmutable $date;
+    public private(set) \DateTimeImmutable $date;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    private(set) \DateTimeImmutable $createdAt;
+    public private(set) \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    private(set) \DateTime $updatedAt;
+    public private(set) \DateTime $updatedAt;
 
     #[ORM\Column(name: 'currency', type: 'string', length: 3)]
-    private(set) string $currency;
+    public private(set) string $currency;
 
     #[ORM\Column(name: 'context_uuid', type: 'string', length: 36)]
-    private(set) string $contextUuid;
+    public private(set) string $contextUuid;
 
     #[ORM\Column(name: 'context', type: 'string', length: 36)]
-    private(set) string $context;
+    public private(set) string $context;
 
     #[ORM\Column(name: 'is_deleted', type: 'boolean', options: ['default' => false])]
-    private(set) bool $isDeleted;
+    public private(set) bool $isDeleted;
 
     private function __construct(
         string $budgetPlanId,
@@ -237,7 +237,7 @@ final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }
 
-     private function applyBudgetPlanIncomeAdjustedDomainEvent_v1(BudgetPlanIncomeAdjustedDomainEvent_v1 $event): void
+    private function applyBudgetPlanIncomeAdjustedDomainEvent_v1(BudgetPlanIncomeAdjustedDomainEvent_v1 $event): void
     {
         $this->updatedAt = \DateTime::createFromImmutable($event->occurredOn);
     }

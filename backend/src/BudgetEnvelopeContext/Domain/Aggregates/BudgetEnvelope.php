@@ -361,11 +361,11 @@ final class BudgetEnvelope implements AggregateRootInterface, SnapshotableAggreg
             'isDeleted' => $this->isDeleted,
         ];
     }
-    
+
     public static function fromSnapshot(array $data, int $version): self
     {
         $budgetEnvelope = new self();
-        
+
         $budgetEnvelope->budgetEnvelopeId = BudgetEnvelopeId::fromString($data['budgetEnvelopeId']);
         $budgetEnvelope->userId = UserId::fromString($data['userId']);
         $budgetEnvelope->budgetEnvelopeName = BudgetEnvelopeName::fromString($data['budgetEnvelopeName']);
@@ -382,7 +382,7 @@ final class BudgetEnvelope implements AggregateRootInterface, SnapshotableAggreg
         $budgetEnvelope->updatedAt = new \DateTime($data['updatedAt']);
         $budgetEnvelope->isDeleted = $data['isDeleted'];
         $budgetEnvelope->aggregateVersion = $version;
-        
+
         return $budgetEnvelope;
     }
 }

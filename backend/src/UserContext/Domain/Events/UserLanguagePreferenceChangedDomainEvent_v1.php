@@ -27,7 +27,7 @@ final class UserLanguagePreferenceChangedDomainEvent_v1 implements UserDomainEve
         string $aggregateId,
         string $languagePreference,
         string $userId,
-        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID
+        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
     ) {
         $this->aggregateId = $aggregateId;
         $this->languagePreference = $languagePreference;

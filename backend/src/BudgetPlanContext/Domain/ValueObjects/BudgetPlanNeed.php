@@ -12,7 +12,7 @@ final readonly class BudgetPlanNeed
         protected string $uuid,
         protected string $needName,
         protected string $category,
-        protected string $amount
+        protected string $amount,
     ) {
         Assert::that($uuid)
             ->notBlank('UUID should not be blank.')
@@ -33,7 +33,8 @@ final readonly class BudgetPlanNeed
         Assert::that($amount)
             ->notBlank('Amount should not be blank.')
             ->string('Amount must be a string.')
-            ->regex('/^\d+(\.\d{1,2})?$/',
+            ->regex(
+                '/^\d+(\.\d{1,2})?$/',
                 'The amount must be a string representing a number with up to two decimal places (e.g., "0.00").',
             );
     }
@@ -74,7 +75,7 @@ final readonly class BudgetPlanNeed
             'uuid' => $this->uuid,
             'needName' => $this->needName,
             'category' => $this->category,
-            'amount' => $this->amount
+            'amount' => $this->amount,
         ];
     }
 }

@@ -31,12 +31,6 @@ parameters:
 			path: src/BudgetPlanContext/Application/Queries/GetACalendarWithItsBudgetPlansFinancialRatiosByYearQuery.php
 
 		-
-			message: '#^Anonymous function has an unused use \$currentDate\.$#'
-			identifier: closure.unusedUse
-			count: 4
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
-
-		-
 			message: '#^Cannot access offset ''context'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
@@ -541,12 +535,6 @@ parameters:
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
-			message: '#^Method App\\Libraries\\FluxCapacitor\\EventStore\\EventStore\:\:createAggregateFromEvents\(\) should return App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface but returns mixed\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
-
-		-
 			message: '#^Method App\\Libraries\\FluxCapacitor\\EventStore\\EventStore\:\:getEventPayload\(\) should return array but returns mixed\.$#'
 			identifier: return.type
 			count: 2
@@ -567,7 +555,7 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var with type App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface is not subtype of native type string\.$#'
 			identifier: varTag.nativeType
-			count: 1
+			count: 2
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-

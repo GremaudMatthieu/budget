@@ -57,7 +57,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
     private array $needs;
     private array $wants;
     private array $savings;
-    private(set) \DateTimeImmutable $date;
+    public private(set) \DateTimeImmutable $date;
     private int $aggregateVersion = 0;
     private bool $isDeleted = false;
     private \DateTime $updatedAt;
@@ -83,10 +83,10 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                 (string) $budgetPlanId,
                 UtcClock::fromImmutableToString($date),
                 (string) $currency,
-                array_map(fn(BudgetPlanIncome $income) => $income->toArray(), $incomes),
-                array_map(fn(BudgetPlanNeed $need) => $need->toArray(), self::generateFakeNeeds($incomes, (string) $userLanguagePreference, $uuidGenerator, $translator)),
-                array_map(fn(BudgetPlanWant $want) => $want->toArray(), self::generateFakeWants($incomes, (string) $userLanguagePreference, $uuidGenerator, $translator)),
-                array_map(fn(BudgetPlanSaving $saving) => $saving->toArray(), self::generateFakeSavings($incomes, (string) $userLanguagePreference, $uuidGenerator, $translator)),
+                array_map(fn (BudgetPlanIncome $income) => $income->toArray(), $incomes),
+                array_map(fn (BudgetPlanNeed $need) => $need->toArray(), self::generateFakeNeeds($incomes, (string) $userLanguagePreference, $uuidGenerator, $translator)),
+                array_map(fn (BudgetPlanWant $want) => $want->toArray(), self::generateFakeWants($incomes, (string) $userLanguagePreference, $uuidGenerator, $translator)),
+                array_map(fn (BudgetPlanSaving $saving) => $saving->toArray(), self::generateFakeSavings($incomes, (string) $userLanguagePreference, $uuidGenerator, $translator)),
                 (string) $userId,
                 $context->getContextId(),
                 $context->getContext(),
@@ -111,28 +111,32 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                 (string) $budgetPlanId,
                 UtcClock::fromImmutableToString($date),
                 (string) $budgetPlanToCopy->currency,
-                array_map(fn(BudgetPlanIncome $income) => $income->toArray(),
+                array_map(
+                    fn (BudgetPlanIncome $income) => $income->toArray(),
                     self::generateIncomesFromABudgetPlanThatAlreadyExists(
                         $budgetPlanToCopy->incomes,
                         $uuidGenerator,
                         $currentDate,
                     ),
                 ),
-                array_map(fn(BudgetPlanNeed $need) => $need->toArray(),
+                array_map(
+                    fn (BudgetPlanNeed $need) => $need->toArray(),
                     self::generateNeedsFromABudgetPlanThatAlreadyExists(
                         $budgetPlanToCopy->needs,
                         $uuidGenerator,
                         $currentDate,
                     ),
                 ),
-                array_map(fn(BudgetPlanWant $want) => $want->toArray(),
+                array_map(
+                    fn (BudgetPlanWant $want) => $want->toArray(),
                     self::generateWantsFromABudgetPlanThatAlreadyExists(
                         $budgetPlanToCopy->wants,
                         $uuidGenerator,
                         $currentDate,
                     ),
                 ),
-                array_map(fn(BudgetPlanSaving $saving) => $saving->toArray(),
+                array_map(
+                    fn (BudgetPlanSaving $saving) => $saving->toArray(),
                     self::generateSavingsFromABudgetPlanThatAlreadyExists(
                         $budgetPlanToCopy->savings,
                         $uuidGenerator,
@@ -428,26 +432,26 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
         $this->userId = UserId::fromString($event->userId);
         $this->date = new \DateTimeImmutable($event->date);
         $this->currency = BudgetPlanCurrency::fromString($event->currency);
-        $this->incomes = array_map(fn(array $income) => BudgetPlanIncome::fromArray($income), $event->incomes);
-        $this->needs = array_map(fn(array $income) => BudgetPlanNeed::fromArray($income), $event->needs);
-        $this->wants = array_map(fn(array $income) => BudgetPlanWant::fromArray($income), $event->wants);
-        $this->savings = array_map(fn(array $income) => BudgetPlanSaving::fromArray($income), $event->savings);
+        $this->incomes = array_map(fn (array $income) => BudgetPlanIncome::fromArray($income), $event->incomes);
+        $this->needs = array_map(fn (array $income) => BudgetPlanNeed::fromArray($income), $event->needs);
+        $this->wants = array_map(fn (array $income) => BudgetPlanWant::fromArray($income), $event->wants);
+        $this->savings = array_map(fn (array $income) => BudgetPlanSaving::fromArray($income), $event->savings);
         $this->context = Context::from($event->contextId, $event->context);
         $this->isDeleted = false;
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
     public function applyBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1(
-        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1 $event
+        BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1 $event,
     ): void {
         $this->budgetPlanId = BudgetPlanId::fromString($event->aggregateId);
         $this->userId = UserId::fromString($event->userId);
         $this->date = new \DateTimeImmutable($event->date);
         $this->currency = BudgetPlanCurrency::fromString($event->currency);
-        $this->incomes = array_map(fn(array $income) => BudgetPlanIncome::fromArray($income), $event->incomes);
-        $this->needs = array_map(fn(array $income) => BudgetPlanNeed::fromArray($income), $event->needs);
-        $this->wants = array_map(fn(array $income) => BudgetPlanWant::fromArray($income), $event->wants);
-        $this->savings = array_map(fn(array $income) => BudgetPlanSaving::fromArray($income), $event->savings);
+        $this->incomes = array_map(fn (array $income) => BudgetPlanIncome::fromArray($income), $event->incomes);
+        $this->needs = array_map(fn (array $income) => BudgetPlanNeed::fromArray($income), $event->needs);
+        $this->wants = array_map(fn (array $income) => BudgetPlanWant::fromArray($income), $event->wants);
+        $this->savings = array_map(fn (array $income) => BudgetPlanSaving::fromArray($income), $event->savings);
         $this->context = Context::from($event->contextId, $event->context);
         $this->isDeleted = false;
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
@@ -511,7 +515,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
 
     public function applyBudgetPlanIncomeAdjustedDomainEvent_v1(BudgetPlanIncomeAdjustedDomainEvent_v1 $event): void
     {
-        $this->incomes = array_map(function(BudgetPlanIncome $income) use ($event) {
+        $this->incomes = array_map(function (BudgetPlanIncome $income) use ($event) {
             if ($income->getUuid() === $event->uuid) {
                 return BudgetPlanIncome::fromArray([
                     'uuid' => $event->uuid,
@@ -520,6 +524,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     'amount' => $event->amount,
                 ]);
             }
+
             return $income;
         }, $this->incomes);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
@@ -527,7 +532,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
 
     public function applyBudgetPlanWantAdjustedDomainEvent_v1(BudgetPlanWantAdjustedDomainEvent_v1 $event): void
     {
-        $this->wants = array_map(function(BudgetPlanWant $want) use ($event) {
+        $this->wants = array_map(function (BudgetPlanWant $want) use ($event) {
             if ($want->getUuid() === $event->uuid) {
                 return BudgetPlanWant::fromArray([
                     'uuid' => $event->uuid,
@@ -536,6 +541,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     'amount' => $event->amount,
                 ]);
             }
+
             return $want;
         }, $this->wants);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
@@ -543,7 +549,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
 
     public function applyBudgetPlanNeedAdjustedDomainEvent_v1(BudgetPlanNeedAdjustedDomainEvent_v1 $event): void
     {
-        $this->needs = array_map(function(BudgetPlanNeed $need) use ($event) {
+        $this->needs = array_map(function (BudgetPlanNeed $need) use ($event) {
             if ($need->getUuid() === $event->uuid) {
                 return BudgetPlanNeed::fromArray([
                     'uuid' => $event->uuid,
@@ -552,6 +558,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     'amount' => $event->amount,
                 ]);
             }
+
             return $need;
         }, $this->needs);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
@@ -559,7 +566,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
 
     public function applyBudgetPlanSavingAdjustedDomainEvent_v1(BudgetPlanSavingAdjustedDomainEvent_v1 $event): void
     {
-        $this->savings = array_map(function(BudgetPlanSaving $saving) use ($event) {
+        $this->savings = array_map(function (BudgetPlanSaving $saving) use ($event) {
             if ($saving->getUuid() === $event->uuid) {
                 return BudgetPlanSaving::fromArray([
                     'uuid' => $event->uuid,
@@ -568,6 +575,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     'amount' => $event->amount,
                 ]);
             }
+
             return $saving;
         }, $this->savings);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
@@ -575,25 +583,25 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
 
     public function applyBudgetPlanIncomeRemovedDomainEvent_v1(BudgetPlanIncomeRemovedDomainEvent_v1 $event): void
     {
-        $this->incomes = array_filter($this->incomes, fn(BudgetPlanIncome $income) => $income->getUuid() !== $event->uuid);
+        $this->incomes = array_filter($this->incomes, fn (BudgetPlanIncome $income) => $income->getUuid() !== $event->uuid);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
     public function applyBudgetPlanWantRemovedDomainEvent_v1(BudgetPlanWantRemovedDomainEvent_v1 $event): void
     {
-        $this->wants = array_filter($this->wants, fn(BudgetPlanWant $want) => $want->getUuid() !== $event->uuid);
+        $this->wants = array_filter($this->wants, fn (BudgetPlanWant $want) => $want->getUuid() !== $event->uuid);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
     public function applyBudgetPlanNeedRemovedDomainEvent_v1(BudgetPlanNeedRemovedDomainEvent_v1 $event): void
     {
-        $this->needs = array_filter($this->needs, fn(BudgetPlanNeed $need) => $need->getUuid() !== $event->uuid);
+        $this->needs = array_filter($this->needs, fn (BudgetPlanNeed $need) => $need->getUuid() !== $event->uuid);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
     public function applyBudgetPlanSavingRemovedDomainEvent_v1(BudgetPlanSavingRemovedDomainEvent_v1 $event): void
     {
-        $this->savings = array_filter($this->savings, fn(BudgetPlanSaving $saving) => $saving->getUuid() !== $event->uuid);
+        $this->savings = array_filter($this->savings, fn (BudgetPlanSaving $saving) => $saving->getUuid() !== $event->uuid);
         $this->updatedAt = UtcClock::fromImmutableToDateTime($event->occurredOn);
     }
 
@@ -601,13 +609,13 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
         array $incomes,
         string $userPreferredLanguage,
         UuidGeneratorInterface $uuidGenerator,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
     ): array {
         $needsAmount = array_reduce(
-                $incomes,
-                fn(float $carry, BudgetPlanIncome $income) => $carry + (float) $income->getAmount(),
-                0.00,
-            ) * 0.50;
+            $incomes,
+            fn (float $carry, BudgetPlanIncome $income) => $carry + (float) $income->getAmount(),
+            0.00,
+        ) * 0.50;
 
         return [
             BudgetPlanNeed::fromArray([
@@ -618,7 +626,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'rent',
-                'amount' => \sprintf("%.2f", $needsAmount * 0.40),
+                'amount' => \sprintf('%.2f', $needsAmount * 0.40),
             ]),
             BudgetPlanNeed::fromArray([
                 'uuid' => $uuidGenerator->generate(),
@@ -628,7 +636,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'utilities',
-                'amount' => \sprintf("%.2f", $needsAmount * 0.20),
+                'amount' => \sprintf('%.2f', $needsAmount * 0.20),
             ]),
             BudgetPlanNeed::fromArray([
                 'uuid' => $uuidGenerator->generate(),
@@ -638,7 +646,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'food',
-                'amount' => \sprintf("%.2f", $needsAmount * 0.40),
+                'amount' => \sprintf('%.2f', $needsAmount * 0.40),
             ]),
         ];
     }
@@ -650,10 +658,10 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
         TranslatorInterface $translator,
     ): array {
         $wantsAmount = array_reduce(
-                $incomes,
-                fn(float $carry, BudgetPlanIncome $income) => $carry + (float) $income->getAmount(),
-                0.00,
-            ) * 0.30;
+            $incomes,
+            fn (float $carry, BudgetPlanIncome $income) => $carry + (float) $income->getAmount(),
+            0.00,
+        ) * 0.30;
 
         return [
             BudgetPlanWant::fromArray(
@@ -664,8 +672,9 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                         locale: $userPreferredLanguage,
                     ),
                     'category' => 'entertainment',
-                    'amount' => \sprintf("%.2f", $wantsAmount * 0.50),
-                ]),
+                    'amount' => \sprintf('%.2f', $wantsAmount * 0.50),
+                ]
+            ),
             BudgetPlanWant::fromArray([
                 'uuid' => $uuidGenerator->generate(),
                 'wantName' => $translator->trans(
@@ -674,7 +683,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'dining-out',
-                'amount' => \sprintf("%.2f", $wantsAmount * 0.50),
+                'amount' => \sprintf('%.2f', $wantsAmount * 0.50),
             ]),
         ];
     }
@@ -686,10 +695,10 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
         TranslatorInterface $translator,
     ): array {
         $savingsAmount = array_reduce(
-                $incomes,
-                fn(float $carry, BudgetPlanIncome $income) => $carry + (float) $income->getAmount(),
-                0.00,
-            ) * 0.20;
+            $incomes,
+            fn (float $carry, BudgetPlanIncome $income) => $carry + (float) $income->getAmount(),
+            0.00,
+        ) * 0.20;
 
         return [
             BudgetPlanSaving::fromArray([
@@ -700,7 +709,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'emergency-fund',
-                'amount' => \sprintf("%.2f", $savingsAmount * 0.50),
+                'amount' => \sprintf('%.2f', $savingsAmount * 0.50),
             ]),
             BudgetPlanSaving::fromArray([
                 'uuid' => $uuidGenerator->generate(),
@@ -710,7 +719,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
                     locale: $userPreferredLanguage,
                 ),
                 'category' => 'retirement',
-                'amount' => \sprintf("%.2f", $savingsAmount * 0.50),
+                'amount' => \sprintf('%.2f', $savingsAmount * 0.50),
             ]),
         ];
     }
@@ -720,7 +729,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
         UuidGeneratorInterface $uuidGenerator,
         \DateTimeImmutable $currentDate,
     ): array {
-        return array_map(function(BudgetPlanIncome $income) use ($uuidGenerator, $currentDate) {
+        return array_map(function (BudgetPlanIncome $income) use ($uuidGenerator) {
             $newIncome = [];
             $newIncome['uuid'] = $uuidGenerator->generate();
             $newIncome['amount'] = $income->getAmount();
@@ -736,7 +745,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
         UuidGeneratorInterface $uuidGenerator,
         \DateTimeImmutable $currentDate,
     ): array {
-        return array_map(function(BudgetPlanNeed $need) use ($uuidGenerator, $currentDate) {
+        return array_map(function (BudgetPlanNeed $need) use ($uuidGenerator) {
             $newNeed = [];
             $newNeed['uuid'] = $uuidGenerator->generate();
             $newNeed['amount'] = $need->getAmount();
@@ -752,7 +761,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
         UuidGeneratorInterface $uuidGenerator,
         \DateTimeImmutable $currentDate,
     ): array {
-        return array_map(function(BudgetPlanSaving $saving) use ($uuidGenerator, $currentDate) {
+        return array_map(function (BudgetPlanSaving $saving) use ($uuidGenerator) {
             $newSaving = [];
             $newSaving['uuid'] = $uuidGenerator->generate();
             $newSaving['amount'] = $saving->getAmount();
@@ -768,7 +777,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
         UuidGeneratorInterface $uuidGenerator,
         \DateTimeImmutable $currentDate,
     ): array {
-        return array_map(function(BudgetPlanWant $want) use ($uuidGenerator, $currentDate) {
+        return array_map(function (BudgetPlanWant $want) use ($uuidGenerator) {
             $newWant = [];
             $newWant['uuid'] = $uuidGenerator->generate();
             $newWant['amount'] = $want->getAmount();
@@ -799,10 +808,10 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
             'budgetPlanId' => (string) $this->budgetPlanId,
             'userId' => (string) $this->userId,
             'currency' => (string) $this->currency,
-            'incomes' => array_map(fn(BudgetPlanIncome $income) => $income->toArray(), $this->incomes),
-            'needs' => array_map(fn(BudgetPlanNeed $need) => $need->toArray(), $this->needs),
-            'wants' => array_map(fn(BudgetPlanWant $want) => $want->toArray(), $this->wants),
-            'savings' => array_map(fn(BudgetPlanSaving $saving) => $saving->toArray(), $this->savings),
+            'incomes' => array_map(fn (BudgetPlanIncome $income) => $income->toArray(), $this->incomes),
+            'needs' => array_map(fn (BudgetPlanNeed $need) => $need->toArray(), $this->needs),
+            'wants' => array_map(fn (BudgetPlanWant $want) => $want->toArray(), $this->wants),
+            'savings' => array_map(fn (BudgetPlanSaving $saving) => $saving->toArray(), $this->savings),
             'context' => [
                 'contextId' => $this->context->getContextId(),
                 'context' => $this->context->getContext(),
@@ -819,10 +828,10 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
         $aggregate->budgetPlanId = BudgetPlanId::fromString($data['budgetPlanId']);
         $aggregate->userId = UserId::fromString($data['userId']);
         $aggregate->currency = BudgetPlanCurrency::fromString($data['currency']);
-        $aggregate->incomes = array_map(fn(array $income) => BudgetPlanIncome::fromArray($income), $data['incomes']);
-        $aggregate->needs = array_map(fn(array $need) => BudgetPlanNeed::fromArray($need), $data['needs']);
-        $aggregate->wants = array_map(fn(array $want) => BudgetPlanWant::fromArray($want), $data['wants']);
-        $aggregate->savings = array_map(fn(array $saving) => BudgetPlanSaving::fromArray($saving), $data['savings']);
+        $aggregate->incomes = array_map(fn (array $income) => BudgetPlanIncome::fromArray($income), $data['incomes']);
+        $aggregate->needs = array_map(fn (array $need) => BudgetPlanNeed::fromArray($need), $data['needs']);
+        $aggregate->wants = array_map(fn (array $want) => BudgetPlanWant::fromArray($want), $data['wants']);
+        $aggregate->savings = array_map(fn (array $saving) => BudgetPlanSaving::fromArray($saving), $data['savings']);
         $aggregate->date = new \DateTimeImmutable($data['date']);
         $aggregate->isDeleted = $data['isDeleted'];
         $aggregate->updatedAt = new \DateTime($data['updatedAt']);
