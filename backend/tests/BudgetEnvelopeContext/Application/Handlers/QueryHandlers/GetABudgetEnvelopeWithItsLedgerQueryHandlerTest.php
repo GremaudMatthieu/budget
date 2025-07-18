@@ -10,7 +10,7 @@ use App\BudgetEnvelopeContext\Domain\Exceptions\BudgetEnvelopeNotFoundException;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeEntryType;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
-use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
+use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopeView;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use App\SharedContext\Domain\ValueObjects\UserId;
 use PHPUnit\Framework\MockObject\MockObject;

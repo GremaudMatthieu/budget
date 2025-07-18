@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\UserContext\Infrastructure\Adapters;
 
+use App\Gateway\User\Views\UserView;
 use App\UserContext\Domain\Ports\Outbound\RefreshTokenGeneratorInterface;
-use App\UserContext\ReadModels\Views\UserView;
 use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface as GesdinetRefreshTokenGeneratorInterface;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenInterface;
 

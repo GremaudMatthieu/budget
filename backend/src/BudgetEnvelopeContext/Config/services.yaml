@@ -16,7 +16,3 @@ services:
   App\BudgetEnvelopeContext\Application\Handlers\QueryHandlers\:
     resource: '../Application/Handlers/QueryHandlers/'
     tags: [ 'messenger.message_handler' ]
-
-  App\BudgetEnvelopeContext\ReadModels\Projections\:
-    resource: '../ReadModels/Projections/'
-    tags: [ 'messenger.message_handler' ]

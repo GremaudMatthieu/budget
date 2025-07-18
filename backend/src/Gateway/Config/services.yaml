@@ -22,3 +22,18 @@ services:
   App\Gateway\BudgetEnvelope\Presentation\Cli\:
     resource: '../../Gateway/BudgetEnvelope/Presentation/Cli/'
     tags: [ 'console.command' ]
+
+  App\Gateway\BudgetEnvelope\Projections\:
+    resource: '../BudgetEnvelope/Projections/'
+    tags: [ 'messenger.message_handler' ]
+    public: true
+
+  App\Gateway\BudgetPlan\Projections\:
+    resource: '../BudgetPlan/Projections/'
+    tags: [ 'messenger.message_handler' ]
+    public: true
+
+  App\Gateway\User\Projections\:
+    resource: '../User/Projections/'
+    tags: [ 'messenger.message_handler' ]
+    public: true

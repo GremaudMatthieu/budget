@@ -12,7 +12,3 @@ services:
   App\UserContext\Application\Handlers\CommandHandlers\:
     resource: '../Application/Handlers/CommandHandlers/'
     tags: ['messenger.message_handler']
-
-  App\UserContext\ReadModels\Projections\:
-    resource: '../ReadModels/Projections/'
-    tags: [ 'messenger.message_handler']

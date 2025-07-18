@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\UserContext\Domain\Ports\Inbound;
 
-use App\UserContext\ReadModels\Views\UserView;
+use App\Gateway\User\Views\UserView;
 
 interface AuthenticationServiceInterface
 {

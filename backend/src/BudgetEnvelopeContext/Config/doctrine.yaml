@@ -1,9 +1,0 @@
-doctrine:
-  orm:
-    mappings:
-      EnvelopeView:
-        type: attribute
-        is_bundle: false
-        dir: '%kernel.project_dir%/src/BudgetEnvelopeContext/ReadModels/Views'
-        prefix: 'App\BudgetEnvelopeContext\ReadModels\Views'
-        alias: EnvelopeView

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\UserContext\Infrastructure\Persistence\Repositories;
 
+use App\Gateway\User\Views\UserView;
 use App\UserContext\Domain\Ports\Inbound\UserViewInterface;
 use App\UserContext\Domain\Ports\Inbound\UserViewRepositoryInterface;
-use App\UserContext\ReadModels\Views\UserView;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 

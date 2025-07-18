@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UserContext\Application\Handlers\CommandHandlers;
 
+use App\Gateway\User\Views\UserView;
 use App\SharedContext\Domain\Ports\Outbound\CommandBusInterface;
 use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Application\Commands\SignUpAUserCommand;
@@ -11,7 +12,6 @@ use App\UserContext\Application\Commands\SignUpOrAuthenticateWithOAuth2Command;
 use App\UserContext\Domain\Ports\Inbound\UserOAuthRepositoryInterface;
 use App\UserContext\Domain\Ports\Inbound\UserViewRepositoryInterface;
 use App\UserContext\Domain\ValueObjects\UserConsent;
-use App\UserContext\ReadModels\Views\UserView;
 
 final readonly class SignUpOrAuthenticateWithOAuth2CommandHandler
 {

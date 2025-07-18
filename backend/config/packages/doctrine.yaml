@@ -1,7 +1,6 @@
 imports:
     - { resource: '../../src/Libraries/FluxCapacitor/Config/doctrine.yaml' }
-    - { resource: '../../src/BudgetEnvelopeContext/Config/doctrine.yaml' }
-    - { resource: '../../src/BudgetPlanContext/Config/doctrine.yaml' }
+    - { resource: '../../src/Gateway/Config/doctrine.yaml' }
     - { resource: '../../src/UserContext/Config/doctrine.yaml' }
 
 doctrine:

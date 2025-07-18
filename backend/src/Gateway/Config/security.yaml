@@ -1,0 +1,6 @@
+security:
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Gateway\User\Views\UserView
+        property: email

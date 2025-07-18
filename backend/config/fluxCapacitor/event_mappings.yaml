@@ -85,3 +85,29 @@ event_to_aggregate:
   UserSignedUpDomainEvent_v1: User
   UserEmailRegisteredDomainEvent_v1: UserEmailRegistry
   UserEmailReleasedDomainEvent_v1: UserEmailRegistry
+
+projections:
+  App\Gateway\BudgetEnvelope\Projections\BudgetEnvelopeProjection:
+    table: budget_envelope_view
+    aggregate: BudgetEnvelope
+  App\Gateway\BudgetEnvelope\Projections\BudgetEnvelopeLedgerEntryProjection:
+    table: budget_envelope_ledger_entry_view
+    aggregate: BudgetEnvelope
+  App\Gateway\User\Projections\UserProjection:
+    table: user_view
+    aggregate: User
+  App\Gateway\BudgetPlan\Projections\BudgetPlanProjection:
+    table: budget_plan_view
+    aggregate: BudgetPlan
+  App\Gateway\BudgetPlan\Projections\BudgetPlanIncomeEntryProjection:
+    table: budget_plan_income_entry_view
+    aggregate: BudgetPlan
+  App\Gateway\BudgetPlan\Projections\BudgetPlanNeedEntryProjection:
+    table: budget_plan_need_entry_view
+    aggregate: BudgetPlan
+  App\Gateway\BudgetPlan\Projections\BudgetPlanSavingEntryProjection:
+    table: budget_plan_saving_entry_view
+    aggregate: BudgetPlan
+  App\Gateway\BudgetPlan\Projections\BudgetPlanWantEntryProjection:
+    table: budget_plan_want_entry_view
+    aggregate: BudgetPlan

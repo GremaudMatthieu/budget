@@ -13,4 +13,8 @@ interface EventClassMapInterface
     public function getAggregatePathByByStreamName(string $streamName): string;
 
     public function getStreamNameByEventPath(string $eventPath): string;
+
+    public function getEventToAggregateMap(): array;
+
+    public function getProjections(): array;
 }

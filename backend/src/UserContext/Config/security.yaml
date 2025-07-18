@@ -1,6 +1,0 @@
-security:
-  providers:
-    app_user_provider:
-      entity:
-        class: App\UserContext\ReadModels\Views\UserView
-        property: email

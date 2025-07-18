@@ -103,126 +103,6 @@ parameters:
 			path: src/BudgetPlanContext/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
 
 		-
-			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanIncomeEntryViewInterface\:\:fromEvent\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Projections/BudgetPlanIncomeEntryProjection.php
-
-		-
-			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanNeedEntryViewInterface\:\:fromEvent\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Projections/BudgetPlanNeedEntryProjection.php
-
-		-
-			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanSavingEntryViewInterface\:\:fromEvent\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Projections/BudgetPlanSavingEntryProjection.php
-
-		-
-			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanWantEntryViewInterface\:\:fromEvent\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Projections/BudgetPlanWantEntryProjection.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanIncomeEntryView\:\:\$category \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanIncomeEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeAmount \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanIncomeEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeName \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanIncomeEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanIncomeEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanIncomeEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanNeedEntryView\:\:\$category \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanNeedEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanNeedEntryView\:\:\$needAmount \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanNeedEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanNeedEntryView\:\:\$needName \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanNeedEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanNeedEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanNeedEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanSavingEntryView\:\:\$category \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanSavingEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanSavingEntryView\:\:\$savingAmount \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanSavingEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanSavingEntryView\:\:\$savingName \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanSavingEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanSavingEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanSavingEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanWantEntryView\:\:\$category \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanWantEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanWantEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanWantEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanWantEntryView\:\:\$wantAmount \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanWantEntryView.php
-
-		-
-			message: '#^Property App\\BudgetPlanContext\\ReadModels\\Views\\BudgetPlanWantEntryView\:\:\$wantName \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/BudgetPlanContext/ReadModels/Views/BudgetPlanWantEntryView.php
-
-		-
 			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -251,6 +131,126 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: src/Gateway/BudgetEnvelope/Presentation/Cli/RewindABudgetEnvelopeCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanIncomeEntryViewInterface\:\:fromEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Gateway/BudgetPlan/Projections/BudgetPlanIncomeEntryProjection.php
+
+		-
+			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanNeedEntryViewInterface\:\:fromEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Gateway/BudgetPlan/Projections/BudgetPlanNeedEntryProjection.php
+
+		-
+			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanSavingEntryViewInterface\:\:fromEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Gateway/BudgetPlan/Projections/BudgetPlanSavingEntryProjection.php
+
+		-
+			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanWantEntryViewInterface\:\:fromEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Gateway/BudgetPlan/Projections/BudgetPlanWantEntryProjection.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$needAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$needName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$savingAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$savingName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$wantAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$wantName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Gateway/BudgetPlan/Views/BudgetPlanWantEntryView.php
 
 		-
 			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
@@ -305,6 +305,18 @@ parameters:
 			identifier: encapsedStringPart.nonString
 			count: 1
 			path: src/Gateway/User/Presentation/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
+
+		-
+			message: '#^Method App\\Gateway\\User\\Views\\UserView\:\:getRoles\(\) should return array\<string\> but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Gateway/User/Views/UserView.php
+
+		-
+			message: '#^Method App\\Gateway\\User\\Views\\UserView\:\:getUserIdentifier\(\) should return non\-empty\-string but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Gateway/User/Views/UserView.php
 
 		-
 			message: '#^Property App\\Libraries\\FluxCapacitor\\Anonymizer\\Entities\\EncryptionKey\:\:\$createdAt is unused\.$#'
@@ -583,6 +595,12 @@ parameters:
 			path: src/Libraries/FluxCapacitor/EventStore/Services/EventClassMap.php
 
 		-
+			message: '#^Cannot access offset ''projections'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/Services/EventClassMap.php
+
+		-
 			message: '#^Method App\\Libraries\\FluxCapacitor\\EventStore\\Services\\EventClassMap\:\:getAggregatePathByByStreamName\(\) should return string but returns mixed\.$#'
 			identifier: return.type
 			count: 1
@@ -625,6 +643,12 @@ parameters:
 			path: src/Libraries/FluxCapacitor/EventStore/Services/EventClassMap.php
 
 		-
+			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Services\\EventClassMap\:\:\$projections \(array\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Libraries/FluxCapacitor/EventStore/Services/EventClassMap.php
+
+		-
 			message: '#^Binary operation "%%" between mixed and int results in an error\.$#'
 			identifier: binaryOp.invalid
 			count: 1
@@ -647,6 +671,108 @@ parameters:
 			identifier: cast.int
 			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/Services/SnapshotService.php
+
+		-
+			message: '#^Binary operation "\+\=" between \(float\|int\) and mixed results in an error\.$#'
+			identifier: assignOp.invalid
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Console/ProjectionReplayCommand.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Console/ProjectionReplayCommand.php
+
+		-
+			message: '#^Part \$projectionClass \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Console/ProjectionReplayCommand.php
+
+		-
+			message: '#^Part \$projectionClass \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 2
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Console/ProjectionResetCommand.php
+
+		-
+			message: '#^Binary operation "\+\=" between \(float\|int\) and mixed results in an error\.$#'
+			identifier: assignOp.invalid
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Console/ProjectionStatusCommand.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionManager.php
+
+		-
+			message: '#^Cannot access offset ''id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionManager.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionManager.php
+
+		-
+			message: '#^Method App\\Libraries\\FluxCapacitor\\ProjectionManager\\Services\\ProjectionManager\:\:reconstructEvent\(\) should return object but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionManager.php
+
+		-
+			message: '#^Part \$eventData\[''id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionManager.php
+
+		-
+			message: '#^Part \$eventName \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionManager.php
+
+		-
+			message: '#^Trying to invoke object but it might not be a callable\.$#'
+			identifier: callable.nonCallable
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionManager.php
+
+		-
+			message: '#^Variable \$eventData might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionManager.php
+
+		-
+			message: '#^Cannot access offset ''aggregate'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionRegistry.php
+
+		-
+			message: '#^Cannot access offset ''table'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionRegistry.php
+
+		-
+			message: '#^Method App\\Libraries\\FluxCapacitor\\ProjectionManager\\Services\\ProjectionRegistry\:\:getContextFromProjectionClass\(\) should return string\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionRegistry.php
+
+		-
+			message: '#^Method App\\Libraries\\FluxCapacitor\\ProjectionManager\\Services\\ProjectionRegistry\:\:getTableForProjection\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionRegistry.php
 
 		-
 			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Services\\RequestIdProvider\:\:\$requestId \(string\) does not accept string\|null\.$#'
@@ -725,15 +851,3 @@ parameters:
 			identifier: property.unusedType
 			count: 1
 			path: src/UserContext/Domain/Entities/UserOAuth.php
-
-		-
-			message: '#^Method App\\UserContext\\ReadModels\\Views\\UserView\:\:getRoles\(\) should return array\<string\> but returns array\.$#'
-			identifier: return.type
-			count: 1
-			path: src/UserContext/ReadModels/Views/UserView.php
-
-		-
-			message: '#^Method App\\UserContext\\ReadModels\\Views\\UserView\:\:getUserIdentifier\(\) should return non\-empty\-string but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: src/UserContext/ReadModels/Views/UserView.php

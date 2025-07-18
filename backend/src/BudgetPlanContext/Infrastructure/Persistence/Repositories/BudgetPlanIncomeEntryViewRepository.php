@@ -6,7 +6,7 @@ namespace App\BudgetPlanContext\Infrastructure\Persistence\Repositories;
 
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanIncomeEntryViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanIncomeEntryViewRepositoryInterface;
-use App\BudgetPlanContext\ReadModels\Views\BudgetPlanIncomeEntryView;
+use App\Gateway\BudgetPlan\Views\BudgetPlanIncomeEntryView;
 use Doctrine\DBAL\Connection;
 
 final class BudgetPlanIncomeEntryViewRepository implements BudgetPlanIncomeEntryViewRepositoryInterface

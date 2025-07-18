@@ -17,3 +17,31 @@ services:
     arguments:
       $connection: '@doctrine.dbal.default_connection'
       $snapshotFrequency: 50
+
+  App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistryInterface:
+    class: App\Libraries\FluxCapacitor\ProjectionManager\Services\ProjectionRegistry
+    arguments:
+      $eventClassMap: '@App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface'
+
+  App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface:
+    class: App\Libraries\FluxCapacitor\ProjectionManager\Services\ProjectionManager
+    arguments:
+      $eventClassMap: '@App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface'
+      $projectionRegistry: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistryInterface'
+      $connection: '@doctrine.dbal.default_connection'
+      $container: '@service_container'
+
+  App\Libraries\FluxCapacitor\ProjectionManager\Console\ProjectionReplayCommand:
+    arguments:
+      $projectionManager: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface'
+    tags: ['console.command']
+
+  App\Libraries\FluxCapacitor\ProjectionManager\Console\ProjectionResetCommand:
+    arguments:
+      $projectionManager: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface'
+    tags: ['console.command']
+
+  App\Libraries\FluxCapacitor\ProjectionManager\Console\ProjectionStatusCommand:
+    arguments:
+      $projectionManager: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface'
+    tags: ['console.command']

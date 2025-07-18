@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\UserContext\Domain\Services;
 
+use App\Gateway\User\Views\UserView;
 use App\UserContext\Domain\Exceptions\UserNotFoundException;
 use App\UserContext\Domain\Ports\Inbound\AuthenticationServiceInterface;
 use App\UserContext\Domain\Ports\Inbound\UserViewRepositoryInterface;
 use App\UserContext\Domain\Ports\Outbound\EntityManagerInterface;
 use App\UserContext\Domain\Ports\Outbound\JWTTokenManagerInterface;
 use App\UserContext\Domain\Ports\Outbound\RefreshTokenGeneratorInterface;
-use App\UserContext\ReadModels\Views\UserView;
 
 final readonly class AuthenticationService implements AuthenticationServiceInterface
 {

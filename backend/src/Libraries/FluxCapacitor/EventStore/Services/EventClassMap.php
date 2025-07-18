@@ -13,6 +13,7 @@ final readonly class EventClassMap implements EventClassMapInterface
     private array $eventMappings;
     private array $aggregateMappings;
     private array $eventToAggregateMap;
+    private array $projections;
 
     public function __construct(KernelInterface $kernel)
     {
@@ -20,6 +21,7 @@ final readonly class EventClassMap implements EventClassMapInterface
         $this->eventMappings = $config['events'] ?? [];
         $this->aggregateMappings = $config['aggregates'] ?? [];
         $this->eventToAggregateMap = $config['event_to_aggregate'] ?? [];
+        $this->projections = $config['projections'] ?? [];
     }
 
     public function getClassNameByEventPath(string $eventPath): string
@@ -57,5 +59,15 @@ final readonly class EventClassMap implements EventClassMapInterface
     public function getClassNamesByEventsPaths(array $eventsPaths): array
     {
         return array_map([$this, 'getClassNameByEventPath'], $eventsPaths);
+    }
+
+    public function getEventToAggregateMap(): array
+    {
+        return $this->eventToAggregateMap;
+    }
+
+    public function getProjections(): array
+    {
+        return $this->projections;
     }
 }

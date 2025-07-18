@@ -8,9 +8,9 @@ use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeLedgerEntryView
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopesPaginatedInterface;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewInterface;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
-use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeLedgerEntryView;
-use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopesPaginated;
-use App\BudgetEnvelopeContext\ReadModels\Views\BudgetEnvelopeView;
+use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopeLedgerEntryView;
+use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopesPaginated;
+use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopeView;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;

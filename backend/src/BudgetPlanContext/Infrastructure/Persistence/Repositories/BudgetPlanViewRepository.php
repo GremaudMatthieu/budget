@@ -6,11 +6,11 @@ namespace App\BudgetPlanContext\Infrastructure\Persistence\Repositories;
 
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanViewRepositoryInterface;
-use App\BudgetPlanContext\ReadModels\Views\BudgetPlanIncomeEntryView;
-use App\BudgetPlanContext\ReadModels\Views\BudgetPlanNeedEntryView;
-use App\BudgetPlanContext\ReadModels\Views\BudgetPlanSavingEntryView;
-use App\BudgetPlanContext\ReadModels\Views\BudgetPlanView;
-use App\BudgetPlanContext\ReadModels\Views\BudgetPlanWantEntryView;
+use App\Gateway\BudgetPlan\Views\BudgetPlanIncomeEntryView;
+use App\Gateway\BudgetPlan\Views\BudgetPlanNeedEntryView;
+use App\Gateway\BudgetPlan\Views\BudgetPlanSavingEntryView;
+use App\Gateway\BudgetPlan\Views\BudgetPlanView;
+use App\Gateway\BudgetPlan\Views\BudgetPlanWantEntryView;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;

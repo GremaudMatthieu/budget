@@ -5,7 +5,7 @@ services:
         
     # OAuth repository
     App\UserContext\Domain\Ports\Inbound\UserOAuthRepositoryInterface:
-        class: App\UserContext\Infrastructure\Repositories\DoctrineUserOAuthRepository
+        class: App\UserContext\Infrastructure\Persistence\Repositories\DoctrineUserOAuthRepository
         arguments:
             - '@doctrine.orm.entity_manager'
             
