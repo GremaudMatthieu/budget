@@ -59,7 +59,7 @@ final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateI
     private array $needs;
     private array $wants;
     private array $savings;
-    public private(set) \DateTimeImmutable $date;
+    public \DateTimeImmutable $date;
     private int $aggregateVersion = 0;
     private bool $isDeleted = false;
     private \DateTime $updatedAt;

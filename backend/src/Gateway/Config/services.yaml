@@ -1,7 +1,3 @@
-parameters:
-  MOBILE_APP_SCHEME: '%env(MOBILE_APP_SCHEME)%'
-  FRONTEND_URL: '%env(FRONTEND_URL)%'
-
 services:
   _defaults:
     autowire: true

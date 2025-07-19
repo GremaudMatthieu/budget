@@ -21,46 +21,46 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'budget_envelope_view')]
 #[ORM\Index(name: 'idx_budget_envelope_view_user_uuid', columns: ['user_uuid'])]
 #[ORM\Index(name: 'idx_budget_envelope_view_uuid', columns: ['uuid'])]
-final class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSerializable
+class BudgetEnvelopeView implements BudgetEnvelopeViewInterface, \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'budget_envelope_view_id_seq', allocationSize: 1, initialValue: 1)]
-    public private(set) int $id;
+    public int $id;
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
-    public private(set) string $uuid;
+    public string $uuid;
 
     #[ORM\Column(name: 'created_at', type: 'datetime')]
-    public private(set) \DateTimeImmutable $createdAt;
+    public \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    public private(set) \DateTime $updatedAt;
+    public \DateTime $updatedAt;
 
     #[ORM\Column(name: 'current_amount', type: 'string', length: 13)]
-    public private(set) string $currentAmount;
+    public string $currentAmount;
 
     #[ORM\Column(name: 'targeted_amount', type: 'string', length: 13)]
-    public private(set) string $targetedAmount;
+    public string $targetedAmount;
 
     #[ORM\Column(name: 'name', type: 'string', length: 25)]
-    public private(set) string $name;
+    public string $name;
 
     #[ORM\Column(name: 'currency', type: 'string', length: 3)]
-    public private(set) string $currency;
+    public string $currency;
 
     #[ORM\Column(name: 'user_uuid', type: 'string', length: 36)]
-    public private(set) string $userUuid;
+    public string $userUuid;
 
     #[ORM\Column(name: 'context_uuid', type: 'string', length: 36)]
-    public private(set) string $contextUuid;
+    public string $contextUuid;
 
     #[ORM\Column(name: 'context', type: 'string', length: 36)]
-    public private(set) string $context;
+    public string $context;
 
     #[ORM\Column(name: 'is_deleted', type: 'boolean', options: ['default' => false])]
-    public private(set) bool $isDeleted;
+    public bool $isDeleted;
 
     private function __construct(
         string $budgetEnvelopeId,

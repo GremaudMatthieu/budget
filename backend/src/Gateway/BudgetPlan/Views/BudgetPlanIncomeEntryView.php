@@ -14,34 +14,34 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'budget_plan_income_entry_view')]
 #[ORM\Index(name: 'idx_budget_plan_income_entry_view_uuid', columns: ['uuid'])]
 #[ORM\Index(name: 'idx_budget_plan_income_entry_budget_plan_view_uuid', columns: ['budget_plan_uuid'])]
-final class BudgetPlanIncomeEntryView implements \JsonSerializable, BudgetPlanIncomeEntryViewInterface
+class BudgetPlanIncomeEntryView implements \JsonSerializable, BudgetPlanIncomeEntryViewInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'budget_plan_income_entry_view_id_seq', allocationSize: 1, initialValue: 1)]
-    public private(set) int $id;
+    public int $id;
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
-    public private(set) string $uuid;
+    public string $uuid;
 
     #[ORM\Column(name: 'budget_plan_uuid', type: 'string', length: 36)]
-    public private(set) string $budgetPlanUuid;
+    public string $budgetPlanUuid;
 
     #[ORM\Column(name: 'income_name', type: 'string', length: 35)]
-    public private(set) string $incomeName;
+    public string $incomeName;
 
     #[ORM\Column(name: 'income_amount', type: 'string', length: 13)]
-    public private(set) string $incomeAmount;
+    public string $incomeAmount;
 
     #[ORM\Column(name: 'category', type: 'string', length: 35)]
-    public private(set) string $category;
+    public string $category;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    public private(set) \DateTimeImmutable $createdAt;
+    public \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    public private(set) \DateTime $updatedAt;
+    public \DateTime $updatedAt;
 
     private function __construct(
         string $budgetPlanUuid,

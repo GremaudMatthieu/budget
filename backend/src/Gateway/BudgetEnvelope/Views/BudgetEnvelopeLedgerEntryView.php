@@ -13,31 +13,31 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: 'budget_envelope_ledger_entry_view')]
 #[ORM\Index(name: 'idx_budget_envelope_ledger_entry_view_budget_envelope_uuid', columns: ['budget_envelope_uuid'])]
-final class BudgetEnvelopeLedgerEntryView implements BudgetEnvelopeLedgerEntryViewInterface, \JsonSerializable
+class BudgetEnvelopeLedgerEntryView implements BudgetEnvelopeLedgerEntryViewInterface, \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'budget_envelope_ledger_view_id_seq', allocationSize: 1, initialValue: 1)]
-    public private(set) int $id;
+    public int $id;
 
     #[ORM\Column(name: 'budget_envelope_uuid', type: 'string', length: 36, unique: false)]
-    public private(set) string $budgetEnvelopeUuid;
+    public string $budgetEnvelopeUuid;
 
     #[ORM\Column(name: 'created_at', type: 'datetime')]
-    public private(set) \DateTimeImmutable $createdAt;
+    public \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'monetary_amount', type: 'string', length: 13)]
-    public private(set) string $monetaryAmount;
+    public string $monetaryAmount;
 
     #[ORM\Column(name: 'entry_type', type: 'string', length: 6)]
-    public private(set) string $entryType;
+    public string $entryType;
 
     #[ORM\Column(name: 'description', type: 'string', length: 13, options: ['default' => ''])]
-    public private(set) string $description;
+    public string $description;
 
     #[ORM\Column(name: 'user_uuid', type: 'string', length: 36)]
-    public private(set) string $userUuid;
+    public string $userUuid;
 
     private function __construct(
         string $budgetEnvelopeId,

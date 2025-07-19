@@ -325,12 +325,6 @@ parameters:
 			path: src/Gateway/User/Presentation/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
 
 		-
-			message: '#^Part \$frontendUrl \(array\|bool\|float\|int\|string\|UnitEnum\|null\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 1
-			path: src/Gateway/User/Presentation/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
-
-		-
 			message: '#^Method App\\Gateway\\User\\Views\\UserView\:\:getRoles\(\) should return array\<string\> but returns array\.$#'
 			identifier: return.type
 			count: 1
@@ -341,30 +335,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: src/Gateway/User/Views/UserView.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\Anonymizer\\Entities\\EncryptionKey\:\:\$createdAt is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/Anonymizer/Entities/EncryptionKey.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\Anonymizer\\Entities\\EncryptionKey\:\:\$encryptionKey is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/Anonymizer/Entities/EncryptionKey.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\Anonymizer\\Entities\\EncryptionKey\:\:\$id is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/Anonymizer/Entities/EncryptionKey.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\Anonymizer\\Entities\\EncryptionKey\:\:\$userId is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/Anonymizer/Entities/EncryptionKey.php
 
 		-
 			message: '#^Method App\\Libraries\\FluxCapacitor\\Anonymizer\\Repositories\\KeyManagementRepository\:\:decryptKey\(\) should return string but returns string\|false\.$#'
@@ -389,48 +359,6 @@ parameters:
 			identifier: cast.string
 			count: 1
 			path: src/Libraries/FluxCapacitor/Anonymizer/Services/EventEncryptor.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Entities\\EventStore\:\:\$eventName is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/EventStore/Entities/EventStore.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Entities\\EventStore\:\:\$id is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/EventStore/Entities/EventStore.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Entities\\EventStore\:\:\$metaData is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: src/Libraries/FluxCapacitor/EventStore/Entities/EventStore.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Entities\\EventStore\:\:\$occurredOn is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/EventStore/Entities/EventStore.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Entities\\EventStore\:\:\$payload is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/EventStore/Entities/EventStore.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Entities\\EventStore\:\:\$streamId is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/EventStore/Entities/EventStore.php
-
-		-
-			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Entities\\EventStore\:\:\$userId is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: src/Libraries/FluxCapacitor/EventStore/Entities/EventStore.php
 
 		-
 			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'

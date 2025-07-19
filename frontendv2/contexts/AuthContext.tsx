@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '@/services/apiClient';
 import axios from 'axios';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://gogobudgeto.com/api';
 
 // Define the user type
 type User = {

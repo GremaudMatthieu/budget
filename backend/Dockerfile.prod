@@ -1,0 +1,65 @@
+# Production Dockerfile for GoGoBudgeto API
+FROM php:8.4-fpm-alpine
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Install system dependencies
+RUN apk add --no-cache \
+    bash \
+    curl \
+    git \
+    unzip \
+    postgresql-dev \
+    icu-dev \
+    libzip-dev \
+    oniguruma-dev \
+    && docker-php-ext-install \
+        intl \
+        pdo_pgsql \
+        bcmath \
+        zip \
+        mbstring \
+        opcache
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Configure PHP for production
+RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.memory_consumption=256" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.max_accelerated_files=20000" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.validate_timestamps=0" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.save_comments=1" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "realpath_cache_size=4096K" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "realpath_cache_ttl=600" >> /usr/local/etc/php/conf.d/opcache.ini
+
+# Copy composer files
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies (production only)
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-progress --prefer-dist
+
+# Copy application code
+COPY . .
+
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# Run composer scripts
+RUN composer run-script --no-dev post-install-cmd
+
+# Create var directories
+RUN mkdir -p var/cache var/log var/sessions \
+    && chown -R www-data:www-data var \
+    && chmod -R 775 var
+
+# Expose port
+EXPOSE 9000
+
+# Use www-data user
+USER www-data
+
+# Start PHP-FPM
+CMD ["php-fpm"] 

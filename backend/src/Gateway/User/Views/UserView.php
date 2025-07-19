@@ -25,55 +25,55 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'user_view')]
-final class UserView implements UserViewInterface, UserInterface, \JsonSerializable
+class UserView implements UserViewInterface, UserInterface, \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'user_view_id_seq', allocationSize: 1, initialValue: 1)]
-    public private(set) int $id;
+    public int $id;
 
     #[ORM\Column(name: 'uuid', type: 'string', length: 36, unique: true)]
-    public private(set) string $uuid;
+    public string $uuid;
 
     #[ORM\Column(name: 'email', type: 'string', length: 320)]
-    public private(set) string $email;
+    public string $email;
 
     #[ORM\Column(name: 'firstname', type: 'string', length: 50)]
-    public private(set) string $firstname;
+    public string $firstname;
 
     #[ORM\Column(name: 'lastname', type: 'string', length: 50)]
-    public private(set) string $lastname;
+    public string $lastname;
 
     #[ORM\Column(name: 'language_preference', type: 'string', length: 35)]
-    public private(set) string $languagePreference;
+    public string $languagePreference;
 
     #[ORM\Column(name: 'consent_given', type: 'boolean')]
-    public private(set) bool $consentGiven;
+    public bool $consentGiven;
 
     #[ORM\Column(name: 'consent_date', type: 'datetime_immutable')]
-    public private(set) \DateTimeImmutable $consentDate;
+    public \DateTimeImmutable $consentDate;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    public private(set) \DateTimeImmutable $createdAt;
+    public \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    public private(set) \DateTime $updatedAt;
+    public \DateTime $updatedAt;
 
     #[ORM\Column(name: 'roles', type: 'json')]
-    public private(set) array $roles = ['ROLE_USER'];
+    public array $roles = ['ROLE_USER'];
 
     #[ORM\Column(name: 'registration_context', type: 'string', length: 32)]
-    public private(set) string $registrationContext;
+    public string $registrationContext;
 
     #[ORM\Column(name: 'provider_user_id', type: 'string', length: 255)]
-    public private(set) string $providerUserId;
+    public string $providerUserId;
 
     #[ORM\Column(name: 'context_uuid', type: 'string', length: 36)]
-    public private(set) string $contextId;
+    public string $contextId;
 
     #[ORM\Column(name: 'context', type: 'string', length: 36)]
-    public private(set) string $context;
+    public string $context;
 
     public function __construct(
         string $userId,

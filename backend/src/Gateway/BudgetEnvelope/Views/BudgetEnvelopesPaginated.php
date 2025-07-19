@@ -6,11 +6,11 @@ namespace App\Gateway\BudgetEnvelope\Views;
 
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopesPaginatedInterface;
 
-final class BudgetEnvelopesPaginated implements BudgetEnvelopesPaginatedInterface, \jsonSerializable
+class BudgetEnvelopesPaginated implements BudgetEnvelopesPaginatedInterface, \jsonSerializable
 {
     /* @var array<object> */
-    public private(set) iterable $budgetEnvelopes;
-    public private(set) int $totalItems;
+    public iterable $budgetEnvelopes;
+    public int $totalItems;
 
     /**
      * @param array<object> $budgetEnvelopes

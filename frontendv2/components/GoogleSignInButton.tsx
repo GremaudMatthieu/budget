@@ -13,7 +13,7 @@ export default function GoogleSignInButton() {
   const [isLoading, setIsLoading] = useState(false);
   const { loginWithGoogle } = useAuth();
   const { language } = useLanguage();
-  const API_URL = process.env.EXPO_PUBLIC_API_URL;
+  const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://gogobudgeto.com/api';
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);

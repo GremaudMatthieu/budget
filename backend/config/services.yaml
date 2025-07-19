@@ -7,6 +7,8 @@ imports:
     - { resource: '../src/Libraries/FluxCapacitor/Config/services.yaml' }
 
 parameters:
+    FRONTEND_URL: '%env(FRONTEND_URL)%'
+    MOBILE_APP_SCHEME: '%env(MOBILE_APP_SCHEME)%'
 
 services:
     _defaults:

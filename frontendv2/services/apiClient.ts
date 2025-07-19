@@ -14,7 +14,7 @@ class ApiClient {
 
   constructor() {
     // Use the correct API URL
-    const API_URL = process.env.EXPO_PUBLIC_API_URL;
+    const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://gogobudgeto.com/api';
     console.log('ApiClient initialized with URL:', API_URL);
     
     this.client = axios.create({
@@ -162,7 +162,7 @@ class ApiClient {
     try {
       const refreshToken = await SecureStore.getItemAsync('refresh_token');
       if (!refreshToken) throw new Error('No refresh token');
-      const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/token/refresh`, { refresh_token: refreshToken });
+      const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL || 'https://gogobudgeto.com/api'}/token/refresh`, { refresh_token: refreshToken });
       const newToken = response.data?.token || response.data?.access_token;
       if (newToken) {
         this.setAuthToken(newToken);

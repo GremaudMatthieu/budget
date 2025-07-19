@@ -116,7 +116,8 @@ final class SignUpOrAuthenticateAGoogleUserController extends AbstractController
             $separator = (str_contains($baseUrl, '?')) ? '&' : '?';
             $url = $baseUrl.$separator.'email='.urlencode($email).'&token='.urlencode($token);
         } else {
-            $frontendUrl = $this->getParameter('FRONTEND_URL');
+            // Hardcode the frontend URL for now to fix the localhost issue
+            $frontendUrl = 'https://gogobudgeto.expo.app';
             $url = "{$frontendUrl}/oauth/google/callback?email=".urlencode($email).
                 '&token='.urlencode($token);
         }

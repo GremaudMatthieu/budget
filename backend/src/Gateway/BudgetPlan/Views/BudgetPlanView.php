@@ -29,40 +29,40 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_budget_plan_view_user_uuid', columns: ['user_uuid'])]
 #[ORM\Index(name: 'idx_budget_plan_view_uuid', columns: ['uuid'])]
 #[ORM\Index(name: 'idx_budget_plan_view_date', columns: ['date'])]
-final class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
+class BudgetPlanView implements \JsonSerializable, BudgetPlanViewInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\SequenceGenerator(sequenceName: 'budget_plan_view_id_seq', allocationSize: 1, initialValue: 1)]
-    public private(set) int $id;
+    public int $id;
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
-    public private(set) string $uuid;
+    public string $uuid;
 
     #[ORM\Column(name: 'user_uuid', type: 'string', length: 36)]
-    public private(set) string $userId;
+    public string $userId;
 
     #[ORM\Column(name: 'date', type: 'datetime_immutable')]
-    public private(set) \DateTimeImmutable $date;
+    public \DateTimeImmutable $date;
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    public private(set) \DateTimeImmutable $createdAt;
+    public \DateTimeImmutable $createdAt;
 
     #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    public private(set) \DateTime $updatedAt;
+    public \DateTime $updatedAt;
 
     #[ORM\Column(name: 'currency', type: 'string', length: 3)]
-    public private(set) string $currency;
+    public string $currency;
 
     #[ORM\Column(name: 'context_uuid', type: 'string', length: 36)]
-    public private(set) string $contextUuid;
+    public string $contextUuid;
 
     #[ORM\Column(name: 'context', type: 'string', length: 36)]
-    public private(set) string $context;
+    public string $context;
 
     #[ORM\Column(name: 'is_deleted', type: 'boolean', options: ['default' => false])]
-    public private(set) bool $isDeleted;
+    public bool $isDeleted;
 
     private function __construct(
         string $budgetPlanId,
