@@ -1,0 +1,13 @@
+name: Deploy
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  deploy:
+    name: Deploy
+    environment: production
+    type: deploy
+    params:
+      prod: true
