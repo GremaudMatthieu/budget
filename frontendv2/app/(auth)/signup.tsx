@@ -32,21 +32,6 @@ function SignupContent() {
         <GoogleSignInButton />
       </View>
 
-      <View className="flex-row items-center my-8">
-        <View className="flex-1 h-[1px] bg-surface-border" />
-        <Text className="text-text-muted mx-4">or</Text>
-        <View className="flex-1 h-[1px] bg-surface-border" />
-      </View>
-
-      {/* Email Sign Up Option */}
-      <TouchableOpacity 
-        className="border border-surface-borderDark bg-surface-light rounded-xl py-4 px-6 flex-row items-center justify-center mb-6 shadow-sm"
-        onPress={() => router.push('/(auth)/email-signup')}
-      >
-        <Ionicons name="mail-outline" size={20} color="#64748b" />
-        <Text className="text-text-primary ml-2 font-medium">{t('auth.signUpWithEmail')}</Text>
-      </TouchableOpacity>
-
       <View className="flex-row justify-center mt-4">
         <Text className="text-text-secondary">{t('auth.alreadyHaveAccount')} </Text>
         <TouchableOpacity onPress={() => router.replace('/signin')}>
