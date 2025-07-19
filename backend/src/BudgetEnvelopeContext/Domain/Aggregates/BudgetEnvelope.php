@@ -23,6 +23,7 @@ use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeEntryDescription
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeTargetedAmount;
+use App\Libraries\FluxCapacitor\Anonymizer\Traits\EncryptedKeyCacheTrait;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\SnapshotableAggregateInterface;
 use App\Libraries\FluxCapacitor\EventStore\Traits\DomainEventsCapabilityTrait;
@@ -33,6 +34,7 @@ use App\SharedContext\Domain\ValueObjects\UtcClock;
 final class BudgetEnvelope implements AggregateRootInterface, SnapshotableAggregateInterface
 {
     use DomainEventsCapabilityTrait;
+    use EncryptedKeyCacheTrait;
 
     private BudgetEnvelopeId $budgetEnvelopeId;
     private UserId $userId;

@@ -7,7 +7,7 @@ namespace App\Gateway\User\Projections;
 use App\Gateway\User\Views\UserView;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\UserDomainEventInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
 use App\UserContext\Domain\Events\UserDeletedDomainEvent_v1;
 use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent_v1;
 use App\UserContext\Domain\Events\UserLanguagePreferenceChangedDomainEvent_v1;
@@ -33,7 +33,7 @@ final readonly class UserProjection
     ) {
     }
 
-    public function __invoke(UserDomainEventInterface $event): void
+    public function __invoke(DomainEventInterface $event): void
     {
         $encryptionKey = $this->keyManagementRepository->getKey($event->aggregateId);
 

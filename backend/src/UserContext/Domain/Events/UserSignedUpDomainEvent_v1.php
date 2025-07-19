@@ -4,13 +4,12 @@ namespace App\UserContext\Domain\Events;
 
 use App\Libraries\FluxCapacitor\Anonymizer\Attributes\PersonalData;
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\AbstractUserSignedUpDomainEventInterface;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\UserDomainEventInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\VersionedDomainEventInterface;
 use App\Libraries\FluxCapacitor\EventStore\Traits\VersionedEventTrait;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 
-final class UserSignedUpDomainEvent_v1 implements UserDomainEventInterface, AbstractUserSignedUpDomainEventInterface, VersionedDomainEventInterface
+final class UserSignedUpDomainEvent_v1 implements AbstractUserSignedUpDomainEventInterface, VersionedDomainEventInterface
 {
     use VersionedEventTrait;
 

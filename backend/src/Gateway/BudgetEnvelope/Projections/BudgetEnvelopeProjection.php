@@ -16,18 +16,31 @@ use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedD
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewInterface;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
 use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopeView;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 final readonly class BudgetEnvelopeProjection
 {
-    public function __construct(private BudgetEnvelopeViewRepositoryInterface $budgetEnvelopeViewRepository)
-    {
+    public function __construct(
+        private BudgetEnvelopeViewRepositoryInterface $budgetEnvelopeViewRepository,
+        private KeyManagementRepositoryInterface $keyManagementRepository,
+        private EventEncryptorInterface $eventEncryptor,
+    ) {
     }
 
     public function __invoke(DomainEventInterface $event): void
     {
+        $encryptionKey = $this->keyManagementRepository->getKey($event->userId);
+
+        if (!$encryptionKey) {
+            return;
+        }
+
+        $event = $this->eventEncryptor->decrypt($event, $event->userId);
+
         match($event::class) {
             BudgetEnvelopeAddedDomainEvent_v1::class => $this->handleBudgetEnvelopeAddedDomainEvent_v1($event),
             BudgetEnvelopeCreditedDomainEvent_v1::class => $this->handleBudgetEnvelopeCreditedDomainEvent_v1($event),

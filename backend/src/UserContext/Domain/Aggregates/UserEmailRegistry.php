@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UserContext\Domain\Aggregates;
 
+use App\Libraries\FluxCapacitor\Anonymizer\Traits\EncryptedKeyCacheTrait;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\SharedContext\Domain\ValueObjects\UserId;
 use App\UserContext\Domain\Events\UserEmailRegisteredDomainEvent_v1;
@@ -13,6 +14,8 @@ use App\UserContext\Domain\ValueObjects\UserEmailRegistryId;
 
 final class UserEmailRegistry implements AggregateRootInterface
 {
+    use EncryptedKeyCacheTrait;
+
     private string $userEmailRegistryId;
     private int $aggregateVersion = 0;
     private array $raisedDomainEvents = [];

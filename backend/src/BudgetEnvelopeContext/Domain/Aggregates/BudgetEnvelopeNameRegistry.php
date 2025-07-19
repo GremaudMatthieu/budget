@@ -8,6 +8,7 @@ use App\BudgetEnvelopeContext\Domain\Exceptions\BudgetEnvelopeNameAlreadyExistsF
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeId;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeName;
 use App\BudgetEnvelopeContext\Domain\ValueObjects\BudgetEnvelopeNameRegistryId;
+use App\Libraries\FluxCapacitor\Anonymizer\Traits\EncryptedKeyCacheTrait;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\Libraries\FluxCapacitor\EventStore\Traits\DomainEventsCapabilityTrait;
 use App\SharedContext\Domain\ValueObjects\UserId;
@@ -15,6 +16,7 @@ use App\SharedContext\Domain\ValueObjects\UserId;
 final class BudgetEnvelopeNameRegistry implements AggregateRootInterface
 {
     use DomainEventsCapabilityTrait;
+    use EncryptedKeyCacheTrait;
 
     private string $budgetEnvelopeNameRegistryId;
     private array $registeredNames = [];

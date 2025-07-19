@@ -7,6 +7,7 @@ use App\BudgetPlanContext\Domain\Events\BudgetPlanDateReleasedDomainEvent_v1;
 use App\BudgetPlanContext\Domain\Exceptions\BudgetPlanDateAlreadyExistsForUserException;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanDateRegistryId;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanId;
+use App\Libraries\FluxCapacitor\Anonymizer\Traits\EncryptedKeyCacheTrait;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\Libraries\FluxCapacitor\EventStore\Traits\DomainEventsCapabilityTrait;
 use App\SharedContext\Domain\ValueObjects\UserId;
@@ -14,6 +15,7 @@ use App\SharedContext\Domain\ValueObjects\UtcClock;
 
 final class BudgetPlanDateRegistry implements AggregateRootInterface
 {
+    use EncryptedKeyCacheTrait;
     use DomainEventsCapabilityTrait;
 
     private string $budgetPlanDateRegistryId;

@@ -35,6 +35,7 @@ use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanSaving;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanSavingCategory;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanWant;
 use App\BudgetPlanContext\Domain\ValueObjects\BudgetPlanWantCategory;
+use App\Libraries\FluxCapacitor\Anonymizer\Traits\EncryptedKeyCacheTrait;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\SnapshotableAggregateInterface;
 use App\Libraries\FluxCapacitor\EventStore\Traits\DomainEventsCapabilityTrait;
@@ -48,6 +49,7 @@ use App\SharedContext\Domain\ValueObjects\UtcClock;
 final class BudgetPlan implements AggregateRootInterface, SnapshotableAggregateInterface
 {
     use DomainEventsCapabilityTrait;
+    use EncryptedKeyCacheTrait;
 
     private BudgetPlanId $budgetPlanId;
     private UserId $userId;

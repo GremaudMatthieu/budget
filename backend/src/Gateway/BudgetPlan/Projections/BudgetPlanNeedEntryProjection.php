@@ -13,18 +13,31 @@ use App\BudgetPlanContext\Domain\Events\BudgetPlanRemovedDomainEvent_v1;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanNeedEntryViewInterface;
 use App\BudgetPlanContext\Domain\Ports\Inbound\BudgetPlanNeedEntryViewRepositoryInterface;
 use App\Gateway\BudgetPlan\Views\BudgetPlanNeedEntryView;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 final readonly class BudgetPlanNeedEntryProjection
 {
-    public function __construct(private BudgetPlanNeedEntryViewRepositoryInterface $budgetPlanNeedEntryViewRepository)
-    {
+    public function __construct(
+        private BudgetPlanNeedEntryViewRepositoryInterface $budgetPlanNeedEntryViewRepository,
+        private KeyManagementRepositoryInterface $keyManagementRepository,
+        private EventEncryptorInterface $eventEncryptor,
+    ) {
     }
 
     public function __invoke(DomainEventInterface $event): void
     {
+        $encryptionKey = $this->keyManagementRepository->getKey($event->userId);
+
+        if (!$encryptionKey) {
+            return;
+        }
+
+        $event = $this->eventEncryptor->decrypt($event, $event->userId);
+
         match($event::class) {
             BudgetPlanGeneratedDomainEvent_v1::class => $this->handleBudgetPlanGeneratedDomainEvent_v1($event),
             BudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1::class => $this->handleBudgetPlanGeneratedWithOneThatAlreadyExistsDomainEvent_v1($event),

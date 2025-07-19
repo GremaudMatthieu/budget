@@ -11,4 +11,6 @@ interface AggregateRootInterface
     public function setAggregateVersion(int $aggregateVersion): self;
 
     public function getAggregateId(): string;
+
+    public function clearKeys(): array;
 }

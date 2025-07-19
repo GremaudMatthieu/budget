@@ -10,6 +10,8 @@ use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeReplayedDomainEvent_v1
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRewoundDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeLedgerEntryViewRepositoryInterface;
 use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopeLedgerEntryView;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface;
 use App\SharedContext\Domain\Ports\Inbound\EventSourcedRepositoryInterface;
@@ -23,11 +25,21 @@ final readonly class BudgetEnvelopeLedgerEntryProjection
         private BudgetEnvelopeLedgerEntryViewRepositoryInterface $budgetEnvelopeLedgerEntryViewRepository,
         private EventSourcedRepositoryInterface $eventSourcedRepository,
         private EventClassMapInterface $eventClassMap,
+        private KeyManagementRepositoryInterface $keyManagementRepository,
+        private EventEncryptorInterface $eventEncryptor,
     ) {
     }
 
     public function __invoke(DomainEventInterface $event): void
     {
+        $encryptionKey = $this->keyManagementRepository->getKey($event->userId);
+
+        if (!$encryptionKey) {
+            return;
+        }
+
+        $event = $this->eventEncryptor->decrypt($event, $event->userId);
+
         match($event::class) {
             BudgetEnvelopeCreditedDomainEvent_v1::class => $this->handleBudgetEnvelopeCreditedDomainEvent_v1($event),
             BudgetEnvelopeDebitedDomainEvent_v1::class => $this->handleBudgetEnvelopeDebitedDomainEvent_v1($event),

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Libraries\FluxCapacitor\EventStore;
 
 use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\UserDomainEventInterface;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
 use App\Libraries\FluxCapacitor\EventStore\Exceptions\PublishDomainEventsException;
 use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
@@ -15,7 +14,6 @@ use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\EventUpcastingServiceInterface;
 use App\Libraries\FluxCapacitor\EventStore\Ports\SnapshotableAggregateInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\UserAggregateInterface;
 use App\Libraries\FluxCapacitor\EventStore\Services\RequestIdProvider;
 use App\Libraries\FluxCapacitor\EventStore\Services\SnapshotService;
 use App\Libraries\FluxCapacitor\EventStore\Traits\AggregateTrackerTrait;
@@ -130,10 +128,7 @@ final class EventStore implements EventStoreInterface
 
             foreach ($aggregate->raisedDomainEvents() as $event) {
                 $version = $aggregate->aggregateVersion();
-
-                if (is_subclass_of($event::class, UserDomainEventInterface::class)) {
-                    $event = $this->eventEncryptor->encrypt($event, $event->userId);
-                }
+                $event = $this->eventEncryptor->encrypt($event, $event->userId);
                 $event->requestId = $this->requestIdProvider->requestId;
 
                 $this->connection->insert('event_store', [
@@ -151,12 +146,10 @@ final class EventStore implements EventStoreInterface
             }
 
             $this->eventBus->execute($aggregate->raisedDomainEvents());
+
             $this->connection->commit();
             $aggregate->clearRaisedDomainEvents();
-
-            if ($aggregate instanceof UserAggregateInterface) {
-                $aggregate->clearKeys();
-            }
+            $aggregate->clearKeys();
 
             if ($aggregate instanceof SnapshotableAggregateInterface
                 && $this->snapshotService->shouldCreateSnapshot($aggregate)) {
@@ -232,7 +225,7 @@ final class EventStore implements EventStoreInterface
 
     private function getEventPayload(array $eventData, string $eventPath): array
     {
-        if (is_subclass_of($eventPath, UserDomainEventInterface::class)) {
+        if (is_subclass_of($eventPath, DomainEventInterface::class)) {
             $decodedPayload = json_decode(
                 $eventData['payload'],
                 true,
