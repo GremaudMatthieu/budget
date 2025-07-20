@@ -39,13 +39,6 @@ export function getCurrencySymbol(currencyCode: string = 'USD'): string {
     'USD': '$',
     'EUR': '€',
     'GBP': '£',
-    'JPY': '¥',
-    'CAD': 'C$',
-    'AUD': 'A$',
-    'CHF': 'Fr',
-    'CNY': '¥',
-    'INR': '₹',
-    'BRL': 'R$',
   };
   
   return currencySymbols[currencyCode] || currencyCode;
@@ -71,12 +64,6 @@ export function getCurrencyOptions() {
     { value: 'USD', label: `USD (${getCurrencySymbol('USD')})` },
     { value: 'EUR', label: `EUR (${getCurrencySymbol('EUR')})` },
     { value: 'GBP', label: `GBP (${getCurrencySymbol('GBP')})` },
-    { value: 'JPY', label: `JPY (${getCurrencySymbol('JPY')})` },
-    { value: 'CAD', label: `CAD (${getCurrencySymbol('CAD')})` },
-    { value: 'AUD', label: `AUD (${getCurrencySymbol('AUD')})` },
-    { value: 'CHF', label: `CHF (${getCurrencySymbol('CHF')})` },
-    { value: 'CNY', label: `CNY (${getCurrencySymbol('CNY')})` },
-    { value: 'INR', label: `INR (${getCurrencySymbol('INR')})` }
   ];
 }
 
@@ -87,10 +74,4 @@ export const currencyOptions = [
   { value: 'USD', label: 'USD ($)' },
   { value: 'EUR', label: 'EUR (€)' },
   { value: 'GBP', label: 'GBP (£)' },
-  { value: 'JPY', label: 'JPY (¥)' },
-  { value: 'CAD', label: 'CAD (C$)' },
-  { value: 'AUD', label: 'AUD (A$)' },
-  { value: 'CHF', label: 'CHF' },
-  { value: 'CNY', label: 'CNY (¥)' },
-  { value: 'INR', label: 'INR (₹)' }
 ];
