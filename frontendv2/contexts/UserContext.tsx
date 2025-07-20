@@ -170,9 +170,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }));
     
     try {
-      await apiClient.delete('/users/delete', { 
-        headers: { 'request-id': requestId }
-      });
+      await apiClient.postWithRequestId('/users/delete', {}, requestId);
       
       console.log(`Delete request sent successfully with ID: ${requestId}`);
       // The logout will be handled by the socket event
