@@ -37,6 +37,13 @@ export default {
   auth: {
     welcomeTitle: 'GoGoBudgeto',
     welcomeSubtitle: 'Smart budgeting for your financial freedom',
+    seoTitle: 'GogoBudgeto - Smart Budgeting Made Simple',
+    seoSubtitle: 'Take control of your monthly spending with the envelope method',
+    whyChooseTitle: 'Complete Budgeting Solution',
+    whyChooseDescription: 'GogoBudgeto combines two powerful budgeting approaches: envelope method for spending control and comprehensive budget planning for long-term financial success. Track your monthly spending with smart envelopes while planning your income allocation using the proven 50/30/20 rule.',
+    howItWorksTitle: 'Dual-Approach Budgeting',
+    howItWorksDescription: 'Create detailed monthly budget plans that allocate your income to needs (50%), wants (30%), and savings (20%). Then use budget envelopes to track and control spending in each category, ensuring you stay within your planned limits.',
+    budgetingBenefits: 'Smart budget planning prevents overspending, builds savings habits, and gives you complete visibility into your financial health through intelligent tracking and analytics.',
     secureAndPrivate: 'Secure & Private',
     features: 'Our Features',
     smartBudgetingTitle: 'Smart Budgeting',
@@ -70,6 +77,8 @@ export default {
   dashboard: {
     welcome: 'Welcome back,',
     summary: 'Your financial summary',
+    seoTitle: 'Smart Budgeting Dashboard - GogoBudgeto',
+    seoSubtitle: 'Track your monthly spending and manage budget envelopes with intelligent financial planning',
     quickActions: 'Quick Actions',
     myEnvelopes: 'My Envelopes',
     budgetPlans: 'Budget Plans',

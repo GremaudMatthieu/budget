@@ -54,6 +54,17 @@ function WelcomeContent() {
           </View>
         </View>
       </View>
+
+      {/* SEO Content Section */}
+      <View className="px-6 mb-8">
+        <Text className="text-xl font-semibold text-secondary-800 mb-3">{t('auth.whyChooseTitle')}</Text>
+        <Text className="text-text-secondary mb-4 leading-6">{t('auth.whyChooseDescription')}</Text>
+        
+        <Text className="text-lg font-semibold text-secondary-800 mb-3 mt-6">{t('auth.howItWorksTitle')}</Text>
+        <Text className="text-text-secondary mb-4 leading-6">{t('auth.howItWorksDescription')}</Text>
+        
+        <Text className="text-text-secondary leading-6">{t('auth.budgetingBenefits')}</Text>
+      </View>
       
       {/* Testimonial/Highlight Section */}
       <View className="bg-secondary-900 mx-6 rounded-xl p-6 mb-8">
@@ -104,6 +115,10 @@ export default function WelcomeScreen() {
     return (
       <WebContainer>
         <View className="flex min-h-screen justify-center items-center">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-slate-900 mb-4">{t('auth.seoTitle')}</h1>
+            <h2 className="text-xl text-slate-600 mb-6">{t('auth.seoSubtitle')}</h2>
+          </div>
           <WelcomeContent />
         </View>
       </WebContainer>

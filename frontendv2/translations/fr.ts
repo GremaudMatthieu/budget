@@ -37,6 +37,13 @@ export default {
   auth: {
     welcomeTitle: 'GoGoBudgeto',
     welcomeSubtitle: 'Une budgétisation intelligente pour votre liberté financière',
+    seoTitle: 'GogoBudgeto - Budgétisation Intelligente Simplifiée',
+    seoSubtitle: 'Prenez le contrôle de vos dépenses mensuelles avec la méthode des enveloppes',
+    whyChooseTitle: 'Solution Budgétaire Complète',
+    whyChooseDescription: 'GogoBudgeto combine deux approches budgétaires puissantes : la méthode des enveloppes pour contrôler les dépenses et la planification budgétaire complète pour le succès financier à long terme. Suivez vos dépenses mensuelles avec des enveloppes intelligentes tout en planifiant l\'allocation de vos revenus selon la règle éprouvée 50/30/20.',
+    howItWorksTitle: 'Budgétisation à Double Approche',
+    howItWorksDescription: 'Créez des plans budgétaires mensuels détaillés qui allouent vos revenus aux besoins (50%), aux envies (30%) et à l\'épargne (20%). Utilisez ensuite les enveloppes budgétaires pour suivre et contrôler les dépenses dans chaque catégorie, en vous assurant de rester dans vos limites planifiées.',
+    budgetingBenefits: 'La planification budgétaire intelligente prévient les dépassements, développe les habitudes d\'épargne et vous donne une visibilité complète sur votre santé financière grâce au suivi et aux analyses intelligents.',
     secureAndPrivate: 'Sécurisé et privé',
     features: 'Nos fonctionnalités',
     smartBudgetingTitle: 'Budgétisation intelligente',
@@ -70,6 +77,8 @@ export default {
   dashboard: {
     welcome: 'Bienvenue,',
     summary: 'Votre résumé financier',
+    seoTitle: 'Tableau de Bord Budgétisation Intelligente - GogoBudgeto',
+    seoSubtitle: 'Suivez vos dépenses mensuelles et gérez vos enveloppes budgétaires avec une planification financière intelligente',
     quickActions: 'Actions rapides',
     myEnvelopes: 'Mes enveloppes',
     budgetPlans: 'Plans budgétaires',
