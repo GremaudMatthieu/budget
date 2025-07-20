@@ -8,7 +8,7 @@ import WebContainer from '@/components/web/WebContainer';
 
 export default function SupportScreen() {
   const { t } = useTranslation();
-  const supportEmail = 'support@yourcompany.com';
+  const supportEmail = 'support@gogobudgeto.com';
   const router = useRouter();
   if (Platform.OS === 'web') {
     return (

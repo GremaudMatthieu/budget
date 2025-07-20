@@ -13,6 +13,7 @@ export default function RootHtml({ children }: PropsWithChildren) {
         <meta name="keywords" content="budget, budgeting, envelope method, financial planning, money management, expense tracking" />
         <meta name="author" content="GogoBudgeto" />
         <meta name="robots" content="index, follow" />
+        <meta name="google-site-verification" content="rl_7wdoVEVDotXZPzDPR9WgT9-gBIJj6cLhpmzH45io" />
         <meta property="og:title" content="GogoBudgeto" />
         <meta property="og:description" content="Track your budgets, envelopes, and plans easily. Mobile-first and accessible." />
         <meta property="og:type" content="website" />

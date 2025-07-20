@@ -19,9 +19,6 @@ export default function AboutScreen() {
             <p className="text-base text-text-primary mb-4">
               {t('profile.aboutDescription', { defaultValue: 'A modern budgeting app to help you manage your finances with ease.' })}
             </p>
-            <a href="https://yourcompany.com" className="text-primary-600 underline text-base font-semibold block text-center hover:text-primary-700 transition" target="_blank" rel="noopener noreferrer">
-              yourcompany.com
-            </a>
           </div>
         </div>
       </WebContainer>
@@ -36,9 +33,6 @@ export default function AboutScreen() {
           <Text className="text-base text-text-primary mb-4">
             {t('profile.aboutDescription', { defaultValue: 'A modern budgeting app to help you manage your finances with ease.' })}
           </Text>
-          <TouchableOpacity onPress={() => Linking.openURL('https://yourcompany.com')}>
-            <Text className="text-primary-600 underline text-base font-semibold">yourcompany.com</Text>
-          </TouchableOpacity>
         </View>
       </AnimatedHeaderLayout>
     </SwipeBackWrapper>
