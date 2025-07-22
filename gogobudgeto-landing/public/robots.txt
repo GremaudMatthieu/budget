@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Allow: /en/
+
+# Disallow sensitive paths (if any exist on your server)
+Disallow: /api/
+Disallow: /_astro/
+Disallow: /tmp/
+Disallow: /var/
+
+# Main sitemap
+Sitemap: https://gogobudgeto.com/sitemap-index.xml
+
+# Crawl delay (optional - can help with server load)
+Crawl-delay: 1

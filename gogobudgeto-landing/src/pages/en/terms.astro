@@ -1,0 +1,75 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getLocaleFromUrl, t } from '../../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const title = 'Terms of Service - GoGoBudgeto';
+---
+
+<Layout title={title}>
+  <div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-6 max-w-4xl">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <div class="flex items-center justify-center mb-6">
+          <i class="fas fa-wallet text-3xl mr-3 text-blue-600" aria-hidden="true"></i>
+          <h1 class="text-3xl font-bold text-gray-800">GoGoBudgeto</h1>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Terms of Service</h2>
+        <p class="text-gray-600">Last updated: January 1, 2025</p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-8">
+        <div class="prose prose-gray max-w-none">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">1. Acceptance of Terms</h3>
+          <p class="text-gray-600 mb-6">
+            By using GoGoBudgeto, you agree to be bound by these terms of service. If you do not agree to these terms, please do not use our service.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">2. Service Description</h3>
+          <p class="text-gray-600 mb-6">
+            GoGoBudgeto is a personal finance tool that allows you to create monthly budget plans and manage your budget envelopes. Our service never connects to your bank accounts and operates in a completely secure and private manner.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">3. Security and Privacy</h3>
+          <p class="text-gray-600 mb-6">
+            We are committed to protecting your personal data. GoGoBudgeto requires no connection to your bank accounts and all your financial data remains under your exclusive control.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">4. Acceptable Use</h3>
+          <p class="text-gray-600 mb-6">
+            You agree to use GoGoBudgeto only for lawful purposes and in accordance with these terms. You must not use the service in a way that infringes upon the rights of others or violates applicable laws.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">5. Intellectual Property</h3>
+          <p class="text-gray-600 mb-6">
+            All intellectual property rights relating to GoGoBudgeto, including software, trademark and content, belong to GoGoBudgeto. You receive only a limited license to use the service.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">6. Limitation of Liability</h3>
+          <p class="text-gray-600 mb-6">
+            GoGoBudgeto is provided "as is" without warranty of any kind. We shall not be liable for direct, indirect or consequential damages resulting from the use of our service.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">7. Changes to Terms</h3>
+          <p class="text-gray-600 mb-6">
+            We reserve the right to modify these terms at any time. Changes will take effect upon posting on this page.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">8. Contact</h3>
+          <p class="text-gray-600 mb-6">
+            For any questions regarding these terms of service, you can contact us at: support@gogobudgeto.com
+          </p>
+        </div>
+      </div>
+
+      <!-- Back to Home -->
+      <div class="text-center mt-8">
+        <a href="/en/" class="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors duration-300">
+          <i class="fas fa-arrow-left mr-2" aria-hidden="true"></i>
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

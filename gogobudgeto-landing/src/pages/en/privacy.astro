@@ -1,0 +1,95 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getLocaleFromUrl, t } from '../../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const title = 'Privacy Policy - GoGoBudgeto';
+---
+
+<Layout title={title}>
+  <div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-6 max-w-4xl">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <div class="flex items-center justify-center mb-6">
+          <i class="fas fa-wallet text-3xl mr-3 text-blue-600" aria-hidden="true"></i>
+          <h1 class="text-3xl font-bold text-gray-800">GoGoBudgeto</h1>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Privacy Policy</h2>
+        <p class="text-gray-600">Last updated: January 1, 2025</p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg p-8">
+        <div class="prose prose-gray max-w-none">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">1. Privacy Commitment</h3>
+          <p class="text-gray-600 mb-6">
+            At GoGoBudgeto, we are committed to protecting your privacy. This privacy policy explains how we collect, use and protect your personal information.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">2. No Bank Connection</h3>
+          <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+            <p class="text-green-700 font-medium">
+              🔒 GoGoBudgeto NEVER connects to your bank accounts. All your financial data remains private and under your exclusive control.
+            </p>
+          </div>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">3. Information Collected</h3>
+          <p class="text-gray-600 mb-4">We only collect:</p>
+          <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+            <li>Your email address for account creation</li>
+            <li>Budget data you voluntarily enter</li>
+            <li>Basic usage information (pages visited, features used)</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">4. Data Usage</h3>
+          <p class="text-gray-600 mb-4">Your data is used exclusively to:</p>
+          <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+            <li>Provide budgeting functionality</li>
+            <li>Save your budget plans and envelopes</li>
+            <li>Improve user experience</li>
+            <li>Contact you only when necessary</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">5. Data Sharing</h3>
+          <p class="text-gray-600 mb-6">
+            We do not sell, rent or share your personal data with third parties, except as required by law or with your explicit consent.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">6. Data Security</h3>
+          <p class="text-gray-600 mb-4">We protect your data through:</p>
+          <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+            <li>SSL/TLS encryption for all communications</li>
+            <li>Secure storage with data encryption</li>
+            <li>Limited data access on a need-to-know basis</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">7. Your Rights</h3>
+          <p class="text-gray-600 mb-4">You have the right to:</p>
+          <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+            <li>Access your personal data</li>
+            <li>Correct or delete your data</li>
+            <li>Delete your account at any time</li>
+          </ul>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">8. Cookies</h3>
+          <p class="text-gray-600 mb-6">
+            We only use essential cookies for service functionality. No tracking or advertising cookies are used.
+          </p>
+
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">9. Contact</h3>
+          <p class="text-gray-600 mb-6">
+            For any questions about this privacy policy or to exercise your rights, contact us at: support@gogobudgeto.com
+          </p>
+        </div>
+      </div>
+
+      <!-- Back to Home -->
+      <div class="text-center mt-8">
+        <a href="/en/" class="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors duration-300">
+          <i class="fas fa-arrow-left mr-2" aria-hidden="true"></i>
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

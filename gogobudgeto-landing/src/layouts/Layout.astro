@@ -1,0 +1,174 @@
+---
+import { getLocaleFromUrl, getAlternateUrl, t } from '../i18n/utils';
+
+interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string;
+}
+
+const { title, description, keywords } = Astro.props;
+const locale = getLocaleFromUrl(Astro.url);
+const alternateLocale = locale === 'fr' ? 'en' : 'fr';
+const alternateUrl = getAlternateUrl(Astro.url, alternateLocale);
+
+const finalTitle = title || t('meta.title', locale);
+const finalDescription = description || t('meta.description', locale);
+const finalKeywords = keywords || t('meta.keywords', locale);
+---
+
+<!DOCTYPE html>
+<html lang={locale}>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>{finalTitle}</title>
+  <meta name="description" content={finalDescription}>
+  <meta name="keywords" content={finalKeywords}>
+  <meta name="author" content="GoGoBudgeto">
+  <meta name="robots" content="index, follow">
+  <meta name="google-site-verification" content="ttlyB4qz1hgnd6-UIzQHCcx5gc-LsQkjvxrqdP7SSxM" />
+  <!-- Canonical URL -->
+  <link rel="canonical" href={Astro.url.href}>
+  
+  <!-- Alternate Languages -->
+  <link rel="alternate" hreflang="fr" href={locale === 'fr' ? Astro.url.href : `${Astro.site}${alternateUrl}`}>
+  <link rel="alternate" hreflang="en" href={locale === 'en' ? Astro.url.href : `${Astro.site}${alternateUrl}`}>
+  <link rel="alternate" hreflang="x-default" href={Astro.site}>
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content={Astro.url.href}>
+  <meta property="og:title" content={finalTitle}>
+  <meta property="og:description" content={finalDescription}>
+  <meta property="og:image" content={`${Astro.site}/og-image.png`}>
+  <meta property="og:locale" content={locale === 'fr' ? 'fr_FR' : 'en_US'}>
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content={Astro.url.href}>
+  <meta property="twitter:title" content={finalTitle}>
+  <meta property="twitter:description" content={finalDescription}>
+  <meta property="twitter:image" content={`${Astro.site}/og-image.png`}>
+  
+  <!-- Favicon - Astro détecte automatiquement /public/favicon.ico -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/icon.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  
+  <!-- Schema.org structured data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "GoGoBudgeto",
+      "applicationCategory": "FinanceApplication", 
+      "description": "{finalDescription}",
+      "url": "{Astro.site}",
+      "operatingSystem": ["iOS", "Android", "Web"],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      }
+    }
+  </script>
+</head>
+
+<body class="font-['Poppins'] bg-gray-50">
+  <slot />
+  
+  <!-- Analytics placeholder -->
+  <!-- Add your Google Analytics or other tracking code here -->
+  
+  <!-- Performance optimization -->
+  <script>
+    // Preload critical resources
+    const criticalImages = [
+      'https://illustrations.popsy.co/amber/digital-nomad.svg'
+    ];
+    
+    criticalImages.forEach(src => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = src;
+      document.head.appendChild(link);
+    });
+
+    // Language detection and redirect
+    (function() {
+      const currentPath = window.location.pathname;
+      const hasLanguageParam = window.location.search.includes('lang=');
+      
+      // Check if user has made a language choice (stored in localStorage)
+      const userLanguageChoice = localStorage.getItem('userLanguageChoice');
+      
+      // Only redirect on home page, if no language parameter, and no user choice
+      if ((currentPath === '/' || currentPath === '/index.html') && !hasLanguageParam && !userLanguageChoice) {
+        const browserLang = navigator.language || navigator.languages[0] || 'fr';
+        const detectedLang = browserLang.toLowerCase();
+        
+        // If browser is not French, redirect to English
+        if (!detectedLang.startsWith('fr')) {
+          window.location.href = '/en/';
+        }
+      }
+      
+      // Store user language choice when they click language switcher
+      document.addEventListener('DOMContentLoaded', function() {
+        const langSwitcher = document.querySelector('a[href*="/en"], a[href="/"]');
+        if (langSwitcher) {
+          langSwitcher.addEventListener('click', function() {
+            const targetLang = this.href.includes('/en') ? 'en' : 'fr';
+            localStorage.setItem('userLanguageChoice', targetLang);
+          });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
+
+<style is:global>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8fafc;
+  }
+  
+  .gradient-bg {
+    background: linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  /* Performance optimizations */
+  img {
+    loading: lazy;
+  }
+  
+  .feature-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+</style>

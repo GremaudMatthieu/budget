@@ -1,0 +1,199 @@
+---
+import { getLocaleFromUrl, getAlternateUrl, t } from '../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const alternateLocale = locale === 'fr' ? 'en' : 'fr';
+const alternateUrl = getAlternateUrl(Astro.url, alternateLocale);
+---
+
+<!-- Header -->
+<header class="gradient-bg text-white relative">
+  <div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center">
+        <i class="fas fa-wallet text-3xl mr-3" aria-hidden="true"></i>
+        <h1 class="text-2xl font-bold">GoGoBudgeto</h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="https://gogobudgeto.expo.app/signin" class="hidden md:block px-4 py-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
+          {t('header.login', locale)}
+        </a>
+        <div class="relative">
+          <a href={alternateUrl} class="flex items-center space-x-2 hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded transition-all duration-300" aria-label={locale === 'fr' ? 'Switch to English' : 'Passer au français'}>
+            <span class="hidden md:inline">{t('header.lang', locale)}</span>
+            <i class="fas fa-globe text-sm" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-16 md:mt-24 mb-16 md:mb-24 flex flex-col md:flex-row items-center">
+      <div class="md:w-1/2 mb-12 md:mb-0">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">{t('header.title', locale)}</h2>
+        <p class="text-xl opacity-90 mb-8 leading-relaxed">{t('header.subtitle', locale)}</p>
+        <div class="flex justify-center sm:justify-start">
+          <a href="https://gogobudgeto.expo.app/signin" class="px-8 py-4 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 inline-block text-center">
+            {t('header.cta.primary', locale)}
+          </a>
+        </div>
+      </div>
+      <div class="md:w-1/2 flex justify-center animate-float">
+        <img 
+          src="https://illustrations.popsy.co/amber/digital-nomad.svg" 
+          alt="Finance illustration" 
+          class="w-full max-w-md"
+          width="400"
+          height="400"
+          loading="eager"
+        >
+      </div>
+    </div>
+  </div>
+  
+  <div class="absolute bottom-0 left-0 right-0">
+    <svg viewBox="0 0 1440 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M0 0H1440V77.7778C1440 77.7778 1152 150 720 150C288 150 0 77.7778 0 77.7778V0Z" fill="#f8fafc"/>
+    </svg>
+  </div>
+</header>
+
+<!-- Features Section -->
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-6">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">{t('features.title', locale)}</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">{t('features.subtitle', locale)}</p>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Feature 1 -->
+      <div class="feature-card bg-white rounded-xl p-8 shadow-lg">
+        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-6">
+          <i class="fas fa-wallet text-blue-600 text-2xl" aria-hidden="true"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">{t('features.smart.title', locale)}</h3>
+        <p class="text-gray-600">{t('features.smart.description', locale)}</p>
+      </div>
+      
+      <!-- Feature 2 -->
+      <div class="feature-card bg-white rounded-xl p-8 shadow-lg">
+        <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-6">
+          <i class="fas fa-chart-pie text-purple-600 text-2xl" aria-hidden="true"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">{t('features.planning.title', locale)}</h3>
+        <p class="text-gray-600">{t('features.planning.description', locale)}</p>
+      </div>
+      
+      <!-- Feature 3 -->
+      <div class="feature-card bg-white rounded-xl p-8 shadow-lg">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-6">
+          <i class="fas fa-chart-line text-green-600 text-2xl" aria-hidden="true"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">{t('features.analysis.title', locale)}</h3>
+        <p class="text-gray-600">{t('features.analysis.description', locale)}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Savings Highlight -->
+<section class="py-16 bg-gray-50">
+  <div class="container mx-auto px-6">
+    <div class="bg-indigo-900 rounded-2xl p-8 md:p-12 text-white overflow-hidden relative">
+      <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-800 rounded-full opacity-20" aria-hidden="true"></div>
+      <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-indigo-800 rounded-full opacity-20" aria-hidden="true"></div>
+      
+      <div class="relative z-10 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-8 md:mb-0">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">{t('savings.title', locale)}</h2>
+          <p class="text-xl opacity-90">{t('savings.subtitle', locale)}</p>
+        </div>
+        <div class="md:w-1/2">
+          <div class="flex items-center justify-center md:justify-end">
+            <div class="w-full max-w-md">
+              <div class="flex mb-4" aria-hidden="true">
+                <div class="h-3 flex-1 bg-blue-500 rounded-full mr-2"></div>
+                <div class="h-3 flex-1 bg-purple-500 rounded-full mx-2"></div>
+                <div class="h-3 flex-1 bg-green-500 rounded-full ml-2"></div>
+              </div>
+              <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm">
+                <div class="flex justify-between mb-2">
+                  <span>{t('savings.needs', locale)}</span>
+                  <span class="font-bold">50%</span>
+                </div>
+                <div class="flex justify-between mb-2">
+                  <span>{t('savings.wants', locale)}</span>
+                  <span class="font-bold">30%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>{t('savings.savings', locale)}</span>
+                  <span class="font-bold">20%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- CTA Section -->
+<section class="py-16 gradient-bg text-white">
+  <div class="container mx-auto px-6 text-center">
+    <h2 class="text-3xl md:text-4xl font-bold mb-6">{t('cta.title', locale)}</h2>
+    <p class="text-xl opacity-90 mb-8 max-w-2xl mx-auto">{t('cta.subtitle', locale)}</p>
+    
+    <div class="flex justify-center">
+      <a href="https://gogobudgeto.expo.app/signin" class="px-8 py-4 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 inline-block text-center">
+        {t('cta.primary', locale)}
+      </a>
+    </div>
+    
+    <p class="mt-8 text-sm opacity-80">
+      {locale === 'fr' ? (
+        <>En vous inscrivant, vous acceptez nos <a href="/terms" class="underline hover:text-blue-200 transition-colors">Conditions</a> et notre <a href="/privacy" class="underline hover:text-blue-200 transition-colors">Politique de confidentialité</a></>
+      ) : (
+        <>By signing up, you agree to our <a href="/en/terms" class="underline hover:text-blue-200 transition-colors">Terms</a> and <a href="/en/privacy" class="underline hover:text-blue-200 transition-colors">Privacy Policy</a></>
+      )}
+    </p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-12">
+  <div class="container mx-auto px-6">
+    <div class="text-center">
+      <div class="flex items-center justify-center mb-4">
+        <i class="fas fa-wallet text-2xl mr-3 text-blue-400" aria-hidden="true"></i>
+        <h3 class="text-xl font-bold">GoGoBudgeto</h3>
+      </div>
+      <p class="text-gray-400 mb-8">{t('footer.tagline', locale)}</p>
+      <p class="text-gray-400">{t('footer.copyright', locale)}</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Feature cards animation on scroll
+  document.addEventListener('DOMContentLoaded', function() {
+    const featureCards = document.querySelectorAll('.feature-card');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    featureCards.forEach((card, index) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+      observer.observe(card);
+    });
+  });
+</script>

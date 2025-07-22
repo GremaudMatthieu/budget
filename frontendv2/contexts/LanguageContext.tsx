@@ -29,13 +29,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         let storedLanguage = await getStoredLanguage();
 
         // If logged in, use user's preference if available
-        if (user?.language) {
-          storedLanguage = user.language;
+        if (user?.languagePreference) {
+          storedLanguage = user.languagePreference;
         }
 
         // If no stored language, use device locale
         if (!storedLanguage) {
-          const deviceLocale = Localization.locale.split('-')[0];
+          const locales = Localization.getLocales();
+          const deviceLocale = locales[0]?.languageCode || 'en';
           // Only allow supported languages (en, fr)
           storedLanguage = deviceLocale === 'fr' ? 'fr' : 'en';
         }
