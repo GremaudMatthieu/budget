@@ -186,16 +186,23 @@ export default function CreateBudgetPlanScreen() {
       <View className="flex-1 bg-background-subtle">
         <StatusBar style="dark" />
         <Stack.Screen options={{ headerShown: false }} />
-        <AnimatedHeaderLayout
-          title={t('budgetPlans.createBudgetPlan')}
-          subtitle={formatMonthYear(year, month) ? `${t('budgetPlans.planning')} ${formatMonthYear(year, month)}` : undefined}
-          showBackButton={true}
-          headerHeight={130}
-        >
+        {Platform.OS === 'web' ? (
           <ScrollView 
             className="flex-1 px-4 pt-6"
             contentContainerStyle={{ paddingBottom: 40 }}
           >
+        ) : (
+          <AnimatedHeaderLayout
+            title={t('budgetPlans.createBudgetPlan')}
+            subtitle={formatMonthYear(year, month) ? `${t('budgetPlans.planning')} ${formatMonthYear(year, month)}` : undefined}
+            showBackButton={true}
+            headerHeight={130}
+          >
+            <ScrollView 
+              className="flex-1 px-4 pt-6"
+              contentContainerStyle={{ paddingBottom: 40 }}
+            >
+        )}
             {/* Instructions Card */}
             <View className="card mb-6">
               <View className="card-content">
