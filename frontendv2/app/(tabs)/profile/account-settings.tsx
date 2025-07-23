@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Modal, Pressable, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
@@ -11,6 +11,11 @@ import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NameInput from '@/components/inputs/NameInput';
+import SelectField from '@/components/inputs/SelectField';
+import ResponsiveModal from '@/components/modals/ResponsiveModal';
+import { ResponsiveFormActions } from '@/components/forms/ResponsiveForm';
+import ActionButton from '@/components/buttons/ActionButton';
 
 export default function AccountSettingsScreen() {
   const { t } = useTranslation();
@@ -44,7 +49,6 @@ export default function AccountSettingsScreen() {
   }, [language]);
   const [editing, setEditing] = useState<null | 'firstName' | 'lastName' | 'language'>(null);
   const [loading, setLoading] = useState(false);
-  const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const handleEdit = (field: 'firstName' | 'lastName' | 'language') => setEditing(field);
@@ -54,10 +58,6 @@ export default function AccountSettingsScreen() {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleLanguageSelect = (lang: string) => {
-    setForm(prev => ({ ...prev, language: lang }));
-    setLanguageModalOpen(false);
-  };
 
   const handleSave = async () => {
     setLoading(true);
@@ -137,22 +137,35 @@ export default function AccountSettingsScreen() {
         <div className="bg-white rounded-xl shadow-md px-4 py-3 mb-3">
           <Text className="text-xs text-gray-500 mb-1">{t('profile.firstName')}</Text>
           {editing === 'firstName' ? (
-            <View className="flex-row items-center">
-              <TextInput
+            <View>
+              <NameInput
                 value={form.firstName}
                 onChangeText={v => handleChange('firstName', v)}
-                className="flex-1 border border-gray-300 rounded-lg p-3 bg-white text-lg"
+                placeholder={t('profile.firstName')}
                 autoFocus
                 editable={!loading}
                 autoCapitalize="words"
                 accessibilityLabel={t('profile.firstName')}
+                icon={<Ionicons name="person-outline" size={18} color="#64748b" />}
               />
-              <TouchableOpacity onPress={handleSave} disabled={loading} className="ml-2 p-2 bg-green-100 rounded-full" accessibilityLabel={t('common.save')}>
-                {loading ? <ActivityIndicator /> : <Ionicons name="checkmark" size={20} color="#16a34a" />}
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleCancel} disabled={loading} className="ml-2 p-2 bg-gray-200 rounded-full" accessibilityLabel={t('common.cancel')}>
-                <Ionicons name="close" size={20} color="#222" />
-              </TouchableOpacity>
+              <View className={`flex-row ${Platform.OS === 'web' ? 'gap-3 justify-end' : 'space-x-3'} mt-3`}>
+                <ActionButton
+                  label={t('common.cancel')}
+                  onPress={handleCancel}
+                  disabled={loading}
+                  variant="secondary"
+                  size="sm"
+                  fullWidth={Platform.OS !== 'web'}
+                />
+                <ActionButton
+                  label={t('common.save')}
+                  onPress={handleSave}
+                  disabled={loading}
+                  variant="primary"
+                  size="sm"
+                  fullWidth={Platform.OS !== 'web'}
+                />
+              </View>
             </View>
           ) : (
             <View className="flex-row items-center">
@@ -167,22 +180,35 @@ export default function AccountSettingsScreen() {
         <div className="bg-white rounded-xl shadow-md px-4 py-3 mb-3">
           <Text className="text-xs text-gray-500 mb-1">{t('profile.lastName')}</Text>
           {editing === 'lastName' ? (
-            <View className="flex-row items-center">
-              <TextInput
+            <View>
+              <NameInput
                 value={form.lastName}
                 onChangeText={v => handleChange('lastName', v)}
-                className="flex-1 border border-gray-300 rounded-lg p-3 bg-white text-lg"
+                placeholder={t('profile.lastName')}
                 autoFocus
                 editable={!loading}
                 autoCapitalize="words"
                 accessibilityLabel={t('profile.lastName')}
+                icon={<Ionicons name="person-outline" size={18} color="#64748b" />}
               />
-              <TouchableOpacity onPress={handleSave} disabled={loading} className="ml-2 p-2 bg-green-100 rounded-full" accessibilityLabel={t('common.save')}>
-                {loading ? <ActivityIndicator /> : <Ionicons name="checkmark" size={20} color="#16a34a" />}
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleCancel} disabled={loading} className="ml-2 p-2 bg-gray-200 rounded-full" accessibilityLabel={t('common.cancel')}>
-                <Ionicons name="close" size={20} color="#222" />
-              </TouchableOpacity>
+              <View className={`flex-row ${Platform.OS === 'web' ? 'gap-3 justify-end' : 'space-x-3'} mt-3`}>
+                <ActionButton
+                  label={t('common.cancel')}
+                  onPress={handleCancel}
+                  disabled={loading}
+                  variant="secondary"
+                  size="sm"
+                  fullWidth={Platform.OS !== 'web'}
+                />
+                <ActionButton
+                  label={t('common.save')}
+                  onPress={handleSave}
+                  disabled={loading}
+                  variant="primary"
+                  size="sm"
+                  fullWidth={Platform.OS !== 'web'}
+                />
+              </View>
             </View>
           ) : (
             <View className="flex-row items-center">
@@ -198,48 +224,36 @@ export default function AccountSettingsScreen() {
           <Text className="text-xs text-gray-500 mb-1">{t('profile.language')}</Text>
           {editing === 'language' ? (
             <>
-                                <TouchableOpacity 
-                  onPress={() => setLanguageModalOpen(true)}
-                  className="flex-row items-center border border-gray-300 rounded-lg p-3 bg-white"
-                  accessibilityLabel={t('profile.language')}
-              >
-                <Text className="flex-1 text-lg text-gray-900">
-                  {form.language === 'en' ? 'English' : 'Français'}
-                </Text>
-                <Ionicons name="chevron-down" size={20} color="#222" />
-              </TouchableOpacity>
-              <View className="flex-row mt-2">
-                <TouchableOpacity onPress={handleSave} disabled={loading} className="flex-1 p-2 bg-green-100 rounded-full mr-2" accessibilityLabel={t('common.save')}>
-                  {loading ? <ActivityIndicator /> : <Text className="text-green-700 text-center font-semibold">{t('common.save')}</Text>}
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleCancel} disabled={loading} className="flex-1 p-2 bg-gray-200 rounded-full" accessibilityLabel={t('common.cancel')}>
-                  <Text className="text-gray-700 text-center font-semibold">{t('common.cancel')}</Text>
-                </TouchableOpacity>
-              </View>
-              <Modal
-                visible={languageModalOpen}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setLanguageModalOpen(false)}
-              >
-                <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' }} onPress={() => setLanguageModalOpen(false)} />
-                <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-6 shadow-lg">
-                  <TouchableOpacity
-                    onPress={() => handleLanguageSelect('en')}
-                    className={`py-4 ${form.language === 'en' ? 'bg-primary-100' : ''} rounded-lg mb-2`}
-                    accessibilityLabel="English"
-                  >
-                    <Text className={`text-lg ${form.language === 'en' ? 'text-primary-700 font-bold' : 'text-gray-900'}`}>English</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleLanguageSelect('fr')}
-                    className={`py-4 ${form.language === 'fr' ? 'bg-primary-100' : ''} rounded-lg mb-2`}
-                    accessibilityLabel="Français"
-                  >
-                    <Text className={`text-lg ${form.language === 'fr' ? 'text-primary-700 font-bold' : 'text-gray-900'}`}>Français</Text>
-                  </TouchableOpacity>
+                                <View>
+                <SelectField
+                  placeholder={t('profile.selectLanguage')}
+                  options={[
+                    { id: 'en', name: 'English', icon: 'language-outline', iconColor: '#0c6cf2' },
+                    { id: 'fr', name: 'Français', icon: 'language-outline', iconColor: '#0c6cf2' }
+                  ]}
+                  value={form.language}
+                  onChange={(value) => setForm(prev => ({ ...prev, language: value }))}
+                  icon={<Ionicons name="language-outline" size={18} color="#64748b" />}
+                  disabled={loading}
+                  noMargin={true}
+                />
+                <View className={`flex-row ${Platform.OS === 'web' ? 'gap-3 justify-start' : 'space-x-3'} mt-3`}>
+                  <ActionButton
+                    label={t('common.save')}
+                    onPress={handleSave}
+                    disabled={loading}
+                    variant="primary"
+                    size="sm"
+                  />
+                  <ActionButton
+                    label={t('common.cancel')}
+                    onPress={handleCancel}
+                    disabled={loading}
+                    variant="secondary"
+                    size="sm"
+                  />
                 </View>
-              </Modal>
+              </View>
             </>
           ) : (
             <View className="flex-row items-center">
@@ -253,59 +267,53 @@ export default function AccountSettingsScreen() {
           )}
         </div>
         {/* Delete Account Button */}
-        <TouchableOpacity 
-          onPress={() => {
-            handleDeleteAccount();
-          }}
-          className="bg-red-100 rounded-xl p-4 items-center mt-8 mb-2"
-          disabled={loading}
-          accessibilityLabel={t('profile.deleteAccount')}
-        >
-          <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
-          <Text className="text-red-700 font-semibold text-base">{t('profile.deleteAccount')}</Text>
-        </TouchableOpacity>
-
-        {/* Web Delete Confirmation Dialog */}
-        {deleteModalOpen && (
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="delete-account-title"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-            tabIndex={-1}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                setDeleteModalOpen(false);
-              }
-            }}
+        <div className={`${Platform.OS === 'web' ? 'flex justify-center' : ''} mt-8 mb-2`}>
+          <TouchableOpacity 
+            onPress={handleDeleteAccount}
+            className={`bg-red-100 rounded-xl p-4 items-center ${Platform.OS === 'web' ? 'hover:bg-red-200 transition-colors min-w-[200px]' : ''}`}
+            disabled={loading}
+            accessibilityLabel={t('profile.deleteAccount')}
           >
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+            <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
+            <Text className="text-red-700 font-semibold text-base">{t('profile.deleteAccount')}</Text>
+          </TouchableOpacity>
+        </div>
+
+        <ResponsiveModal
+          visible={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          title={t('profile.deleteAccount')}
+          size="sm"
+          scrollable={false}
+        >
+          <View className="text-center space-y-6">
+            <View className="items-center">
+              <View className="w-16 h-16 rounded-full bg-danger-100 items-center justify-center mb-4">
                 <Ionicons name="alert-outline" size={32} color="#dc2626" />
-              </div>
-              <h2 id="delete-account-title" className="text-2xl font-bold text-gray-900 mb-2">{t('profile.deleteAccount')}</h2>
-              <p className="text-center text-gray-600 mb-6">
-                {t('profile.deleteAccountConfirm')}
-              </p>
-              <div className="flex w-full gap-3 mt-2">
-                <button
-                  onClick={() => setDeleteModalOpen(false)}
-                  className="flex-1 py-3 border border-gray-300 rounded-xl text-gray-700 text-base font-medium bg-white hover:bg-gray-50 transition"
-                  autoFocus
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  onClick={confirmDeleteAccount}
-                  className="flex-1 py-3 bg-red-600 rounded-xl text-white text-base font-semibold hover:bg-red-700 transition"
-                  disabled={loading}
-                >
-                  {loading ? t('common.loading') : t('common.delete')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+              </View>
+            </View>
+            
+            <Text className="text-center text-gray-600 text-base">
+              {t('profile.deleteAccountConfirm')}
+            </Text>
+
+            <ResponsiveFormActions>
+              <ActionButton
+                label={t('common.cancel')}
+                onPress={() => setDeleteModalOpen(false)}
+                variant="secondary"
+                size="md"
+              />
+              <ActionButton
+                label={loading ? t('common.loading') : t('common.delete')}
+                onPress={confirmDeleteAccount}
+                variant="danger"
+                size="md"
+                disabled={loading}
+              />
+            </ResponsiveFormActions>
+          </View>
+        </ResponsiveModal>
       </div>
     );
   }
@@ -382,48 +390,36 @@ export default function AccountSettingsScreen() {
             <Text className="text-xs text-gray-500 mb-1">{t('profile.language')}</Text>
             {editing === 'language' ? (
               <>
-                  <TouchableOpacity 
-                  onPress={() => setLanguageModalOpen(true)}
-                  className="flex-row items-center border border-gray-300 rounded-lg p-3 bg-white"
-                  accessibilityLabel={t('profile.language')}
-                >
-                  <Text className="flex-1 text-lg text-gray-900">
-                    {form.language === 'en' ? 'English' : 'Français'}
-                  </Text>
-                  <Ionicons name="chevron-down" size={20} color="#222" />
-                </TouchableOpacity>
-                <View className="flex-row mt-2">
-                  <TouchableOpacity onPress={handleSave} disabled={loading} className="flex-1 p-2 bg-green-100 rounded-full mr-2" accessibilityLabel={t('common.save')}>
-                    {loading ? <ActivityIndicator /> : <Text className="text-green-700 text-center font-semibold">{t('common.save')}</Text>}
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={handleCancel} disabled={loading} className="flex-1 p-2 bg-gray-200 rounded-full" accessibilityLabel={t('common.cancel')}>
-                    <Text className="text-gray-700 text-center font-semibold">{t('common.cancel')}</Text>
-                  </TouchableOpacity>
-                </View>
-                <Modal
-                  visible={languageModalOpen}
-                  transparent
-                  animationType="fade"
-                  onRequestClose={() => setLanguageModalOpen(false)}
-                >
-                  <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' }} onPress={() => setLanguageModalOpen(false)} />
-                  <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-6 shadow-lg">
-                    <TouchableOpacity
-                      onPress={() => handleLanguageSelect('en')}
-                      className={`py-4 ${form.language === 'en' ? 'bg-primary-100' : ''} rounded-lg mb-2`}
-                      accessibilityLabel="English"
-                    >
-                      <Text className={`text-lg ${form.language === 'en' ? 'text-primary-700 font-bold' : 'text-gray-900'}`}>English</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleLanguageSelect('fr')}
-                      className={`py-4 ${form.language === 'fr' ? 'bg-primary-100' : ''} rounded-lg mb-2`}
-                      accessibilityLabel="Français"
-                    >
-                      <Text className={`text-lg ${form.language === 'fr' ? 'text-primary-700 font-bold' : 'text-gray-900'}`}>Français</Text>
-                    </TouchableOpacity>
+                  <View>
+                  <SelectField
+                    placeholder={t('profile.selectLanguage')}
+                    options={[
+                      { id: 'en', name: 'English', icon: 'language-outline', iconColor: '#0c6cf2' },
+                      { id: 'fr', name: 'Français', icon: 'language-outline', iconColor: '#0c6cf2' }
+                    ]}
+                    value={form.language}
+                    onChange={(value) => setForm(prev => ({ ...prev, language: value }))}
+                    icon={<Ionicons name="language-outline" size={18} color="#64748b" />}
+                    disabled={loading}
+                    noMargin={true}
+                  />
+                  <View className={`flex-row ${Platform.OS === 'web' ? 'gap-3 justify-start' : 'space-x-3'} mt-3`}>
+                    <ActionButton
+                      label={t('common.save')}
+                      onPress={handleSave}
+                      disabled={loading}
+                      variant="primary"
+                      size="sm"
+                    />
+                    <ActionButton
+                      label={t('common.cancel')}
+                      onPress={handleCancel}
+                      disabled={loading}
+                      variant="secondary"
+                      size="sm"
+                    />
                   </View>
-                </Modal>
+                </View>
               </>
             ) : (
               <View className="flex-row items-center">
@@ -438,15 +434,17 @@ export default function AccountSettingsScreen() {
           </View>
 
           {/* Delete Account Button */}
-          <TouchableOpacity 
-            onPress={handleDeleteAccount}
-            className="bg-red-100 rounded-xl p-4 items-center mt-8 mb-2"
-            disabled={loading}
-            accessibilityLabel={t('profile.deleteAccount')}
-          >
-            <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
-            <Text className="text-red-700 font-semibold text-base">{t('profile.deleteAccount')}</Text>
-          </TouchableOpacity>
+          <View className="flex items-center mt-8 mb-2">
+            <TouchableOpacity 
+              onPress={handleDeleteAccount}
+              className="bg-red-100 rounded-xl p-4 items-center min-w-[200px]"
+              disabled={loading}
+              accessibilityLabel={t('profile.deleteAccount')}
+            >
+              <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
+              <Text className="text-red-700 font-semibold text-base">{t('profile.deleteAccount')}</Text>
+            </TouchableOpacity>
+          </View>
         </AnimatedHeaderLayout>
       </View>
     </SwipeBackWrapper>

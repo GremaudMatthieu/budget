@@ -8,6 +8,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '@/utils/useTranslation';
+import ResponsiveModal from './ResponsiveModal';
+import { ResponsiveFormActions } from '@/components/forms/ResponsiveForm';
+import ActionButton from '@/components/buttons/ActionButton';
 
 interface DeleteConfirmationModalProps {
   visible: boolean;
@@ -27,44 +30,40 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Modal
-      animationType="fade"
-      transparent={true}
+    <ResponsiveModal
       visible={visible}
-      onRequestClose={onClose}
+      onClose={onClose}
+      title={t('modals.confirmDeletion')}
+      size="sm"
+      scrollable={false}
     >
-      <View className="flex-1 justify-center items-center bg-black/50 px-6">
-        <View className="bg-white rounded-2xl w-full p-6 mt-6 mb-10">
-          <View className="items-center mb-4">
-            <View className="w-16 h-16 rounded-full bg-danger-100 items-center justify-center mb-4">
-              <Ionicons name="alert-outline" size={32} color="#dc2626" />
-            </View>
-            <Text className="text-xl font-bold text-text-primary mb-2">{t('modals.confirmDeletion')}</Text>
-          </View>
-          <Text className="text-center text-text-secondary mb-6">
-            {message || t('modals.deleteConfirmation', { name })}
-          </Text>
-          <View className="flex-row gap-3 w-full">
-            <TouchableOpacity
-              onPress={onClose}
-              className="flex-1 py-3 border border-gray-300 rounded-xl bg-white"
-              accessibilityRole="button"
-              accessibilityLabel={t('common.cancel')}
-            >
-              <Text className="text-text-primary text-center font-medium">{t('common.cancel')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={onConfirm}
-              className="flex-1 py-3 bg-danger-600 rounded-xl"
-              accessibilityRole="button"
-              accessibilityLabel={t('common.delete')}
-            >
-              <Text className="text-white text-center font-semibold">{t('common.delete')}</Text>
-            </TouchableOpacity>
+      <View className="text-center space-y-6">
+        <View className="items-center">
+          <View className="w-16 h-16 rounded-full bg-danger-100 items-center justify-center mb-4">
+            <Ionicons name="alert-outline" size={32} color="#dc2626" />
           </View>
         </View>
+        
+        <Text className="text-center text-gray-600 text-base">
+          {message || t('modals.deleteConfirmation', { name })}
+        </Text>
+
+        <ResponsiveFormActions>
+          <ActionButton
+            label={t('common.cancel')}
+            onPress={onClose}
+            variant="secondary"
+            size="md"
+          />
+          <ActionButton
+            label={t('common.delete')}
+            onPress={onConfirm}
+            variant="danger"
+            size="md"
+          />
+        </ResponsiveFormActions>
       </View>
-    </Modal>
+    </ResponsiveModal>
   );
 };
 

@@ -362,6 +362,8 @@ export default {
     amountRequired: 'Le montant est obligatoire',
     nameRequired: 'Le nom ne peut pas être vide',
     nameTooShort: 'Le nom doit comporter au moins 3 caractères',
+    nameTooLong: 'Le nom ne peut pas dépasser {{count}} caractères',
+    categoryRequired: 'La catégorie est obligatoire',
   },
   
   // Validation and hints

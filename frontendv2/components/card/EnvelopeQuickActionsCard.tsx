@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '@/utils/useTranslation';
 
@@ -20,43 +20,58 @@ const EnvelopeQuickActionsCard: React.FC<EnvelopeQuickActionsCardProps> = ({
   currency,
 }) => {
   const { t } = useTranslation();
+  const isWeb = Platform.OS === 'web';
+  
+  // Use appropriate size for web vs mobile
+  const buttonPadding = isWeb ? 'py-2 px-4' : 'p-4';
+  const buttonTextSize = isWeb ? 'text-sm' : 'text-base';
+  const buttonLayout = 'flex-1';
+  
   return (
     <View className="bg-white rounded-xl shadow-md p-4 mb-4">
       <Text className="text-lg font-semibold text-text-primary mb-2">{t('envelopes.quickActions')}</Text>
       <View className="flex-row space-x-3 mb-4">
         <TouchableOpacity
           onPress={() => onQuickCredit('10')}
-          className="flex-1 bg-green-100 p-4 rounded-xl flex-row items-center justify-center"
+          className={`${buttonLayout} bg-success-100 ${buttonPadding} rounded-lg flex-row items-center justify-center ${isWeb ? 'hover:bg-success-200 transition-colors cursor-pointer' : ''}`}
           disabled={disabled}
         >
-          <Ionicons name="arrow-down-circle-outline" size={20} color="#16a34a" />
-          <Text className="text-green-700 font-medium ml-2">{t('envelopes.addX', { amount: 10, currency })}</Text>
+          <Ionicons name="add" size={16} color="#16a34a" />
+          <Text className={`text-success-700 font-medium ml-1 ${buttonTextSize}`}>
+            {t('envelopes.addFunds')} {10} {currency}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => onQuickDebit('10')}
-          className="flex-1 bg-red-100 p-4 rounded-xl flex-row items-center justify-center"
+          className={`${buttonLayout} bg-danger-100 ${buttonPadding} rounded-lg flex-row items-center justify-center ${isWeb ? 'hover:bg-danger-200 transition-colors cursor-pointer' : ''}`}
           disabled={disabled}
         >
-          <Ionicons name="arrow-up-circle-outline" size={20} color="#dc2626" />
-          <Text className="text-red-700 font-medium ml-2">{t('envelopes.spendX', { amount: 10, currency })}</Text>
+          <Ionicons name="remove" size={16} color="#dc2626" />
+          <Text className={`text-danger-700 font-medium ml-1 ${buttonTextSize}`}>
+            {t('envelopes.withdraw')} {10} {currency}
+          </Text>
         </TouchableOpacity>
       </View>
       <View className="flex-row space-x-3">
         <TouchableOpacity
           onPress={() => onQuickCredit('25')}
-          className="flex-1 bg-green-100 p-4 rounded-xl flex-row items-center justify-center"
+          className={`${buttonLayout} bg-success-100 ${buttonPadding} rounded-lg flex-row items-center justify-center ${isWeb ? 'hover:bg-success-200 transition-colors cursor-pointer' : ''}`}
           disabled={disabled}
         >
-          <Ionicons name="arrow-down-circle-outline" size={20} color="#16a34a" />
-          <Text className="text-green-700 font-medium ml-2">{t('envelopes.addX', { amount: 25, currency })}</Text>
+          <Ionicons name="add" size={16} color="#16a34a" />
+          <Text className={`text-success-700 font-medium ml-1 ${buttonTextSize}`}>
+            {t('envelopes.addFunds')} {25} {currency}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => onQuickDebit('25')}
-          className="flex-1 bg-red-100 p-4 rounded-xl flex-row items-center justify-center"
+          className={`${buttonLayout} bg-danger-100 ${buttonPadding} rounded-lg flex-row items-center justify-center ${isWeb ? 'hover:bg-danger-200 transition-colors cursor-pointer' : ''}`}
           disabled={disabled}
         >
-          <Ionicons name="arrow-up-circle-outline" size={20} color="#dc2626" />
-          <Text className="text-red-700 font-medium ml-2">{t('envelopes.spendX', { amount: 25, currency })}</Text>
+          <Ionicons name="remove" size={16} color="#dc2626" />
+          <Text className={`text-danger-700 font-medium ml-1 ${buttonTextSize}`}>
+            {t('envelopes.withdraw')} {25} {currency}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

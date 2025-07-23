@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, TextInputProps } from 'react-native';
+import { View, Text, TextInput, TextInputProps, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
 
@@ -29,22 +29,27 @@ const AmountInput: React.FC<AmountInputProps> = ({
     }
   };
 
+  const isWeb = Platform.OS === 'web';
+  
   return (
-    <View className="mb-4">
+    <View>
       {label && (
-        <Text className="mb-1 text-sm font-medium text-text-secondary">{label}</Text>
+        <Text className={`${isWeb ? 'mb-2' : 'mb-1'} text-sm font-medium text-gray-700`}>{label}</Text>
       )}
       
-      <View className="relative flex-row items-center">
-        <View className="absolute left-3 top-0 bottom-0 justify-center z-10">
-          <Text className="text-text-secondary font-medium">{currency}</Text>
+      <View className={`
+        flex-row items-center rounded-xl border bg-white overflow-hidden
+        ${error ? 'border-danger-500' : 'border-surface-border'}
+        ${isWeb ? 'focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500 transition-all' : ''}
+      `}>
+        <View className="px-3 py-3 bg-gray-50 border-r border-surface-border min-w-[50px] items-center">
+          <Text className="font-medium text-text-secondary text-sm">{currency}</Text>
         </View>
-        
         <TextInput
           value={normalizeAmountInput(value || '')}
           onChangeText={handleAmountChange}
           keyboardType="decimal-pad"
-          className={`p-3 pl-8 rounded-xl border ${error ? 'border-danger-500' : 'border-surface-border'} bg-white text-text-primary ${className || ''}`}
+          className={`flex-1 p-3 text-text-primary ${className || ''}`}
           placeholder="0.00"
           placeholderTextColor="#9ca3af"
           {...props}
@@ -52,7 +57,7 @@ const AmountInput: React.FC<AmountInputProps> = ({
       </View>
       
       {error && (
-        <View className="flex-row items-center mt-1">
+        <View className="flex-row items-center mt-2">
           <Ionicons name="alert-circle-outline" size={14} color="#ef4444" />
           <Text className="ml-1 text-xs text-danger-600">{error}</Text>
         </View>

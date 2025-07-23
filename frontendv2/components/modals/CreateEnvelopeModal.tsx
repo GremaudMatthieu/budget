@@ -7,6 +7,8 @@ import AmountInput from '@/components/inputs/AmountInput';
 import NameInput from '@/components/inputs/NameInput';
 import ActionButton from '@/components/buttons/ActionButton';
 import SelectField from '@/components/inputs/SelectField';
+import ResponsiveModal from '@/components/modals/ResponsiveModal';
+import { ResponsiveForm, ResponsiveFormField, ResponsiveFormActions } from '@/components/forms/ResponsiveForm';
 import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
 import validateAmount from '@/utils/validateAmount';
 
@@ -116,86 +118,78 @@ const CreateEnvelopeModal: React.FC<CreateEnvelopeModalProps> = ({
   const currencyOptionsList = getCurrencyOptions();
 
   return (
-    <Modal
+    <ResponsiveModal
       visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      accessibilityViewIsModal
-      accessible
+      onClose={handleClose}
+      title={t('modals.createEnvelope')}
+      size="md"
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 justify-end"
-      >
-        <TouchableWithoutFeedback onPress={onClose} accessible={false}>
-          <View className="flex-1 bg-black/50" />
-        </TouchableWithoutFeedback>
-        <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10">
-          <View className="flex-row justify-between items-center mb-6">
-            <Text className="text-xl font-bold" accessibilityRole="header">{t('modals.createEnvelope')}</Text>
-            <TouchableOpacity onPress={onClose} className="p-2" accessibilityLabel={t('common.close')}>
-              <Ionicons name="close" size={24} color="#666" />
-            </TouchableOpacity>
-          </View>
-          <ScrollView className="space-y-4" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-            <NameInput
-              label={t('envelopes.envelopeName')}
-              value={name}
-              onChangeText={handleNameChange}
-              placeholder={t('modals.nameFieldHint')}
-              icon={<Ionicons name="bookmark-outline" size={18} color="#64748b" />}
-              editable={!submitted}
-              onBlur={() => setNameTouched(true)}
-              onFocus={() => setNameTouched(true)}
-              error={nameTouched && nameError ? nameError : undefined}
-            />
-            <AmountInput
-              label={t('envelopes.targetAmount')}
-              value={targetAmount}
-              onChangeText={handleAmountChange}
-              currency="$"
-              editable={!submitted}
-              placeholder={t('modals.amountFieldHint')}
-              onBlur={() => setAmountTouched(true)}
-              onFocus={() => setAmountTouched(true)}
-              error={amountTouched && amountError ? amountError : undefined}
-              maxLength={13}
-            />
-            <SelectField
-              label={t('common.currency')}
-              placeholder={t('modals.selectCurrency')}
-              options={currencyOptionsList.map(option => ({
-                id: option.value,
-                name: option.label,
-                icon: "cash-outline",
-                iconColor: "#16a34a"
-              }))}
-              value={currency}
-              onChange={setCurrency}
-              icon={<Ionicons name="cash-outline" size={18} color="#16a34a" />}
-              disabled={submitted}
-            />
-          </ScrollView>
-          <View className="flex-row space-x-3 mt-6">
-            <ActionButton
-              label={t('common.cancel')}
-              onPress={onClose}
-              disabled={submitted}
-              className="flex-1"
-              variant="secondary"
-            />
-            <ActionButton
-              label={submitted ? t('common.loading') : t('envelopes.createEnvelope')}
-              onPress={handleSubmit}
-              disabled={submitted || !!nameError || !!amountError || !nameTouched || !amountTouched}
-              className="flex-1"
-              variant="primary"
-            />
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+      <ResponsiveForm>
+        <ResponsiveFormField>
+          <NameInput
+            label={t('envelopes.envelopeName')}
+            value={name}
+            onChangeText={handleNameChange}
+            placeholder={t('modals.nameFieldHint')}
+            icon={<Ionicons name="bookmark-outline" size={18} color="#64748b" />}
+            editable={!submitted}
+            onBlur={() => setNameTouched(true)}
+            onFocus={() => setNameTouched(true)}
+            error={nameTouched && nameError ? nameError : undefined}
+          />
+        </ResponsiveFormField>
+
+        <ResponsiveFormField>
+          <AmountInput
+            label={t('envelopes.targetAmount')}
+            value={targetAmount}
+            onChangeText={handleAmountChange}
+            currency="$"
+            editable={!submitted}
+            placeholder={t('modals.amountFieldHint')}
+            onBlur={() => setAmountTouched(true)}
+            onFocus={() => setAmountTouched(true)}
+            error={amountTouched && amountError ? amountError : undefined}
+            maxLength={13}
+          />
+        </ResponsiveFormField>
+
+        <ResponsiveFormField>
+          <SelectField
+            label={t('common.currency')}
+            placeholder={t('modals.selectCurrency')}
+            options={currencyOptionsList.map(option => ({
+              id: option.value,
+              name: option.label,
+              icon: "cash-outline",
+              iconColor: "#16a34a"
+            }))}
+            value={currency}
+            onChange={setCurrency}
+            icon={<Ionicons name="cash-outline" size={18} color="#16a34a" />}
+            disabled={submitted}
+            noMargin={true}
+          />
+        </ResponsiveFormField>
+
+        <ResponsiveFormActions>
+          <ActionButton
+            label={t('common.cancel')}
+            onPress={handleClose}
+            disabled={submitted}
+            variant="secondary"
+            size="md"
+          />
+          <ActionButton
+            label={submitted ? t('common.loading') : t('envelopes.createEnvelope')}
+            onPress={handleSubmit}
+            disabled={submitted || !!nameError || !!amountError || !nameTouched || !amountTouched}
+            variant="primary"
+            size="md"
+          />
+        </ResponsiveFormActions>
+      </ResponsiveForm>
+    </ResponsiveModal>
   );
 };
 

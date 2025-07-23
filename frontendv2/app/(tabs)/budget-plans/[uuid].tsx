@@ -436,83 +436,27 @@ export default function BudgetPlanDetailScreen() {
             <Text className="text-primary-700 text-sm">{getBudgetAdvice()}</Text>
           </View>
         </View>
-        {/* Delete Budget Plan Button (web and mobile) */}
-        {Platform.OS === 'web'
-          ? (() => {
-              // Web-specific delete confirmation dialog for budget plan
-              const renderWebDeleteDialog = () => {
-                if (!isDeletePlanModalOpen) return null;
-                return (
-                  <div
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="delete-plan-title"
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-                    tabIndex={-1}
-                  >
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-full bg-danger-100 flex items-center justify-center mb-4">
-                        <Ionicons name="alert-outline" size={32} color="#dc2626" />
-                      </div>
-                      <h2 id="delete-plan-title" className="text-2xl font-bold text-text-primary mb-2">{t('modals.confirmDeletion')}</h2>
-                      <p className="text-center text-text-secondary mb-6">
-                        {t('modals.deleteConfirmation', { name: planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan') })}
-                      </p>
-                      <div className="flex w-full gap-3 mt-2">
-                        <button
-                          onClick={() => setIsDeletePlanModalOpen(false)}
-                          className="flex-1 py-3 border border-gray-300 rounded-xl text-text-primary text-base font-medium bg-white hover:bg-gray-50 transition"
-                          autoFocus
-                        >
-                          {t('common.cancel')}
-                        </button>
-                        <button
-                          onClick={handleDeleteBudgetPlan}
-                          className="flex-1 py-3 bg-danger-600 rounded-xl text-white text-base font-semibold hover:bg-danger-700 transition"
-                        >
-                          {t('common.delete')}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              };
-              return (
-                <div className="flex flex-col items-center w-full">
-                  <TouchableOpacity
-                    onPress={() => setIsDeletePlanModalOpen(true)}
-                    className="bg-red-100 rounded-xl p-4 items-center mt-6 mb-10"
-                    accessibilityRole="button"
-                    accessibilityLabel={t('budgetPlans.deletePlan')}
-                    style={{ display: 'flex', justifyContent: 'center' }}
-                  >
-                    <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
-                    <Text className="text-red-700 font-semibold text-base">{t('budgetPlans.deletePlan')}</Text>
-                  </TouchableOpacity>
-                  {renderWebDeleteDialog()}
-                </div>
-              );
-            })()
-          : (
-            <View className="flex flex-col items-center w-full">
-              <TouchableOpacity
-                onPress={() => setIsDeletePlanModalOpen(true)}
-                className="bg-red-100 rounded-xl p-4 items-center mt-6 mb-10"
-                accessibilityRole="button"
-                accessibilityLabel={t('budgetPlans.deletePlan')}
-              >
-                <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
-                <Text className="text-red-700 font-semibold text-base">{t('budgetPlans.deletePlan')}</Text>
-              </TouchableOpacity>
-              <DeleteConfirmationModal
-                visible={isDeletePlanModalOpen}
-                onClose={() => setIsDeletePlanModalOpen(false)}
-                onConfirm={handleDeleteBudgetPlan}
-                name={planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}
-                message={t('modals.deleteConfirmation', { name: planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan') })}
-              />
-            </View>
-          )}
+        {/* Delete Budget Plan Button (mobile only) */}
+        {Platform.OS !== 'web' && (
+          <View className="flex flex-col items-center w-full">
+            <TouchableOpacity
+              onPress={() => setIsDeletePlanModalOpen(true)}
+              className="bg-red-100 rounded-xl p-4 items-center mt-6 mb-10"
+              accessibilityRole="button"
+              accessibilityLabel={t('budgetPlans.deletePlan')}
+            >
+              <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
+              <Text className="text-red-700 font-semibold text-base">{t('budgetPlans.deletePlan')}</Text>
+            </TouchableOpacity>
+            <DeleteConfirmationModal
+              visible={isDeletePlanModalOpen}
+              onClose={() => setIsDeletePlanModalOpen(false)}
+              onConfirm={handleDeleteBudgetPlan}
+              name={planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}
+              message={t('modals.deleteConfirmation', { name: planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan') })}
+            />
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -719,7 +663,7 @@ export default function BudgetPlanDetailScreen() {
 
   if (Platform.OS === 'web') {
     return (
-      <div className="mb-8 mt-2">
+      <div className="mb-8 mt-2 pb-32">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-900 mb-1">{planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}</h1>
@@ -740,8 +684,30 @@ export default function BudgetPlanDetailScreen() {
           {renderWants()}
           {renderSavings()}
           {renderIncomes()}
-          <div className="h-32" />
         </div>
+        
+        {/* Delete Budget Plan Button - Web (at bottom of page) */}
+        <div className="flex flex-col items-center w-full mt-8 mb-4">
+          <TouchableOpacity
+            onPress={() => setIsDeletePlanModalOpen(true)}
+            className="bg-red-100 rounded-xl p-4 items-center"
+            accessibilityRole="button"
+            accessibilityLabel={t('budgetPlans.deletePlan')}
+            style={{ display: 'flex', justifyContent: 'center' }}
+          >
+            <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
+            <Text className="text-red-700 font-semibold text-base">{t('budgetPlans.deletePlan')}</Text>
+          </TouchableOpacity>
+        </div>
+        
+        {/* Delete confirmation modal for web */}
+        <DeleteConfirmationModal
+          visible={isDeletePlanModalOpen}
+          onClose={() => setIsDeletePlanModalOpen(false)}
+          onConfirm={handleDeleteBudgetPlan}
+          name={planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}
+          message={t('modals.deleteConfirmation', { name: planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan') })}
+        />
         {/* Modals */}
         {isAddModalOpen && (
           <BudgetItemModal

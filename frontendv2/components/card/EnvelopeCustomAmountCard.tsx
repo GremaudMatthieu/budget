@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
 import { useTranslation } from '@/utils/useTranslation';
 import { validateEnvelopeAmountField } from '@/utils/validateEnvelopeAmount';
@@ -76,6 +77,13 @@ const EnvelopeCustomAmountCard: React.FC<EnvelopeCustomAmountCardProps> = ({
     onDebit();
   };
 
+  const isWeb = Platform.OS === 'web';
+  
+  // Use same size as envelope listing buttons
+  const buttonPadding = isWeb ? 'py-2 px-4' : 'p-3';
+  const buttonTextSize = isWeb ? 'text-sm' : 'text-base';
+  const buttonLayout = 'flex-1';
+
   return (
     <View className="bg-white rounded-xl shadow-md p-4 mb-4">
       <Text className="text-lg font-semibold text-text-primary mb-2 min-w-0 break-all" numberOfLines={2} ellipsizeMode="tail">{t('envelopes.customAmount')}</Text>
@@ -102,17 +110,23 @@ const EnvelopeCustomAmountCard: React.FC<EnvelopeCustomAmountCardProps> = ({
       <View className="flex-row space-x-3">
         <TouchableOpacity
           onPress={handleCredit}
-          className="flex-1 bg-green-500 p-3 rounded-xl"
+          className={`${buttonLayout} bg-success-100 ${buttonPadding} rounded-lg flex-row items-center justify-center ${isWeb ? 'hover:bg-success-200 transition-colors cursor-pointer' : ''}`}
           disabled={disabled || !!error || !amount.trim()}
         >
-          <Text className="text-white text-center font-semibold">{t('envelopes.credit')}</Text>
+          <Ionicons name="add" size={16} color="#16a34a" />
+          <Text className={`text-success-700 font-medium ml-1 ${buttonTextSize}`}>
+            {t('envelopes.addFunds')}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleDebit}
-          className="flex-1 bg-red-500 p-3 rounded-xl"
+          className={`${buttonLayout} bg-danger-100 ${buttonPadding} rounded-lg flex-row items-center justify-center ${isWeb ? 'hover:bg-danger-200 transition-colors cursor-pointer' : ''}`}
           disabled={disabled || !!error || !amount.trim()}
         >
-          <Text className="text-white text-center font-semibold">{t('envelopes.debit')}</Text>
+          <Ionicons name="remove" size={16} color="#dc2626" />
+          <Text className={`text-danger-700 font-medium ml-1 ${buttonTextSize}`}>
+            {t('envelopes.withdraw')}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

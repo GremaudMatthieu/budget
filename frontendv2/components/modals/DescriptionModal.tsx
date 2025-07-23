@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, TextInput, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '@/utils/useTranslation';
+import ResponsiveModal from './ResponsiveModal';
+import { ResponsiveFormField, ResponsiveFormActions } from '@/components/forms/ResponsiveForm';
 import ActionButton from '@/components/buttons/ActionButton';
 
 export interface DescriptionModalProps {
@@ -77,75 +79,63 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({
     : t('envelopes.confirmWithdrawal');
 
   return (
-    <Modal
+    <ResponsiveModal
       visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      accessibilityViewIsModal
-      accessible
+      onClose={onClose}
+      title={modalTitle}
+      size="sm"
+      scrollable={false}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 justify-end"
-      >
-        <TouchableWithoutFeedback onPress={onClose} accessible={false}>
-          <View className="flex-1 bg-black/50" />
-        </TouchableWithoutFeedback>
-        <View className="bg-white rounded-t-3xl px-6 pt-6 pb-10">
-          <View className="flex-row justify-between items-center mb-6">
-            <Text className="text-xl font-bold" accessibilityRole="header">{modalTitle}</Text>
-            <TouchableOpacity onPress={onClose} className="p-2" accessibilityLabel={t('common.close')}>
-              <Ionicons name="close" size={24} color="#666" />
-            </TouchableOpacity>
-          </View>
-          <ScrollView className="space-y-4" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-            <Text className="mb-2 text-sm font-medium text-text-secondary">
-              {t('modals.addDescription')}:
-            </Text>
-            <View className="relative">
-              <View className="absolute left-3 top-3">
-                <Ionicons name="create-outline" size={18} color="#64748b" />
-              </View>
-              <TextInput
-                value={description}
-                onChangeText={setDescription}
-                placeholder={t('common.description')}
-                placeholderTextColor="#9ca3af"
-                className="p-3 pl-10 border border-surface-border rounded-xl bg-white text-text-primary"
-                multiline
-                numberOfLines={3}
-                textAlignVertical="top"
-                style={{ minHeight: 80 }}
-                editable={!loading}
-                maxLength={13}
-                onBlur={() => setTouched(true)}
-                onFocus={() => setTouched(true)}
-              />
-              {touched && error && (
-                <Text className="text-red-500 text-xs mt-1">{error}</Text>
-              )}
+      <View className="space-y-4">
+        <ResponsiveFormField>
+          <Text className="mb-2 text-sm font-medium text-text-secondary">
+            {t('modals.addDescription')}:
+          </Text>
+          <View className="relative">
+            <View className="absolute left-3 top-3 z-10">
+              <Ionicons name="create-outline" size={18} color="#64748b" />
             </View>
-          </ScrollView>
-          <View className="flex-row space-x-3 mt-6">
-            <ActionButton
-              label={t('common.cancel')}
-              onPress={onClose}
-              className="flex-1"
-              disabled={loading}
-              variant="secondary"
+            <TextInput
+              value={description}
+              onChangeText={setDescription}
+              placeholder={t('common.description')}
+              placeholderTextColor="#9ca3af"
+              className={`p-3 pl-10 border border-surface-border rounded-xl bg-white text-text-primary ${
+                Platform.OS === 'web' ? 'focus:border-primary-500 focus:ring-1 focus:ring-primary-500' : ''
+              }`}
+              multiline
+              numberOfLines={3}
+              textAlignVertical="top"
+              style={{ minHeight: 80 }}
+              editable={!loading}
+              maxLength={13}
+              onBlur={() => setTouched(true)}
+              onFocus={() => setTouched(true)}
             />
-            <ActionButton
-              label={actionLabel}
-              onPress={handleSubmit}
-              className="flex-1"
-              disabled={loading || !!error || !description.trim()}
-              variant="primary"
-            />
+            {touched && error && (
+              <Text className="text-red-500 text-xs mt-1">{error}</Text>
+            )}
           </View>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+        </ResponsiveFormField>
+
+        <ResponsiveFormActions>
+          <ActionButton
+            label={t('common.cancel')}
+            onPress={onClose}
+            disabled={loading}
+            variant="secondary"
+            size="md"
+          />
+          <ActionButton
+            label={actionLabel}
+            onPress={handleSubmit}
+            disabled={loading || !!error || !description.trim()}
+            variant="primary"
+            size="md"
+          />
+        </ResponsiveFormActions>
+      </View>
+    </ResponsiveModal>
   );
 };
 

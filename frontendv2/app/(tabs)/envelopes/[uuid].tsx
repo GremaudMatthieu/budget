@@ -94,48 +94,11 @@ export default function EnvelopeDetailScreen() {
     return details.envelope.name.length > 40 || details.envelope.name.includes('\n') ? 180 : 130;
   };
 
-  // Web-specific delete confirmation dialog
-  const renderWebDeleteDialog = () => {
-    if (!deleteModalOpen) return null;
-    return (
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="delete-envelope-title"
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-        tabIndex={-1}
-      >
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-danger-100 flex items-center justify-center mb-4">
-            <Ionicons name="alert-outline" size={32} color="#dc2626" />
-          </div>
-          <h2 id="delete-envelope-title" className="text-2xl font-bold text-text-primary mb-2">{t('modals.confirmDeletion')}</h2>
-          <p className="text-center text-text-secondary mb-6">
-            {t('modals.deleteConfirmation', { name: details.envelope.name })}
-          </p>
-          <div className="flex w-full gap-3 mt-2">
-            <button
-              onClick={() => setDeleteModalOpen(false)}
-              className="flex-1 py-3 border border-gray-300 rounded-xl text-text-primary text-base font-medium bg-white hover:bg-gray-50 transition"
-              autoFocus
-            >
-              {t('common.cancel')}
-            </button>
-            <button
-              onClick={handleDeleteEnvelope}
-              className="flex-1 py-3 bg-danger-600 rounded-xl text-white text-base font-semibold hover:bg-danger-700 transition"
-            >
-              {t('common.delete')}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
+
 
   if (Platform.OS === 'web') {
     return (
-      <div className="mb-8 mt-2">
+      <div className="mb-8 mt-2 pb-16">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-900 mb-1">{details.envelope.name}</h1>
@@ -192,7 +155,13 @@ export default function EnvelopeDetailScreen() {
             <Ionicons name="trash-outline" size={20} color="#dc2626" style={{ marginBottom: 2 }} />
             <Text className="text-red-700 font-semibold text-base">{t('envelopes.deleteEnvelope')}</Text>
           </TouchableOpacity>
-          {renderWebDeleteDialog()}
+          <DeleteConfirmationModal
+            visible={deleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            onConfirm={handleDeleteEnvelope}
+            name={details.envelope.name}
+            message={t('modals.deleteConfirmation', { name: details.envelope.name })}
+          />
           <DescriptionModal
             visible={descriptionModalOpen}
             onClose={() => setDescriptionModalOpen(false)}

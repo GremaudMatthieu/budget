@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Modal, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ScrollView, ActivityIndicator, Platform, TouchableWithoutFeedback } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useBudget } from '@/contexts/BudgetContext';
 import { createUtcSafeDate, formatMonthYear } from '@/utils/dateUtils';
@@ -153,8 +153,10 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
       transparent
       animationType="fade"
     >
-      <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="w-[90%] max-w-md bg-background-light p-6 rounded-2xl shadow-lg">
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+            <View className="w-[90%] max-w-md bg-background-light p-6 rounded-2xl shadow-lg">
           <View className="flex-row justify-between items-center mb-5">
             <View className="flex-row items-center">
               <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center mr-2">
@@ -337,8 +339,11 @@ const DuplicateBudgetPlanModal: React.FC<DuplicateBudgetPlanModalProps> = ({
               )}
             </TouchableOpacity>
           </View>
+
+            </View>
+          </TouchableWithoutFeedback>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };

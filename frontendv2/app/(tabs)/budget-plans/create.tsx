@@ -4,11 +4,8 @@ import {
   Text, 
   ScrollView, 
   TouchableOpacity, 
-  TextInput,
-  ActivityIndicator,
   Platform,
-  KeyboardAvoidingView,
-  Modal
+  KeyboardAvoidingView
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,8 +14,11 @@ import { useBudget } from '@/contexts/BudgetContext';
 import { useErrorContext } from '@/contexts/ErrorContext';
 import { useTranslation } from '@/utils/useTranslation';
 import validateAmount from '@/utils/validateAmount';
-import { currencyOptions } from '@/utils/currencyUtils';
+import { getCurrencyOptions } from '@/utils/currencyUtils';
 import SelectField from '@/components/inputs/SelectField';
+import NameInput from '@/components/inputs/NameInput';
+import AmountInput from '@/components/inputs/AmountInput';
+import ActionButton from '@/components/buttons/ActionButton';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
 import { validateEnvelopeAmountField } from '@/utils/validateEnvelopeAmount';
@@ -38,14 +38,10 @@ export default function CreateBudgetPlanScreen() {
 
   // Form state
   const [currency, setCurrency] = useState('USD');
-  const [currencySelectVisible, setCurrencySelectVisible] = useState(false);
-  const [incomes, setIncomes] = useState([{ name: '', amount: '', category: 'Employment' }]);
+  const [incomes, setIncomes] = useState([{ name: '', amount: '', category: '' }]);
   const [year, setYear] = useState<number>(0);
   const [month, setMonth] = useState<number>(0);
 
-  // State for category selection modal
-  const [categorySelectVisible, setCategorySelectVisible] = useState(false);
-  const [currentEditingIncomeIndex, setCurrentEditingIncomeIndex] = useState<number | null>(null);
 
   // Add per-income error state
   const [incomeErrors, setIncomeErrors] = useState<{ name?: string; amount?: string; category?: string }[]>([]);
@@ -172,11 +168,6 @@ export default function CreateBudgetPlanScreen() {
     );
   };
 
-  // Get currency label
-  const getCurrencyLabel = (value: string): string => {
-    const option = currencyOptions.find(opt => opt.value === value);
-    return option ? option.label : value;
-  };
 
   // Render content that will be shared between both web and mobile
   const renderContent = () => (
@@ -203,18 +194,19 @@ export default function CreateBudgetPlanScreen() {
               <View className="card-content">
                 <Text className="text-lg font-semibold text-text-primary mb-4">{t('budgetPlans.selectCurrency')}</Text>
                 
-                <TouchableOpacity 
-                  onPress={() => setCurrencySelectVisible(true)}
-                  className="neomorphic-inset p-4 rounded-lg flex-row justify-between items-center"
-                >
-                  <View className="flex-row items-center">
-                    <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center mr-2">
-                      <Text className="text-primary-700 font-bold">{currency.charAt(0)}</Text>
-                    </View>
-                    <Text className="text-text-primary font-medium">{getCurrencyLabel(currency)}</Text>
-                  </View>
-                  <Ionicons name="chevron-down" size={18} color="#64748b" />
-                </TouchableOpacity>
+                <SelectField
+                  placeholder={t('modals.selectCurrency')}
+                  options={getCurrencyOptions().map(option => ({
+                    id: option.value,
+                    name: option.label,
+                    icon: "cash-outline",
+                    iconColor: "#16a34a"
+                  }))}
+                  value={currency}
+                  onChange={setCurrency}
+                  icon={<Ionicons name="cash-outline" size={18} color="#16a34a" />}
+                  noMargin={true}
+                />
               </View>
             </View>
             
@@ -255,33 +247,26 @@ export default function CreateBudgetPlanScreen() {
                     </View>
                     
                     <View className="mb-3">
-                      <Text className="text-text-secondary text-sm mb-1">{t('common.name')}</Text>
-                      <TextInput
+                      <NameInput
+                        label={t('common.name')}
                         value={income.name}
                         onChangeText={(value) => handleIncomeNameChange(index, value)}
                         placeholder={t('budgetPlans.incomeNamePlaceholder')}
-                        className="border border-surface-border rounded-lg p-3 bg-white"
                         maxLength={35}
+                        icon={<Ionicons name="person-outline" size={18} color="#64748b" />}
+                        error={incomeErrors[index]?.name}
                       />
-                      {incomeErrors[index]?.name && (
-                        <Text className="text-red-500 text-xs mt-1">{incomeErrors[index].name}</Text>
-                      )}
                     </View>
                     
                     <View className="mb-3">
-                      <Text className="text-text-secondary text-sm mb-1">{t('common.amount')}</Text>
-                      <View className="flex-row items-center border border-surface-border rounded-lg bg-white overflow-hidden">
-                        <View className="px-3 py-3 bg-gray-50 border-r border-surface-border">
-                          <Text className="font-medium text-text-secondary">{currency}</Text>
-                        </View>
-                        <TextInput
-                          value={income.amount}
-                          onChangeText={(value) => handleIncomeAmountChange(index, value)}
-                          placeholder={t('modals.amountPlaceholder')}
-                          keyboardType="decimal-pad"
-                          className="flex-1 p-3"
-                        />
-                      </View>
+                      <AmountInput
+                        label={t('common.amount')}
+                        value={income.amount}
+                        onChangeText={(value) => handleIncomeAmountChange(index, value)}
+                        placeholder={t('modals.amountPlaceholder')}
+                        currency={currency}
+                        error={incomeErrors[index]?.amount}
+                      />
                     </View>
                     
                     <View>
@@ -297,6 +282,8 @@ export default function CreateBudgetPlanScreen() {
                         value={income.category}
                         onChange={(value) => handleIncomeCategoryChange(index, value)}
                         icon={<Ionicons name="pricetag-outline" size={18} color="#9333ea" />}
+                        noMargin={true}
+                        error={incomeErrors[index]?.category}
                       />
                     </View>
                   </View>
@@ -328,27 +315,23 @@ export default function CreateBudgetPlanScreen() {
             </View>
             
             {/* Action Buttons */}
-            <View className="flex-row space-x-4 mb-10">
-              <TouchableOpacity
+            <View className={`flex-row ${Platform.OS === 'web' ? 'gap-4 justify-end' : 'space-x-4'} mb-10`}>
+              <ActionButton
+                label={t('common.cancel')}
                 onPress={() => router.back()}
-                className="flex-1 py-4 px-6 rounded-xl border-2 border-primary-600"
-              >
-                <Text className="text-primary-600 text-center font-semibold">{t('common.cancel')}</Text>
-              </TouchableOpacity>
+                variant="secondary"
+                size="md"
+                fullWidth={Platform.OS !== 'web'}
+              />
               
-              <TouchableOpacity
+              <ActionButton
+                label={loading ? t('common.loading') : t('common.create')}
                 onPress={handleSubmit}
                 disabled={loading || !isFormValid()}
-                className={`flex-1 py-4 px-6 rounded-xl shadow-md ${
-                  loading || !isFormValid() ? 'bg-gray-400' : 'bg-primary-600'
-                }`}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#ffffff" />
-                ) : (
-                  <Text className="text-white text-center font-semibold">{t('common.create')}</Text>
-                )}
-              </TouchableOpacity>
+                variant="primary"
+                size="md"
+                fullWidth={Platform.OS !== 'web'}
+              />
             </View>
     </>
   );
@@ -384,97 +367,7 @@ export default function CreateBudgetPlanScreen() {
           </AnimatedHeaderLayout>
         )}
         
-        {/* Currency Selector Modal */}
-        <Modal
-          visible={currencySelectVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setCurrencySelectVisible(false)}
-        >
-          <View className="flex-1 bg-black/50 justify-center items-center p-6">
-            <View className="bg-white w-full max-h-[70%] rounded-xl overflow-hidden">
-              <View className="flex-row justify-between items-center p-4 border-b border-gray-200">
-                <Text className="text-lg font-semibold text-text-primary">{t('modals.selectCurrency')}</Text>
-                <TouchableOpacity onPress={() => setCurrencySelectVisible(false)}>
-                  <Ionicons name="close" size={24} color="#64748b" />
-                </TouchableOpacity>
-              </View>
-              
-              <ScrollView>
-                {currencyOptions.map((option) => (
-                  <TouchableOpacity
-                    key={option.value}
-                    onPress={() => {
-                      setCurrency(option.value);
-                      setCurrencySelectVisible(false);
-                    }}
-                    className={`p-4 border-b border-gray-100 flex-row items-center ${
-                      currency === option.value ? 'bg-primary-50' : ''
-                    }`}
-                  >
-                    <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center mr-3">
-                      <Text className="font-bold text-primary-700">{option.value.charAt(0)}</Text>
-                    </View>
-                    <Text className={`${currency === option.value ? 'text-primary-600 font-medium' : 'text-text-primary'}`}>
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
 
-        {/* Category Selector Modal */}
-        <Modal
-          visible={categorySelectVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setCategorySelectVisible(false)}
-        >
-          <View className="flex-1 bg-black/50 justify-center items-center p-6">
-            <View className="bg-white w-full max-h-[70%] rounded-xl overflow-hidden">
-              <View className="flex-row justify-between items-center p-4 border-b border-gray-200">
-                <Text className="text-lg font-semibold text-text-primary">{t('modals.selectIncomeCategory')}</Text>
-                <TouchableOpacity onPress={() => setCategorySelectVisible(false)}>
-                  <Ionicons name="close" size={24} color="#64748b" />
-                </TouchableOpacity>
-              </View>
-              
-              <ScrollView>
-                {incomesCategories.map((category) => (
-                  <TouchableOpacity
-                    key={category.id}
-                    onPress={() => {
-                      if (currentEditingIncomeIndex !== null) {
-                        handleIncomeCategoryChange(currentEditingIncomeIndex, category.id);
-                      }
-                      setCategorySelectVisible(false);
-                    }}
-                    className={`p-4 border-b border-gray-100 flex-row items-center ${
-                      currentEditingIncomeIndex !== null && 
-                      incomes[currentEditingIncomeIndex].category === category.id 
-                        ? 'bg-primary-50' 
-                        : ''
-                    }`}
-                  >
-                    <View className="w-8 h-8 rounded-full bg-purple-100 items-center justify-center mr-3">
-                      <Ionicons name="pricetag-outline" size={16} color="#9333ea" />
-                    </View>
-                    <Text className={`${
-                      currentEditingIncomeIndex !== null && 
-                      incomes[currentEditingIncomeIndex].category === category.id 
-                        ? 'text-primary-600 font-medium' 
-                        : 'text-text-primary'
-                    }`}>
-                      {category.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
       </View>
     </KeyboardAvoidingView>
   );
