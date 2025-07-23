@@ -316,11 +316,16 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                   </View>
                                 ) : (
                                   <View className="flex-row flex-1 items-center">
+                                    <View className="flex-1">
+                                      <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
+                                    </View>
+
                                     <TouchableOpacity
                                       onPress={() => navigateToEnvelopeDetail(envelope.uuid)}
-                                      className="flex-1"
+                                      className="p-2 mr-1 bg-primary-50 rounded-full"
+                                      style={{ opacity: 0.9 }}
                                     >
-                                      <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
+                                      <Ionicons name="document-text-outline" size={18} color="#0284c7" />
                                     </TouchableOpacity>
 
                                     <TouchableOpacity
@@ -458,11 +463,16 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                   </View>
                                 ) : (
                                   <View className="flex-row flex-1 items-center">
+                                    <View className="flex-1">
+                                      <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
+                                    </View>
+
                                     <TouchableOpacity
                                       onPress={() => navigateToEnvelopeDetail(envelope.uuid)}
-                                      className="flex-1"
+                                      className="p-2 mr-1 bg-primary-50 rounded-full"
+                                      style={{ opacity: 0.9 }}
                                     >
-                                      <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
+                                      <Ionicons name="document-text-outline" size={18} color="#0284c7" />
                                     </TouchableOpacity>
 
                                     <TouchableOpacity
@@ -593,11 +603,16 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                   </View>
                                 ) : (
                                   <View className="flex-row flex-1 items-center">
+                                    <View className="flex-1">
+                                      <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
+                                    </View>
+
                                     <TouchableOpacity
                                       onPress={() => navigateToEnvelopeDetail(envelope.uuid)}
-                                      className="flex-1"
+                                      className="p-2 mr-1 bg-primary-50 rounded-full"
+                                      style={{ opacity: 0.9 }}
                                     >
-                                      <Text className="text-lg font-semibold text-text-primary">{envelope.name}</Text>
+                                      <Ionicons name="document-text-outline" size={18} color="#0284c7" />
                                     </TouchableOpacity>
 
                                     <TouchableOpacity

@@ -178,31 +178,9 @@ export default function CreateBudgetPlanScreen() {
     return option ? option.label : value;
   };
 
-  return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
-    >
-      <View className="flex-1 bg-background-subtle">
-        <StatusBar style="dark" />
-        <Stack.Screen options={{ headerShown: false }} />
-        {Platform.OS === 'web' ? (
-          <ScrollView 
-            className="flex-1 px-4 pt-6"
-            contentContainerStyle={{ paddingBottom: 40 }}
-          >
-        ) : (
-          <AnimatedHeaderLayout
-            title={t('budgetPlans.createBudgetPlan')}
-            subtitle={formatMonthYear(year, month) ? `${t('budgetPlans.planning')} ${formatMonthYear(year, month)}` : undefined}
-            showBackButton={true}
-            headerHeight={130}
-          >
-            <ScrollView 
-              className="flex-1 px-4 pt-6"
-              contentContainerStyle={{ paddingBottom: 40 }}
-            >
-        )}
+  // Render content that will be shared between both web and mobile
+  const renderContent = () => (
+    <>
             {/* Instructions Card */}
             <View className="card mb-6">
               <View className="card-content">
@@ -372,8 +350,39 @@ export default function CreateBudgetPlanScreen() {
                 )}
               </TouchableOpacity>
             </View>
+    </>
+  );
+
+  return (
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1"
+    >
+      <View className="flex-1 bg-background-subtle">
+        <StatusBar style="dark" />
+        <Stack.Screen options={{ headerShown: false }} />
+        {Platform.OS === 'web' ? (
+          <ScrollView 
+            className="flex-1 px-4 pt-6"
+            contentContainerStyle={{ paddingBottom: 40 }}
+          >
+            {renderContent()}
           </ScrollView>
-        </AnimatedHeaderLayout>
+        ) : (
+          <AnimatedHeaderLayout
+            title={t('budgetPlans.createBudgetPlan')}
+            subtitle={formatMonthYear(year, month) ? `${t('budgetPlans.planning')} ${formatMonthYear(year, month)}` : undefined}
+            showBackButton={true}
+            headerHeight={130}
+          >
+            <ScrollView 
+              className="flex-1 px-4 pt-6"
+              contentContainerStyle={{ paddingBottom: 40 }}
+            >
+              {renderContent()}
+            </ScrollView>
+          </AnimatedHeaderLayout>
+        )}
         
         {/* Currency Selector Modal */}
         <Modal
