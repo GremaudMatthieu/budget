@@ -1,10 +1,10 @@
 User-agent: *
 Allow: /
 Allow: /en/
+Allow: /_astro/
 
 # Disallow sensitive paths (if any exist on your server)
 Disallow: /api/
-Disallow: /_astro/
 Disallow: /tmp/
 Disallow: /var/
 

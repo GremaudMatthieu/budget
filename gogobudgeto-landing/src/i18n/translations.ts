@@ -1,9 +1,9 @@
 export const translations = {
   fr: {
     // Meta
-    'meta.title': 'GoGoBudgeto - Outil de finances personnelles sans connexion bancaire',
-    'meta.description': 'Outil de finances personnelles sécurisé sans connexion à vos comptes bancaires. Budgétisation intelligente avec système d\'enveloppes et analyses personnalisées.',
-    'meta.keywords': 'budget, finances personnelles, épargne, planification budgétaire, gestion financière, économies',
+    'meta.title': 'GoGoBudgeto - App Budget & Finances Personnelles Sans Connexion Bancaire',
+    'meta.description': 'GoGoBudgeto : outil de finances personnelles sécurisé sans connexion à vos comptes bancaires. Budgétisation intelligente avec système d\'enveloppes et analyses personnalisées.',
+    'meta.keywords': 'GoGoBudgeto, gogobudgeto, Gogobudgeto, gogo budgeto, budget, finances personnelles, épargne, planification budgétaire, gestion financière, économies, app budget, application budget, outil budget, logiciel budget, budget mensuel, enveloppes budget, budget familial, gérer ses finances, contrôler ses dépenses, planifier son budget, économiser de l\'argent, suivi des dépenses, budget personnel, finances familiales, gestion de budget, budgétisation, outil financier',
     
     // Header
     'header.login': 'Se connecter',
@@ -43,9 +43,9 @@ export const translations = {
   },
   en: {
     // Meta
-    'meta.title': 'GoGoBudgeto - Personal Finance Tool Without Bank Connection',
-    'meta.description': 'Secure personal finance tool without connecting to your bank accounts. Smart budgeting with envelope system and personalized analysis.',
-    'meta.keywords': 'budget, personal finance, savings, budget planning, financial management, money saving',
+    'meta.title': 'GoGoBudgeto - Budget App & Personal Finance Tool Without Bank Connection',
+    'meta.description': 'GoGoBudgeto: secure personal finance tool without connecting to your bank accounts. Smart budgeting with envelope system and personalized analysis.',
+    'meta.keywords': 'GoGoBudgeto, gogobudgeto, Gogobudgeto, gogo budgeto, budget, personal finance, savings, budget planning, financial management, money saving, budget app, budgeting app, personal budget, budget tool, financial tool, budget software, monthly budget, envelope budgeting, family budget, manage finances, track expenses, budget planner, save money, expense tracker, financial planning, money management, budgeting system, finance app',
     
     // Header
     'header.login': 'Log in',

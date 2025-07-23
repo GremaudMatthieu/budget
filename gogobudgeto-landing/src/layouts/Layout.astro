@@ -53,8 +53,13 @@ const finalKeywords = keywords || t('meta.keywords', locale);
   <meta property="twitter:description" content={finalDescription}>
   <meta property="twitter:image" content={`${Astro.site}/og-image.png`}>
   
-  <!-- Favicon - Astro détecte automatiquement /public/favicon.ico -->
+  <!-- Favicon - Multiple sizes for better search engine support -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/icon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,15 +75,30 @@ const finalKeywords = keywords || t('meta.keywords', locale);
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "GoGoBudgeto",
+      "alternateName": ["gogobudgeto", "Gogobudgeto", "Gogo Budgeto", "App Budget", "Budget App"],
       "applicationCategory": "FinanceApplication", 
       "description": "{finalDescription}",
       "url": "{Astro.site}",
       "operatingSystem": ["iOS", "Android", "Web"],
+      "featureList": [
+        "Budget planning",
+        "Envelope budgeting system", 
+        "Personal finance management",
+        "Expense tracking",
+        "Financial analysis",
+        "Monthly budget creation",
+        "Savings optimization"
+      ],
+      "keywords": "budget, personal finance, budgeting app, envelope system, financial planning, expense tracking, money management, savings",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "EUR"
-      }
+      },
+      "sameAs": [
+        "https://gogobudgeto.com/",
+        "https://gogobudgeto.com/en/"
+      ]
     }
   </script>
 </head>
