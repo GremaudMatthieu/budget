@@ -38,9 +38,16 @@ export function useEnvelopeData(uuid: string) {
     try {
       if (!refreshing) setLoading(true);
       const response = await fetchEnvelopeDetails(uuid);
-      if (isMounted.current && response) setDetails(response);
-    } catch (err) {
-      if (isMounted.current) setError(t('errors.loadEnvelopeDetails'));
+      if (isMounted.current) {
+        setDetails(response); // response will be null for 404 errors
+      }
+    } catch (err: any) {
+      if (isMounted.current) {
+        // Only set error for non-404 errors since 404s are handled by returning null
+        if (err.name !== 'NotFoundError') {
+          setError(t('errors.loadEnvelopeDetails'));
+        }
+      }
     } finally {
       if (isMounted.current) setLoading(false);
     }

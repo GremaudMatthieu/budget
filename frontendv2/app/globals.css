@@ -20,6 +20,35 @@ html, body, #root, #__next {
   button, a, input, select, textarea {
     @apply transition-all duration-200 ease-in-out;
   }
+  
+  /* Prevent zoom on mobile when focusing input fields - AGGRESSIVE */
+  @media screen and (max-width: 768px) {
+    input,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="search"],
+    textarea,
+    select {
+      font-size: 16px !important;
+      max-height: none !important;
+      -webkit-appearance: none !important;
+      -webkit-border-radius: 0 !important;
+      border-radius: 4px !important;
+    }
+    
+    /* Force 16px on all possible input selectors */
+    * input,
+    * textarea,
+    * select,
+    .input,
+    .amount-input {
+      font-size: 16px !important;
+    }
+  }
 }
 
 @layer components {
@@ -87,6 +116,7 @@ html, body, #root, #__next {
   .input {
     @apply px-3 py-2.5 rounded-lg border border-surface-borderDark bg-surface-light text-text-primary;
     @apply focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:outline-none;
+    font-size: 16px; /* Prevent zoom on iOS Safari */
   }
   
   .input-label {

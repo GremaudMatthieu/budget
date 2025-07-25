@@ -71,6 +71,12 @@ class ApiClient {
             // Forbidden
             console.error('Permission denied:', data.message || 'Forbidden');
             break;
+          case 404:
+            // Not Found - throw special error for proper handling
+            console.error('Resource not found:', data.message || 'Not Found');
+            const notFoundError = new Error(data.message || 'Resource not found');
+            notFoundError.name = 'NotFoundError';
+            return Promise.reject(notFoundError);
           case 422:
             // Validation errors
             console.error('Validation errors:', data.errors || data.message);
@@ -162,7 +168,7 @@ class ApiClient {
     try {
       const refreshToken = await SecureStore.getItemAsync('refresh_token');
       if (!refreshToken) throw new Error('No refresh token');
-      const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL || 'https://gogobudgeto.com/api'}/token/refresh`, { refresh_token: refreshToken });
+      const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL || 'https:///127.0.0.1/api'}/token/refresh`, { refresh_token: refreshToken });
       const newToken = response.data?.token || response.data?.access_token;
       if (newToken) {
         this.setAuthToken(newToken);

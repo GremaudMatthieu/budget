@@ -33,6 +33,38 @@ export default {
     total: 'Total',
   },
 
+  // Navigation
+  navigation: {
+    dashboard: 'Dashboard',
+    envelopes: 'Envelopes',
+    budgetPlans: 'Budget Plans',
+    profile: 'Profile',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    goToHomepage: 'Go to homepage',
+    current: 'Current',
+  },
+
+  // Dashboard
+  dashboard: {
+    quickActions: 'Quick Actions',
+    myEnvelopes: 'My Envelopes',
+    budgetPlans: 'Budget Plans',
+    newBudget: 'New Budget',
+    settings: 'Settings',
+    budgetExistsThisMonth: 'A budget already exists this month',
+    currentMonthBudget: 'Current Month Budget',
+    budgetOverview: 'Budget Overview',
+    totalBudget: 'Total Budget',
+    totalSpent: 'Total Spent',
+    recentEnvelopes: 'Recent Envelopes',
+    viewAll: 'View All',
+    noBudgetThisMonth: 'No budget for this month',
+    createBudgetNow: 'Create a budget now',
+    noEnvelopes: 'No envelopes',
+    createEnvelopeNow: 'Create an envelope now',
+  },
+
   // Auth screens
   auth: {
     welcomeTitle: 'GoGoBudgeto',
@@ -258,6 +290,7 @@ export default {
       noIncome: 'Add income sources to get personalized advice based on your budget.',
     },
     deletePlan: 'Delete budget plan',
+    totalBudget: 'Total Budget',
   },
   
   // Profile screens
@@ -410,5 +443,21 @@ export default {
     firstName: 'First Name',
     lastName: 'Last Name',
     language: 'Language',
+  },
+
+  // 404 Not Found page
+  notFound: {
+    title: 'Page Not Found',
+    subtitle: 'Sorry, the page you are looking for doesn\'t exist. It may have been moved, deleted, or the URL is incorrect.',
+    suggestions: 'What can you do?',
+    checkUrl: 'Check the URL in the address bar',
+    tryAgain: 'Refresh the page or try again later',
+    contactSupport: 'Contact our support if the problem persists',
+    goHome: 'Go to Home',
+    goBack: 'Go Back',
+    quickAccess: 'Quick Access',
+    envelopes: 'Envelopes',
+    budgets: 'Budgets',
+    profile: 'Profile',
   },
 };

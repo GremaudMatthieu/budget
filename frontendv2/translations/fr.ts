@@ -33,6 +33,38 @@ export default {
     total: 'Total',
   },
 
+  // Navigation
+  navigation: {
+    dashboard: 'Tableau de bord',
+    envelopes: 'Enveloppes',
+    budgetPlans: 'Plans budgétaires',
+    profile: 'Profil',
+    openMenu: 'Ouvrir le menu',
+    closeMenu: 'Fermer le menu',
+    goToHomepage: 'Aller à l\'accueil',
+    current: 'Actuel',
+  },
+
+  // Dashboard
+  dashboard: {
+    quickActions: 'Actions rapides',
+    myEnvelopes: 'Mes enveloppes',
+    budgetPlans: 'Plans budgétaires',
+    newBudget: 'Nouveau budget',
+    settings: 'Paramètres',
+    budgetExistsThisMonth: 'Un budget existe déjà ce mois-ci',
+    currentMonthBudget: 'Budget du mois actuel',
+    budgetOverview: 'Aperçu du budget',
+    totalBudget: 'Budget total',
+    totalSpent: 'Total dépensé',
+    recentEnvelopes: 'Enveloppes récentes',
+    viewAll: 'Voir tout',
+    noBudgetThisMonth: 'Aucun budget pour ce mois',
+    createBudgetNow: 'Créer un budget maintenant',
+    noEnvelopes: 'Aucune enveloppe',
+    createEnvelopeNow: 'Créer une enveloppe maintenant',
+  },
+
   // Auth screens
   auth: {
     welcomeTitle: 'GoGoBudgeto',
@@ -268,6 +300,7 @@ export default {
       noIncome: 'Ajoutez des sources de revenus pour obtenir des conseils personnalisés selon votre budget.',
     },
     deletePlan: 'Supprimer le plan budgétaire',
+    totalBudget: 'Budget total',
   },
   
   // Profile screens
@@ -413,5 +446,21 @@ export default {
     firstName: 'Prénom',
     lastName: 'Nom',
     language: 'Langue',
+  },
+
+  // 404 Not Found page
+  notFound: {
+    title: 'Page introuvable',
+    subtitle: 'Désolé, la page que vous recherchez n\'existe pas. Elle a peut-être été déplacée, supprimée ou l\'URL est incorrecte.',
+    suggestions: 'Que pouvez-vous faire ?',
+    checkUrl: 'Vérifiez l\'URL dans la barre d\'adresse',
+    tryAgain: 'Rafraîchissez la page ou réessayez plus tard',
+    contactSupport: 'Contactez notre support si le problème persiste',
+    goHome: 'Retour à l\'accueil',
+    goBack: 'Page précédente',
+    quickAccess: 'Accès rapide',
+    envelopes: 'Enveloppes',
+    budgets: 'Budgets',
+    profile: 'Profil',
   },
 };

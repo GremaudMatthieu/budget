@@ -27,15 +27,16 @@ function AuthProtection({ children }: { children: React.ReactNode }) {
 
     const inAuthGroup = segments[0] === "(auth)";
     const inTabsGroup = segments[0] === "(tabs)";
+    const onNotFoundPage = segments.includes("not-found");
 
     if (!user) {
       // If user is not signed in and not on an auth screen, redirect to auth
-      if (!inAuthGroup) {
+      if (!inAuthGroup && !onNotFoundPage) {
         router.replace("/(auth)");
       }
     } else {
-      // If user is signed in and not on a tabs screen, redirect to tabs
-      if (!inTabsGroup) {
+      // If user is signed in and not on a tabs screen or not-found page, redirect to tabs
+      if (!inTabsGroup && !onNotFoundPage) {
         router.replace("/(tabs)");
       }
     }
@@ -60,6 +61,32 @@ import WebContainer from '@/components/web/WebContainer';
 import FooterWeb from '@/components/web/FooterWeb';
 
 export default function RootLayout() {
+  // Prevent zoom on mobile web
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      // Add viewport meta tag programmatically as backup
+      const viewport = document.querySelector('meta[name="viewport"]');
+      if (viewport) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no');
+      }
+      
+      // Prevent zoom with touch events
+      const preventZoom = (e: TouchEvent) => {
+        if (e.touches.length > 1) {
+          e.preventDefault();
+        }
+      };
+      
+      document.addEventListener('touchstart', preventZoom, { passive: false });
+      document.addEventListener('touchmove', preventZoom, { passive: false });
+      
+      return () => {
+        document.removeEventListener('touchstart', preventZoom);
+        document.removeEventListener('touchmove', preventZoom);
+      };
+    }
+  }, []);
+
   if (Platform.OS === 'web') {
     return (
       <RootSiblingParent>

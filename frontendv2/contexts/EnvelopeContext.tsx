@@ -10,6 +10,7 @@ interface EnvelopeContextType {
   error: string | null;
   refreshEnvelopes: (force?: boolean, limit?: number) => Promise<void>;
   fetchEnvelopeDetails: (envelopeId: string) => Promise<EnvelopeDetails | null>;
+  clearCurrentEnvelopeDetails: () => void;
   createEnvelope: (name: string, targetBudget: string, currency: string) => Promise<void>;
   deleteEnvelope: (envelopeId: string, setError: (error: string | null) => void) => Promise<void>;
   creditEnvelope: (envelopeId: string, amount: string, description: string, setError: (error: string | null) => void) => Promise<void>;
@@ -86,10 +87,24 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
       const details = await envelopeService.getEnvelopeDetails(envelopeId);
       setCurrentEnvelopeDetails(details);
       return details;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch envelope details:', err);
+      if (err.name === 'NotFoundError') {
+        // Only clear currentEnvelopeDetails for confirmed 404 errors
+        console.log(`Envelope ${envelopeId} not found - clearing currentEnvelopeDetails`);
+        setCurrentEnvelopeDetails(null);
+        // For 404 errors, return null without setting a global error
+        return null;
+      }
+      setError('Failed to load envelope details');
+      // Don't clear currentEnvelopeDetails for other errors to prevent false 404s
       return null;
     }
+  }, []);
+
+  // Clear current envelope details
+  const clearCurrentEnvelopeDetails = useCallback(() => {
+    setCurrentEnvelopeDetails(null);
   }, []);
 
   // CRUD operations - unchanged...
@@ -342,6 +357,7 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     error,
     refreshEnvelopes,
     fetchEnvelopeDetails,
+    clearCurrentEnvelopeDetails,
     createEnvelope,
     deleteEnvelope,
     creditEnvelope,

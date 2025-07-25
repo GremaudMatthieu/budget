@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Platform, ScrollView, Dimensions, Animated, Alert } from 'react-native';
-import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
+import { useLocalSearchParams, Stack, useRouter, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from '@/utils/useTranslation';
@@ -25,6 +25,7 @@ export default function BudgetPlanDetailScreen() {
   const { language } = useLanguage();
   const { t } = useTranslation();
   const uuid = params.uuid as string;
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
   const {
     setActiveTab,
     refreshing,
@@ -50,7 +51,15 @@ export default function BudgetPlanDetailScreen() {
     savingsCategories,
     incomesCategories,
   } = useBudgetPlanData(uuid);
-  const { refreshBudgetPlans, removeBudgetPlan } = useBudget();
+  const { refreshBudgetPlans, removeBudgetPlan, clearSelectedBudgetPlan } = useBudget();
+
+  // Clear selected budget plan when UUID changes to prevent showing cached data
+  useEffect(() => {
+    if (uuid) {
+      clearSelectedBudgetPlan();
+      setHasAttemptedLoad(false);
+    }
+  }, [uuid, clearSelectedBudgetPlan]);
 
   // Helper functions for formatting and extracting data
   const formatWithTwoDecimals = (num: number): number => Math.round(num * 100) / 100;
@@ -631,6 +640,26 @@ export default function BudgetPlanDetailScreen() {
     }
   };
 
+  // Track when we've attempted to load data
+  useEffect(() => {
+    if (!loading && hasAttemptedLoad === false) {
+      setHasAttemptedLoad(true);
+    }
+  }, [loading, hasAttemptedLoad]);
+
+  // Redirect to not-found page if budget plan doesn't exist after loading
+  useEffect(() => {
+    // Only redirect if we've finished loading, attempted to load, and there's definitely no budget plan
+    // Also ensure we have a valid UUID to prevent false positives
+    if (!loading && hasAttemptedLoad && !selectedBudgetPlan && uuid && uuid.length > 0) {
+      const timer = setTimeout(() => {
+        console.log('Redirecting to not-found - no budget plan found after load attempt');
+        router.push('/not-found');
+      }, 200); // Slightly longer delay to prevent race conditions
+      return () => clearTimeout(timer);
+    }
+  }, [loading, hasAttemptedLoad, selectedBudgetPlan, uuid]);
+
   if (loading && !selectedBudgetPlan) {
     return (
       <View className="flex-1 justify-center items-center bg-background-light">
@@ -641,24 +670,10 @@ export default function BudgetPlanDetailScreen() {
       </View>
     );
   }
+  
   if (!selectedBudgetPlan) {
-    return (
-      <View className="flex-1 justify-center items-center bg-background-light">
-        <View className="w-16 h-16 bg-red-100 rounded-full items-center justify-center mb-4">
-          <Ionicons name="alert-circle-outline" size={32} color="#dc2626" />
-        </View>
-        <Text className="text-text-primary text-lg font-medium mb-2">{t('budgetPlans.notFound')}</Text>
-        <Text className="text-text-secondary mb-6 text-center px-8">
-          {t('budgetPlans.notFoundDescription')}
-        </Text>
-        <TouchableOpacity
-          onPress={() => router.push('/budget-plans')}
-          className="bg-primary-600 px-6 py-3 rounded-xl shadow-sm"
-        >
-          <Text className="text-white font-medium">{t('budgetPlans.backToBudgetPlans')}</Text>
-        </TouchableOpacity>
-      </View>
-    );
+    // This shouldn't render because of the redirect effect above, but keep as fallback
+    return null;
   }
 
   if (Platform.OS === 'web') {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import Svg, { G, Path, Circle, Text as SvgText } from 'react-native-svg';
+import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from '@/utils/useTranslation';
 
 interface PieChartData {
   name: string;
@@ -13,119 +14,126 @@ interface BudgetItemPieChartProps {
   size?: number;
 }
 
-// Custom implementation that works with modern react-native-svg
+// Modern card-based visualization that matches the app's design language
 const BudgetItemPieChart: React.FC<BudgetItemPieChartProps> = ({ data, size = 200 }) => {
+  const { t } = useTranslation();
+  
   // Filter out zero values
   const filteredData = data.filter(item => item.value > 0);
   
   // Check if there's any data to display
   if (filteredData.length === 0) {
     return (
-      <View className="items-center py-4">
-        <Text className="text-gray-500">No data to display</Text>
+      <View className="items-center py-8">
+        <View className="w-16 h-16 rounded-full bg-gray-100 items-center justify-center mb-3">
+          <Ionicons name="analytics-outline" size={24} color="#64748b" />
+        </View>
+        <Text className="text-gray-500 text-center">No data to display</Text>
       </View>
     );
   }
 
-  // Calculate total
+  // Calculate total and percentages
   const total = filteredData.reduce((sum, item) => sum + item.value, 0);
   
-  // Create pie chart paths
-  const svgSize = size;
-  const centerX = svgSize / 2;
-  const centerY = svgSize / 2;
-  const radius = svgSize * 0.4; // Outer radius
-  const innerRadius = radius * 0.65; // Inner radius for donut style
-
-  // Generate SVG paths for pie slices
-  const generatePath = (startAngle: number, endAngle: number): string => {
-    const x1 = centerX + radius * Math.cos(startAngle);
-    const y1 = centerY + radius * Math.sin(startAngle);
-    
-    const x2 = centerX + radius * Math.cos(endAngle);
-    const y2 = centerY + radius * Math.sin(endAngle);
-    
-    const x3 = centerX + innerRadius * Math.cos(endAngle);
-    const y3 = centerY + innerRadius * Math.sin(endAngle);
-    
-    const x4 = centerX + innerRadius * Math.cos(startAngle);
-    const y4 = centerY + innerRadius * Math.sin(startAngle);
-
-    const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0;
-    
-    // Move to outer edge start, arc to outer edge end, line to inner edge end,
-    // arc back to inner edge start, close path
-    return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x4} ${y4} Z`;
+  // Get icon based on category name
+  const getIcon = (name: string) => {
+    const nameLower = name.toLowerCase();
+    if (nameLower.includes('need') || nameLower.includes('besoin')) return 'home-outline';
+    if (nameLower.includes('want') || nameLower.includes('envie')) return 'heart-outline';
+    if (nameLower.includes('saving') || nameLower.includes('épargne')) return 'wallet-outline';
+    if (nameLower.includes('income') || nameLower.includes('revenu')) return 'trending-up-outline';
+    return 'pie-chart-outline';
   };
 
-  // Calculate positions for each slice
-  let startAngle = -Math.PI / 2; // Start from top
-  const slices = filteredData.map((item, index) => {
-    const angle = (item.value / total) * (2 * Math.PI);
-    const endAngle = startAngle + angle;
-    
-    // Calculate position for label
-    const midAngle = startAngle + angle / 2;
-    const labelRadius = (radius + innerRadius) / 2;
-    const labelX = centerX + labelRadius * Math.cos(midAngle);
-    const labelY = centerY + labelRadius * Math.sin(midAngle);
-    
-    // Create the path for this slice
-    const path = generatePath(startAngle, endAngle);
-    
-    // Save end angle as start for next slice
-    const currentStartAngle = startAngle;
-    startAngle = endAngle;
-    
-    return {
-      path,
-      color: item.color,
-      labelX,
-      labelY,
-      name: item.name,
-      value: item.value,
-      percent: ((item.value / total) * 100).toFixed(1)
-    };
-  });
+  // Sort by value for better visual hierarchy
+  const sortedData = [...filteredData].sort((a, b) => b.value - a.value);
 
   return (
     <View className="w-full">
-      <View className="items-center">
-        <Svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
-          {/* Render pie slices */}
-          {slices.map((slice, index) => (
-            <G key={index}>
-              <Path d={slice.path} fill={slice.color} />
-              <SvgText
-                fill="#fff"
-                fontSize="12"
-                fontWeight="bold"
-                x={slice.labelX}
-                y={slice.labelY}
-                textAnchor="middle"
-                alignmentBaseline="middle"
-              >
-                {slice.name.charAt(0)}
-              </SvgText>
-            </G>
-          ))}
-          
-          {/* Optional: Add a center circle */}
-          <Circle cx={centerX} cy={centerY} r={innerRadius * 0.9} fill="#fff" />
-        </Svg>
-      </View>
-      
-      {/* Legend */}
-      <View className="flex-row justify-center flex-wrap mt-4">
-        {filteredData.map((item, index) => (
-          <View key={index} className="flex-row items-center mx-3 mb-2">
-            <View 
-              style={{ backgroundColor: item.color }}
-              className="w-3 h-3 rounded-full mr-2"
-            />
-            <Text className="text-gray-700 text-sm">{item.name} ({((item.value / total) * 100).toFixed(0)}%)</Text>
+      {/* Header with total */}
+      <View className="bg-primary-50 rounded-xl p-4 mb-4">
+        <View className="flex-row items-center justify-center">
+          <View className="w-12 h-12 rounded-full bg-primary-600 items-center justify-center mr-3">
+            <Ionicons name="analytics" size={20} color="#ffffff" />
           </View>
-        ))}
+          <View>
+            <Text className="text-sm text-primary-600 font-medium">{t('budgetPlans.totalBudget')}</Text>
+            <Text className="text-xl font-bold text-primary-800">${total.toLocaleString()}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Modern card layout */}
+      <View className="space-y-3">
+        {sortedData.map((item, index) => {
+          const percentage = (item.value / total) * 100;
+          
+          return (
+            <View key={index} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center flex-1">
+                  <View 
+                    className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                    style={{ backgroundColor: item.color + '20' }}
+                  >
+                    <Ionicons 
+                      name={getIcon(item.name) as any} 
+                      size={18} 
+                      color={item.color} 
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-base font-semibold text-gray-800 mb-1">
+                      {item.name}
+                    </Text>
+                    <View className="flex-row items-center justify-between mb-2">
+                      <Text className="text-sm text-gray-600">
+                        ${item.value.toLocaleString()}
+                      </Text>
+                      <Text 
+                        className="text-sm font-bold"
+                        style={{ color: item.color }}
+                      >
+                        {percentage.toFixed(1)}%
+                      </Text>
+                    </View>
+                    {/* Progress bar */}
+                    <View className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <View 
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ 
+                          backgroundColor: item.color,
+                          width: `${percentage}%` 
+                        }}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          );
+        })}
+      </View>
+
+      {/* Summary stats */}
+      <View className="bg-gray-50 rounded-xl p-4 mt-4">
+        <Text className="text-sm font-medium text-gray-600 mb-3 text-center">
+          {t('budgetPlans.budgetSummary')}
+        </Text>
+        <View className="flex-row justify-center">
+          {sortedData.slice(0, 3).map((item, index) => (
+            <View key={index} className="items-center mx-4">
+              <View 
+                className="w-3 h-3 rounded-full mb-1"
+                style={{ backgroundColor: item.color }}
+              />
+              <Text className="text-xs text-gray-500">
+                {((item.value / total) * 100).toFixed(0)}%
+              </Text>
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );

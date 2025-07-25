@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, RefreshControl, TouchableOpacity, Text, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -13,11 +13,14 @@ import DescriptionModal from '@/components/modals/DescriptionModal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import { Ionicons } from '@expo/vector-icons';
 import { useEnvelopeData } from '@/hooks/useEnvelopeData';
+import { useEnvelopes } from '@/contexts/EnvelopeContext';
 
 export default function EnvelopeDetailScreen() {
   const { uuid } = useLocalSearchParams<{ uuid: string }>();
   const { t } = useTranslation();
   const router = useRouter();
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
+  const { clearCurrentEnvelopeDetails } = useEnvelopes();
   const {
     details,
     loading,
@@ -50,12 +53,40 @@ export default function EnvelopeDetailScreen() {
     deleteEnvelope,
   } = useEnvelopeData(uuid as string);
 
+  // Clear current envelope details when UUID changes to prevent showing cached data
+  useEffect(() => {
+    if (uuid) {
+      clearCurrentEnvelopeDetails();
+      setHasAttemptedLoad(false);
+    }
+  }, [uuid, clearCurrentEnvelopeDetails]);
+
   // Always fetch latest details when page is focused
   useFocusEffect(
     React.useCallback(() => {
       loadEnvelopeDetails();
     }, [loadEnvelopeDetails])
   );
+
+  // Track when we've attempted to load data
+  useEffect(() => {
+    if (!loading && hasAttemptedLoad === false) {
+      setHasAttemptedLoad(true);
+    }
+  }, [loading, hasAttemptedLoad]);
+
+  // Redirect to not-found page if envelope doesn't exist after loading
+  useEffect(() => {
+    // Only redirect if we've finished loading, attempted to load, and there's definitely no envelope
+    // Also ensure we have a valid UUID to prevent false positives
+    if (!loading && hasAttemptedLoad && !details && uuid && uuid.length > 0) {
+      const timer = setTimeout(() => {
+        console.log('Redirecting to not-found - no envelope found after load attempt');
+        router.push('/not-found');
+      }, 200); // Slightly longer delay to prevent race conditions
+      return () => clearTimeout(timer);
+    }
+  }, [loading, hasAttemptedLoad, details, uuid]);
 
   const handleDeleteEnvelope = async () => {
     if (!details) return;
@@ -78,12 +109,8 @@ export default function EnvelopeDetailScreen() {
   }
 
   if (!details) {
-    return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <StatusBar style="dark" />
-        <Text>{t('envelopes.notFound')}</Text>
-      </View>
-    );
+    // This shouldn't render because of the redirect effect above, but keep as fallback
+    return null;
   }
 
   const progress = Number(details.envelope.currentAmount) / Number(details.envelope.targetedAmount);

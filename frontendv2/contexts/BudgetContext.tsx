@@ -142,9 +142,17 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       const data = await budgetService.getBudgetPlan(budgetPlanId);
       setSelectedBudgetPlan(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to fetch budget plan:", err);
-      setError('Failed to load budget plan details');
+      if (err.name === 'NotFoundError') {
+        // Only clear selectedBudgetPlan for confirmed 404 errors
+        console.log(`Budget plan ${budgetPlanId} not found - clearing selectedBudgetPlan`);
+        setSelectedBudgetPlan(null);
+        // Don't set error for 404 - let the component handle the not found state
+      } else {
+        setError('Failed to load budget plan details');
+        // Don't clear selectedBudgetPlan for other errors to prevent false 404s
+      }
     } finally {
       setLoading(false);
     }

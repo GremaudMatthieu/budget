@@ -2,7 +2,7 @@
 
 A modern, full-stack budget management application built with React Native/Expo and Symfony, featuring event sourcing architecture.
 
-🌐 **Live Demo**: [https://gogobudgeto.expo.app](https://gogobudgeto.expo.app)
+🌐 **Live Demo**: [https://gogobudgeto.com](https://gogobudgeto.com)
 
 ## 📱 Overview
 
