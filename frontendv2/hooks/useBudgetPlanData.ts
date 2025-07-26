@@ -23,10 +23,6 @@ export function useBudgetPlanData(uuid: string) {
     wantsCategories,
     savingsCategories,
     incomesCategories,
-    fetchNeedsCategories,
-    fetchWantsCategories,
-    fetchSavingsCategories,
-    fetchIncomesCategories,
   } = useBudget();
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -64,22 +60,13 @@ export function useBudgetPlanData(uuid: string) {
     }
   }, [uuid, fetchBudgetPlan, setError, t]);
 
-  const handleOpenAddModal = async (type: 'need' | 'want' | 'saving' | 'income') => {
+  const handleOpenAddModal = (type: 'need' | 'want' | 'saving' | 'income') => {
     setCurrentItemType(type);
-    try {
-      switch (type) {
-        case 'need': await fetchNeedsCategories(); break;
-        case 'want': await fetchWantsCategories(); break;
-        case 'saving': await fetchSavingsCategories(); break;
-        case 'income': await fetchIncomesCategories(); break;
-      }
-    } catch (err) {
-      setError(t(`errors.failedToFetch${type.charAt(0).toUpperCase() + type.slice(1)}Categories`));
-    }
     setIsAddModalOpen(true);
+    // Categories are now preloaded when fetching budget plan, no need to fetch here
   };
 
-  const handleOpenEditModal = async (
+  const handleOpenEditModal = (
     type: 'need' | 'want' | 'saving' | 'income',
     id: string,
     name: string,
@@ -88,17 +75,8 @@ export function useBudgetPlanData(uuid: string) {
   ) => {
     setCurrentItemType(type);
     setCurrentItem({ id, name, amount, category });
-    try {
-      switch (type) {
-        case 'need': await fetchNeedsCategories(); break;
-        case 'want': await fetchWantsCategories(); break;
-        case 'saving': await fetchSavingsCategories(); break;
-        case 'income': await fetchIncomesCategories(); break;
-      }
-    } catch (err) {
-      setError(t(`errors.failedToFetch${type.charAt(0).toUpperCase() + type.slice(1)}Categories`));
-    }
     setIsEditModalOpen(true);
+    // Categories are now preloaded when fetching budget plan, no need to fetch here
   };
 
   const handleOpenDeleteModal = (type: 'need' | 'want' | 'saving' | 'income', id: string, name: string) => {

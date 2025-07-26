@@ -295,7 +295,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                     <TextInput
                                       value={editingName.name}
                                       onChangeText={handleNameChange}
-                                      className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                      className="w-40 p-2 border border-surface-border rounded-lg bg-white"
                                       maxLength={25}
                                       autoFocus
                                       onBlur={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
@@ -360,7 +360,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                     onChangeText={text => handleAmountChange(envelope.uuid, normalizeAmountInput(text))}
                                     placeholder={t('envelopes.enterAmount')}
                                     keyboardType="decimal-pad"
-                                    className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                    className="flex-1 min-w-0 p-2 border border-surface-border rounded-lg bg-white"
                                     maxLength={13}
                                     onBlur={() => {
                                       setAmountTouched(prev => ({ ...prev, [envelope.uuid]: true }));
@@ -377,20 +377,20 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                       envelope.currentAmount,
                                       envelope.targetedAmount
                                     )}
-                                    className="p-2 bg-success-100 rounded-lg"
+                                    className="px-3 py-2 bg-success-100 rounded-lg shrink-0"
                                     disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
                                   >
-                                    <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
+                                    <Text className="text-success-700 font-medium text-sm">{t('envelopes.addFunds')}</Text>
                                   </TouchableOpacity>
                                   <TouchableOpacity
                                     onPress={() => handleDebitEnvelope(
                                       envelope.uuid,
                                       envelope.currentAmount
                                     )}
-                                    className="p-2 bg-danger-100 rounded-lg"
+                                    className="px-3 py-2 bg-danger-100 rounded-lg shrink-0"
                                     disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
                                   >
-                                    <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
+                                    <Text className="text-danger-700 font-medium text-sm">{t('envelopes.withdraw')}</Text>
                                   </TouchableOpacity>
                                 </View>
                               </View>
@@ -442,7 +442,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                     <TextInput
                                       value={editingName.name}
                                       onChangeText={handleNameChange}
-                                      className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                      className="w-40 p-2 border border-surface-border rounded-lg bg-white"
                                       maxLength={25}
                                       autoFocus
                                       onBlur={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
@@ -507,7 +507,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                     onChangeText={text => handleAmountChange(envelope.uuid, normalizeAmountInput(text))}
                                     placeholder={t('envelopes.enterAmount')}
                                     keyboardType="decimal-pad"
-                                    className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                    className="flex-1 min-w-0 p-2 border border-surface-border rounded-lg bg-white"
                                     maxLength={13}
                                     onBlur={() => {
                                       setAmountTouched(prev => ({ ...prev, [envelope.uuid]: true }));
@@ -524,20 +524,20 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                       envelope.currentAmount,
                                       envelope.targetedAmount
                                     )}
-                                    className="p-2 bg-success-100 rounded-lg"
+                                    className="px-3 py-2 bg-success-100 rounded-lg shrink-0"
                                     disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
                                   >
-                                    <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
+                                    <Text className="text-success-700 font-medium text-sm">{t('envelopes.addFunds')}</Text>
                                   </TouchableOpacity>
                                   <TouchableOpacity
                                     onPress={() => handleDebitEnvelope(
                                       envelope.uuid,
                                       envelope.currentAmount
                                     )}
-                                    className="p-2 bg-danger-100 rounded-lg"
+                                    className="px-3 py-2 bg-danger-100 rounded-lg shrink-0"
                                     disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
                                   >
-                                    <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
+                                    <Text className="text-danger-700 font-medium text-sm">{t('envelopes.withdraw')}</Text>
                                   </TouchableOpacity>
                                 </View>
                               </View>
@@ -582,7 +582,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                     <TextInput
                                       value={editingName.name}
                                       onChangeText={handleNameChange}
-                                      className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                      className="w-40 p-2 border border-surface-border rounded-lg bg-white"
                                       maxLength={25}
                                       autoFocus
                                       onBlur={() => setNameTouched(prev => ({ ...prev, [envelope.uuid]: true }))}
@@ -646,7 +646,7 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                     onChangeText={text => handleAmountChange(envelope.uuid, normalizeAmountInput(text))}
                                     placeholder={t('envelopes.enterAmount')}
                                     keyboardType="decimal-pad"
-                                    className="flex-1 p-2 border border-surface-border rounded-lg bg-white"
+                                    className="flex-1 min-w-0 p-2 border border-surface-border rounded-lg bg-white"
                                     maxLength={13}
                                     onBlur={() => {
                                       setAmountTouched(prev => ({ ...prev, [envelope.uuid]: true }));
@@ -663,20 +663,20 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
                                       envelope.currentAmount,
                                       envelope.targetedAmount
                                     )}
-                                    className="p-2 bg-success-100 rounded-lg"
+                                    className="px-3 py-2 bg-success-100 rounded-lg shrink-0"
                                     disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
                                   >
-                                    <Text className="text-success-700 font-medium">{t('envelopes.addFunds')}</Text>
+                                    <Text className="text-success-700 font-medium text-sm">{t('envelopes.addFunds')}</Text>
                                   </TouchableOpacity>
                                   <TouchableOpacity
                                     onPress={() => handleDebitEnvelope(
                                       envelope.uuid,
                                       envelope.currentAmount
                                     )}
-                                    className="p-2 bg-danger-100 rounded-lg"
+                                    className="px-3 py-2 bg-danger-100 rounded-lg shrink-0"
                                     disabled={!amounts[envelope.uuid] || envelope.pending || !!amountErrors[envelope.uuid]}
                                   >
-                                    <Text className="text-danger-700 font-medium">{t('envelopes.withdraw')}</Text>
+                                    <Text className="text-danger-700 font-medium text-sm">{t('envelopes.withdraw')}</Text>
                                   </TouchableOpacity>
                                 </View>
                               </View>

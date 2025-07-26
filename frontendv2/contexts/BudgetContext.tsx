@@ -142,6 +142,20 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       const data = await budgetService.getBudgetPlan(budgetPlanId);
       setSelectedBudgetPlan(data);
+      
+      // Preload all categories when fetching budget plan to have translations ready
+      // This avoids loading delays when opening editing modals
+      try {
+        await Promise.all([
+          fetchNeedsCategories(),
+          fetchWantsCategories(),
+          fetchSavingsCategories(),
+          fetchIncomesCategories()
+        ]);
+      } catch (categoryErr) {
+        // Don't fail the budget plan load if categories fail
+        console.warn("Failed to preload some categories:", categoryErr);
+      }
     } catch (err: any) {
       console.error("Failed to fetch budget plan:", err);
       if (err.name === 'NotFoundError') {
@@ -156,7 +170,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setLoading(false);
     }
-  }, [setError]);
+  }, [setError, fetchNeedsCategories, fetchWantsCategories, fetchSavingsCategories, fetchIncomesCategories]);
 
   const clearSelectedBudgetPlan = useCallback(() => {
     setSelectedBudgetPlan(null);
