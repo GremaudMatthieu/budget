@@ -29,8 +29,7 @@ class UserView implements UserViewInterface, UserInterface, \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
-    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
-    #[ORM\SequenceGenerator(sequenceName: 'user_view_id_seq', allocationSize: 1, initialValue: 1)]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     public int $id;
 
     #[ORM\Column(name: 'uuid', type: 'string', length: 36, unique: true)]

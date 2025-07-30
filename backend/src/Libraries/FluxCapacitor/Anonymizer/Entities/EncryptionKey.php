@@ -13,7 +13,7 @@ class EncryptionKey
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     public int $id;
 
     #[ORM\Column(name: 'user_id', type: 'string', length: 36)]

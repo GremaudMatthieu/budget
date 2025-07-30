@@ -19,8 +19,7 @@ class EventStore
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
-    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
-    #[ORM\SequenceGenerator(sequenceName: 'event_store_id_seq', allocationSize: 1, initialValue: 1)]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     public int $id;
 
     #[ORM\Column(name: 'stream_id', type: 'string', length: 36)]

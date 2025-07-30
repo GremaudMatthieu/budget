@@ -8,11 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'user_oauth')]
+#[ORM\UniqueConstraint(name: 'unique_provider_user', columns: ['provider', 'provider_user_id'])]
+#[ORM\UniqueConstraint(name: 'unique_user_provider', columns: ['user_id', 'provider'])]
 class UserOAuth
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string')]

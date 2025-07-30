@@ -17,8 +17,7 @@ class BudgetEnvelopeLedgerEntryView implements BudgetEnvelopeLedgerEntryViewInte
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
-    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
-    #[ORM\SequenceGenerator(sequenceName: 'budget_envelope_ledger_view_id_seq', allocationSize: 1, initialValue: 1)]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     public int $id;
 
     #[ORM\Column(name: 'budget_envelope_uuid', type: 'string', length: 36, unique: false)]

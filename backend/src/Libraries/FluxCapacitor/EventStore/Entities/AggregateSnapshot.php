@@ -13,8 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
 class AggregateSnapshot
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     public int $id;
 
     #[ORM\Column(type: 'string', length: 36)]

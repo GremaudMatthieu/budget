@@ -18,8 +18,7 @@ class BudgetPlanIncomeEntryView implements \JsonSerializable, BudgetPlanIncomeEn
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
-    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
-    #[ORM\SequenceGenerator(sequenceName: 'budget_plan_income_entry_view_id_seq', allocationSize: 1, initialValue: 1)]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     public int $id;
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
