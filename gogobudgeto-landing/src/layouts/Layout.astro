@@ -75,21 +75,22 @@ const finalKeywords = keywords || t('meta.keywords', locale);
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "GoGoBudgeto",
-      "alternateName": ["gogobudgeto", "Gogobudgeto", "Gogo Budgeto", "App Budget", "Budget App"],
+      "alternateName": ["gogobudgeto", "Gogobudgeto", "Gogo Budgeto", "App Budget 50/30/20", "Budget Enveloppes", "Budget App"],
       "applicationCategory": "FinanceApplication", 
       "description": "{finalDescription}",
       "url": "{Astro.site}",
       "operatingSystem": ["iOS", "Android", "Web"],
       "featureList": [
-        "Budget planning",
-        "Envelope budgeting system", 
-        "Personal finance management",
-        "Expense tracking",
-        "Financial analysis",
-        "Monthly budget creation",
-        "Savings optimization"
+        "Génération automatique plans budgétaires mensuels 50/30/20",
+        "Création enveloppes économies par objectifs", 
+        "Modification plans budget selon dépenses réelles",
+        "Comparaison budget réel vs idéal 50/30/20",
+        "Historique chronologique mouvements enveloppes",
+        "Vue ensemble annuelle budget vs 50/30/20",
+        "Ajustement budget temps réel",
+        "Organisation économies sans connexion bancaire"
       ],
-      "keywords": "budget, personal finance, budgeting app, envelope system, financial planning, expense tracking, money management, savings",
+      "keywords": "gogobudgeto app, plans budgétaires mensuels, enveloppes économies, budget réel vs 50/30/20, générer plan budget, créer enveloppes économies, historique mouvements enveloppes, gogobudgeto budget",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -98,7 +99,12 @@ const finalKeywords = keywords || t('meta.keywords', locale);
       "sameAs": [
         "https://gogobudgeto.com/",
         "https://gogobudgeto.com/en/"
-      ]
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "GoGoBudgeto",
+        "url": "https://gogobudgeto.com"
+      }
     }
   </script>
 </head>

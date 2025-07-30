@@ -1,25 +1,25 @@
 export const translations = {
   fr: {
     // Meta
-    'meta.title': 'GoGoBudgeto - App Budget & Finances Personnelles Sans Connexion Bancaire',
-    'meta.description': 'GoGoBudgeto : outil de finances personnelles sécurisé sans connexion à vos comptes bancaires. Budgétisation intelligente avec système d\'enveloppes et analyses personnalisées.',
-    'meta.keywords': 'GoGoBudgeto, gogobudgeto, Gogobudgeto, gogo budgeto, budget, finances personnelles, épargne, planification budgétaire, gestion financière, économies, app budget, application budget, outil budget, logiciel budget, budget mensuel, enveloppes budget, budget familial, gérer ses finances, contrôler ses dépenses, planifier son budget, économiser de l\'argent, suivi des dépenses, budget personnel, finances familiales, gestion de budget, budgétisation, outil financier',
+    'meta.title': 'GoGoBudgeto - App Budget Gratuite 50/30/20 & Enveloppes d\'Économies',
+    'meta.description': 'GoGoBudgeto : app budget gratuite qui génère automatiquement vos plans budgétaires mensuels 50/30/20. Créez vos enveloppes pour organiser vos économies par objectifs. Comparez votre budget réel vs idéal 50/30/20.',
+    'meta.keywords': 'GoGoBudgeto, gogobudgeto gratuit, app budget gratuite, gogobudgeto app, budget gogobudgeto, plans budgétaires mensuels, enveloppes économies, budget réel vs 50/30/20, générer plan budget, créer enveloppes économies, historique mouvements enveloppes, logiciel budget gratuit, application budget gratuite, outil budget français gratuit',
     
     // Header
     'header.login': 'Se connecter',
     'header.lang': 'FR',
-    'header.title': 'Outil de finances personnelles sans connexion bancaire',
-    'header.subtitle': 'Créez vos plans budgétaires mensuels en toute simplicité et gérez vos enveloppes de budget. Aucune connexion à vos comptes bancaires requise.',
-    'header.cta.primary': 'Commencer',
+    'header.title': 'Budget 50/30/20 et Méthode des Enveloppes pour Partitionner vos Économies',
+    'header.subtitle': 'GoGoBudgeto génère vos plans budgétaires mensuels selon la règle 50/30/20 et utilise les enveloppes pour organiser vos économies par catégorie. Gratuit et sans connexion bancaire.',
+    'header.cta.primary': 'Commencer Gratuitement',
     'header.cta.secondary': 'Voir la démo',
     
     // Features
     'features.title': 'Nos fonctionnalités',
     'features.subtitle': 'Découvrez comment GoGoBudgeto peut transformer votre gestion financière',
-    'features.smart.title': 'Plans budgétaires mensuels',
-    'features.smart.description': 'Créez facilement vos plans budgétaires mensuels pour savoir exactement combien vous économisez chaque mois.',
-    'features.planning.title': 'Enveloppes de budget',
-    'features.planning.description': 'Gérez vos enveloppes de budget basées sur vos plans budgétaires pour contrôler vos dépenses par catégorie.',
+    'features.smart.title': 'Plans Budgétaires 50/30/20',
+    'features.smart.description': 'GoGoBudgeto génère automatiquement vos plans budgétaires selon la règle 50/30/20 : 50% besoins, 30% envies, 20% épargne pour optimiser votre budget mensuel.',
+    'features.planning.title': 'Système d\'Enveloppes',
+    'features.planning.description': 'Partitionnez vos économies avec la méthode des enveloppes. Organisez votre épargne par objectifs et catégories pour un contrôle optimal de vos finances.',
     'features.analysis.title': 'Analyses intelligentes',
     'features.analysis.description': 'Conseils financiers et analyses personnalisés pour optimiser votre épargne et réduire vos dépenses.',
     
@@ -33,8 +33,8 @@ export const translations = {
     
     // CTA
     'cta.title': 'Prêt à prendre le contrôle de vos finances?',
-    'cta.subtitle': 'Rejoignez des milliers d\'utilisateurs qui ont déjà transformé leur gestion budgétaire.',
-    'cta.primary': 'Commencer',
+    'cta.subtitle': 'Rejoignez des milliers d\'utilisateurs qui ont déjà transformé leur gestion budgétaire avec GoGoBudgeto gratuit.',
+    'cta.primary': 'Commencer Gratuitement',
     'cta.disclaimer': 'En vous inscrivant, vous acceptez nos Conditions et notre Politique de confidentialité',
     
     // Footer
@@ -43,25 +43,25 @@ export const translations = {
   },
   en: {
     // Meta
-    'meta.title': 'GoGoBudgeto - Budget App & Personal Finance Tool Without Bank Connection',
-    'meta.description': 'GoGoBudgeto: secure personal finance tool without connecting to your bank accounts. Smart budgeting with envelope system and personalized analysis.',
-    'meta.keywords': 'GoGoBudgeto, gogobudgeto, Gogobudgeto, gogo budgeto, budget, personal finance, savings, budget planning, financial management, money saving, budget app, budgeting app, personal budget, budget tool, financial tool, budget software, monthly budget, envelope budgeting, family budget, manage finances, track expenses, budget planner, save money, expense tracker, financial planning, money management, budgeting system, finance app',
+    'meta.title': 'GoGoBudgeto - Free Budget App that Generates 50/30/20 Plans & Savings Envelopes',
+    'meta.description': 'GoGoBudgeto: free budget app that automatically generates your monthly 50/30/20 budget plans. Create envelopes to organize your savings by goals. Compare your actual budget vs ideal 50/30/20.',
+    'meta.keywords': 'GoGoBudgeto, gogobudgeto free, free budget app, gogobudgeto app, budget gogobudgeto, monthly budget plans, savings envelopes, actual budget vs 50/30/20, generate budget plan, create savings envelopes, envelope movement history, free budgeting software, free budget application, free personal finance tool',
     
     // Header
     'header.login': 'Log in',
     'header.lang': 'EN',
-    'header.title': 'Personal finance tool without bank connection',
-    'header.subtitle': 'Create your monthly budget plans with simplicity and manage your budget envelopes. No bank account connection required.',
-    'header.cta.primary': 'Get started',
+    'header.title': '50/30/20 Budget and Envelope Method to Partition Your Savings',
+    'header.subtitle': 'GoGoBudgeto generates your monthly budget plans using the 50/30/20 rule and uses envelopes to organize your savings by category. Free and no bank connection required.',
+    'header.cta.primary': 'Start Free',
     'header.cta.secondary': 'Watch demo',
     
     // Features
     'features.title': 'Our features',
     'features.subtitle': 'Discover how GoGoBudgeto can transform your financial management',
-    'features.smart.title': 'Monthly budget plans',
-    'features.smart.description': 'Easily create your monthly budget plans to know exactly how much you save each month.',
-    'features.planning.title': 'Budget envelopes',
-    'features.planning.description': 'Manage your budget envelopes based on your budget plans to control spending by category.',
+    'features.smart.title': '50/30/20 Budget Plans',
+    'features.smart.description': 'GoGoBudgeto automatically generates your budget plans using the 50/30/20 rule: 50% needs, 30% wants, 20% savings to optimize your monthly budget.',
+    'features.planning.title': 'Envelope System',
+    'features.planning.description': 'Partition your savings with the envelope method. Organize your savings by goals and categories for optimal control of your finances.',
     'features.analysis.title': 'Smart analysis',
     'features.analysis.description': 'Personalized financial advice and analysis to optimize your savings and reduce expenses.',
     
@@ -75,8 +75,8 @@ export const translations = {
     
     // CTA
     'cta.title': 'Ready to take control of your finances?',
-    'cta.subtitle': 'Join thousands of users who have already transformed their budget management.',
-    'cta.primary': 'Get started',
+    'cta.subtitle': 'Join thousands of users who have already transformed their budget management with free GoGoBudgeto.',
+    'cta.primary': 'Start Free',
     'cta.disclaimer': 'By signing up, you agree to our Terms and Privacy Policy',
     
     // Footer

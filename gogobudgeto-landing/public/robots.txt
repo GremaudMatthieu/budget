@@ -8,7 +8,7 @@ Disallow: /api/
 Disallow: /tmp/
 Disallow: /var/
 
-# Main sitemap
+# Main sitemap (generated automatically by Astro)
 Sitemap: https://gogobudgeto.com/sitemap-index.xml
 
 # Crawl delay (optional - can help with server load)
