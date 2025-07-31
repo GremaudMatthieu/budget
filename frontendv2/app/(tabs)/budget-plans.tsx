@@ -1,27 +1,21 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   View, 
   Text, 
-  ScrollView, 
   TouchableOpacity, 
   ActivityIndicator,
-  RefreshControl,
   Dimensions,
-  Animated,
   Platform
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useBudget } from '@/contexts/BudgetContext';
 import { useErrorContext } from '@/contexts/ErrorContext';
 import { formatCurrency } from '@/utils/currencyUtils';
-import { normalizeMonthYear, createUtcSafeDate, getMonthYearKey, formatMonthYear } from '@/utils/dateUtils';
-import DuplicateBudgetPlanModal from '@/components/modals/DuplicateBudgetPlanModal';
 import { useTranslation } from '@/utils/useTranslation';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
+import SavingsChart from '@/components/charts/SavingsChart';
 
 export default function BudgetPlansScreen() {
   const router = useRouter();
@@ -30,8 +24,7 @@ export default function BudgetPlansScreen() {
   const { 
     budgetPlansCalendar,
     loading,
-    fetchBudgetPlansCalendar,
-    clearSelectedBudgetPlan
+    fetchBudgetPlansCalendar
   } = useBudget();
 
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -39,26 +32,26 @@ export default function BudgetPlansScreen() {
   const screenWidth = Dimensions.get('window').width;
   const isTablet = screenWidth > 768;
   
-  // Load calendar data on initial mount
-  useEffect(() => {
-    loadCalendarData();
-  }, [currentYear]);
-
   // Function to load calendar data
-  const loadCalendarData = async () => {
+  const loadCalendarData = useCallback(async () => {
     try {
       await fetchBudgetPlansCalendar(currentYear);
     } catch (err) {
       console.error('Error loading budget plans calendar:', err);
       setError('Failed to load budget plans calendar');
     }
-  };
+  }, [currentYear, fetchBudgetPlansCalendar, setError]);
+  
+  // Load calendar data on initial mount
+  useEffect(() => {
+    loadCalendarData();
+  }, [loadCalendarData]);
 
   // Always fetch latest data when page is focused
   useFocusEffect(
     React.useCallback(() => {
       loadCalendarData();
-    }, [currentYear])
+    }, [loadCalendarData])
   );
 
   // Handle refresh
@@ -66,7 +59,7 @@ export default function BudgetPlansScreen() {
     setRefreshing(true);
     await loadCalendarData();
     setRefreshing(false);
-  }, [currentYear]);
+  }, [loadCalendarData]);
 
   // Month selection handler
   const handleMonthSelect = (year: number, month: number) => {
@@ -247,6 +240,49 @@ export default function BudgetPlansScreen() {
       return t('budgetPlans.advice.savingsLow');
     }
     return t('budgetPlans.advice.general');
+  };
+
+  // Calculate savings data for the chart
+  const calculateSavingsData = () => {
+    if (!budgetPlansCalendar || !budgetPlansCalendar[currentYear]) {
+      return [];
+    }
+
+    const yearData = budgetPlansCalendar[currentYear];
+    
+    const savingsData = [];
+    let cumulativeAmount = 0;
+
+    // Process each month in order
+    for (let month = 1; month <= 12; month++) {
+      const monthData = yearData[month];
+      if (monthData && monthData.uuid) {
+        
+        // Calculate savings amount for this month using actual savings amounts
+        const monthlyIncome = monthData.totalIncome || 0;
+        const savingsPercentage = monthData.savingsPercentage || 0;
+        
+        // Try different properties for savings amount
+        const monthlySavings = monthData.totalSavings || 
+                              monthData.savingsAmount || 
+                              (monthlyIncome * savingsPercentage) / 100;
+        
+        
+        cumulativeAmount += monthlySavings;
+        
+        // Get short month names using translation keys
+        const shortMonthKeys = ['jan', 'feb', 'mar', 'apr', 'mayShort', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        
+        savingsData.push({
+          month: t(`months.${shortMonthKeys[month - 1]}`), // Short month name
+          monthlyAmount: monthlySavings,
+          cumulativeAmount: cumulativeAmount,
+          currency: monthData.currency || 'USD'
+        });
+      }
+    }
+
+    return savingsData;
   };
 
   // Helper: check if any budget plan exists for the current year
@@ -512,6 +548,56 @@ export default function BudgetPlansScreen() {
             })}
           </View>
         </View>
+        
+        {/* Your Savings Section */}
+        {hasAnyBudgetPlanForYear(currentYear) && (
+          <View className="mb-6">
+            <Text className="text-xl font-semibold text-secondary-800 mb-4">{t('budgetPlans.yourSavings')}</Text>
+            
+            <View className="card">
+              <View className="card-content">
+                <Text className="text-sm text-secondary-600 mb-4">
+                  {t('budgetPlans.yourSavingsDescription')}
+                </Text>
+                
+                <SavingsChart 
+                  savingsData={calculateSavingsData()} 
+                  currency={budgetPlansCalendar?.[currentYear]?.[Object.keys(budgetPlansCalendar[currentYear])[0]]?.currency || 'USD'} 
+                />
+                
+                {/* Summary stats */}
+                {(() => {
+                  const savingsData = calculateSavingsData();
+                  if (savingsData.length > 0) {
+                    const totalSavings = savingsData[savingsData.length - 1]?.cumulativeAmount || 0;
+                    const averageMonthlySavings = totalSavings / savingsData.length;
+                    const currency = savingsData[0]?.currency || 'USD';
+                    
+                    return (
+                      <View className="mt-4 pt-4 border-t border-gray-100">
+                        <View className="flex-row justify-between items-center">
+                          <View className="flex-1">
+                            <Text className="text-sm text-secondary-600">{t('budgetPlans.cumulativeSavings')}</Text>
+                            <Text className="text-lg font-semibold text-text-primary">
+                              {formatCurrency(formatWithTwoDecimals(totalSavings), currency)}
+                            </Text>
+                          </View>
+                          <View className="flex-1 items-end">
+                            <Text className="text-sm text-secondary-600">{t('budgetPlans.monthlySavings')} {t('budgetPlans.avgShort')}</Text>
+                            <Text className="text-lg font-semibold text-text-primary">
+                              {formatCurrency(formatWithTwoDecimals(averageMonthlySavings), currency)}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  }
+                  return null;
+                })()}
+              </View>
+            </View>
+          </View>
+        )}
         
         {/* Guide Section */}
         <View className="bg-secondary-900 rounded-xl p-6 mb-6">

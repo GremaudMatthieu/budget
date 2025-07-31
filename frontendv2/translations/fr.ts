@@ -45,25 +45,6 @@ export default {
     current: 'Actuel',
   },
 
-  // Dashboard
-  dashboard: {
-    quickActions: 'Actions rapides',
-    myEnvelopes: 'Mes enveloppes',
-    budgetPlans: 'Plans budgétaires',
-    newBudget: 'Nouveau budget',
-    settings: 'Paramètres',
-    budgetExistsThisMonth: 'Un budget existe déjà ce mois-ci',
-    currentMonthBudget: 'Budget du mois actuel',
-    budgetOverview: 'Aperçu du budget',
-    totalBudget: 'Budget total',
-    totalSpent: 'Total dépensé',
-    recentEnvelopes: 'Enveloppes récentes',
-    viewAll: 'Voir tout',
-    noBudgetThisMonth: 'Aucun budget pour ce mois',
-    createBudgetNow: 'Créer un budget maintenant',
-    noEnvelopes: 'Aucune enveloppe',
-    createEnvelopeNow: 'Créer une enveloppe maintenant',
-  },
 
   // Auth screens
   auth: {
@@ -301,6 +282,16 @@ export default {
     },
     deletePlan: 'Supprimer le plan budgétaire',
     totalBudget: 'Budget total',
+    yourSavings: 'Vos Économies',
+    yourSavingsDescription: 'Suivez vos économies cumulées au fil des mois',
+    cumulativeSavings: 'Économies Cumulées',
+    monthlySavings: 'Économies Mensuelles',
+    monthly: 'Mensuel',
+    cumulative: 'Cumulé',
+    avgShort: '(moy)',
+    noSavingsData: 'Aucune donnée d\'économies disponible pour cette année',
+    category: 'Catégorie',
+    categories: 'Catégories',
   },
   
   // Profile screens
@@ -419,6 +410,7 @@ export default {
     february: 'Février',
     march: 'Mars',
     april: 'Avril',
+    may: 'Mai',
     june: 'Juin',
     july: 'Juillet',
     august: 'Août',
@@ -430,7 +422,7 @@ export default {
     feb: 'Fév',
     mar: 'Mar',
     apr: 'Avr',
-    may: 'Mai',
+    mayShort: 'Mai',
     jun: 'Jun',
     jul: 'Jul',
     aug: 'Aoû',
