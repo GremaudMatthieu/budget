@@ -50,6 +50,11 @@ export class BudgetService {
     await apiClient.delete(`/budget-plans/${budgetPlanId}`, config);
   }
 
+  async changeBudgetPlanCurrency(budgetPlanId: string, currency: string, requestId: string): Promise<void> {
+    const config = { headers: { 'Request-Id': requestId } };
+    await apiClient.post(`/budget-plans/${budgetPlanId}/change-currency`, { currency }, config);
+  }
+
   // Budget item management
   async addBudgetItem(
     budgetPlanId: string, 

@@ -70,6 +70,12 @@ export const envelopeService = {
       { targetedAmount, currentAmount }, 
       { headers: { 'Request-Id': requestId } }
     ),
+    
+  changeCurrency: (envelopeId: string, currency: string, requestId: string) =>
+    apiClient.post(`/envelopes/${envelopeId}/change-currency`, 
+      { currency }, 
+      { headers: { 'Request-Id': requestId } }
+    ),
 
   // Queries
   listEnvelopes: (limit?: number) => {

@@ -17,6 +17,7 @@ interface EnvelopeContextType {
   debitEnvelope: (envelopeId: string, amount: string, description: string, setError: (error: string | null) => void) => Promise<void>;
   updateEnvelopeName: (envelopeId: string, name: string, setError: (error: string | null) => void) => Promise<void>;
   updateTargetBudget: (envelopeId: string, targetedAmount: string, currentAmount: string, setError: (error: string | null) => void) => Promise<void>;
+  changeCurrency: (envelopeId: string, currency: string, setError: (error: string | null) => void) => Promise<void>;
 }
 
 const EnvelopeContext = createContext<EnvelopeContextType | undefined>(undefined);
@@ -350,6 +351,48 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
+  const changeCurrency = async (
+    envelopeId: string,
+    currency: string,
+    setError: (error: string | null) => void
+  ) => {
+    const requestId = uuid.v4();
+
+    setPendingRequests(prev => ({
+      ...prev,
+      [requestId]: true
+    }));
+
+    try {
+      await envelopeService.changeCurrency(envelopeId, currency, requestId);
+      // WebSocket event will handle the UI update
+      
+      // Safety timeout: clear pending state after 5 seconds if no WebSocket event is received
+      setTimeout(() => {
+        setPendingRequests(prev => {
+          if (prev[requestId]) {
+            console.log(`Fallback timeout for change currency ${envelopeId}: clearing pending state`);
+            const updated = { ...prev };
+            delete updated[requestId];
+            return updated;
+          }
+          return prev;
+        });
+      }, 5000);
+    } catch (err) {
+      console.error("Change currency error:", err);
+      setError("Failed to change currency");
+
+      setPendingRequests(prev => {
+        const updated = { ...prev };
+        delete updated[requestId];
+        return updated;
+      });
+
+      throw err;
+    }
+  };
+
   const value = {
     envelopesData,
     currentEnvelopeDetails,
@@ -364,6 +407,7 @@ export const EnvelopeProvider: React.FC<{ children: ReactNode }> = ({ children }
     debitEnvelope,
     updateEnvelopeName,
     updateTargetBudget,
+    changeCurrency,
   };
 
   return (

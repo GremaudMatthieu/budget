@@ -34,6 +34,7 @@ interface BudgetContextType {
   removeBudgetItem: (type: "need" | "want" | "saving" | "income", itemId: string) => Promise<boolean>;
   refreshBudgetPlans: () => Promise<void>;
   removeBudgetPlan: (budgetPlanId: string) => Promise<void>;
+  changeBudgetPlanCurrency: (budgetPlanId: string, currency: string) => Promise<void>;
 }
 
 // Create context with default values
@@ -396,6 +397,27 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [fetchBudgetPlansCalendar, setError]);
 
+  // Add this method to change budget plan currency
+  const changeBudgetPlanCurrency = useCallback(async (budgetPlanId: string, currency: string) => {
+    const requestId = uuid.v4() as string;
+    setLoading(true);
+    try {
+      await budgetService.changeBudgetPlanCurrency(budgetPlanId, currency, requestId);
+      // WebSocket event will handle the UI update
+      
+      // Safety timeout: clear loading state after 5 seconds if no WebSocket event is received
+      setTimeout(() => {
+        console.log(`Fallback timeout for change budget plan currency ${budgetPlanId}: clearing loading state`);
+        setLoading(false);
+      }, 5000);
+    } catch (err) {
+      console.error('Failed to change budget plan currency:', err);
+      setError('Failed to change currency');
+      setLoading(false);
+      throw err;
+    }
+  }, [setError]);
+
   const value = {
     budgetPlansCalendar,
     selectedBudgetPlan,
@@ -420,6 +442,7 @@ export const BudgetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     removeBudgetItem,
     refreshBudgetPlans,
     removeBudgetPlan,
+    changeBudgetPlanCurrency,
   };
 
   return <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>;

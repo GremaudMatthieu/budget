@@ -23,6 +23,31 @@ import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 import { useFocusEffect } from 'expo-router';
 import { normalizeAmountInput } from '@/utils/normalizeAmountInput';
 import { validateEnvelopeAmountField } from '@/utils/validateEnvelopeAmount';
+import { formatCurrency } from '@/utils/currencyUtils';
+
+// Utility functions for envelope totals and mixed currency detection
+const getUniqueCurrencies = (envelopes: any[]): string[] => {
+  const currencies = envelopes.map(envelope => envelope.currency);
+  return [...new Set(currencies)];
+};
+
+const hasMixedCurrencies = (envelopes: any[]): boolean => {
+  return getUniqueCurrencies(envelopes).length > 1;
+};
+
+const calculateTotalCurrentBudget = (envelopes: any[]): number => {
+  return envelopes.reduce((total, envelope) => total + Number(envelope.currentAmount), 0);
+};
+
+const calculateTotalTargetBudget = (envelopes: any[]): number => {
+  return envelopes.reduce((total, envelope) => total + Number(envelope.targetedAmount), 0);
+};
+
+const calculateOverallProgress = (envelopes: any[]): number => {
+  const totalCurrent = calculateTotalCurrentBudget(envelopes);
+  const totalTarget = calculateTotalTargetBudget(envelopes);
+  return totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0;
+};
 
 // Content component for envelopes, which will be wrapped with the animated header
 function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }) {
@@ -696,23 +721,92 @@ function EnvelopesContent({ onCreateEnvelope }: { onCreateEnvelope: () => void }
               </View>
             )}
 
-          {/* Budget Summary Section */}
-          {(envelopesData?.envelopes ?? []).length > 0 && (
-            <View className="bg-secondary-900 rounded-xl p-6 mb-8">
-              <View className="bg-secondary-800 rounded-lg p-4 mb-4">
-                <Text className="text-xl font-bold text-white min-w-0 break-all" numberOfLines={2} ellipsizeMode="tail">{t('envelopes.budgetOverview')}</Text>
-                <Text className="text-secondary-300 min-w-0 break-all">
-                  {(envelopesData?.envelopes ?? []).filter(e => Number(e.currentAmount) / Number(e.targetedAmount) >= 1).length} {t('envelopes.completedOf')} {(envelopesData?.envelopes?.length ?? 0)} {t('envelopes.title').toLowerCase()}
-                </Text>
-              </View>
-              <View className="flex-row items-center min-w-0">
-                <View className="h-1 flex-1 bg-success-500 rounded-full min-w-0" />
-                <View className="h-1 flex-1 bg-primary-500 rounded-full mx-1 min-w-0" />
-                <View className="h-1 flex-1 bg-secondary-500 rounded-full min-w-0" />
-              </View>
+          {/* Enhanced Budget Summary Section with Totals and Mixed Currency Warning */}
+          {(envelopesData?.envelopes ?? []).length > 0 && (() => {
+            const envelopes = envelopesData.envelopes;
+            const mixedCurrencies = hasMixedCurrencies(envelopes);
+            const uniqueCurrencies = getUniqueCurrencies(envelopes);
+            const totalCurrent = calculateTotalCurrentBudget(envelopes);
+            const totalTarget = calculateTotalTargetBudget(envelopes);
+            const overallProgress = calculateOverallProgress(envelopes);
+            const completedCount = envelopes.filter(e => Number(e.currentAmount) / Number(e.targetedAmount) >= 1).length;
+            
+            // Use the most common currency for display, or first currency if all equal
+            const primaryCurrency = uniqueCurrencies.reduce((a, b) => 
+              envelopes.filter(e => e.currency === a).length >= envelopes.filter(e => e.currency === b).length ? a : b
+            );
 
-            </View>
-          )}
+            return (
+              <View className="bg-secondary-900 rounded-xl p-6 mb-8">
+                {/* Mixed Currency Warning */}
+                {mixedCurrencies && (
+                  <View className="bg-orange-100 border border-orange-300 rounded-lg p-4 mb-4">
+                    <View className="flex-row items-center mb-2">
+                      <Ionicons name="warning" size={18} color="#ea580c" style={{ marginRight: 8 }} />
+                      <Text className="text-orange-800 font-semibold text-sm">{t('envelopes.mixedCurrenciesWarning')}</Text>
+                    </View>
+                    <Text className="text-orange-700 text-xs mb-2">
+                      {t('envelopes.mixedCurrenciesDescription')}
+                    </Text>
+                    <Text className="text-orange-600 text-xs font-medium">
+                      {t('envelopes.currenciesUsed')}: {uniqueCurrencies.join(', ')}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Total Summary */}
+                <View className="bg-secondary-800 rounded-lg p-4 mb-4">
+                  <Text className="text-xl font-bold text-white mb-2">{t('envelopes.totalSummary')}</Text>
+                  
+                  <View className="flex-row justify-between items-center mb-2">
+                    <Text className="text-secondary-300 text-sm">{t('envelopes.totalCurrentBudget')}</Text>
+                    <Text className="text-white font-semibold">
+                      {mixedCurrencies ? 
+                        `${formatCurrency(totalCurrent, primaryCurrency)} *` : 
+                        formatCurrency(totalCurrent, primaryCurrency)
+                      }
+                    </Text>
+                  </View>
+                  
+                  <View className="flex-row justify-between items-center mb-2">
+                    <Text className="text-secondary-300 text-sm">{t('envelopes.totalTargetBudget')}</Text>
+                    <Text className="text-white font-semibold">
+                      {mixedCurrencies ? 
+                        `${formatCurrency(totalTarget, primaryCurrency)} *` : 
+                        formatCurrency(totalTarget, primaryCurrency)
+                      }
+                    </Text>
+                  </View>
+                  
+                  <View className="flex-row justify-between items-center mb-3">
+                    <Text className="text-secondary-300 text-sm">{t('envelopes.overallProgress')}</Text>
+                    <Text className="text-white font-semibold">{overallProgress.toFixed(1)}%</Text>
+                  </View>
+
+                  {mixedCurrencies && (
+                    <Text className="text-orange-300 text-xs italic">
+                      * {t('envelopes.mixedCurrenciesInaccurate')}
+                    </Text>
+                  )}
+                </View>
+
+                {/* Budget Overview */}
+                <View className="bg-secondary-800 rounded-lg p-4 mb-4">
+                  <Text className="text-xl font-bold text-white min-w-0 break-all" numberOfLines={2} ellipsizeMode="tail">{t('envelopes.budgetOverview')}</Text>
+                  <Text className="text-secondary-300 min-w-0 break-all">
+                    {completedCount} {t('envelopes.completedOf')} {envelopes.length} {t('envelopes.title').toLowerCase()}
+                  </Text>
+                </View>
+
+                {/* Progress Bar */}
+                <View className="flex-row items-center min-w-0">
+                  <View className="h-1 flex-1 bg-success-500 rounded-full min-w-0" />
+                  <View className="h-1 flex-1 bg-primary-500 rounded-full mx-1 min-w-0" />
+                  <View className="h-1 flex-1 bg-secondary-500 rounded-full min-w-0" />
+                </View>
+              </View>
+            );
+          })()}
 
         </View>
 

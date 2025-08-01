@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '@/utils/useTranslation';
+import { formatCurrency } from '@/utils/currencyUtils';
 
 interface PieChartData {
     name: string;
@@ -12,10 +13,11 @@ interface PieChartData {
 interface BudgetItemPieChartProps {
     data: PieChartData[];
     size?: number;
+    currency?: string;
 }
 
 // Modern card-based visualization that matches the app's design language
-const BudgetItemPieChart: React.FC<BudgetItemPieChartProps> = ({ data, size = 200 }) => {
+const BudgetItemPieChart: React.FC<BudgetItemPieChartProps> = ({ data, size = 200, currency = 'USD' }) => {
     const { t } = useTranslation();
 
     // Filter out zero values
@@ -238,7 +240,10 @@ const BudgetItemPieChart: React.FC<BudgetItemPieChartProps> = ({ data, size = 20
                                         textShadowRadius: 2
                                     }}
                                 >
-                                    ${(total / 1000).toFixed(0)}K
+                                    {total >= 1000 ? 
+                                        formatCurrency(Math.round(total / 1000), currency) + 'K' : 
+                                        formatCurrency(total, currency)
+                                    }
                                 </Text>
                                 <Text
                                     className="text-gray-500 mt-1"

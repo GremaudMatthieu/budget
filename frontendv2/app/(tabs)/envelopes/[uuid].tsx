@@ -11,6 +11,7 @@ import EnvelopeCustomAmountCard from '@/components/card/EnvelopeCustomAmountCard
 import EnvelopeTransactionHistoryCard from '@/components/card/EnvelopeTransactionHistoryCard';
 import DescriptionModal from '@/components/modals/DescriptionModal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
+import ChangeCurrencyModal from '@/components/modals/ChangeCurrencyModal';
 import { Ionicons } from '@expo/vector-icons';
 import { useEnvelopeData } from '@/hooks/useEnvelopeData';
 import { useEnvelopes } from '@/contexts/EnvelopeContext';
@@ -35,6 +36,8 @@ export default function EnvelopeDetailScreen() {
     setDeleteModalOpen,
     descriptionModalOpen,
     setDescriptionModalOpen,
+    changeCurrencyModalOpen,
+    setChangeCurrencyModalOpen,
     description,
     setDescription,
     currentAction,
@@ -48,6 +51,7 @@ export default function EnvelopeDetailScreen() {
     handleQuickCredit,
     handleQuickDebit,
     handleDescriptionSubmit,
+    handleChangeCurrency,
     setError,
     editingTargetError,
     deleteEnvelope,
@@ -131,7 +135,17 @@ export default function EnvelopeDetailScreen() {
             <h1 className="text-3xl font-bold text-slate-900 mb-1">{details.envelope.name}</h1>
             {/* Add subtitle or stats here if needed */}
           </div>
-          {/* Place any important actions/info from the blue header here if needed */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setChangeCurrencyModalOpen(true)}
+              className="flex-row items-center px-3 py-2 bg-blue-100 rounded-xl hover:bg-blue-200 transition"
+              style={{ display: 'flex' }}
+              disabled={!!details.envelope.pending}
+            >
+              <Ionicons name="cash-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
+              <span className="text-blue-700 font-semibold">{t('envelopes.changeCurrency')}</span>
+            </button>
+          </div>
         </div>
         <EnvelopeProgressCard
           name={details.envelope.name}
@@ -173,7 +187,7 @@ export default function EnvelopeDetailScreen() {
         <div className="flex flex-col items-center w-full">
           <TouchableOpacity
             onPress={() => setDeleteModalOpen(true)}
-            className="bg-red-100 rounded-xl p-4 items-center mt-6 mb-10"
+            className="bg-red-100 rounded-xl p-4 items-center mb-10"
             disabled={!!details.envelope.pending}
             accessibilityRole="button"
             accessibilityLabel={t('envelopes.deleteEnvelope')}
@@ -195,6 +209,14 @@ export default function EnvelopeDetailScreen() {
             onSubmit={handleDescriptionSubmit}
             actionType={currentAction?.type || 'credit'}
           />
+          <ChangeCurrencyModal
+            visible={changeCurrencyModalOpen}
+            onClose={() => setChangeCurrencyModalOpen(false)}
+            onSubmit={handleChangeCurrency}
+            currentCurrency={details.envelope.currency}
+            itemName={details.envelope.name}
+            loading={loading}
+          />
         </div>
         <div className="h-32" />
       </div>
@@ -208,6 +230,21 @@ export default function EnvelopeDetailScreen() {
           title={details.envelope.name}
           showBackButton
           headerHeight={getHeaderHeight()}
+          rightComponent={
+            <View className="flex-row gap-2">
+              <TouchableOpacity
+                onPress={() => setChangeCurrencyModalOpen(true)}
+                className="flex-row items-center px-3 py-2 bg-blue-100 rounded-xl"
+                accessibilityRole="button"
+                accessibilityLabel={t('envelopes.changeCurrency')}
+                activeOpacity={0.8}
+                disabled={!!details.envelope.pending}
+              >
+                <Ionicons name="cash-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
+                <Text className="text-blue-700 font-semibold">{t('envelopes.changeCurrency')}</Text>
+              </TouchableOpacity>
+            </View>
+          }
         >
           <StatusBar style="dark" />
           <ScrollView
@@ -254,7 +291,7 @@ export default function EnvelopeDetailScreen() {
             />
             <TouchableOpacity
               onPress={() => setDeleteModalOpen(true)}
-              className="bg-red-100 rounded-xl p-4 items-center mt-6 mb-10"
+              className="bg-red-100 rounded-xl p-4 items-center mb-10"
               disabled={!!details.envelope.pending}
               accessibilityRole="button"
               accessibilityLabel={t('envelopes.deleteEnvelope')}
@@ -273,6 +310,14 @@ export default function EnvelopeDetailScreen() {
               onClose={() => setDescriptionModalOpen(false)}
               onSubmit={handleDescriptionSubmit}
               actionType={currentAction?.type || 'credit'}
+            />
+            <ChangeCurrencyModal
+              visible={changeCurrencyModalOpen}
+              onClose={() => setChangeCurrencyModalOpen(false)}
+              onSubmit={handleChangeCurrency}
+              currentCurrency={details.envelope.currency}
+              itemName={details.envelope.name}
+              loading={loading}
             />
           </ScrollView>
         </AnimatedHeaderLayout>

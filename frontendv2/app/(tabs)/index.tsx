@@ -7,6 +7,7 @@ import { useTranslation } from '@/utils/useTranslation';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 import { useBudget } from '@/contexts/BudgetContext';
 import { useEnvelopes } from '@/contexts/EnvelopeContext';
+import { formatCurrency } from '@/utils/currencyUtils';
 
 // Content component for the dashboard, which will be wrapped with the animated header
 function DashboardContent() {
@@ -39,6 +40,15 @@ function DashboardContent() {
   const spent = currentBudget?.totalAllocated ?? 0;
   const total = currentBudget?.totalIncome ?? 0;
   const spentPercent = total > 0 ? Math.min(100, (spent / total) * 100) : 0;
+
+  // Get currency - use current budget currency or most common envelope currency
+  const budgetCurrency = currentBudget?.currency;
+  const envelopeCurrencies = envelopesData?.envelopes?.map(env => env.currency) ?? [];
+  const mostCommonEnvelopeCurrency = envelopeCurrencies.length > 0 ? 
+    envelopeCurrencies.reduce((a, b, _, arr) => 
+      arr.filter(c => c === a).length >= arr.filter(c => c === b).length ? a : b
+    ) : 'USD';
+  const currency = budgetCurrency || mostCommonEnvelopeCurrency;
 
   // Get up to 3 most recent envelopes
   const envelopes = envelopesData?.envelopes?.slice(0, 3) ?? [];
@@ -112,14 +122,14 @@ function DashboardContent() {
           <>
             <View className="flex-row justify-between mb-2">
               <Text className="text-text-secondary">{t('dashboard.spentSoFar')}</Text>
-              <Text className="font-semibold">${spent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+              <Text className="font-semibold">{formatCurrency(spent, currency)}</Text>
             </View>
             <View className="w-full h-2 bg-gray-200 rounded-full mb-1">
               <View className="h-2 bg-primary-600 rounded-full" style={{ width: `${spentPercent}%` }} />
             </View>
             <View className="flex-row justify-between">
-              <Text className="text-xs text-text-muted">$0</Text>
-              <Text className="text-xs text-text-muted">${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+              <Text className="text-xs text-text-muted">{formatCurrency(0, currency)}</Text>
+              <Text className="text-xs text-text-muted">{formatCurrency(total, currency)}</Text>
             </View>
           </>
         ) : (
@@ -150,7 +160,7 @@ function DashboardContent() {
                     <Text className="text-xs text-text-muted">{env.updatedAt ? new Date(env.updatedAt).toLocaleDateString() : ''}</Text>
                   </View>
                 </View>
-                <Text className="font-semibold">${parseFloat(env.currentAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+                <Text className="font-semibold">{formatCurrency(parseFloat(env.currentAmount), env.currency)}</Text>
               </View>
             ))}
           </View>

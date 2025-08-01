@@ -12,6 +12,7 @@ import BudgetItemPieChart from '@/components/BudgetItemPieChart';
 import BudgetItemModal from '@/components/modals/BudgetItemModal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import DuplicateBudgetPlanModal from '@/components/modals/DuplicateBudgetPlanModal';
+import ChangeCurrencyModal from '@/components/modals/ChangeCurrencyModal';
 import { normalizeMonthYear } from '@/utils/dateUtils';
 import { useBudgetPlanData } from '@/hooks/useBudgetPlanData';
 import { formatCurrency } from '@/utils/currencyUtils';
@@ -51,7 +52,7 @@ export default function BudgetPlanDetailScreen() {
     savingsCategories,
     incomesCategories,
   } = useBudgetPlanData(uuid);
-  const { refreshBudgetPlans, removeBudgetPlan, clearSelectedBudgetPlan } = useBudget();
+  const { refreshBudgetPlans, removeBudgetPlan, clearSelectedBudgetPlan, changeBudgetPlanCurrency, fetchBudgetPlan } = useBudget();
 
   // Clear selected budget plan when UUID changes to prevent showing cached data
   useEffect(() => {
@@ -401,7 +402,7 @@ export default function BudgetPlanDetailScreen() {
         </View>
         {/* --- Pie Chart & Legend (not boxed) --- */}
         <View className="w-full items-center justify-center mt-2 mb-2">
-          <BudgetItemPieChart data={chartData} size={160} />
+          <BudgetItemPieChart data={chartData} size={160} currency={planDetails?.currency} />
         </View>
         {/* --- Budget Health Section (not a card, just a section with divider) --- */}
         <View className="w-full mt-2 pt-4 border-t border-gray-200">
@@ -627,6 +628,7 @@ export default function BudgetPlanDetailScreen() {
   // --- Duplicate modal state ---
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
   const [isDeletePlanModalOpen, setIsDeletePlanModalOpen] = useState(false);
+  const [isChangeCurrencyModalOpen, setIsChangeCurrencyModalOpen] = useState(false);
 
   // Handler to delete the budget plan
   const handleDeleteBudgetPlan = async () => {
@@ -637,6 +639,22 @@ export default function BudgetPlanDetailScreen() {
       router.push('/budget-plans');
     } catch (err) {
       // setError && setError(t('budgetPlans.failedToDeletePlan'));
+    }
+  };
+
+  // Handler to change budget plan currency
+  const handleChangeBudgetPlanCurrency = async (currency: string) => {
+    if (!selectedBudgetPlan?.budgetPlan?.uuid) return;
+    try {
+      await changeBudgetPlanCurrency(selectedBudgetPlan.budgetPlan.uuid, currency);
+      setIsChangeCurrencyModalOpen(false);
+      // Refresh both the budget plans calendar and the current budget plan details
+      await Promise.all([
+        refreshBudgetPlans(),
+        fetchBudgetPlan(selectedBudgetPlan.budgetPlan.uuid)
+      ]);
+    } catch (err) {
+      console.error('Failed to change budget plan currency:', err);
     }
   };
 
@@ -684,14 +702,24 @@ export default function BudgetPlanDetailScreen() {
             <h1 className="text-3xl font-bold text-slate-900 mb-1">{planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}</h1>
             <p className="text-slate-500">{`${formatCurrency(formatWithTwoDecimals(totalIncome), planDetails?.currency)} • ${t('budgetPlans.remaining')}: ${formatCurrency(formatWithTwoDecimals(remaining), planDetails?.currency)}`}</p>
           </div>
-          <button
-            onClick={() => setIsDuplicateModalOpen(true)}
-            className="flex-row items-center px-3 py-2 bg-primary-100 rounded-xl ml-2 hover:bg-primary-200 transition"
-            style={{ display: 'flex' }}
-          >
-            <Ionicons name="copy-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
-            <span className="text-primary-700 font-semibold">{t('budgetPlans.duplicate')}</span>
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setIsChangeCurrencyModalOpen(true)}
+              className="flex-row items-center px-3 py-2 bg-blue-100 rounded-xl hover:bg-blue-200 transition"
+              style={{ display: 'flex' }}
+            >
+              <Ionicons name="cash-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
+              <span className="text-blue-700 font-semibold">{t('budgetPlans.changeCurrency')}</span>
+            </button>
+            <button
+              onClick={() => setIsDuplicateModalOpen(true)}
+              className="flex-row items-center px-3 py-2 bg-primary-100 rounded-xl hover:bg-primary-200 transition"
+              style={{ display: 'flex' }}
+            >
+              <Ionicons name="copy-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
+              <span className="text-primary-700 font-semibold">{t('budgetPlans.duplicate')}</span>
+            </button>
+          </div>
         </div>
         <div className="space-y-8">
           {renderOverview()}
@@ -789,6 +817,14 @@ export default function BudgetPlanDetailScreen() {
           sourceMonth={sourceMonth}
           sourceYear={sourceYear}
         />
+        <ChangeCurrencyModal
+          visible={isChangeCurrencyModalOpen}
+          onClose={() => setIsChangeCurrencyModalOpen(false)}
+          onSubmit={handleChangeBudgetPlanCurrency}
+          currentCurrency={planDetails?.currency || 'USD'}
+          itemName={planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}
+          loading={loading}
+        />
       </div>
     );
   }
@@ -802,16 +838,28 @@ export default function BudgetPlanDetailScreen() {
           subtitle={getHeaderSubtitle()}
           showBackButton={true}
           rightComponent={
-            <TouchableOpacity
-              onPress={() => setIsDuplicateModalOpen(true)}
-              className="flex-row items-center px-3 py-2 bg-primary-100 rounded-xl ml-2"
-              accessibilityRole="button"
-              accessibilityLabel={t('budgetPlans.duplicate')}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="copy-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
-              <Text className="text-primary-700 font-semibold">{t('budgetPlans.duplicate')}</Text>
-            </TouchableOpacity>
+            <View className="flex-row gap-2">
+              <TouchableOpacity
+                onPress={() => setIsChangeCurrencyModalOpen(true)}
+                className="flex-row items-center px-3 py-2 bg-blue-100 rounded-xl"
+                accessibilityRole="button"
+                accessibilityLabel={t('budgetPlans.changeCurrency')}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="cash-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
+                <Text className="text-blue-700 font-semibold">{t('budgetPlans.changeCurrency')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setIsDuplicateModalOpen(true)}
+                className="flex-row items-center px-3 py-2 bg-primary-100 rounded-xl"
+                accessibilityRole="button"
+                accessibilityLabel={t('budgetPlans.duplicate')}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="copy-outline" size={18} color="#0284c7" style={{ marginRight: 6 }} />
+                <Text className="text-primary-700 font-semibold">{t('budgetPlans.duplicate')}</Text>
+              </TouchableOpacity>
+            </View>
           }
           onRefresh={onRefresh}
           refreshing={refreshing}
@@ -909,6 +957,14 @@ export default function BudgetPlanDetailScreen() {
             sourceBudgetPlanId={uuid}
             sourceMonth={sourceMonth}
             sourceYear={sourceYear}
+          />
+          <ChangeCurrencyModal
+            visible={isChangeCurrencyModalOpen}
+            onClose={() => setIsChangeCurrencyModalOpen(false)}
+            onSubmit={handleChangeBudgetPlanCurrency}
+            currentCurrency={planDetails?.currency || 'USD'}
+            itemName={planDetails?.date ? formatDate(planDetails.date) : t('budgetPlans.budgetPlan')}
+            loading={loading}
           />
         </AnimatedHeaderLayout>
       </View>

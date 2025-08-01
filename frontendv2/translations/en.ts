@@ -27,6 +27,7 @@ export default {
     date: 'Date',
     description: 'Description',
     currency: 'Currency',
+    newCurrency: 'New Currency',
     pending: 'Pending',
     locale: 'en-US',
     vs: 'vs',
@@ -113,7 +114,7 @@ export default {
   // Envelopes screens
   envelopes: {
     title: 'My Envelopes',
-    subtitle: 'Track your spending categories',
+    subtitle: 'Track your saving categories',
     createEnvelope: 'Create Envelope',
     envelopeName: 'Envelope Name',
     targetAmount: 'Target Amount',
@@ -159,6 +160,16 @@ export default {
     transactionHistory: 'Transaction History',
     addedFunds: 'Added funds',
     spentFunds: 'Spent funds',
+    changeCurrency: 'Change Currency',
+    failedToChangeCurrency: 'Failed to change currency',
+    totalSummary: 'Total Summary',
+    totalCurrentBudget: 'Total Current Budget',
+    totalTargetBudget: 'Total Target Budget',
+    overallProgress: 'Overall Progress',
+    mixedCurrenciesWarning: 'Mixed Currencies Warning',
+    mixedCurrenciesDescription: 'Your budget envelopes use different currencies. Total amounts and progress may not accurately reflect your financial situation since this app does not perform currency conversion. For accurate analysis, ensure all your envelopes use the same currency.',
+    currenciesUsed: 'Currencies used',
+    mixedCurrenciesInaccurate: 'Values may be inaccurate due to mixed currencies',
   },
   
   // Budget plans screens
@@ -282,6 +293,12 @@ export default {
     noSavingsData: 'No savings data available for this year',
     category: 'Category',
     categories: 'Categories',
+    changeCurrency: 'Change Currency',
+    mixedCurrenciesWarning: 'Mixed Currencies Warning',
+    mixedCurrenciesDescription: 'Your budget plans for this year use different currencies. Annual totals and charts may not accurately reflect your financial situation since this app does not perform currency conversion. For accurate analysis, ensure all your budget plans use the same currency.',
+    mixedCurrenciesInaccurate: 'Values may be inaccurate due to mixed currencies',
+    chartMixedCurrenciesInaccurate: 'Chart values may be inaccurate due to mixed currencies',
+    currenciesUsed: 'Currencies used',
   },
   
   // Profile screens
@@ -355,6 +372,8 @@ export default {
     enterAmountHint: 'Enter the amount for this item',
     enterNameHint: 'Enter the name for this item',
     selectCategoryHint: 'Select a category for this item',
+    changeCurrency: 'Change Currency',
+    changeCurrencyDescription: 'Please note that changing the currency will not automatically convert the amounts. This app does not perform currency conversion. If conversion is needed, you will need to manually update the amounts to reflect the new currency values.',
   },
   
   // Error messages

@@ -118,6 +118,9 @@ export default function BudgetPlansScreen() {
   const renderBudgetSummary = () => {
     if (!budgetSummary || !rule5030 || !yearlyTotals || yearlyTotals.income <= 0) return null;
     
+    const mixedCurrencies = hasMixedCurrencies(currentYear);
+    const primaryCurrency = getPrimaryCurrency(currentYear);
+    
     return (
       <View className="mb-6">
         <Text className="text-xl font-semibold text-secondary-800 mb-4">{t('budgetPlans.yearlySummary')}</Text>
@@ -125,13 +128,27 @@ export default function BudgetPlansScreen() {
           <View className="card-content">
             <Text className="text-lg font-semibold text-text-primary mb-2">{currentYear} {t('budgetPlans.overview')}</Text>
             
+            {mixedCurrencies && (
+              <View className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
+                <View className="flex-row items-center">
+                  <Ionicons name="warning" size={16} color="#d97706" style={{ marginRight: 6 }} />
+                  <Text className="text-amber-700 text-xs font-medium">
+                    {t('budgetPlans.mixedCurrenciesInaccurate')}
+                  </Text>
+                </View>
+              </View>
+            )}
+            
             <View className="flex-row justify-between items-center mb-2">
               <Text className="text-sm text-secondary-600">{t('budgetPlans.totalIncome')}</Text>
               <Text 
                 className="font-semibold text-text-primary break-all" 
                 style={{ fontSize: yearlyTotals.income > 9999999 ? 14 : 16 }}
               >
-                {formatCurrency(formatWithTwoDecimals(yearlyTotals.income))}
+                {mixedCurrencies ? 
+                  `${formatCurrency(formatWithTwoDecimals(yearlyTotals.income), primaryCurrency)} *` : 
+                  formatCurrency(formatWithTwoDecimals(yearlyTotals.income), primaryCurrency)
+                }
               </Text>
             </View>
             
@@ -142,13 +159,22 @@ export default function BudgetPlansScreen() {
                   className="font-semibold text-text-primary break-all" 
                   style={{ fontSize: yearlyTotals.allocated > 9999999 ? 14 : 16 }}
                 >
-                  {formatCurrency(formatWithTwoDecimals(yearlyTotals.allocated))}
+                  {mixedCurrencies ? 
+                    `${formatCurrency(formatWithTwoDecimals(yearlyTotals.allocated), primaryCurrency)} *` : 
+                    formatCurrency(formatWithTwoDecimals(yearlyTotals.allocated), primaryCurrency)
+                  }
                 </Text>
                 <Text className="text-xs text-secondary-500 ml-1">
                   ({formatWithTwoDecimals((yearlyTotals.allocated / yearlyTotals.income) * 100)}%)
                 </Text>
               </View>
             </View>
+            
+            {mixedCurrencies && (
+              <Text className="text-amber-600 text-xs italic mb-3">
+                * {t('budgetPlans.mixedCurrenciesInaccurate')}
+              </Text>
+            )}
             
             <Text className="text-sm font-medium text-secondary-700 mb-2">
               {t('budgetPlans.ruleVsBudget')}
@@ -291,6 +317,79 @@ export default function BudgetPlansScreen() {
     // Check if any month in the year has a budget plan (uuid present)
     return Object.values(budgetPlansCalendar[year]).some(
       (monthData: any) => monthData && monthData.uuid
+    );
+  };
+
+  // Helper: check if there are mixed currencies in the current year's budget plans
+  const hasMixedCurrencies = (year: number): boolean => {
+    if (!budgetPlansCalendar || !budgetPlansCalendar[year]) return false;
+    
+    const currencies = new Set<string>();
+    Object.values(budgetPlansCalendar[year]).forEach((monthData: any) => {
+      if (monthData && monthData.uuid && monthData.currency) {
+        currencies.add(monthData.currency);
+      }
+    });
+    
+    return currencies.size > 1;
+  };
+
+  // Helper: get all currencies used in the current year
+  const getYearCurrencies = (year: number): string[] => {
+    if (!budgetPlansCalendar || !budgetPlansCalendar[year]) return [];
+    
+    const currencies = new Set<string>();
+    Object.values(budgetPlansCalendar[year]).forEach((monthData: any) => {
+      if (monthData && monthData.uuid && monthData.currency) {
+        currencies.add(monthData.currency);
+      }
+    });
+    
+    return Array.from(currencies).sort();
+  };
+
+  // Helper: get the most commonly used currency in the year for display
+  const getPrimaryCurrency = (year: number): string => {
+    if (!budgetPlansCalendar || !budgetPlansCalendar[year]) return 'USD';
+    
+    const currencyCount: { [key: string]: number } = {};
+    Object.values(budgetPlansCalendar[year]).forEach((monthData: any) => {
+      if (monthData && monthData.uuid && monthData.currency) {
+        currencyCount[monthData.currency] = (currencyCount[monthData.currency] || 0) + 1;
+      }
+    });
+    
+    // Return the most frequent currency, or USD as fallback
+    return Object.keys(currencyCount).reduce((a, b) => 
+      currencyCount[a] > currencyCount[b] ? a : b, 'USD'
+    );
+  };
+
+  // Render mixed currencies warning
+  const renderMixedCurrenciesWarning = () => {
+    if (!hasMixedCurrencies(currentYear)) return null;
+    
+    const currencies = getYearCurrencies(currentYear);
+    
+    return (
+      <View className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+        <View className="flex-row items-start">
+          <View className="w-6 h-6 rounded-full bg-amber-100 items-center justify-center mr-3 mt-0.5">
+            <Ionicons name="warning" size={16} color="#d97706" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-amber-800 font-semibold mb-1">
+              {t('budgetPlans.mixedCurrenciesWarning')}
+            </Text>
+            <Text className="text-amber-700 text-sm mb-2">
+              {t('budgetPlans.mixedCurrenciesDescription')}
+            </Text>
+            <Text className="text-amber-600 text-xs">
+              {t('budgetPlans.currenciesUsed')}: {currencies.join(', ')}
+            </Text>
+          </View>
+        </View>
+      </View>
     );
   };
 
@@ -442,6 +541,9 @@ export default function BudgetPlansScreen() {
           )}
         </View>
         
+        {/* Mixed Currencies Warning */}
+        {renderMixedCurrenciesWarning()}
+        
         {/* Yearly Budget Summary - New section using the new API data */}
         {renderBudgetSummary()}
         
@@ -560,9 +662,20 @@ export default function BudgetPlansScreen() {
                   {t('budgetPlans.yourSavingsDescription')}
                 </Text>
                 
+                {hasMixedCurrencies(currentYear) && (
+                  <View className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                    <View className="flex-row items-center">
+                      <Ionicons name="warning" size={16} color="#d97706" style={{ marginRight: 6 }} />
+                      <Text className="text-amber-700 text-xs font-medium">
+                        {t('budgetPlans.chartMixedCurrenciesInaccurate')}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+                
                 <SavingsChart 
                   savingsData={calculateSavingsData()} 
-                  currency={budgetPlansCalendar?.[currentYear]?.[Object.keys(budgetPlansCalendar[currentYear])[0]]?.currency || 'USD'} 
+                  currency={getPrimaryCurrency(currentYear)} 
                 />
                 
                 {/* Summary stats */}
@@ -571,7 +684,7 @@ export default function BudgetPlansScreen() {
                   if (savingsData.length > 0) {
                     const totalSavings = savingsData[savingsData.length - 1]?.cumulativeAmount || 0;
                     const averageMonthlySavings = totalSavings / savingsData.length;
-                    const currency = savingsData[0]?.currency || 'USD';
+                    const currency = getPrimaryCurrency(currentYear);
                     
                     return (
                       <View className="mt-4 pt-4 border-t border-gray-100">

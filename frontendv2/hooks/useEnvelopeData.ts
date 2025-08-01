@@ -17,6 +17,7 @@ export function useEnvelopeData(uuid: string) {
     debitEnvelope,
     updateEnvelopeName,
     updateTargetBudget,
+    changeCurrency,
     currentEnvelopeDetails,
   } = useEnvelopes();
 
@@ -28,6 +29,7 @@ export function useEnvelopeData(uuid: string) {
   const [amount, setAmount] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
+  const [changeCurrencyModalOpen, setChangeCurrencyModalOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [currentAction, setCurrentAction] = useState<{ type: 'credit' | 'debit'; amount: string } | null>(null);
   const [editingTargetError, setEditingTargetError] = useState<string | null>(null);
@@ -204,6 +206,18 @@ export function useEnvelopeData(uuid: string) {
     }
   };
 
+  // Handler to change envelope currency
+  const handleChangeCurrency = useCallback(async (currency: string) => {
+    if (!details) return;
+    try {
+      await changeCurrency(details.envelope.uuid, currency, setError);
+      setChangeCurrencyModalOpen(false);
+      await loadEnvelopeDetails();
+    } catch (err) {
+      setError(t('envelopes.failedToChangeCurrency'));
+    }
+  }, [details, changeCurrency, setError, t, loadEnvelopeDetails]);
+
   return {
     details,
     loading,
@@ -218,6 +232,8 @@ export function useEnvelopeData(uuid: string) {
     setDeleteModalOpen,
     descriptionModalOpen,
     setDescriptionModalOpen,
+    changeCurrencyModalOpen,
+    setChangeCurrencyModalOpen,
     description,
     setDescription,
     currentAction,
@@ -231,6 +247,7 @@ export function useEnvelopeData(uuid: string) {
     handleQuickCredit,
     handleQuickDebit,
     handleDescriptionSubmit,
+    handleChangeCurrency,
     setError,
     editingTargetError,
     setEditingTargetError,

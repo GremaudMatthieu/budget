@@ -27,6 +27,7 @@ export default {
     date: 'Date',
     description: 'Description',
     currency: 'Devise',
+    newCurrency: 'Nouvelle devise',
     pending: 'En attente',
     locale: 'fr-FR',
     vs: 'contre',
@@ -113,7 +114,7 @@ export default {
   // Envelopes screens
   envelopes: {
     title: 'Mes Enveloppes',
-    subtitle: 'Suivez vos catégories de dépenses',
+    subtitle: 'Suivez vos catégories d\'économie',
     createEnvelope: 'Créer une enveloppe',
     envelopeName: 'Nom de l\'enveloppe',
     targetAmount: 'Montant cible',
@@ -159,6 +160,16 @@ export default {
     transactionHistory: 'Historique des transactions',
     addedFunds: 'Fonds ajoutés',
     spentFunds: 'Fonds dépensés',
+    changeCurrency: 'Changer la devise',
+    failedToChangeCurrency: 'Échec du changement de devise',
+    totalSummary: 'Récapitulatif total',
+    totalCurrentBudget: 'Budget actuel total',
+    totalTargetBudget: 'Budget cible total',
+    overallProgress: 'Progression globale',
+    mixedCurrenciesWarning: 'Avertissement devises mixtes',
+    mixedCurrenciesDescription: 'Vos enveloppes budgétaires utilisent différentes devises. Les montants totaux et la progression peuvent ne pas refléter fidèlement votre situation financière car cette application n\'effectue pas de conversion de devises. Pour une analyse précise, assurez-vous que toutes vos enveloppes utilisent la même devise.',
+    currenciesUsed: 'Devises utilisées',
+    mixedCurrenciesInaccurate: 'Les valeurs peuvent être inexactes en raison de devises mixtes',
   },
   
   // Budget plans screens
@@ -292,6 +303,12 @@ export default {
     noSavingsData: 'Aucune donnée d\'économies disponible pour cette année',
     category: 'Catégorie',
     categories: 'Catégories',
+    changeCurrency: 'Changer la devise',
+    mixedCurrenciesWarning: 'Avertissement devises mixtes',
+    mixedCurrenciesDescription: 'Vos plans budgétaires pour cette année utilisent différentes devises. Les totaux annuels et graphiques peuvent ne pas refléter fidèlement votre situation financière car cette application n\'effectue pas de conversion de devises. Pour une analyse précise, assurez-vous que tous vos plans budgétaires utilisent la même devise.',
+    mixedCurrenciesInaccurate: 'Les valeurs peuvent être inexactes en raison de devises mixtes',
+    chartMixedCurrenciesInaccurate: 'Les valeurs du graphique peuvent être inexactes en raison de devises mixtes',
+    currenciesUsed: 'Devises utilisées',
   },
   
   // Profile screens
@@ -361,6 +378,8 @@ export default {
     wantName: 'Nom de l\'envie',
     savingName: 'Nom de l\'épargne',
     incomeName: 'Nom du revenu',
+    changeCurrency: 'Changer la devise',
+    changeCurrencyDescription: 'Veuillez noter que le changement de devise ne convertira pas automatiquement les montants. Cette application n\'effectue pas de conversion de devises. Si une conversion est nécessaire, vous devrez mettre à jour manuellement les montants pour refléter les valeurs dans la nouvelle devise.',
   },
   
   // Error messages
