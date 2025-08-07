@@ -1,5 +1,5 @@
 ---
-import { getLocaleFromUrl, getAlternateUrl, t } from '../i18n/utils';
+import { getLocaleFromUrl, getHreflangUrls, t } from '../i18n/utils';
 
 interface Props {
   title?: string;
@@ -9,8 +9,7 @@ interface Props {
 
 const { title, description, keywords } = Astro.props;
 const locale = getLocaleFromUrl(Astro.url);
-const alternateLocale = locale === 'fr' ? 'en' : 'fr';
-const alternateUrl = getAlternateUrl(Astro.url, alternateLocale);
+const hreflangUrls = getHreflangUrls(Astro.url, Astro.site);
 
 const finalTitle = title || t('meta.title', locale);
 const finalDescription = description || t('meta.description', locale);
@@ -42,8 +41,8 @@ const finalKeywords = keywords || t('meta.keywords', locale);
   <link rel="canonical" href={Astro.url.href}>
   
   <!-- Alternate Languages -->
-  <link rel="alternate" hreflang="fr" href={locale === 'fr' ? Astro.url.href : `${Astro.site}${alternateUrl}`}>
-  <link rel="alternate" hreflang="en" href={locale === 'en' ? Astro.url.href : `${Astro.site}${alternateUrl}`}>
+  <link rel="alternate" hreflang="fr" href={hreflangUrls.fr}>
+  <link rel="alternate" hreflang="en" href={hreflangUrls.en}>
   <link rel="alternate" hreflang="x-default" href={Astro.site}>
   
   <!-- Open Graph / Facebook -->
