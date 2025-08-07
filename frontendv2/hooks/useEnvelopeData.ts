@@ -96,7 +96,7 @@ export function useEnvelopeData(uuid: string) {
       setEditingName(null);
       await loadEnvelopeDetails();
     } catch (err) {
-      setError(t('envelopes.failedToUpdateName'));
+      setError(t('envelopes.nameAlreadyExistsForUser'));
     }
   }, [details, editingName, updateEnvelopeName, setError, t, loadEnvelopeDetails]);
 

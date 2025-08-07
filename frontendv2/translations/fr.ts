@@ -113,6 +113,8 @@ export default {
   
   // Envelopes screens
   envelopes: {
+    nameAlreadyExistsForUser: 'Le nom est déjà pris par une autre enveloppe.',
+    targetLessThanCurrent: 'Le budget visé ne peut être inférieur au montant dans l\'enveloppe.',
     title: 'Mes Enveloppes',
     subtitle: 'Suivez vos catégories d\'économie',
     createEnvelope: 'Créer une enveloppe',
@@ -162,6 +164,10 @@ export default {
     spentFunds: 'Fonds dépensés',
     changeCurrency: 'Changer la devise',
     failedToChangeCurrency: 'Échec du changement de devise',
+    name: 'Nom',
+    actions: 'Actions',
+    complete: 'complète',
+    enterName: 'Entrer le nom',
     totalSummary: 'Récapitulatif total',
     totalCurrentBudget: 'Budget actuel total',
     totalTargetBudget: 'Budget cible total',
@@ -407,6 +413,7 @@ export default {
     nameTooShort: 'Le nom doit comporter au moins 3 caractères',
     nameTooLong: 'Le nom ne peut pas dépasser {{count}} caractères',
     categoryRequired: 'La catégorie est obligatoire',
+    amountInvalid: 'Veuillez entrer un montant valide',
   },
   
   // Validation and hints

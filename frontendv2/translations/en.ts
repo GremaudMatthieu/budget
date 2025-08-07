@@ -113,6 +113,8 @@ export default {
   
   // Envelopes screens
   envelopes: {
+    nameAlreadyExistsForUser: 'Name already exists for another envelope.',
+    targetLessThanCurrent: 'Target budget is less than the amount in the envelope',
     title: 'My Envelopes',
     subtitle: 'Track your saving categories',
     createEnvelope: 'Create Envelope',
@@ -162,6 +164,10 @@ export default {
     spentFunds: 'Spent funds',
     changeCurrency: 'Change Currency',
     failedToChangeCurrency: 'Failed to change currency',
+    name: 'Name',
+    actions: 'Actions',
+    complete: 'complete',
+    enterName: 'Enter name',
     totalSummary: 'Total Summary',
     totalCurrentBudget: 'Total Current Budget',
     totalTargetBudget: 'Total Target Budget',
@@ -404,6 +410,7 @@ export default {
     descriptionTooLong: 'Description must be at most 35 characters',
     nameRequired: 'Envelope name cannot be empty',
     nameTooShort: 'Envelope name must be at least 2 characters',
+    amountInvalid: 'Please enter a valid amount',
   },
   
   // Validation and hints
