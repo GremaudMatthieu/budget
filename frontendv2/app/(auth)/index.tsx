@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Platform, Linking } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '@/utils/useTranslation';
+import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import AnimatedHeaderLayout from '@/components/withAnimatedHeader';
 import WebContainer from '@/components/web/WebContainer';
@@ -11,6 +12,17 @@ import WebContainer from '@/components/web/WebContainer';
 function WelcomeContent() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { language } = useLanguage();
+
+  const handleOpenTerms = () => {
+    const url = language === 'fr' ? 'https://gogobudgeto.com/terms' : 'https://gogobudgeto.com/en/terms';
+    Linking.openURL(url);
+  };
+
+  const handleOpenPrivacy = () => {
+    const url = language === 'fr' ? 'https://gogobudgeto.com/privacy' : 'https://gogobudgeto.com/en/privacy';
+    Linking.openURL(url);
+  };
 
   return (
     <View className="flex-1">
@@ -80,7 +92,7 @@ function WelcomeContent() {
       </View>
 
       {/* CTA Section */}
-      <View className="px-6 pb-10">
+      <View className="px-6 pb-20">
         <TouchableOpacity
           className="bg-primary-600 rounded-xl py-4 items-center mb-4 shadow-md"
           onPress={() => router.push('/(auth)/signup')}
@@ -95,9 +107,24 @@ function WelcomeContent() {
           <Text className="text-text-primary text-lg font-semibold">{t('auth.signIn')}</Text>
         </TouchableOpacity>
         
-        <Text className="text-center mt-6 text-text-muted">
-          {t('auth.termsAndPrivacy')}
-        </Text>
+        <View className="flex-row flex-wrap justify-center mt-6">
+          <Text className="text-text-muted text-sm text-center">
+            {t('auth.termsAndPrivacy')}
+          </Text>
+          <TouchableOpacity onPress={handleOpenTerms}>
+            <Text className="text-primary-600 text-sm underline">
+              {t('auth.terms')}
+            </Text>
+          </TouchableOpacity>
+          <Text className="text-text-muted text-sm text-center">
+            {t('auth.and')}
+          </Text>
+          <TouchableOpacity onPress={handleOpenPrivacy}>
+            <Text className="text-primary-600 text-sm underline">
+              {t('auth.privacyPolicy')}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -114,12 +141,14 @@ export default function WelcomeScreen() {
   if (Platform.OS === 'web') {
     return (
       <WebContainer>
-        <View className="flex min-h-screen justify-center items-center">
-          <div className="text-center mb-8">
+        <View className="flex min-h-screen">
+          <div className="text-center mb-8 pt-12">
             <h1 className="text-4xl font-bold text-slate-900 mb-4">{t('auth.seoTitle')}</h1>
             <h2 className="text-xl text-slate-600 mb-6">{t('auth.seoSubtitle')}</h2>
           </div>
-          <WelcomeContent />
+          <div className="pb-32">
+            <WelcomeContent />
+          </div>
         </View>
       </WebContainer>
     );

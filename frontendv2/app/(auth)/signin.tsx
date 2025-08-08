@@ -45,9 +45,6 @@ function SignInContent() {
           <Ionicons name="shield-checkmark" size={16} color="#64748b" />
           <Text className="text-text-muted ml-2 text-sm">{t('auth.secureAuthentication')}</Text>
         </View>
-        <Text className="text-text-muted text-xs text-center">
-          {t('auth.dataProtection')}
-        </Text>
       </View>
     </View>
   );

@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from '../../utils/useTranslation';
+import { useLanguage } from '../../contexts/LanguageContext';
 import GoogleSignInButton from '../../components/GoogleSignInButton';
 import { Ionicons } from '@expo/vector-icons';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -11,8 +12,19 @@ import WebContainer from '@/components/web/WebContainer';
 
 function SignupContent() {
   const { t } = useTranslation();
+  const { language } = useLanguage();
   const [error] = useState<string | null>(null);
   const router = useRouter();
+
+  const handleOpenTerms = () => {
+    const url = language === 'fr' ? 'https://gogobudgeto.com/terms' : 'https://gogobudgeto.com/en/terms';
+    Linking.openURL(url);
+  };
+
+  const handleOpenPrivacy = () => {
+    const url = language === 'fr' ? 'https://gogobudgeto.com/privacy' : 'https://gogobudgeto.com/en/privacy';
+    Linking.openURL(url);
+  };
 
   return (
     <View className="flex-1 px-6 justify-center max-w-[500px] w-full self-center">
@@ -45,9 +57,24 @@ function SignupContent() {
           <Ionicons name="shield-checkmark" size={16} color="#64748b" />
           <Text className="text-text-muted ml-2 text-sm">{t('auth.secureAuthentication')}</Text>
         </View>
-        <Text className="text-text-muted text-xs text-center">
-          {t('auth.termsAndPrivacy')}
-        </Text>
+        <View className="flex-row flex-wrap justify-center">
+          <Text className="text-text-muted text-xs text-center">
+            {t('auth.termsAndPrivacy')}
+          </Text>
+          <TouchableOpacity onPress={handleOpenTerms}>
+            <Text className="text-primary-600 text-xs underline">
+              {t('auth.terms')}
+            </Text>
+          </TouchableOpacity>
+          <Text className="text-text-muted text-xs text-center">
+            {t('auth.and')}
+          </Text>
+          <TouchableOpacity onPress={handleOpenPrivacy}>
+            <Text className="text-primary-600 text-xs underline">
+              {t('auth.privacyPolicy')}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
