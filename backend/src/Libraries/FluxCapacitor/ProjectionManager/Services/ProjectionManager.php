@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Libraries\FluxCapacitor\ProjectionManager\Services;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface;
-use App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface;
-use App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistryInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMap;
+use App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManager as ProjectionManagerInterface;
+use App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistry;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -14,8 +14,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final readonly class ProjectionManager implements ProjectionManagerInterface
 {
     public function __construct(
-        private EventClassMapInterface $eventClassMap,
-        private ProjectionRegistryInterface $projectionRegistry,
+        private EventClassMap $eventClassMap,
+        private ProjectionRegistry $projectionRegistry,
         private Connection $connection,
         private ContainerInterface $container,
     ) {

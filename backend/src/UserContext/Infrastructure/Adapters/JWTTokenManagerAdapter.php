@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\UserContext\Infrastructure\Adapters;
 
-use App\Gateway\User\Views\UserView;
-use App\UserContext\Domain\Ports\Outbound\JWTTokenManagerInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface as LexikJWTTokenManagerInterface;
+use App\Presentation\User\UserView;
+use App\UserContext\JWTTokenManager;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManager as LexikJWTTokenManager;
 
-final readonly class JWTTokenManagerAdapter implements JWTTokenManagerInterface
+final readonly class JWTTokenManagerAdapter implements JWTTokenManager
 {
-    public function __construct(private LexikJWTTokenManagerInterface $JWTTokenManager)
+    public function __construct(private LexikJWTTokenManager $JWTTokenManager)
     {
     }
 

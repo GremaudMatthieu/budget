@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\SharedContext\Infrastructure\Adapters;
 
-use App\SharedContext\Domain\Ports\Outbound\TranslatorInterface;
+use App\SharedContext\Domain\Ports\Outbound\Translator as TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface as Translator;
 
 final readonly class TranslatorAdapter implements TranslatorInterface

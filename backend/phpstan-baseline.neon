@@ -4,337 +4,61 @@ parameters:
 			message: '#^Cannot access offset ''context'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/BudgetEnvelopeContext/Domain/Aggregates/BudgetEnvelope.php
+			path: src/BudgetEnvelopeContext/Domain/BudgetEnvelope.php
 
 		-
 			message: '#^Cannot access offset ''contextId'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/BudgetEnvelopeContext/Domain/Aggregates/BudgetEnvelope.php
+			path: src/BudgetEnvelopeContext/Domain/BudgetEnvelope.php
 
 		-
-			message: '#^Method App\\BudgetEnvelopeContext\\Domain\\Aggregates\\BudgetEnvelope\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
+			message: '#^Method App\\BudgetEnvelopeContext\\Domain\\BudgetEnvelope\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/BudgetEnvelopeContext/Domain/Aggregates/BudgetEnvelope.php
+			path: src/BudgetEnvelopeContext/Domain/BudgetEnvelope.php
 
 		-
-			message: '#^Property App\\BudgetEnvelopeContext\\Domain\\Aggregates\\BudgetEnvelope\:\:\$isDeleted \(bool\) does not accept mixed\.$#'
+			message: '#^Property App\\BudgetEnvelopeContext\\Domain\\BudgetEnvelope\:\:\$isDeleted \(bool\) does not accept mixed\.$#'
 			identifier: assign.propertyType
 			count: 1
-			path: src/BudgetEnvelopeContext/Domain/Aggregates/BudgetEnvelope.php
+			path: src/BudgetEnvelopeContext/Domain/BudgetEnvelope.php
 
 		-
-			message: '#^Method App\\BudgetEnvelopeContext\\Domain\\Aggregates\\BudgetEnvelopeNameRegistry\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
+			message: '#^Method App\\BudgetEnvelopeContext\\Domain\\BudgetEnvelopeNameRegistry\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/BudgetEnvelopeContext/Domain/Aggregates/BudgetEnvelopeNameRegistry.php
-
-		-
-			message: '#^Cannot access offset 1\|2\|3\|4\|5\|6\|7\|8\|9\|10\|11\|12 on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/BudgetPlanContext/Application/Handlers/QueryHandlers/ListBudgetPlansCalendarQueryHandler.php
-
-		-
-			message: '#^Method App\\BudgetPlanContext\\Application\\Queries\\GetACalendarWithItsBudgetPlansFinancialRatiosByYearQuery\:\:getDate\(\) should return DateTimeImmutable but returns DateTimeImmutable\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: src/BudgetPlanContext/Application/Queries/GetACalendarWithItsBudgetPlansFinancialRatiosByYearQuery.php
+			path: src/BudgetEnvelopeContext/Domain/BudgetEnvelopeNameRegistry.php
 
 		-
 			message: '#^Cannot access offset ''context'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
+			path: src/BudgetPlanContext/Domain/BudgetPlan.php
 
 		-
 			message: '#^Cannot access offset ''contextId'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
+			path: src/BudgetPlanContext/Domain/BudgetPlan.php
 
 		-
-			message: '#^Method App\\BudgetPlanContext\\Domain\\Aggregates\\BudgetPlan\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
+			message: '#^Method App\\BudgetPlanContext\\Domain\\BudgetPlan\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
+			path: src/BudgetPlanContext/Domain/BudgetPlan.php
 
 		-
-			message: '#^Property App\\BudgetPlanContext\\Domain\\Aggregates\\BudgetPlan\:\:\$isDeleted \(bool\) does not accept mixed\.$#'
+			message: '#^Property App\\BudgetPlanContext\\Domain\\BudgetPlan\:\:\$isDeleted \(bool\) does not accept mixed\.$#'
 			identifier: assign.propertyType
 			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlan.php
+			path: src/BudgetPlanContext/Domain/BudgetPlan.php
 
 		-
-			message: '#^Method App\\BudgetPlanContext\\Domain\\Aggregates\\BudgetPlanDateRegistry\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
+			message: '#^Method App\\BudgetPlanContext\\Domain\\BudgetPlanDateRegistry\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/BudgetPlanContext/Domain/Aggregates/BudgetPlanDateRegistry.php
-
-		-
-			message: '#^Cannot access offset ''incomeCategoriesRatio''\|''incomeCategoriesTotal''\|''needCategoriesRatio''\|''needCategoriesTotal''\|''savingCategoriesRatio''\|''savingCategoriesTotal''\|''wantCategoriesRatio''\|''wantCategoriesTotal'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/BudgetPlanContext/Domain/Services/BudgetPlanCategoriesTranslator.php
-
-		-
-			message: '#^Cannot access offset string on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/BudgetPlanContext/Domain/Services/BudgetPlanCategoriesTranslator.php
-
-		-
-			message: '#^Method App\\BudgetPlanContext\\Domain\\Services\\BudgetPlanCategoriesTranslator\:\:translate\(\) should return array but returns mixed\.$#'
-			identifier: return.type
-			count: 1
-			path: src/BudgetPlanContext/Domain/Services/BudgetPlanCategoriesTranslator.php
-
-		-
-			message: '#^Method App\\BudgetPlanContext\\Domain\\Services\\BudgetPlanCategoriesTranslator\:\:translateCategories\(\) should return array but returns mixed\.$#'
-			identifier: return.type
-			count: 1
-			path: src/BudgetPlanContext/Domain/Services/BudgetPlanCategoriesTranslator.php
-
-		-
-			message: '#^Cannot access offset ''category'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/BudgetPlanContext/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
-
-		-
-			message: '#^Cannot access offset string on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/BudgetPlanContext/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
-
-		-
-			message: '#^Cannot cast mixed to float\.$#'
-			identifier: cast.double
-			count: 10
-			path: src/BudgetPlanContext/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
-
-		-
-			message: '#^Cannot cast mixed to int\.$#'
-			identifier: cast.int
-			count: 2
-			path: src/BudgetPlanContext/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
-
-		-
-			message: '#^Part \$direction \(mixed\) of encapsed string cannot be cast to string\.$#'
-			identifier: encapsedStringPart.nonString
-			count: 2
-			path: src/BudgetPlanContext/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: src/Gateway/BudgetEnvelope/Presentation/Cli/ReplayABudgetEnvelopeCommand.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetEnvelope\\Presentation\\Cli\\ReplayABudgetEnvelopeCommand\:\:\$defaultName has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: src/Gateway/BudgetEnvelope/Presentation/Cli/ReplayABudgetEnvelopeCommand.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: src/Gateway/BudgetEnvelope/Presentation/Cli/RewindABudgetEnvelopeCommand.php
-
-		-
-			message: '#^Negated boolean expression is always false\.$#'
-			identifier: booleanNot.alwaysFalse
-			count: 1
-			path: src/Gateway/BudgetEnvelope/Presentation/Cli/RewindABudgetEnvelopeCommand.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetEnvelope\\Presentation\\Cli\\RewindABudgetEnvelopeCommand\:\:\$defaultName has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: src/Gateway/BudgetEnvelope/Presentation/Cli/RewindABudgetEnvelopeCommand.php
-
-		-
-			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanIncomeEntryViewInterface\:\:fromEvent\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Gateway/BudgetPlan/Projections/BudgetPlanIncomeEntryProjection.php
-
-		-
-			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanNeedEntryViewInterface\:\:fromEvent\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Gateway/BudgetPlan/Projections/BudgetPlanNeedEntryProjection.php
-
-		-
-			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanSavingEntryViewInterface\:\:fromEvent\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Gateway/BudgetPlan/Projections/BudgetPlanSavingEntryProjection.php
-
-		-
-			message: '#^Call to an undefined method App\\BudgetPlanContext\\Domain\\Ports\\Inbound\\BudgetPlanWantEntryViewInterface\:\:fromEvent\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Gateway/BudgetPlan/Projections/BudgetPlanWantEntryProjection.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$category \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeAmount \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeName \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$category \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanNeedEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$needAmount \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanNeedEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$needName \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanNeedEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanNeedEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$category \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanSavingEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$savingAmount \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanSavingEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$savingName \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanSavingEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanSavingEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$category \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanWantEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanWantEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$wantAmount \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanWantEntryView.php
-
-		-
-			message: '#^Property App\\Gateway\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$wantName \(string\) does not accept mixed\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Gateway/BudgetPlan/Views/BudgetPlanWantEntryView.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Gateway/User/Presentation/Cli/ReplayAUserCommand.php
-
-		-
-			message: '#^Property App\\Gateway\\User\\Presentation\\Cli\\ReplayAUserCommand\:\:\$defaultName has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: src/Gateway/User/Presentation/Cli/ReplayAUserCommand.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: src/Gateway/User/Presentation/Cli/RewindAUserCommand.php
-
-		-
-			message: '#^Property App\\Gateway\\User\\Presentation\\Cli\\RewindAUserCommand\:\:\$defaultName has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: src/Gateway/User/Presentation/Cli/RewindAUserCommand.php
-
-		-
-			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''&''\|''\?'' results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: src/Gateway/User/Presentation/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
-
-		-
-			message: '#^Binary operation "\." between mixed and ''email\='' results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: src/Gateway/User/Presentation/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
-
-		-
-			message: '#^Cannot access offset ''languagePreference'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/Gateway/User/Presentation/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
-
-		-
-			message: '#^Cannot access offset ''platform'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: src/Gateway/User/Presentation/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
-
-		-
-			message: '#^Method App\\Gateway\\User\\Views\\UserView\:\:getRoles\(\) should return array\<string\> but returns array\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Gateway/User/Views/UserView.php
-
-		-
-			message: '#^Method App\\Gateway\\User\\Views\\UserView\:\:getUserIdentifier\(\) should return non\-empty\-string but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Gateway/User/Views/UserView.php
+			path: src/BudgetPlanContext/Domain/BudgetPlanDateRegistry.php
 
 		-
 			message: '#^Method App\\Libraries\\FluxCapacitor\\Anonymizer\\Repositories\\KeyManagementRepository\:\:decryptKey\(\) should return string but returns string\|false\.$#'
@@ -367,25 +91,25 @@ parameters:
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
-			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface\:\:aggregateVersion\(\)\.$#'
+			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRoot\:\:aggregateVersion\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
-			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface\:\:clearRaisedDomainEvents\(\)\.$#'
+			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRoot\:\:clearRaisedDomainEvents\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
-			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface\:\:raisedDomainEvents\(\)\.$#'
+			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRoot\:\:raisedDomainEvents\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
-			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\DomainEventInterface\:\:getVersion\(\)\.$#'
+			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\DomainEvent\:\:getVersion\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
@@ -415,7 +139,7 @@ parameters:
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
-			message: '#^Call to an undefined static method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface\:\:fromSnapshot\(\)\.$#'
+			message: '#^Call to an undefined static method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRoot\:\:fromSnapshot\(\)\.$#'
 			identifier: staticMethod.notFound
 			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
@@ -463,19 +187,19 @@ parameters:
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
-			message: '#^Method App\\Libraries\\FluxCapacitor\\EventStore\\EventStore\:\:load\(\) should return App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface but returns mixed\.$#'
+			message: '#^Method App\\Libraries\\FluxCapacitor\\EventStore\\EventStore\:\:load\(\) should return App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRoot but returns mixed\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
-			message: '#^PHPDoc tag @var with type App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface is not subtype of native type string\.$#'
+			message: '#^PHPDoc tag @var with type App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRoot is not subtype of native type string\.$#'
 			identifier: varTag.nativeType
 			count: 2
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
 
 		-
-			message: '#^PHPDoc tag @var with type App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\DomainEventInterface is not subtype of native type string\.$#'
+			message: '#^PHPDoc tag @var with type App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\DomainEvent is not subtype of native type string\.$#'
 			identifier: varTag.nativeType
 			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/EventStore.php
@@ -559,13 +283,13 @@ parameters:
 			path: src/Libraries/FluxCapacitor/EventStore/Services/SnapshotService.php
 
 		-
-			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRootInterface\:\:aggregateVersion\(\)\.$#'
+			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\AggregateRoot\:\:aggregateVersion\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/Services/SnapshotService.php
 
 		-
-			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\SnapshotableAggregateInterface\:\:aggregateVersion\(\)\.$#'
+			message: '#^Call to an undefined method App\\Libraries\\FluxCapacitor\\EventStore\\Ports\\SnapshotableAggregate\:\:aggregateVersion\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Libraries/FluxCapacitor/EventStore/Services/SnapshotService.php
@@ -679,6 +403,606 @@ parameters:
 			path: src/Libraries/FluxCapacitor/ProjectionManager/Services/ProjectionRegistry.php
 
 		-
+			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Presentation/BudgetEnvelope/Cli/ReplayABudgetEnvelopeCommand.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetEnvelope\\Cli\\ReplayABudgetEnvelopeCommand\:\:\$defaultName has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Presentation/BudgetEnvelope/Cli/ReplayABudgetEnvelopeCommand.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Presentation/BudgetEnvelope/Cli/RewindABudgetEnvelopeCommand.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: src/Presentation/BudgetEnvelope/Cli/RewindABudgetEnvelopeCommand.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetEnvelope\\Cli\\RewindABudgetEnvelopeCommand\:\:\$defaultName has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Presentation/BudgetEnvelope/Cli/RewindABudgetEnvelopeCommand.php
+
+		-
+			message: '#^Access to property \$amount on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanIncomeInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanIncomeController.php
+
+		-
+			message: '#^Access to property \$category on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanIncomeInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanIncomeController.php
+
+		-
+			message: '#^Access to property \$name on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanIncomeInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanIncomeController.php
+
+		-
+			message: '#^Access to property \$uuid on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanIncomeInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanIncomeController.php
+
+		-
+			message: '#^Parameter \$addABudgetPlanIncomeInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\AddABudgetPlanIncomeController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanIncomeInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanIncomeController.php
+
+		-
+			message: '#^Access to property \$amount on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanNeedInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanNeedController.php
+
+		-
+			message: '#^Access to property \$category on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanNeedInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanNeedController.php
+
+		-
+			message: '#^Access to property \$name on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanNeedInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanNeedController.php
+
+		-
+			message: '#^Access to property \$uuid on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanNeedInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanNeedController.php
+
+		-
+			message: '#^Parameter \$addABudgetPlanNeedInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\AddABudgetPlanNeedController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanNeedInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanNeedController.php
+
+		-
+			message: '#^Access to property \$amount on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanSavingInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanSavingController.php
+
+		-
+			message: '#^Access to property \$category on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanSavingInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanSavingController.php
+
+		-
+			message: '#^Access to property \$name on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanSavingInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanSavingController.php
+
+		-
+			message: '#^Access to property \$uuid on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanSavingInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanSavingController.php
+
+		-
+			message: '#^Parameter \$addABudgetPlanSavingInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\AddABudgetPlanSavingController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanSavingInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanSavingController.php
+
+		-
+			message: '#^Access to property \$amount on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanWantInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanWantController.php
+
+		-
+			message: '#^Access to property \$category on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanWantInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanWantController.php
+
+		-
+			message: '#^Access to property \$name on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanWantInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanWantController.php
+
+		-
+			message: '#^Access to property \$uuid on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanWantInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanWantController.php
+
+		-
+			message: '#^Parameter \$addABudgetPlanWantInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\AddABudgetPlanWantController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AddABudgetPlanWantInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AddABudgetPlanWantController.php
+
+		-
+			message: '#^Access to property \$amount on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanIncomeInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanIncomeController.php
+
+		-
+			message: '#^Access to property \$category on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanIncomeInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanIncomeController.php
+
+		-
+			message: '#^Access to property \$name on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanIncomeInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanIncomeController.php
+
+		-
+			message: '#^Parameter \$adjustABudgetPlanIncomeInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\AdjustABudgetPlanIncomeController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanIncomeInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanIncomeController.php
+
+		-
+			message: '#^Access to property \$amount on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanNeedInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanNeedController.php
+
+		-
+			message: '#^Access to property \$category on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanNeedInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanNeedController.php
+
+		-
+			message: '#^Access to property \$name on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanNeedInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanNeedController.php
+
+		-
+			message: '#^Parameter \$adjustABudgetPlanNeedInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\AdjustABudgetPlanNeedController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanNeedInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanNeedController.php
+
+		-
+			message: '#^Access to property \$amount on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanSavingInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanSavingController.php
+
+		-
+			message: '#^Access to property \$category on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanSavingInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanSavingController.php
+
+		-
+			message: '#^Access to property \$name on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanSavingInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanSavingController.php
+
+		-
+			message: '#^Parameter \$adjustABudgetPlanSavingInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\AdjustABudgetPlanSavingController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanSavingInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanSavingController.php
+
+		-
+			message: '#^Access to property \$amount on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanWantInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanWantController.php
+
+		-
+			message: '#^Access to property \$category on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanWantInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanWantController.php
+
+		-
+			message: '#^Access to property \$name on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanWantInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanWantController.php
+
+		-
+			message: '#^Parameter \$adjustABudgetPlanWantInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\AdjustABudgetPlanWantController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\AdjustABudgetPlanWantInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/AdjustABudgetPlanWantController.php
+
+		-
+			message: '#^Access to property \$currency on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\ChangeABudgetPlanCurrencyInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/ChangeABudgetPlanCurrencyController.php
+
+		-
+			message: '#^Parameter \$changeABudgetPlanCurrencyInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\ChangeABudgetPlanCurrencyController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\ChangeABudgetPlanCurrencyInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/ChangeABudgetPlanCurrencyController.php
+
+		-
+			message: '#^Access to property \$context on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanController.php
+
+		-
+			message: '#^Access to property \$contextId on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanInput\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanController.php
+
+		-
+			message: '#^Access to property \$currency on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanController.php
+
+		-
+			message: '#^Access to property \$date on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanController.php
+
+		-
+			message: '#^Access to property \$incomes on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanController.php
+
+		-
+			message: '#^Access to property \$uuid on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanInput\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanController.php
+
+		-
+			message: '#^Parameter \$input of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\GenerateABudgetPlanController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanController.php
+
+		-
+			message: '#^Access to property \$budgetPlanUuidThatAlreadyExists on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanWithOneThatAlreadyExistsInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanWithOneThatAlreadyExistsController.php
+
+		-
+			message: '#^Access to property \$context on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanWithOneThatAlreadyExistsInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanWithOneThatAlreadyExistsController.php
+
+		-
+			message: '#^Access to property \$contextId on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanWithOneThatAlreadyExistsInput\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanWithOneThatAlreadyExistsController.php
+
+		-
+			message: '#^Access to property \$date on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanWithOneThatAlreadyExistsInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanWithOneThatAlreadyExistsController.php
+
+		-
+			message: '#^Access to property \$uuid on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanWithOneThatAlreadyExistsInput\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanWithOneThatAlreadyExistsController.php
+
+		-
+			message: '#^Parameter \$input of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\GenerateABudgetPlanWithOneThatAlreadyExistsController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GenerateABudgetPlanWithOneThatAlreadyExistsInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GenerateABudgetPlanWithOneThatAlreadyExistsController.php
+
+		-
+			message: '#^Access to property \$year on an unknown class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GetACalendarWithItsBudgetPlansFinancialRatiosByYearInput\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GetACalendarWithItsBudgetPlansFinancialRatiosByYearController.php
+
+		-
+			message: '#^Instantiated class App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GetACalendarWithItsBudgetPlansFinancialRatiosByYearInput not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GetACalendarWithItsBudgetPlansFinancialRatiosByYearController.php
+
+		-
+			message: '#^Parameter \$getACalendarWithItsBudgetPlansFinancialRatiosByYearInput of method App\\Presentation\\BudgetPlan\\HTTP\\Controllers\\GetACalendarWithItsBudgetPlansFinancialRatiosByYearController\:\:__invoke\(\) has invalid type App\\Presentation\\BudgetPlan\\HTTP\\DTOs\\GetACalendarWithItsBudgetPlansFinancialRatiosByYearInput\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/HTTP/Controllers/GetACalendarWithItsBudgetPlansFinancialRatiosByYearController.php
+
+		-
+			message: '#^Cannot access offset ''incomeCategoriesRatio''\|''incomeCategoriesTotal''\|''needCategoriesRatio''\|''needCategoriesTotal''\|''savingCategoriesRatio''\|''savingCategoriesTotal''\|''wantCategoriesRatio''\|''wantCategoriesTotal'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Presentation/BudgetPlan/Infrastructure/BudgetPlanCategoriesTranslator.php
+
+		-
+			message: '#^Cannot access offset string on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Presentation/BudgetPlan/Infrastructure/BudgetPlanCategoriesTranslator.php
+
+		-
+			message: '#^Method App\\Presentation\\BudgetPlan\\Infrastructure\\BudgetPlanCategoriesTranslator\:\:translate\(\) should return array but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Presentation/BudgetPlan/Infrastructure/BudgetPlanCategoriesTranslator.php
+
+		-
+			message: '#^Method App\\Presentation\\BudgetPlan\\Infrastructure\\BudgetPlanCategoriesTranslator\:\:translateCategories\(\) should return array but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Presentation/BudgetPlan/Infrastructure/BudgetPlanCategoriesTranslator.php
+
+		-
+			message: '#^Cannot access offset ''category'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Presentation/BudgetPlan/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
+
+		-
+			message: '#^Cannot access offset string on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Presentation/BudgetPlan/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
+
+		-
+			message: '#^Cannot cast mixed to float\.$#'
+			identifier: cast.double
+			count: 10
+			path: src/Presentation/BudgetPlan/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 2
+			path: src/Presentation/BudgetPlan/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
+
+		-
+			message: '#^Part \$direction \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 2
+			path: src/Presentation/BudgetPlan/Infrastructure/Persistence/Repositories/BudgetPlanViewRepository.php
+
+		-
+			message: '#^Call to an undefined method App\\Presentation\\BudgetPlan\\BudgetPlanIncomeEntry\:\:fromEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/Projections/BudgetPlanIncomeEntryProjection.php
+
+		-
+			message: '#^Call to an undefined method App\\Presentation\\BudgetPlan\\BudgetPlanNeedEntry\:\:fromEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/Projections/BudgetPlanNeedEntryProjection.php
+
+		-
+			message: '#^Call to an undefined method App\\Presentation\\BudgetPlan\\BudgetPlanSavingEntry\:\:fromEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/Projections/BudgetPlanSavingEntryProjection.php
+
+		-
+			message: '#^Call to an undefined method App\\Presentation\\BudgetPlan\\BudgetPlanWantEntry\:\:fromEvent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Presentation/BudgetPlan/Projections/BudgetPlanWantEntryProjection.php
+
+		-
+			message: '#^Method App\\Presentation\\BudgetPlan\\Queries\\GetACalendarWithItsBudgetPlansFinancialRatiosByYear\:\:getDate\(\) should return DateTimeImmutable but returns DateTimeImmutable\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Presentation/BudgetPlan/Queries/GetACalendarWithItsBudgetPlansFinancialRatiosByYear.php
+
+		-
+			message: '#^Cannot access offset 1\|2\|3\|4\|5\|6\|7\|8\|9\|10\|11\|12 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Presentation/BudgetPlan/Queries/ListBudgetPlansCalendarHandler.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$incomeName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanIncomeEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanIncomeEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$needAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$needName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanNeedEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanNeedEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$savingAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$savingName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanSavingEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanSavingEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$category \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$uuid \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$wantAmount \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Property App\\Presentation\\BudgetPlan\\Views\\BudgetPlanWantEntryView\:\:\$wantName \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Presentation/BudgetPlan/Views/BudgetPlanWantEntryView.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Presentation/User/Cli/ReplayAUserCommand.php
+
+		-
+			message: '#^Property App\\Presentation\\User\\Cli\\ReplayAUserCommand\:\:\$defaultName has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Presentation/User/Cli/ReplayAUserCommand.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Presentation/User/Cli/RewindAUserCommand.php
+
+		-
+			message: '#^Property App\\Presentation\\User\\Cli\\RewindAUserCommand\:\:\$defaultName has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Presentation/User/Cli/RewindAUserCommand.php
+
+		-
+			message: '#^Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and ''&''\|''\?'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Presentation/User/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''email\='' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Presentation/User/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
+
+		-
+			message: '#^Cannot access offset ''languagePreference'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Presentation/User/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
+
+		-
+			message: '#^Cannot access offset ''platform'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Presentation/User/HTTP/Controllers/SignUpOrAuthenticateAGoogleUserController.php
+
+		-
+			message: '#^Method App\\Presentation\\User\\UserView\:\:getRoles\(\) should return array\<string\> but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Presentation/User/UserView.php
+
+		-
+			message: '#^Method App\\Presentation\\User\\UserView\:\:getUserIdentifier\(\) should return non\-empty\-string but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Presentation/User/UserView.php
+
+		-
 			message: '#^Property App\\Libraries\\FluxCapacitor\\EventStore\\Services\\RequestIdProvider\:\:\$requestId \(string\) does not accept string\|null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -700,64 +1024,88 @@ parameters:
 			message: '#^Cannot access an offset on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/UserContext/Application/Handlers/CommandHandlers/SignUpAUserCommandHandler.php
+			path: src/UserContext/Application/Commands/SignUpAUserHandler.php
 
 		-
 			message: '#^Cannot access offset ''context'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/UserContext/Domain/Aggregates/User.php
+			path: src/UserContext/Domain/User.php
 
 		-
 			message: '#^Cannot access offset ''contextId'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/UserContext/Domain/Aggregates/User.php
+			path: src/UserContext/Domain/User.php
 
 		-
-			message: '#^Method App\\UserContext\\Domain\\Aggregates\\User\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
+			message: '#^Method App\\UserContext\\Domain\\User\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/UserContext/Domain/Aggregates/User.php
+			path: src/UserContext/Domain/User.php
 
 		-
-			message: '#^Property App\\UserContext\\Domain\\Aggregates\\User\:\:\$providerUserId \(string\) does not accept mixed\.$#'
+			message: '#^Property App\\UserContext\\Domain\\User\:\:\$providerUserId \(string\) does not accept mixed\.$#'
 			identifier: assign.propertyType
 			count: 1
-			path: src/UserContext/Domain/Aggregates/User.php
+			path: src/UserContext/Domain/User.php
 
 		-
-			message: '#^Property App\\UserContext\\Domain\\Aggregates\\User\:\:\$roles \(array\) does not accept mixed\.$#'
+			message: '#^Property App\\UserContext\\Domain\\User\:\:\$roles \(array\) does not accept mixed\.$#'
 			identifier: assign.propertyType
 			count: 1
-			path: src/UserContext/Domain/Aggregates/User.php
+			path: src/UserContext/Domain/User.php
 
 		-
 			message: '#^Cannot access offset ''isRegistered'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 3
-			path: src/UserContext/Domain/Aggregates/UserEmailRegistry.php
+			path: src/UserContext/Domain/UserEmailRegistry.php
 
 		-
 			message: '#^Cannot access offset ''userId'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/UserContext/Domain/Aggregates/UserEmailRegistry.php
+			path: src/UserContext/Domain/UserEmailRegistry.php
 
 		-
-			message: '#^Method App\\UserContext\\Domain\\Aggregates\\UserEmailRegistry\:\:getEmailOwner\(\) should return string\|null but returns mixed\.$#'
+			message: '#^Method App\\UserContext\\Domain\\UserEmailRegistry\:\:getEmailOwner\(\) should return string\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/UserContext/Domain/Aggregates/UserEmailRegistry.php
+			path: src/UserContext/Domain/UserEmailRegistry.php
 
 		-
-			message: '#^Method App\\UserContext\\Domain\\Aggregates\\UserEmailRegistry\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
+			message: '#^Method App\\UserContext\\Domain\\UserEmailRegistry\:\:getKeyByUserId\(\) should return string\|null but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/UserContext/Domain/Aggregates/UserEmailRegistry.php
+			path: src/UserContext/Domain/UserEmailRegistry.php
 
 		-
-			message: '#^Property App\\UserContext\\Domain\\Entities\\UserOAuth\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			message: '#^Call to method create\(\) on an unknown class Lexik\\Bundle\\JWTAuthenticationBundle\\Services\\JWTTokenManager\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/UserContext/Infrastructure/Adapters/JWTTokenManagerAdapter.php
+
+		-
+			message: '#^Method App\\UserContext\\Infrastructure\\Adapters\\JWTTokenManagerAdapter\:\:create\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/UserContext/Infrastructure/Adapters/JWTTokenManagerAdapter.php
+
+		-
+			message: '#^Parameter \$JWTTokenManager of method App\\UserContext\\Infrastructure\\Adapters\\JWTTokenManagerAdapter\:\:__construct\(\) has invalid type Lexik\\Bundle\\JWTAuthenticationBundle\\Services\\JWTTokenManager\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/UserContext/Infrastructure/Adapters/JWTTokenManagerAdapter.php
+
+		-
+			message: '#^Property App\\UserContext\\Infrastructure\\Adapters\\JWTTokenManagerAdapter\:\:\$JWTTokenManager has unknown class Lexik\\Bundle\\JWTAuthenticationBundle\\Services\\JWTTokenManager as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/UserContext/Infrastructure/Adapters/JWTTokenManagerAdapter.php
+
+		-
+			message: '#^Property App\\UserContext\\Infrastructure\\Entities\\UserOAuth\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1
-			path: src/UserContext/Domain/Entities/UserOAuth.php
+			path: src/UserContext/Infrastructure/Entities/UserOAuth.php

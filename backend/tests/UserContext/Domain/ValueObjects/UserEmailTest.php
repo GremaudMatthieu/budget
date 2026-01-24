@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\UserContext\Domain\ValueObjects;
 
-use App\UserContext\Domain\ValueObjects\UserEmail;
-use PHPUnit\Framework\TestCase;
+use App\UserContext\Domain\UserEmail;
 use Assert\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
 class UserEmailTest extends TestCase
 {

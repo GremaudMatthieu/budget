@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\UserContext\Domain\Events;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\VersionedDomainEventInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEvent;
+use App\Libraries\FluxCapacitor\EventStore\Ports\VersionedDomainEvent;
 use App\Libraries\FluxCapacitor\EventStore\Traits\VersionedEventTrait;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 
-final class UserEmailReleasedDomainEvent_v1 implements VersionedDomainEventInterface
+final class UserEmailReleasedDomainEvent_v1 implements VersionedDomainEvent
 {
     use VersionedEventTrait;
 
@@ -26,7 +26,7 @@ final class UserEmailReleasedDomainEvent_v1 implements VersionedDomainEventInter
         string $aggregateId,
         string $userId,
         string $email,
-        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
+        string $requestId = DomainEvent::DEFAULT_REQUEST_ID,
     ) {
         $this->aggregateId = $aggregateId;
         $this->userId = $userId;

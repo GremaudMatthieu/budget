@@ -1,5 +1,5 @@
 imports:
-    - { resource: '../../src/Gateway/Config/security.yaml' }
+    - { resource: '../../src/Presentation/Config/security.yaml' }
 
 security:
     password_hashers:

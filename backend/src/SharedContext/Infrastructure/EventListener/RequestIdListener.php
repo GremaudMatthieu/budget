@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\SharedContext\Infrastructure\EventListener;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEvent;
 use App\Libraries\FluxCapacitor\EventStore\Services\RequestIdProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -22,7 +22,7 @@ class RequestIdListener implements EventSubscriberInterface
     {
         $this->requestIdProvider->requestId = $event->getRequest()->headers->get(
             'request-id',
-            DomainEventInterface::DEFAULT_REQUEST_ID,
+            DomainEvent::DEFAULT_REQUEST_ID,
         );
     }
 

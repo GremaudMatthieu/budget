@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\SharedContext\Infrastructure\Adapters;
 
-use App\SharedContext\Domain\Ports\Outbound\UuidGeneratorInterface;
+use App\SharedContext\Domain\Ports\Outbound\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
-final class UuidGeneratorAdapter implements UuidGeneratorInterface
+final class UuidGeneratorAdapter implements UuidGenerator
 {
     public function generate(): string
     {

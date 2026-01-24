@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Tests\UserContext\Domain\Services;
 
-use App\Libraries\FluxCapacitor\Anonymizer\Exceptions\UserEncryptionException;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\EncryptionServiceInterface;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Exceptions\UserEncryption;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EncryptionService as EncryptionServiceInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepository;
 use App\Libraries\FluxCapacitor\Anonymizer\Services\EncryptionService;
 use PHPUnit\Framework\TestCase;
 
 final class EncryptionServiceTest extends TestCase
 {
-    private KeyManagementRepositoryInterface $keyManagementRepository;
+    private KeyManagementRepository $keyManagementRepository;
     private EncryptionServiceInterface $encryptionService;
 
     protected function setUp(): void
     {
-        $this->keyManagementRepository = $this->createMock(KeyManagementRepositoryInterface::class);
+        $this->keyManagementRepository = $this->createMock(KeyManagementRepository::class);
         $this->encryptionService = new EncryptionService($this->keyManagementRepository);
     }
 
@@ -63,7 +63,7 @@ final class EncryptionServiceTest extends TestCase
 
     public function testEncryptThrowsExceptionOnFailure(): void
     {
-        $this->expectException(UserEncryptionException::class);
+        $this->expectException(UserEncryption::class);
 
         $userId = 'user123';
         $data = 'sensitive data';

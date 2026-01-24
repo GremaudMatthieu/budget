@@ -11,27 +11,27 @@ use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRenamedDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeReplayedDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeRewoundDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeTargetedAmountChangedDomainEvent_v1;
-use App\BudgetEnvelopeContext\Domain\Ports\Inbound\BudgetEnvelopeViewRepositoryInterface;
-use App\Gateway\BudgetEnvelope\Projections\BudgetEnvelopeProjection;
-use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopeView;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
+use App\Presentation\BudgetEnvelope\Projections\BudgetEnvelopeProjection;
+use App\Presentation\BudgetEnvelope\Views\BudgetEnvelopeView;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptor;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepository;
+use App\Presentation\BudgetEnvelope\BudgetEnvelopeFinder;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class BudgetEnvelopeProjectionTest extends TestCase
 {
-    private BudgetEnvelopeViewRepositoryInterface&MockObject $envelopeViewRepository;
+    private BudgetEnvelopeFinder&MockObject $envelopeViewRepository;
     private BudgetEnvelopeProjection $budgetEnvelopeProjection;
-    private KeyManagementRepositoryInterface&MockObject $keyManagementRepository;
-    private EventEncryptorInterface&MockObject $eventEncryptor;
+    private KeyManagementRepository&MockObject $keyManagementRepository;
+    private EventEncryptor&MockObject $eventEncryptor;
 
     protected function setUp(): void
     {
-        $this->envelopeViewRepository = $this->createMock(BudgetEnvelopeViewRepositoryInterface::class);
-        $this->eventEncryptor = $this->createMock(EventEncryptorInterface::class);
-        $this->keyManagementRepository = $this->createMock(KeyManagementRepositoryInterface::class);
+        $this->envelopeViewRepository = $this->createMock(BudgetEnvelopeFinder::class);
+        $this->eventEncryptor = $this->createMock(EventEncryptor::class);
+        $this->keyManagementRepository = $this->createMock(KeyManagementRepository::class);
         $this->budgetEnvelopeProjection = new BudgetEnvelopeProjection(
             $this->envelopeViewRepository,
             $this->keyManagementRepository,

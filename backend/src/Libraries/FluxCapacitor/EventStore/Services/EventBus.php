@@ -2,7 +2,7 @@
 
 namespace App\Libraries\FluxCapacitor\EventStore\Services;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\EventBusInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventBus as EventBusInterface;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 

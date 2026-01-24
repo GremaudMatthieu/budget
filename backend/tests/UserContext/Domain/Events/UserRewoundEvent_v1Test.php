@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\UserContext\Domain\Events;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEvent;
 use App\UserContext\Domain\Events\UserRewoundDomainEvent_v1;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +29,7 @@ class UserRewoundEvent_v1Test extends TestCase
         $this->assertEquals(
             [
                 'aggregateId' => 'aggregateId',
-                'requestId' => DomainEventInterface::DEFAULT_REQUEST_ID,
+                'requestId' => DomainEvent::DEFAULT_REQUEST_ID,
                 'userId' => 'aggregateId',
                 'email' => 'email',
                 'firstname' => 'firstname',

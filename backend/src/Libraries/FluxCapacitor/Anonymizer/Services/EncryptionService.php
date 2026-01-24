@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Libraries\FluxCapacitor\Anonymizer\Services;
 
-use App\Libraries\FluxCapacitor\Anonymizer\Exceptions\UserEncryptionException;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\EncryptionServiceInterface;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Exceptions\UserEncryption;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EncryptionService as EncryptionServiceInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepository;
 use App\Libraries\FluxCapacitor\Anonymizer\Traits\EncryptedKeyCacheTrait;
 
 final class EncryptionService implements EncryptionServiceInterface
@@ -17,7 +17,7 @@ final class EncryptionService implements EncryptionServiceInterface
     private const int IV_SIZE = 12;
     private const int TAG_SIZE = 16;
 
-    public function __construct(private readonly KeyManagementRepositoryInterface $keyManagementRepository)
+    public function __construct(private readonly KeyManagementRepository $keyManagementRepository)
     {
     }
 
@@ -39,7 +39,7 @@ final class EncryptionService implements EncryptionServiceInterface
 
 
         if (false === $ciphertext) {
-            throw UserEncryptionException::fromEncryptFailure();
+            throw UserEncryption::fromEncryptFailure();
         }
 
         return [
@@ -61,7 +61,7 @@ final class EncryptionService implements EncryptionServiceInterface
         );
 
         if (false === $plaintext) {
-            throw UserEncryptionException::fromDecryptFailure();
+            throw UserEncryption::fromDecryptFailure();
         }
 
         return $plaintext;
@@ -82,7 +82,7 @@ final class EncryptionService implements EncryptionServiceInterface
         }
 
         if (null === $key) {
-            throw UserEncryptionException::fromGetKeyFailure();
+            throw UserEncryption::fromGetKeyFailure();
         }
 
         $this->storeKeyByUserId($userId, $key);

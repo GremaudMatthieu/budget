@@ -1,5 +1,5 @@
 imports:
-    resource: '../src/Gateway/Config/routes.yaml'
+    resource: '../src/Presentation/Config/routes.yaml'
 
 api_login_check:
     path: /api/login_check

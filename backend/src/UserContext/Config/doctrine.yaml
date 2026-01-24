@@ -4,8 +4,8 @@ doctrine:
       UserOAuth:
         type: attribute
         is_bundle: false
-        dir: '%kernel.project_dir%/src/UserContext/Domain/Entities'
-        prefix: 'App\UserContext\Domain\Entities'
+        dir: '%kernel.project_dir%/src/UserContext/Domain'
+        prefix: 'App\UserContext\Domain'
         alias: UserOAuth
       RefreshToken:
         type: attribute

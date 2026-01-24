@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Gateway\BudgetEnvelope\Views;
 
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent_v1;
-use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopesPaginated;
-use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopeView;
+use App\Presentation\BudgetEnvelope\Views\BudgetEnvelopesPaginated;
+use App\Presentation\BudgetEnvelope\Views\BudgetEnvelopeView;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use PHPUnit\Framework\TestCase;
 

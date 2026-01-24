@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\BudgetPlanContext\Domain\Events;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\VersionedDomainEventInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEvent;
+use App\Libraries\FluxCapacitor\EventStore\Ports\VersionedDomainEvent;
 use App\Libraries\FluxCapacitor\EventStore\Traits\VersionedEventTrait;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 
-final class BudgetPlanWantRemovedDomainEvent_v1 implements VersionedDomainEventInterface
+final class BudgetPlanWantRemovedDomainEvent_v1 implements VersionedDomainEvent
 {
     use VersionedEventTrait;
 
@@ -26,7 +26,7 @@ final class BudgetPlanWantRemovedDomainEvent_v1 implements VersionedDomainEventI
         string $aggregateId,
         string $uuid,
         string $userId,
-        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
+        string $requestId = DomainEvent::DEFAULT_REQUEST_ID,
     ) {
         $this->aggregateId = $aggregateId;
         $this->uuid = $uuid;

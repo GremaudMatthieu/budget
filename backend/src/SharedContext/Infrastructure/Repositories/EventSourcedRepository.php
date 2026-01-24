@@ -2,23 +2,23 @@
 
 namespace App\SharedContext\Infrastructure\Repositories;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
-use App\SharedContext\Domain\Ports\Inbound\EventSourcedRepositoryInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRoot;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventStore;
+use App\SharedContext\Domain\Ports\Inbound\EventSourcedRepository as EventSourcedRepositoryInterface;
 
 final readonly class EventSourcedRepository implements EventSourcedRepositoryInterface
 {
-    public function __construct(private EventStoreInterface $eventStore)
+    public function __construct(private EventStore $eventStore)
     {
     }
 
     #[\Override]
-    public function get(string $aggregateId, ?\DateTimeImmutable $desiredDateTime = null): AggregateRootInterface
+    public function get(string $aggregateId, ?\DateTimeImmutable $desiredDateTime = null): AggregateRoot
     {
         return $this->eventStore->load($aggregateId, $desiredDateTime);
     }
 
-    public function trackAggregate(AggregateRootInterface $aggregate): void
+    public function trackAggregate(AggregateRoot $aggregate): void
     {
         $this->eventStore->trackAggregate($aggregate);
     }
@@ -38,7 +38,7 @@ final readonly class EventSourcedRepository implements EventSourcedRepositoryInt
     }
 
     #[\Override]
-    public function save(AggregateRootInterface $aggregate): void
+    public function save(AggregateRoot $aggregate): void
     {
         $this->eventStore->save($aggregate);
     }

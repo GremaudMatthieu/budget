@@ -1,0 +1,17 @@
+budget_envelope_routes:
+  resource:
+    path: ../BudgetEnvelope/HTTP/Controllers/
+    namespace: App\Presentation\BudgetEnvelope\HTTP\Controllers
+  type: attribute
+
+budget_plan_routes:
+  resource:
+    path: ../BudgetPlan/HTTP/Controllers/
+    namespace: App\Presentation\BudgetPlan\HTTP\Controllers
+  type: attribute
+
+user_routes:
+  resource:
+    path: ../User/HTTP/Controllers/
+    namespace: App\Presentation\User\HTTP\Controllers
+  type: attribute

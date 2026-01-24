@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Libraries\FluxCapacitor\EventStore\Services;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\SnapshotableAggregateInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRoot;
+use App\Libraries\FluxCapacitor\EventStore\Ports\SnapshotableAggregate;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 use Doctrine\DBAL\Connection;
 
@@ -17,12 +17,12 @@ final readonly class SnapshotService
     ) {
     }
 
-    public function shouldCreateSnapshot(AggregateRootInterface $aggregate): bool
+    public function shouldCreateSnapshot(AggregateRoot $aggregate): bool
     {
         return 0 === $aggregate->aggregateVersion() % $this->snapshotFrequency;
     }
 
-    public function saveSnapshot(SnapshotableAggregateInterface $aggregate): void
+    public function saveSnapshot(SnapshotableAggregate $aggregate): void
     {
         $snapshotData = $aggregate->createSnapshot();
 
@@ -54,7 +54,7 @@ final readonly class SnapshotService
         ];
     }
 
-    private function getAggregateType(AggregateRootInterface $aggregate): string
+    private function getAggregateType(AggregateRoot $aggregate): string
     {
         return new \ReflectionClass($aggregate)->getShortName();
     }

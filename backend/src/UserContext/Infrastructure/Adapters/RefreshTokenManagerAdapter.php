@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\UserContext\Infrastructure\Adapters;
 
-use App\UserContext\Domain\Ports\Outbound\RefreshTokenManagerInterface;
+use App\UserContext\Domain\RefreshTokenManager;
 use Doctrine\DBAL\Connection;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenInterface;
-use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface as JWTRefreshTokenManagerInterface;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManager as JWTRefreshTokenManager;
 
-final readonly class RefreshTokenManagerAdapter implements RefreshTokenManagerInterface
+final readonly class RefreshTokenManagerAdapter implements RefreshTokenManager
 {
     public function __construct(
-        private JWTRefreshTokenManagerInterface $refreshTokenManager,
+        private JWTRefreshTokenManager $refreshTokenManager,
         private Connection $connection,
     ) {
     }

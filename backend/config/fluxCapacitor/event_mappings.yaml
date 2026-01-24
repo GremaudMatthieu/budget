@@ -39,12 +39,12 @@ events:
   UserEmailReleasedDomainEvent_v1: App\UserContext\Domain\Events\UserEmailReleasedDomainEvent_v1
 
 aggregates:
-  BudgetEnvelope: App\BudgetEnvelopeContext\Domain\Aggregates\BudgetEnvelope
-  BudgetPlan: App\BudgetPlanContext\Domain\Aggregates\BudgetPlan
-  BudgetPlanDateRegistry: App\BudgetPlanContext\Domain\Aggregates\BudgetPlanDateRegistry
-  BudgetEnvelopeNameRegistry: App\BudgetEnvelopeContext\Domain\Aggregates\BudgetEnvelopeNameRegistry
-  User: App\UserContext\Domain\Aggregates\User
-  UserEmailRegistry: App\UserContext\Domain\Aggregates\UserEmailRegistry
+  BudgetEnvelope: App\BudgetEnvelopeContext\Domain\BudgetEnvelope
+  BudgetPlan: App\BudgetPlanContext\Domain\BudgetPlan
+  BudgetPlanDateRegistry: App\BudgetPlanContext\Domain\BudgetPlanDateRegistry
+  BudgetEnvelopeNameRegistry: App\BudgetEnvelopeContext\Domain\BudgetEnvelopeNameRegistry
+  User: App\UserContext\Domain\User
+  UserEmailRegistry: App\UserContext\Domain\UserEmailRegistry
 
 event_to_aggregate:
   BudgetEnvelopeNameRegisteredDomainEvent_v1: BudgetEnvelopeNameRegistry
@@ -87,27 +87,27 @@ event_to_aggregate:
   UserEmailReleasedDomainEvent_v1: UserEmailRegistry
 
 projections:
-  App\Gateway\BudgetEnvelope\Projections\BudgetEnvelopeProjection:
+  App\Presentation\BudgetEnvelope\Projections\BudgetEnvelopeProjection:
     table: budget_envelope_view
     aggregate: BudgetEnvelope
-  App\Gateway\BudgetEnvelope\Projections\BudgetEnvelopeLedgerEntryProjection:
+  App\Presentation\BudgetEnvelope\Projections\BudgetEnvelopeLedgerEntryProjection:
     table: budget_envelope_ledger_entry_view
     aggregate: BudgetEnvelope
-  App\Gateway\User\Projections\UserProjection:
+  App\Presentation\User\Projections\UserProjection:
     table: user_view
     aggregate: User
-  App\Gateway\BudgetPlan\Projections\BudgetPlanProjection:
+  App\Presentation\BudgetPlan\Projections\BudgetPlanProjection:
     table: budget_plan_view
     aggregate: BudgetPlan
-  App\Gateway\BudgetPlan\Projections\BudgetPlanIncomeEntryProjection:
+  App\Presentation\BudgetPlan\Projections\BudgetPlanIncomeEntryProjection:
     table: budget_plan_income_entry_view
     aggregate: BudgetPlan
-  App\Gateway\BudgetPlan\Projections\BudgetPlanNeedEntryProjection:
+  App\Presentation\BudgetPlan\Projections\BudgetPlanNeedEntryProjection:
     table: budget_plan_need_entry_view
     aggregate: BudgetPlan
-  App\Gateway\BudgetPlan\Projections\BudgetPlanSavingEntryProjection:
+  App\Presentation\BudgetPlan\Projections\BudgetPlanSavingEntryProjection:
     table: budget_plan_saving_entry_view
     aggregate: BudgetPlan
-  App\Gateway\BudgetPlan\Projections\BudgetPlanWantEntryProjection:
+  App\Presentation\BudgetPlan\Projections\BudgetPlanWantEntryProjection:
     table: budget_plan_want_entry_view
     aggregate: BudgetPlan

@@ -2,11 +2,11 @@
 
 namespace App\Libraries\FluxCapacitor\EventStore\Traits;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRoot;
 
 trait AggregateTrackerTrait
 {
-    /** @var array<string, AggregateRootInterface> */
+    /** @var array<string, AggregateRoot> */
     private array $trackedAggregates = [];
 
     public function getTrackedAggregates(): array
@@ -19,7 +19,7 @@ trait AggregateTrackerTrait
         $this->trackedAggregates = [];
     }
 
-    public function trackAggregate(AggregateRootInterface $aggregate): void
+    public function trackAggregate(AggregateRoot $aggregate): void
     {
         $this->trackedAggregates[$aggregate->getAggregateId()] = $aggregate;
     }
@@ -31,7 +31,7 @@ trait AggregateTrackerTrait
         }
     }
 
-    private function untrackAggregate(AggregateRootInterface $aggregate): void
+    private function untrackAggregate(AggregateRoot $aggregate): void
     {
         unset($this->trackedAggregates[$aggregate->getAggregateId()]);
     }

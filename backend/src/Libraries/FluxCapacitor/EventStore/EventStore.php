@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Libraries\FluxCapacitor\EventStore;
 
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
-use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregateException;
-use App\Libraries\FluxCapacitor\EventStore\Exceptions\PublishDomainEventsException;
-use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRootInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\EventBusInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\EventStoreInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\EventUpcastingServiceInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\SnapshotableAggregateInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptor;
+use App\Libraries\FluxCapacitor\EventStore\Exceptions\EventsNotFoundForAggregate;
+use App\Libraries\FluxCapacitor\EventStore\Exceptions\PublishDomainEvents;
+use App\Libraries\FluxCapacitor\EventStore\Ports\AggregateRoot;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEvent;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventBus;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMap;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventStore as EventStoreInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventUpcastingService;
+use App\Libraries\FluxCapacitor\EventStore\Ports\SnapshotableAggregate;
 use App\Libraries\FluxCapacitor\EventStore\Services\RequestIdProvider;
 use App\Libraries\FluxCapacitor\EventStore\Services\SnapshotService;
 use App\Libraries\FluxCapacitor\EventStore\Traits\AggregateTrackerTrait;
@@ -28,11 +28,11 @@ final class EventStore implements EventStoreInterface
 
     public function __construct(
         private readonly Connection $connection,
-        private readonly EventBusInterface $eventBus,
+        private readonly EventBus $eventBus,
         private readonly RequestIdProvider $requestIdProvider,
-        private readonly EventClassMapInterface $eventClassMap,
-        private readonly EventEncryptorInterface $eventEncryptor,
-        private readonly EventUpcastingServiceInterface $upcastingService,
+        private readonly EventClassMap $eventClassMap,
+        private readonly EventEncryptor $eventEncryptor,
+        private readonly EventUpcastingService $upcastingService,
         private readonly SnapshotService $snapshotService,
     ) {
     }
@@ -41,14 +41,14 @@ final class EventStore implements EventStoreInterface
      * @throws Exception
      */
     #[\Override]
-    public function load(string $uuid, ?\DateTimeImmutable $desiredDateTime = null): AggregateRootInterface
+    public function load(string $uuid, ?\DateTimeImmutable $desiredDateTime = null): AggregateRoot
     {
         if (!$desiredDateTime) {
             $aggregateType = $this->guessAggregateType($uuid);
             $snapshot = $this->snapshotService->loadSnapshot($uuid, $aggregateType);
 
             if ($snapshot) {
-                /** @var AggregateRootInterface $aggregateClass */
+                /** @var AggregateRoot $aggregateClass */
                 $aggregateClass = $this->eventClassMap->getAggregatePathByByStreamName($aggregateType);
                 $aggregate = $aggregateClass::fromSnapshot($snapshot['data'], $snapshot['version']);
                 $eventsAfterSnapshot = $this->getEventsAfterVersion($uuid, $snapshot['version']);
@@ -116,12 +116,12 @@ final class EventStore implements EventStoreInterface
             $this->connection->commit();
         } catch (Exception) {
             $this->connection->rollBack();
-            throw new PublishDomainEventsException();
+            throw new PublishDomainEvents();
         }
     }
 
     #[\Override]
-    public function save(AggregateRootInterface $aggregate): void
+    public function save(AggregateRoot $aggregate): void
     {
         try {
             $this->connection->beginTransaction();
@@ -151,14 +151,14 @@ final class EventStore implements EventStoreInterface
             $aggregate->clearRaisedDomainEvents();
             $aggregate->clearKeys();
 
-            if ($aggregate instanceof SnapshotableAggregateInterface
+            if ($aggregate instanceof SnapshotableAggregate
                 && $this->snapshotService->shouldCreateSnapshot($aggregate)) {
                 $this->snapshotService->saveSnapshot($aggregate);
             }
 
         } catch (Exception $e) {
             $this->connection->rollBack();
-            throw new PublishDomainEventsException();
+            throw new PublishDomainEvents();
         }
         $this->untrackAggregate($aggregate);
     }
@@ -183,17 +183,17 @@ final class EventStore implements EventStoreInterface
     private function createAggregateFromEvents(
         \Traversable $eventsIterator,
         string $uuid,
-    ): AggregateRootInterface {
+    ): AggregateRoot {
         $eventsIterator->rewind();
 
         if (!$eventsIterator->valid()) {
             $errorMessage = "No events found for aggregate {$uuid}";
-            throw new EventsNotFoundForAggregateException($errorMessage);
+            throw new EventsNotFoundForAggregate($errorMessage);
         }
 
         $firstEvent = $eventsIterator->current();
         $streamName = $firstEvent['stream_name'];
-        /** @var AggregateRootInterface $aggregatePath * */
+        /** @var AggregateRoot $aggregatePath * */
         $aggregatePath = $this->eventClassMap->getAggregatePathByByStreamName($streamName);
         $aggregate = $aggregatePath::empty();
         $version = (int) $firstEvent['stream_version'];
@@ -212,12 +212,12 @@ final class EventStore implements EventStoreInterface
         return $aggregate;
     }
 
-    private function processEventForAggregate(array $eventData, AggregateRootInterface $aggregate): void
+    private function processEventForAggregate(array $eventData, AggregateRoot $aggregate): void
     {
         $eventData = $this->upcastingService->upcastEvent($eventData);
         $eventPath = $this->eventClassMap->getEventPathByClassName($eventData['event_name']);
         $payload = $this->getEventPayload($eventData, $eventPath);
-        /** @var DomainEventInterface $eventPath */
+        /** @var DomainEvent $eventPath */
         $domainEvent = $eventPath::fromArray($payload);
         $methodName = sprintf('apply%s', new \ReflectionClass($domainEvent)->getShortName());
         $aggregate->$methodName($domainEvent);
@@ -225,7 +225,7 @@ final class EventStore implements EventStoreInterface
 
     private function getEventPayload(array $eventData, string $eventPath): array
     {
-        if (is_subclass_of($eventPath, DomainEventInterface::class)) {
+        if (is_subclass_of($eventPath, DomainEvent::class)) {
             $decodedPayload = json_decode(
                 $eventData['payload'],
                 true,
@@ -264,7 +264,7 @@ final class EventStore implements EventStoreInterface
         return $queryBuilder->executeQuery()->iterateAssociative();
     }
 
-    private function applyEventsToAggregate(AggregateRootInterface $aggregate, \Traversable $events): void
+    private function applyEventsToAggregate(AggregateRoot $aggregate, \Traversable $events): void
     {
         foreach ($events as $eventData) {
             $this->processEventForAggregate($eventData, $aggregate);

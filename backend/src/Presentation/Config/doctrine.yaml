@@ -1,0 +1,21 @@
+doctrine:
+  orm:
+    mappings:
+      BudgetPlanView:
+        type: attribute
+        is_bundle: false
+        dir: '%kernel.project_dir%/src/Presentation/BudgetPlan/Views'
+        prefix: 'App\Presentation\BudgetPlan\Views'
+        alias: BudgetPlanView
+      EnvelopeView:
+        type: attribute
+        is_bundle: false
+        dir: '%kernel.project_dir%/src/Presentation/BudgetEnvelope/Views'
+        prefix: 'App\Presentation\BudgetEnvelope\Views'
+        alias: EnvelopeView
+      UserView:
+        type: attribute
+        is_bundle: false
+        dir: '%kernel.project_dir%/src/Presentation/User/Views'
+        prefix: 'App\Presentation\User\Views'
+        alias: UserView

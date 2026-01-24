@@ -18,30 +18,30 @@ services:
       $connection: '@doctrine.dbal.default_connection'
       $snapshotFrequency: 50
 
-  App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistryInterface:
+  App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistry:
     class: App\Libraries\FluxCapacitor\ProjectionManager\Services\ProjectionRegistry
     arguments:
-      $eventClassMap: '@App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface'
+      $eventClassMap: '@App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMap'
 
-  App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface:
+  App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManager:
     class: App\Libraries\FluxCapacitor\ProjectionManager\Services\ProjectionManager
     arguments:
-      $eventClassMap: '@App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface'
-      $projectionRegistry: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistryInterface'
+      $eventClassMap: '@App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMap'
+      $projectionRegistry: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistry'
       $connection: '@doctrine.dbal.default_connection'
       $container: '@service_container'
 
   App\Libraries\FluxCapacitor\ProjectionManager\Console\ProjectionReplayCommand:
     arguments:
-      $projectionManager: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface'
+      $projectionManager: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManager'
     tags: ['console.command']
 
   App\Libraries\FluxCapacitor\ProjectionManager\Console\ProjectionResetCommand:
     arguments:
-      $projectionManager: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface'
+      $projectionManager: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManager'
     tags: ['console.command']
 
   App\Libraries\FluxCapacitor\ProjectionManager\Console\ProjectionStatusCommand:
     arguments:
-      $projectionManager: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface'
+      $projectionManager: '@App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManager'
     tags: ['console.command']

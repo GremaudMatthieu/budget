@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Libraries\FluxCapacitor\Anonymizer\Services;
 
 use App\Libraries\FluxCapacitor\Anonymizer\Attributes\PersonalData;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\AbstractUserSignedUpDomainEventInterface;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\EncryptionServiceInterface;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\AbstractUserSignedUpDomainEvent;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EncryptionService;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptor as EventEncryptorInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEvent;
 
 final readonly class EventEncryptor implements EventEncryptorInterface
 {
-    public function __construct(private EncryptionServiceInterface $encryptionService)
+    public function __construct(private EncryptionService $encryptionService)
     {
     }
 
-    public function encrypt(DomainEventInterface $event, string $userId): DomainEventInterface
+    public function encrypt(DomainEvent $event, string $userId): DomainEvent
     {
         $reflection = new \ReflectionClass($event);
         foreach ($reflection->getProperties() as $property) {
@@ -28,7 +28,7 @@ final readonly class EventEncryptor implements EventEncryptorInterface
                     $encrypted = $this->encryptionService->encrypt(
                         (string) $value,
                         $userId,
-                        $event instanceof AbstractUserSignedUpDomainEventInterface,
+                        $event instanceof AbstractUserSignedUpDomainEvent,
                     );
                     $property->setValue($event, json_encode($encrypted));
                 }
@@ -38,7 +38,7 @@ final readonly class EventEncryptor implements EventEncryptorInterface
         return $event;
     }
 
-    public function decrypt(DomainEventInterface $event, string $userId): DomainEventInterface
+    public function decrypt(DomainEvent $event, string $userId): DomainEvent
     {
         $reflection = new \ReflectionClass($event);
 

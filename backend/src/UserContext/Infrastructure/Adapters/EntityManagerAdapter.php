@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\UserContext\Infrastructure\Adapters;
 
-use App\UserContext\Domain\Ports\Outbound\EntityManagerInterface;
-use Doctrine\ORM\EntityManagerInterface as DoctrineEntityManagerInterface;
+use App\UserContext\Domain\EntityManager;
+use Doctrine\ORM\EntityManager as DoctrineEntityManager;
 
-final readonly class EntityManagerAdapter implements EntityManagerInterface
+final readonly class EntityManagerAdapter implements EntityManager
 {
-    public function __construct(private DoctrineEntityManagerInterface $entityManager)
+    public function __construct(private DoctrineEntityManager $entityManager)
     {
     }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Libraries\FluxCapacitor\Anonymizer\Repositories;
 
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepository as KeyManagementRepositoryInterface;
 use Doctrine\DBAL\Connection;
 
 final readonly class KeyManagementRepository implements KeyManagementRepositoryInterface

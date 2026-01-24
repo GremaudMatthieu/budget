@@ -1,0 +1,47 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  App\Presentation\User\HTTP\Controllers\:
+    resource: '../User/HTTP/Controllers'
+    tags: ['controller.service_arguments']
+
+  App\Presentation\BudgetEnvelope\HTTP\Controllers\:
+    resource: '../BudgetEnvelope/HTTP/Controllers'
+    tags: ['controller.service_arguments']
+
+  App\Presentation\BudgetPlan\HTTP\Controllers\:
+    resource: '../BudgetPlan/HTTP/Controllers'
+    tags: ['controller.service_arguments']
+
+  App\Presentation\BudgetEnvelope\Cli\:
+    resource: '../BudgetEnvelope/Cli/'
+    tags: [ 'console.command' ]
+
+  App\Presentation\User\Cli\:
+    resource: '../User/Cli/'
+    tags: [ 'console.command' ]
+
+  App\Presentation\BudgetEnvelope\Projections\:
+    resource: '../BudgetEnvelope/Projections/'
+    tags: [ 'messenger.message_handler' ]
+    public: true
+
+  App\Presentation\BudgetPlan\Projections\:
+    resource: '../BudgetPlan/Projections/'
+    tags: [ 'messenger.message_handler' ]
+    public: true
+
+  App\Presentation\User\Projections\:
+    resource: '../User/Projections/'
+    tags: [ 'messenger.message_handler' ]
+    public: true
+
+  App\Presentation\BudgetEnvelope\Queries\:
+    resource: '../BudgetEnvelope/Queries/'
+    tags: [ 'messenger.message_handler' ]
+
+  App\Presentation\BudgetPlan\Queries\:
+    resource: '../BudgetPlan/Queries/'
+    tags: [ 'messenger.message_handler' ]

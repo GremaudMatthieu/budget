@@ -14,5 +14,5 @@ services:
 
   App\SharedContext\Infrastructure\Services\BudgetAppEventUpcastingService: ~
   
-  App\Libraries\FluxCapacitor\EventStore\Ports\EventUpcastingServiceInterface:
+  App\Libraries\FluxCapacitor\EventStore\Ports\EventUpcastingService:
     alias: App\SharedContext\Infrastructure\Services\BudgetAppEventUpcastingService

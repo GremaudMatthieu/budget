@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Gateway\BudgetEnvelope\Views;
 
-use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopeLedgerEntryView;
+use App\Presentation\BudgetEnvelope\Views\BudgetEnvelopeLedgerEntryView;
 use PHPUnit\Framework\TestCase;
 
 class BudgetEnvelopeLedgerEntryViewTest extends TestCase

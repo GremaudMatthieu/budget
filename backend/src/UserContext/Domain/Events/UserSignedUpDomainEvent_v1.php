@@ -3,13 +3,13 @@
 namespace App\UserContext\Domain\Events;
 
 use App\Libraries\FluxCapacitor\Anonymizer\Attributes\PersonalData;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\AbstractUserSignedUpDomainEventInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\VersionedDomainEventInterface;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\AbstractUserSignedUpDomainEvent;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEvent;
+use App\Libraries\FluxCapacitor\EventStore\Ports\VersionedDomainEvent;
 use App\Libraries\FluxCapacitor\EventStore\Traits\VersionedEventTrait;
 use App\SharedContext\Domain\ValueObjects\UtcClock;
 
-final class UserSignedUpDomainEvent_v1 implements AbstractUserSignedUpDomainEventInterface, VersionedDomainEventInterface
+final class UserSignedUpDomainEvent_v1 implements AbstractUserSignedUpDomainEvent, VersionedDomainEvent
 {
     use VersionedEventTrait;
 
@@ -48,7 +48,7 @@ final class UserSignedUpDomainEvent_v1 implements AbstractUserSignedUpDomainEven
         string $providerUserId,
         string $contextId,
         string $context,
-        string $requestId = DomainEventInterface::DEFAULT_REQUEST_ID,
+        string $requestId = DomainEvent::DEFAULT_REQUEST_ID,
     ) {
         $this->aggregateId = $aggregateId;
         $this->email = $email;

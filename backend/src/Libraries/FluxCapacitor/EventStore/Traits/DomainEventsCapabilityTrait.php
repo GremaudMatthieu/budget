@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Libraries\FluxCapacitor\EventStore\Traits;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEventInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\DomainEvent;
 
 trait DomainEventsCapabilityTrait
 {
     private array $events = [];
 
-    protected function raiseDomainEvent(DomainEventInterface $event): void
+    protected function raiseDomainEvent(DomainEvent $event): void
     {
         $this->{sprintf('apply%s', new \ReflectionClass($event)->getShortName())}($event);
         $this->events[] = $event;

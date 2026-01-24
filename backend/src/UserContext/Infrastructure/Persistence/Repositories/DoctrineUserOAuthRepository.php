@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\UserContext\Infrastructure\Persistence\Repositories;
 
-use App\UserContext\Domain\Entities\UserOAuth;
-use App\UserContext\Domain\Ports\Inbound\UserOAuthRepositoryInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\UserContext\Domain\UserOAuthRepository;
+use App\UserContext\Infrastructure\Entities\UserOAuth;
+use Doctrine\ORM\EntityManager;
 
-final readonly class DoctrineUserOAuthRepository implements UserOAuthRepositoryInterface
+final readonly class DoctrineUserOAuthRepository implements UserOAuthRepository
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private EntityManager $entityManager,
     ) {
     }
 

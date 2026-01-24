@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Gateway\User\Views;
 
-use App\Gateway\User\Views\UserView;
+use App\Presentation\User\UserView;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use App\UserContext\Domain\Events\UserSignedUpDomainEvent_v1;
 use PHPUnit\Framework\TestCase;

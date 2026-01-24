@@ -2,7 +2,7 @@ imports:
     - { resource: '../src/BudgetEnvelopeContext/Config/services.yaml' }
     - { resource: '../src/BudgetPlanContext/Config/services.yaml' }
     - { resource: '../src/UserContext/Config/services.yaml' }
-    - { resource: '../src/Gateway/Config/services.yaml' }
+    - { resource: '../src/Presentation/Config/services.yaml' }
     - { resource: '../src/SharedContext/Config/services.yaml' }
     - { resource: '../src/Libraries/FluxCapacitor/Config/services.yaml' }
 

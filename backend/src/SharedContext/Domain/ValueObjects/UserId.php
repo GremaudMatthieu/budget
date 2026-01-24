@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\SharedContext\Domain\ValueObjects;
 
-use App\SharedContext\Domain\Ports\Inbound\AggregateIdInterface;
+use App\SharedContext\Domain\Ports\Inbound\AggregateId;
 use Assert\Assert;
 
-final readonly class UserId implements AggregateIdInterface
+final readonly class UserId implements AggregateId
 {
     private function __construct(protected string $uuid)
     {

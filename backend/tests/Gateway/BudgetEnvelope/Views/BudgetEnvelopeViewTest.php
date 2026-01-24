@@ -6,7 +6,7 @@ namespace App\Tests\Gateway\BudgetEnvelope\Views;
 
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeAddedDomainEvent_v1;
 use App\BudgetEnvelopeContext\Domain\Events\BudgetEnvelopeCreditedDomainEvent_v1;
-use App\Gateway\BudgetEnvelope\Views\BudgetEnvelopeView;
+use App\Presentation\BudgetEnvelope\Views\BudgetEnvelopeView;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use PHPUnit\Framework\TestCase;
 

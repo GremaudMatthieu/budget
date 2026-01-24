@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Libraries\FluxCapacitor\ProjectionManager\Console;
 
-use App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManagerInterface;
+use App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class ProjectionResetCommand extends Command
 {
     public function __construct(
-        private readonly ProjectionManagerInterface $projectionManager,
+        private readonly ProjectionManager $projectionManager,
     ) {
         parent::__construct();
     }

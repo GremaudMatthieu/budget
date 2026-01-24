@@ -9,6 +9,6 @@ services:
       - '../Domain/Events/'
       - '../Config/'
 
-  App\UserContext\Application\Handlers\CommandHandlers\:
-    resource: '../Application/Handlers/CommandHandlers/'
+  App\UserContext\Application\Commands\:
+    resource: '../Application/Commands/'
     tags: ['messenger.message_handler']

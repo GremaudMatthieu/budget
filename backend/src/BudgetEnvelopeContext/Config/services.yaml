@@ -9,10 +9,6 @@ services:
       - '../Domain/Events/'
       - '../Config/'
 
-  App\BudgetEnvelopeContext\Application\Handlers\CommandHandlers\:
-    resource: '../Application/Handlers/CommandHandlers/'
+  App\BudgetEnvelopeContext\Application\Commands\:
+    resource: '../Application/Commands/'
     tags: ['messenger.message_handler']
-
-  App\BudgetEnvelopeContext\Application\Handlers\QueryHandlers\:
-    resource: '../Application/Handlers/QueryHandlers/'
-    tags: [ 'messenger.message_handler' ]

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Gateway\User\Projections;
 
-use App\Gateway\User\Projections\UserProjection;
-use App\Gateway\User\Views\UserView;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptorInterface;
-use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepositoryInterface;
+use App\Presentation\User\Projections\UserProjection;
+use App\Presentation\User\UserView;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\EventEncryptor;
+use App\Libraries\FluxCapacitor\Anonymizer\Ports\KeyManagementRepository;
 use App\SharedContext\Domain\Enums\ContextEnum;
 use App\UserContext\Domain\Events\UserDeletedDomainEvent_v1;
 use App\UserContext\Domain\Events\UserFirstnameChangedDomainEvent_v1;
@@ -16,28 +16,28 @@ use App\UserContext\Domain\Events\UserLastnameChangedDomainEvent_v1;
 use App\UserContext\Domain\Events\UserReplayedDomainEvent_v1;
 use App\UserContext\Domain\Events\UserRewoundDomainEvent_v1;
 use App\UserContext\Domain\Events\UserSignedUpDomainEvent_v1;
-use App\UserContext\Domain\Ports\Inbound\UserOAuthRepositoryInterface;
-use App\UserContext\Domain\Ports\Inbound\UserViewRepositoryInterface;
-use App\UserContext\Domain\Ports\Outbound\RefreshTokenManagerInterface;
+use App\UserContext\Domain\RefreshTokenManager;
+use App\UserContext\Domain\UserOAuthRepository;
+use App\UserContext\UserViewRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class UserProjectionTest extends TestCase
 {
-    private UserViewRepositoryInterface&MockObject $userViewRepository;
+    private UserViewRepository&MockObject $userViewRepository;
     private UserProjection $userProjection;
-    private KeyManagementRepositoryInterface&MockObject $keyManagementRepository;
-    private EventEncryptorInterface&MockObject $eventEncryptor;
-    private UserOAuthRepositoryInterface&MockObject $userOAuthRepository;
-    private RefreshTokenManagerInterface&MockObject $refreshTokenManager;
+    private KeyManagementRepository&MockObject $keyManagementRepository;
+    private EventEncryptor&MockObject $eventEncryptor;
+    private UserOAuthRepository&MockObject $userOAuthRepository;
+    private RefreshTokenManager&MockObject $refreshTokenManager;
 
     protected function setUp(): void
     {
-        $this->userViewRepository = $this->createMock(UserViewRepositoryInterface::class);
-        $this->keyManagementRepository = $this->createMock(KeyManagementRepositoryInterface::class);
-        $this->eventEncryptor = $this->createMock(EventEncryptorInterface::class);
-        $this->refreshTokenManager = $this->createMock(RefreshTokenManagerInterface::class);
-        $this->userOAuthRepository = $this->createMock(UserOAuthRepositoryInterface::class);
+        $this->userViewRepository = $this->createMock(UserViewRepository::class);
+        $this->keyManagementRepository = $this->createMock(KeyManagementRepository::class);
+        $this->eventEncryptor = $this->createMock(EventEncryptor::class);
+        $this->refreshTokenManager = $this->createMock(RefreshTokenManager::class);
+        $this->userOAuthRepository = $this->createMock(UserOAuthRepository::class);
         $this->userProjection = new UserProjection(
             $this->userViewRepository,
             $this->keyManagementRepository,

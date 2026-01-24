@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Libraries\FluxCapacitor\ProjectionManager\Services;
 
-use App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistryInterface;
-use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMapInterface;
+use App\Libraries\FluxCapacitor\ProjectionManager\Ports\ProjectionRegistry as ProjectionRegistryInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventClassMap;
 
 final readonly class ProjectionRegistry implements ProjectionRegistryInterface
 {
     public function __construct(
-        private EventClassMapInterface $eventClassMap,
+        private EventClassMap $eventClassMap,
     ) {
     }
 

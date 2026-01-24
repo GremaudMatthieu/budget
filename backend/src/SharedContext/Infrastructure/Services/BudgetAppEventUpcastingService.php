@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\SharedContext\Infrastructure\Services;
 
-use App\Libraries\FluxCapacitor\EventStore\Ports\EventUpcastingServiceInterface;
+use App\Libraries\FluxCapacitor\EventStore\Ports\EventUpcastingService;
 
-final class BudgetAppEventUpcastingService implements EventUpcastingServiceInterface
+final class BudgetAppEventUpcastingService implements EventUpcastingService
 {
     public function upcastEvent(array $eventData): array
     {
